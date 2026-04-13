@@ -14,6 +14,7 @@ import { NouveautesPage } from '@/pages/nouveautes/NouveautesPage'
 import { FondsPage } from '@/pages/fonds/FondsPage'
 import { FicheProduitPage } from '@/pages/catalogue/FicheProduitPage'
 import { CartPage } from '@/pages/cart/CartPage'
+import { FlashInfosPage } from '@/pages/flash-infos/FlashInfosPage'
 
 function Placeholder({ title }: { title: string }) {
   return (
@@ -56,7 +57,7 @@ export default function App() {
                     <Route path="/panier" element={<CartPage />} />
                     <Route path="/top-ventes" element={<Placeholder title="Top Ventes" />} />
                     <Route path="/selections" element={<Placeholder title="Sélections" />} />
-                    <Route path="/flash-infos" element={<Placeholder title="Flash Infos" />} />
+                    <Route path="/flash-infos" element={<FlashInfosPage />} />
                   </Route>
                 </Route>
               </Routes>
