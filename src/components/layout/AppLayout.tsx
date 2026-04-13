@@ -1,7 +1,9 @@
 import styled from 'styled-components'
+import { useNavigate } from 'react-router-dom'
 import { Header } from './Header'
 import { BottomNav } from './BottomNav'
 import { Sidebar } from './Sidebar'
+import { useCart } from '@/contexts/CartContext'
 
 const LayoutRoot = styled.div`
   min-height: 100vh;
@@ -24,10 +26,16 @@ interface AppLayoutProps {
 }
 
 export function AppLayout({ children }: AppLayoutProps) {
+  const { totalItems } = useCart()
+  const navigate = useNavigate()
+
   return (
     <LayoutRoot>
       <Sidebar />
-      <Header />
+      <Header
+        cartCount={totalItems}
+        onCartClick={() => navigate('/panier')}
+      />
       <Main>{children}</Main>
       <BottomNav />
     </LayoutRoot>

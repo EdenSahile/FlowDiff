@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom'
 import { ThemeProvider } from '@/providers/ThemeProvider'
 import { AuthProvider } from '@/contexts/AuthContext'
+import { CartProvider } from '@/contexts/CartContext'
+import { ToastProvider } from '@/components/ui/Toast'
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
 import { AppLayout } from '@/components/layout/AppLayout'
 import { LoginPage } from '@/pages/auth/LoginPage'
@@ -11,6 +13,7 @@ import { RecherchePage } from '@/pages/search/RecherchePage'
 import { NouveautesPage } from '@/pages/nouveautes/NouveautesPage'
 import { FondsPage } from '@/pages/fonds/FondsPage'
 import { FicheProduitPage } from '@/pages/catalogue/FicheProduitPage'
+import { CartPage } from '@/pages/cart/CartPage'
 
 function Placeholder({ title }: { title: string }) {
   return (
@@ -33,28 +36,33 @@ export default function App() {
   return (
     <ThemeProvider>
       <BrowserRouter>
-        <AuthProvider>
-          <Routes>
-            {/* Routes publiques */}
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <ToastProvider>
+          <CartProvider>
+            <AuthProvider>
+              <Routes>
+                {/* Routes publiques */}
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage />} />
+                <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
-            {/* Routes protégées */}
-            <Route element={<ProtectedRoute />}>
-              <Route element={<ProtectedLayout />}>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/recherche" element={<RecherchePage />} />
-                <Route path="/nouveautes" element={<NouveautesPage />} />
-                <Route path="/fonds" element={<FondsPage />} />
-                <Route path="/livre/:id" element={<FicheProduitPage />} />
-                <Route path="/top-ventes" element={<Placeholder title="Top Ventes" />} />
-                <Route path="/selections" element={<Placeholder title="Sélections" />} />
-                <Route path="/flash-infos" element={<Placeholder title="Flash Infos" />} />
-              </Route>
-            </Route>
-          </Routes>
-        </AuthProvider>
+                {/* Routes protégées */}
+                <Route element={<ProtectedRoute />}>
+                  <Route element={<ProtectedLayout />}>
+                    <Route path="/" element={<HomePage />} />
+                    <Route path="/recherche" element={<RecherchePage />} />
+                    <Route path="/nouveautes" element={<NouveautesPage />} />
+                    <Route path="/fonds" element={<FondsPage />} />
+                    <Route path="/livre/:id" element={<FicheProduitPage />} />
+                    <Route path="/panier" element={<CartPage />} />
+                    <Route path="/top-ventes" element={<Placeholder title="Top Ventes" />} />
+                    <Route path="/selections" element={<Placeholder title="Sélections" />} />
+                    <Route path="/flash-infos" element={<Placeholder title="Flash Infos" />} />
+                  </Route>
+                </Route>
+              </Routes>
+            </AuthProvider>
+          </CartProvider>
+          </ToastProvider>
       </BrowserRouter>
     </ThemeProvider>
   )

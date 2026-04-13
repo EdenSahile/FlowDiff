@@ -5,6 +5,7 @@ import { getBookById } from '@/data/mockBooks'
 import { BookCover } from '@/components/catalogue/BookCover'
 import { Button } from '@/components/ui/Button'
 import { TextBadge } from '@/components/ui/Badge'
+import { useCart } from '@/contexts/CartContext'
 
 const fadeIn = keyframes`
   from { opacity: 0; transform: translateY(10px); }
@@ -245,7 +246,9 @@ const NotFoundBox = styled.div`
 export function FicheProduitPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const { addToCart } = useCart()
   const [qty, setQty] = useState(1)
+  const [added, setAdded] = useState(false)
 
   const book = id ? getBookById(id) : undefined
 
@@ -262,6 +265,12 @@ export function FicheProduitPage() {
   }
 
   const isOrderable = book.type !== 'a-paraitre'
+
+  const handleAddToCart = () => {
+    addToCart(book, qty)
+    setAdded(true)
+    setTimeout(() => setAdded(false), 2000)
+  }
   const typeLabel = book.type === 'nouveaute' ? 'Nouveauté' : book.type === 'fonds' ? 'Fonds' : 'À paraître'
   const typeBadge = book.type === 'nouveaute' ? 'new' : 'top'
 
@@ -278,7 +287,7 @@ export function FicheProduitPage() {
           {/* ── Colonne gauche : couverture + actions secondaires ── */}
           <CoverCol>
             <BookCover
-              src={book.coverUrl}
+              isbn={book.isbn}
               alt={`Couverture de ${book.title}`}
               width={160}
               height={240}
@@ -369,9 +378,14 @@ export function FicheProduitPage() {
             size="lg"
             fullWidth
             disabled={!isOrderable}
+            onClick={handleAddToCart}
             aria-label="Ajouter au panier"
           >
-            {isOrderable ? `Ajouter ${qty > 1 ? `${qty} ex.` : ''} au panier — Phase 6` : 'Commande indisponible'}
+            {!isOrderable
+              ? 'Commande indisponible'
+              : added
+              ? '✓ Ajouté au panier !'
+              : `Ajouter ${qty > 1 ? `${qty} ex. ` : ''}au panier`}
           </Button>
         </CardFooter>
       </Card>
