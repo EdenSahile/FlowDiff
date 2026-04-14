@@ -110,7 +110,7 @@ export function ScannerModal({ onClose }: Props) {
   const navigate    = useNavigate()
   const videoRef    = useRef<HTMLVideoElement>(null)
   const streamRef   = useRef<MediaStream | null>(null)
-  const timerRef    = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const controlsRef = useRef<{ stop: () => void } | null>(null)
   const doneRef     = useRef(false)
 
   const [state,     setState]     = useState<ScannerState>('requesting')
@@ -123,7 +123,7 @@ export function ScannerModal({ onClose }: Props) {
   const handleDetected = (ean: string) => {
     if (doneRef.current) return
     doneRef.current = true
-    if (timerRef.current) clearTimeout(timerRef.current)
+    controlsRef.current?.stop()
     streamRef.current?.getTracks().forEach(t => t.stop())
     onClose()
     navigate(`/recherche?q=${encodeURIComponent(ean)}`)
@@ -134,7 +134,7 @@ export function ScannerModal({ onClose }: Props) {
     // Reset obligatoire : React 18 StrictMode fait mount → cleanup (doneRef=true) → remount.
     // Sans ce reset, le scan s'arrête immédiatement au remount.
     doneRef.current = false
-    timerRef.current = null
+    controlsRef.current = null
 
     const start = async () => {
       try {
@@ -164,9 +164,8 @@ export function ScannerModal({ onClose }: Props) {
         if (cancelled) return
 
         setState('scanning')
-        console.log('[Camera]', video.videoWidth, 'x', video.videoHeight)
 
-        /* 3 — Charger ZXing et configurer le reader */
+        /* 3 — Charger ZXing et démarrer le scan via l'API officielle */
         const { BrowserMultiFormatReader } = await import('@zxing/browser')
         const { DecodeHintType, BarcodeFormat } = await import('@zxing/library')
         if (cancelled) return
@@ -182,60 +181,19 @@ export function ScannerModal({ onClose }: Props) {
 
         const reader = new BrowserMultiFormatReader(hints)
 
-        /* 4 — Boucle de scan : full frame + crop centré (pour petits codes-barres) */
-        const fullCanvas = document.createElement('canvas')
-        const fullCtx = fullCanvas.getContext('2d', { willReadFrequently: true })!
-        const cropCanvas = document.createElement('canvas')
-        const cropCtx = cropCanvas.getContext('2d', { willReadFrequently: true })!
-        let frameCount = 0
-
-        const scanLoop = () => {
+        /* 4 — decodeFromStream : ZXing gère le timing vidéo en interne (plus fiable que canvas manuel) */
+        const controls = await reader.decodeFromStream(stream, video, (result, err) => {
           if (cancelled || doneRef.current) return
-
-          const vw = video.videoWidth
-          const vh = video.videoHeight
-          if (!vw || !vh) {
-            timerRef.current = setTimeout(scanLoop, 200)
-            return
-          }
-
-          fullCanvas.width = vw
-          fullCanvas.height = vh
-          fullCtx.drawImage(video, 0, 0)
-          frameCount++
-
-          // Passe 1 : image entière (détecte les grands codes-barres)
-          try {
-            const result = reader.decodeFromCanvas(fullCanvas)
-            if (frameCount <= 3) console.log(`[ZXing] #${frameCount} FULL HIT:`, result.getText())
+          if (result) {
+            console.log('[ZXing] HIT:', result.getText())
             handleDetected(result.getText())
-            return
-          } catch { /* pas trouvé → on essaie le crop */ }
-
-          // Passe 2 : crop centré 50% × 40% (zoom sur petits codes-barres)
-          const cw = Math.floor(vw * 0.5)
-          const ch = Math.floor(vh * 0.4)
-          const cx = Math.floor((vw - cw) / 2)
-          const cy = Math.floor((vh - ch) / 2)
-          cropCanvas.width = cw
-          cropCanvas.height = ch
-          cropCtx.drawImage(fullCanvas, cx, cy, cw, ch, 0, 0, cw, ch)
-
-          try {
-            const result = reader.decodeFromCanvas(cropCanvas)
-            if (frameCount <= 3) console.log(`[ZXing] #${frameCount} CROP HIT:`, result.getText())
-            handleDetected(result.getText())
-            return
-          } catch { /* pas trouvé non plus */ }
-
-          if (frameCount <= 3 || frameCount % 100 === 0) {
-            console.log(`[ZXing] #${frameCount} not found`)
+          } else if (err && !/NotFoundException/i.test(err.name)) {
+            console.warn('[ZXing] err:', err.message)
           }
+        })
 
-          timerRef.current = setTimeout(scanLoop, 120)
-        }
-
-        scanLoop()
+        if (cancelled) { controls.stop(); return }
+        controlsRef.current = controls
         setScanning(true)
 
       } catch (err) {
@@ -257,7 +215,7 @@ export function ScannerModal({ onClose }: Props) {
     return () => {
       cancelled = true
       doneRef.current = true
-      if (timerRef.current) clearTimeout(timerRef.current)
+      controlsRef.current?.stop()
       streamRef.current?.getTracks().forEach(t => t.stop())
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
