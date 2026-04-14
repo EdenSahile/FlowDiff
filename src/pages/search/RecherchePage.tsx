@@ -13,12 +13,10 @@ interface BookInfo {
   coverUrl?: string
 }
 
-/* ── Google Books fetch avec cache ── */
+/* ── Fetch avec cache : Google Books → Open Library en fallback ── */
 const bookCache = new Map<string, BookInfo | null>()
 
-async function fetchBookByIsbn(isbn: string): Promise<BookInfo | null> {
-  if (bookCache.has(isbn)) return bookCache.get(isbn)!
-
+async function fetchFromGoogleBooks(isbn: string): Promise<BookInfo | null> {
   const res = await fetch(
     `https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}&maxResults=1`
   )
@@ -33,13 +31,40 @@ async function fetchBookByIsbn(isbn: string): Promise<BookInfo | null> {
     ? coverRaw.replace('http://', 'https://').replace('zoom=1', 'zoom=2')
     : undefined
 
-  const book: BookInfo = {
+  return {
     isbn,
     title: info.title ?? 'Titre inconnu',
     authors: info.authors ?? [],
     publisher: info.publisher,
     coverUrl,
   }
+}
+
+async function fetchFromOpenLibrary(isbn: string): Promise<BookInfo | null> {
+  const res = await fetch(
+    `https://openlibrary.org/api/books?bibkeys=ISBN:${isbn}&format=json&jscmd=data`
+  )
+  if (!res.ok) return null
+  const data = await res.json()
+  const entry = data[`ISBN:${isbn}`]
+  if (!entry) return null
+
+  const coverUrl: string | undefined = entry.cover?.large ?? entry.cover?.medium
+    ?? `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`
+
+  return {
+    isbn,
+    title: entry.title ?? 'Titre inconnu',
+    authors: (entry.authors ?? []).map((a: { name: string }) => a.name),
+    publisher: entry.publishers?.[0]?.name,
+    coverUrl,
+  }
+}
+
+async function fetchBookByIsbn(isbn: string): Promise<BookInfo | null> {
+  if (bookCache.has(isbn)) return bookCache.get(isbn)!
+
+  const book = await fetchFromGoogleBooks(isbn) ?? await fetchFromOpenLibrary(isbn)
   bookCache.set(isbn, book)
   return book
 }

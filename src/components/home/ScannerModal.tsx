@@ -189,7 +189,9 @@ export function ScannerModal({ onClose }: Props) {
           setScanning(true)
 
         } else {
-          /* ── Stratégie B : ZXing (Firefox, Safari) ── */
+          /* ── Stratégie B : ZXing RAF (Firefox, Safari, Chrome desktop) ── */
+          // decodeFromStream conflicte avec le video déjà joué sur certains navigateurs.
+          // On utilise une boucle requestAnimationFrame (60fps) + decodeFromCanvas directement.
           const { BrowserMultiFormatReader } = await import('@zxing/browser')
           const { DecodeHintType, BarcodeFormat } = await import('@zxing/library')
           if (cancelled) return
@@ -202,16 +204,27 @@ export function ScannerModal({ onClose }: Props) {
             ]],
             [DecodeHintType.TRY_HARDER, true],
           ])
-
           const reader = new BrowserMultiFormatReader(hints)
-          const controls = await reader.decodeFromStream(stream, video, (result, err) => {
-            if (cancelled || doneRef.current) return
-            if (result) handleDetected(result.getText())
-            else if (err && !/NotFoundException/i.test(err.name)) console.warn('[ZXing]', err.message)
-          })
+          const canvas = document.createElement('canvas')
+          const ctx = canvas.getContext('2d', { willReadFrequently: true })!
 
-          if (cancelled) { controls.stop(); return }
-          controlsRef.current = controls
+          const scan = () => {
+            if (cancelled || doneRef.current) return
+            const vw = video.videoWidth
+            const vh = video.videoHeight
+            if (vw > 0 && vh > 0) {
+              canvas.width = vw
+              canvas.height = vh
+              ctx.drawImage(video, 0, 0)
+              try {
+                const result = reader.decodeFromCanvas(canvas)
+                handleDetected(result.getText())
+                return
+              } catch { /* NotFoundException → frame suivante */ }
+            }
+            rafRef.current = requestAnimationFrame(scan)
+          }
+          rafRef.current = requestAnimationFrame(scan)
           setScanning(true)
         }
 
