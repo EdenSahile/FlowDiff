@@ -24,6 +24,7 @@ export interface AuthUser {
   adresseLivraison: string
   remise: number
   telephone: string
+  remisesParUnivers: Record<string, number>
 }
 
 interface AuthResult {
@@ -58,6 +59,7 @@ function toAuthUser(u: MockUser): AuthUser {
     adresseLivraison: u.adresseLivraison,
     remise: u.remise,
     telephone: u.telephone,
+    remisesParUnivers: u.remisesParUnivers ?? {},
   }
 }
 
@@ -75,6 +77,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Restaurer la session au montage
   useEffect(() => {
+    // DEV : auto-login avec LIB001 si ?dev-login dans l'URL
+    if (import.meta.env.DEV && window.location.search.includes('dev-login')) {
+      const devUser = findUser('LIB001')
+      if (devUser) {
+        const token = createMockToken(devUser.id, devUser.codeClient)
+        localStorage.setItem(TOKEN_KEY, token)
+        setUser(toAuthUser(devUser))
+        setIsLoading(false)
+        return
+      }
+    }
     const token = localStorage.getItem(TOKEN_KEY)
     if (token) {
       const payload = parseMockToken(token)

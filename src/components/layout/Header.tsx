@@ -45,10 +45,11 @@ const HeaderBar = styled.header`
 
   @media (min-width: ${({ theme }) => theme.breakpoints.mobile}) {
     left: ${({ theme }) => theme.layout.sidebarWidth};
+    justify-content: flex-end;
   }
 `
 
-const IconButton = styled.button`
+const IconButton = styled.button<{ $mobileOnly?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -68,6 +69,11 @@ const IconButton = styled.button`
     outline: 2px solid ${({ theme }) => theme.colors.primary};
     outline-offset: 2px;
   }
+
+  /* Masqué en desktop si mobile-only */
+  ${({ $mobileOnly, theme }) =>
+    $mobileOnly &&
+    `@media (min-width: ${theme.breakpoints.mobile}) { display: none; }`}
 `
 
 const Logo = styled.div`
@@ -75,6 +81,10 @@ const Logo = styled.div`
   align-items: center;
   gap: ${({ theme }) => theme.spacing.sm};
   user-select: none;
+
+  @media (min-width: ${({ theme }) => theme.breakpoints.mobile}) {
+    display: none;
+  }
 `
 
 const LogoCircle = styled.span`
@@ -123,7 +133,7 @@ interface HeaderProps {
 export function Header({ cartCount = 0, onBurgerClick, onCartClick }: HeaderProps) {
   return (
     <HeaderBar>
-      <IconButton onClick={onBurgerClick} aria-label="Ouvrir le menu">
+      <IconButton $mobileOnly onClick={onBurgerClick} aria-label="Ouvrir le menu">
         <BurgerIcon />
       </IconButton>
 

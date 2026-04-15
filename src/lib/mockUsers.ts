@@ -12,6 +12,7 @@ export interface MockUser {
   adresseLivraison: string
   remise: number // % de remise personnalisée
   telephone: string
+  remisesParUnivers: Record<string, number> // % de remise par thématique
 }
 
 function createMockUser(data: {
@@ -22,6 +23,7 @@ function createMockUser(data: {
   adresseLivraison: string
   remise: number
   telephone: string
+  remisesParUnivers: Record<string, number>
 }): MockUser {
   return {
     id: `mock-${data.codeClient.toLowerCase()}`,
@@ -32,6 +34,7 @@ function createMockUser(data: {
     adresseLivraison: data.adresseLivraison,
     remise: data.remise,
     telephone: data.telephone,
+    remisesParUnivers: data.remisesParUnivers,
   }
 }
 
@@ -44,6 +47,7 @@ export const MOCK_USERS: MockUser[] = [
     adresseLivraison: '12 rue du Parc, 75001 Paris',
     remise: 15,
     telephone: '01 23 45 67 89',
+    remisesParUnivers: { 'Littérature': 10, 'BD': 5, 'Manga': 8, 'Jeunesse': 12, 'Adulte-pratique': 7 },
   }),
   createMockUser({
     codeClient: 'LIB002',
@@ -53,6 +57,7 @@ export const MOCK_USERS: MockUser[] = [
     adresseLivraison: '8 place Bellecour, 69002 Lyon',
     remise: 20,
     telephone: '04 56 78 90 12',
+    remisesParUnivers: { 'Littérature': 15, 'BD': 10, 'Manga': 12, 'Jeunesse': 18, 'Adulte-pratique': 10 },
   }),
   createMockUser({
     codeClient: 'LIB003',
@@ -62,6 +67,7 @@ export const MOCK_USERS: MockUser[] = [
     adresseLivraison: '3 allée des Fleurs, 33000 Bordeaux',
     remise: 12,
     telephone: '05 56 12 34 56',
+    remisesParUnivers: { 'Littérature': 8, 'BD': 5, 'Manga': 6, 'Jeunesse': 10, 'Adulte-pratique': 5 },
   }),
 ]
 

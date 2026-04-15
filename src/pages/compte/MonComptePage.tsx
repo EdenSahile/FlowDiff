@@ -1,0 +1,211 @@
+import styled from 'styled-components'
+import { useAuthContext } from '@/contexts/AuthContext'
+
+/* ── Styled ── */
+const Page = styled.div`
+  padding: ${({ theme }) => theme.spacing.lg};
+  max-width: 600px;
+  margin: 0 auto;
+`
+
+const Title = styled.h1`
+  font-size: ${({ theme }) => theme.typography.sizes['2xl']};
+  font-weight: ${({ theme }) => theme.typography.weights.bold};
+  color: ${({ theme }) => theme.colors.navy};
+  margin-bottom: ${({ theme }) => theme.spacing.xl};
+`
+
+const Card = styled.div`
+  background-color: ${({ theme }) => theme.colors.white};
+  border-radius: ${({ theme }) => theme.radii.xl};
+  box-shadow: ${({ theme }) => theme.shadows.sm};
+  overflow: hidden;
+  margin-bottom: ${({ theme }) => theme.spacing.lg};
+`
+
+const CardHeader = styled.div`
+  background-color: ${({ theme }) => theme.colors.navy};
+  padding: ${({ theme }) => theme.spacing.lg};
+  display: flex;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.md};
+`
+
+const Avatar = styled.div`
+  width: 60px;
+  height: 60px;
+  border-radius: ${({ theme }) => theme.radii.full};
+  background-color: ${({ theme }) => theme.colors.primary};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: ${({ theme }) => theme.typography.sizes['2xl']};
+  font-weight: ${({ theme }) => theme.typography.weights.bold};
+  color: ${({ theme }) => theme.colors.navy};
+  flex-shrink: 0;
+`
+
+const HeaderInfo = styled.div``
+
+const HeaderName = styled.div`
+  font-size: ${({ theme }) => theme.typography.sizes.lg};
+  font-weight: ${({ theme }) => theme.typography.weights.bold};
+  color: ${({ theme }) => theme.colors.white};
+`
+
+const HeaderCode = styled.div`
+  font-size: ${({ theme }) => theme.typography.sizes.sm};
+  color: rgba(255, 255, 255, 0.65);
+  margin-top: 2px;
+`
+
+const CardBody = styled.div`
+  padding: ${({ theme }) => theme.spacing.lg};
+`
+
+const Field = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: ${({ theme }) => theme.spacing.md} 0;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.gray[100]};
+
+  &:last-child {
+    border-bottom: none;
+  }
+`
+
+const FieldLabel = styled.span`
+  font-size: ${({ theme }) => theme.typography.sizes.xs};
+  font-weight: ${({ theme }) => theme.typography.weights.semibold};
+  color: ${({ theme }) => theme.colors.gray[600]};
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+`
+
+const FieldValue = styled.span`
+  font-size: ${({ theme }) => theme.typography.sizes.md};
+  color: ${({ theme }) => theme.colors.navy};
+  font-weight: ${({ theme }) => theme.typography.weights.medium};
+`
+
+const RemiseBadge = styled.span`
+  display: inline-block;
+  background-color: ${({ theme }) => theme.colors.primaryLight};
+  color: ${({ theme }) => theme.colors.navy};
+  font-weight: ${({ theme }) => theme.typography.weights.bold};
+  font-size: ${({ theme }) => theme.typography.sizes.sm};
+  padding: 2px 10px;
+  border-radius: ${({ theme }) => theme.radii.full};
+  border: 1px solid ${({ theme }) => theme.colors.primary};
+`
+
+const RemisesGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: ${({ theme }) => theme.spacing.sm};
+  margin-top: 6px;
+`
+
+const RemiseTile = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 8px;
+  background-color: ${({ theme }) => theme.colors.gray[50]};
+  border: 1px solid ${({ theme }) => theme.colors.gray[200]};
+  border-radius: ${({ theme }) => theme.radii.lg};
+  text-align: center;
+`
+
+const RemiseTileLabel = styled.span`
+  font-size: ${({ theme }) => theme.typography.sizes.xs};
+  color: ${({ theme }) => theme.colors.gray[600]};
+  font-weight: ${({ theme }) => theme.typography.weights.medium};
+`
+
+const RemiseTileValue = styled.span`
+  font-size: ${({ theme }) => theme.typography.sizes.lg};
+  font-weight: ${({ theme }) => theme.typography.weights.bold};
+  color: ${({ theme }) => theme.colors.navy};
+`
+
+const RemiseTileSub = styled.span`
+  font-size: 10px;
+  color: ${({ theme }) => theme.colors.gray[400]};
+`
+
+const InfoNote = styled.p`
+  font-size: ${({ theme }) => theme.typography.sizes.sm};
+  color: ${({ theme }) => theme.colors.gray[600]};
+  background-color: ${({ theme }) => theme.colors.gray[50]};
+  border-radius: ${({ theme }) => theme.radii.md};
+  padding: ${({ theme }) => theme.spacing.md};
+  margin: 0;
+  line-height: ${({ theme }) => theme.typography.lineHeights.relaxed};
+`
+
+/* ── Component ── */
+export function MonComptePage() {
+  const { user } = useAuthContext()
+
+  if (!user) return null
+
+  const initiale = user.nomLibrairie[0]?.toUpperCase() ?? 'L'
+
+  return (
+    <Page>
+      <Title>Mon compte</Title>
+
+      <Card>
+        <CardHeader>
+          <Avatar>{initiale}</Avatar>
+          <HeaderInfo>
+            <HeaderName>{user.nomLibrairie}</HeaderName>
+            <HeaderCode>Code client : {user.codeClient}</HeaderCode>
+          </HeaderInfo>
+        </CardHeader>
+
+        <CardBody>
+          <Field>
+            <FieldLabel>Email</FieldLabel>
+            <FieldValue>{user.email}</FieldValue>
+          </Field>
+          <Field>
+            <FieldLabel>Téléphone</FieldLabel>
+            <FieldValue>{user.telephone}</FieldValue>
+          </Field>
+          <Field>
+            <FieldLabel>Adresse de livraison</FieldLabel>
+            <FieldValue>{user.adresseLivraison}</FieldValue>
+          </Field>
+          <Field>
+            <FieldLabel>Remises par thématique</FieldLabel>
+            {Object.keys(user.remisesParUnivers).length > 0 ? (
+              <RemisesGrid>
+                {Object.entries(user.remisesParUnivers).map(([univers, taux]) => (
+                  <RemiseTile key={univers}>
+                    <RemiseTileLabel>{univers}</RemiseTileLabel>
+                    <RemiseTileValue>{taux} %</RemiseTileValue>
+                    <RemiseTileSub>de remise</RemiseTileSub>
+                  </RemiseTile>
+                ))}
+              </RemisesGrid>
+            ) : (
+              <FieldValue>
+                <RemiseBadge>{user.remise} % sur tous les titres</RemiseBadge>
+              </FieldValue>
+            )}
+          </Field>
+        </CardBody>
+      </Card>
+
+      <InfoNote>
+        Pour modifier vos informations (adresse, email, téléphone), veuillez contacter votre
+        représentant commercial ou le service clients. Les modifications seront effectuées
+        directement dans notre système CRM.
+      </InfoNote>
+    </Page>
+  )
+}

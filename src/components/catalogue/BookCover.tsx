@@ -34,9 +34,51 @@ const Img = styled.img<{ $visible: boolean }>`
   display: ${({ $visible }) => ($visible ? 'block' : 'none')};
 `
 
-const Placeholder = styled.div`
-  font-size: 1.5rem;
-  opacity: 0.35;
+/* Couverture fictive */
+const FictiveCover = styled.div`
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(160deg, #1C3252 0%, #263F69 50%, #162840 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 6px 4px;
+  gap: 4px;
+`
+
+const FictiveSpine = styled.div`
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: rgba(232, 150, 12, 0.7);
+`
+
+const FictiveTitle = styled.div`
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.85);
+  text-align: center;
+  line-height: 1.25;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
+  flex: 1;
+  display: flex;
+  align-items: center;
+`
+
+const FictiveLabel = styled.div`
+  font-size: 8px;
+  color: rgba(255, 255, 255, 0.35);
+  text-align: center;
+  font-style: italic;
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
 `
 
 type State = 'loading' | 'ok' | 'error'
@@ -51,8 +93,6 @@ interface Props {
 export function BookCover({ isbn, alt, width = 80, height = 120 }: Props) {
   const [state, setState] = useState<State>('loading')
 
-  /* Google Books renvoie une image 1×1 quand la couverture est absente (pas de 404).
-     On détecte ce cas en vérifiant naturalWidth après le chargement. */
   const handleLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
     setState(e.currentTarget.naturalWidth > 10 ? 'ok' : 'error')
   }
@@ -62,7 +102,13 @@ export function BookCover({ isbn, alt, width = 80, height = 120 }: Props) {
   return (
     <Wrapper $width={width} $height={height}>
       {state === 'loading' && <Skeleton />}
-      {state === 'error'   && <Placeholder>📖</Placeholder>}
+      {state === 'error' && (
+        <FictiveCover>
+          <FictiveSpine />
+          <FictiveTitle>{alt}</FictiveTitle>
+          <FictiveLabel>couv. fictive</FictiveLabel>
+        </FictiveCover>
+      )}
       <Img
         src={src}
         alt={alt}

@@ -11,7 +11,7 @@ const ScannerModal = lazy(() =>
 
 const Page = styled.div`
   min-height: calc(100vh - ${({ theme }) => theme.layout.headerHeight});
-  background-color: ${({ theme }) => theme.colors.primary};
+  background-color: ${({ theme }) => theme.colors.gray[50]};
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -45,7 +45,7 @@ const GreetingTitle = styled.h1`
 const GreetingSubtitle = styled.p`
   font-family: ${({ theme }) => theme.typography.fontFamily};
   font-size: ${({ theme }) => theme.typography.sizes.sm};
-  color: rgba(30, 58, 95, 0.7);
+  color: ${({ theme }) => theme.colors.gray[600]};
 `
 
 const SearchSection = styled.section`
@@ -63,7 +63,7 @@ const ScannerSection = styled.section`
 const ScannerHint = styled.p`
   font-family: ${({ theme }) => theme.typography.fontFamily};
   font-size: ${({ theme }) => theme.typography.sizes.xs};
-  color: rgba(30, 58, 95, 0.6);
+  color: ${({ theme }) => theme.colors.gray[400]};
   text-align: center;
 `
 

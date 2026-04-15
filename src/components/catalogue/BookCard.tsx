@@ -71,13 +71,6 @@ const Title = styled.h3`
   overflow: hidden;
 `
 
-const Isbn = styled.p`
-  font-family: monospace;
-  font-size: ${({ theme }) => theme.typography.sizes.sm};
-  color: ${({ theme }) => theme.colors.navy};
-  letter-spacing: 0.02em;
-`
-
 const Authors = styled.p`
   font-family: ${({ theme }) => theme.typography.fontFamily};
   font-size: ${({ theme }) => theme.typography.sizes.xs};
@@ -90,7 +83,8 @@ const Authors = styled.p`
 const Publisher = styled.p`
   font-family: ${({ theme }) => theme.typography.fontFamily};
   font-size: ${({ theme }) => theme.typography.sizes.xs};
-  color: ${({ theme }) => theme.colors.gray[400]};
+  color: ${({ theme }) => theme.colors.gray[600]};
+  font-style: italic;
 `
 
 /* ── Zone prix + quantité + bouton ── */
@@ -157,27 +151,27 @@ const QtyValue = styled.span`
 
 const AjouterBtn = styled.button`
   flex: 1;
-  padding: 6px 8px;
+  padding: 5px 10px;
   border: none;
   border-radius: ${({ theme }) => theme.radii.md};
-  background: ${({ theme }) => theme.colors.primary};
-  color: ${({ theme }) => theme.colors.navy};
+  background: ${({ theme }) => theme.colors.navy};
+  color: ${({ theme }) => theme.colors.white};
   font-family: ${({ theme }) => theme.typography.fontFamily};
-  font-size: ${({ theme }) => theme.typography.sizes.sm};
-  font-weight: ${({ theme }) => theme.typography.weights.bold};
+  font-size: ${({ theme }) => theme.typography.sizes.xs};
+  font-weight: ${({ theme }) => theme.typography.weights.semibold};
   cursor: pointer;
   transition: background .15s;
   white-space: nowrap;
 
-  &:hover { background: ${({ theme }) => theme.colors.primaryHover}; }
+  &:hover { background: ${({ theme }) => theme.colors.navyHover}; }
 `
 
 /* ── Couleurs univers ── */
 const universeBadgeColor: Record<string, string> = {
-  'Littérature':     '#1E3A5F',
-  'BD/Mangas':       '#E65100',
+  'Littérature':     '#1C3252',
+  'BD/Mangas':       '#C04A00',
   'Jeunesse':        '#1565C0',
-  'Adulte-pratique': '#2E7D32',
+  'Adulte-pratique': '#1E7045',
 }
 
 interface Props {
@@ -226,7 +220,6 @@ export function BookCard({ book, showType = false }: Props) {
         </TopRow>
 
         <Title>{book.title}</Title>
-        <Isbn>{book.isbn}</Isbn>
         <Authors>{book.authors.join(', ')}</Authors>
         <Publisher>{book.publisher}{book.collection ? ` — ${book.collection}` : ''}</Publisher>
 

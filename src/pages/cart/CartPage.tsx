@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import styled, { keyframes } from 'styled-components'
 import { useCart, REMISE_RATES } from '@/contexts/CartContext'
+import { useOrders } from '@/contexts/OrdersContext'
 import { useAuth } from '@/hooks/useAuth'
 import { BookCover } from '@/components/catalogue/BookCover'
 import { Button } from '@/components/ui/Button'
@@ -290,6 +291,7 @@ const today = new Date().toISOString().split('T')[0]
 export function CartPage() {
   const { items, totalItems, subtotalHT, remiseAmount, netHT, tva, totalTTC,
           updateQty, removeFromCart, clearCart } = useCart()
+  const { addOrder } = useOrders()
   const { user } = useAuth()
   const navigate = useNavigate()
 
@@ -387,6 +389,18 @@ export function CartPage() {
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           <Button variant="primary" size="lg" fullWidth onClick={() => {
+            addOrder({
+              codeClient: user?.codeClient ?? '',
+              adresseLivraison: user?.adresseLivraison ?? '',
+              items,
+              subtotalHT,
+              remiseAmount,
+              netHT,
+              tva,
+              totalTTC,
+              deliveryMode: delivery,
+              deliveryDate: delivery === 'specific' ? specificDate : undefined,
+            })
             clearCart()
             setStep('success')
           }}>
