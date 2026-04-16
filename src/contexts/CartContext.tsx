@@ -10,9 +10,17 @@ export const REMISE_RATES: Record<Universe, number> = {
 }
 
 /* ── Types ── */
+export interface EbookCartOption {
+  hebergeur: string
+  format: string
+  price: number
+  isbnEbook: string
+}
+
 export interface CartItem {
   book: Book
   quantity: number
+  ebookOption?: EbookCartOption
 }
 
 export interface OPCartGroup {
@@ -37,13 +45,17 @@ export interface OPCartGroup {
   }
 }
 
+export function getItemKey(item: CartItem): string {
+  return item.ebookOption ? `${item.book.id}::${item.ebookOption.isbnEbook}` : item.book.id
+}
+
 interface CartContextValue {
   items: CartItem[]
   opGroups: OPCartGroup[]
   totalItems: number
-  addToCart: (book: Book, qty?: number) => void
-  updateQty: (bookId: string, qty: number) => void
-  removeFromCart: (bookId: string) => void
+  addToCart: (book: Book, qty?: number, ebookOption?: EbookCartOption) => void
+  updateQty: (itemKey: string, qty: number) => void
+  removeFromCart: (itemKey: string) => void
   addOPToCart: (group: Omit<OPCartGroup, 'id'>) => void
   removeOP: (opId: string) => void
   clearCart: () => void
@@ -114,22 +126,30 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, [items, opGroups])
 
   /* ── Titres individuels ── */
-  const addToCart = (book: Book, qty = 1) => {
+  const addToCart = (book: Book, qty = 1, ebookOption?: EbookCartOption) => {
     setItems(prev => {
-      const existing = prev.find(i => i.book.id === book.id)
+      const key = ebookOption ? `${book.id}::${ebookOption.isbnEbook}` : book.id
+      const existing = prev.find(i =>
+        ebookOption
+          ? i.book.id === book.id && i.ebookOption?.isbnEbook === ebookOption.isbnEbook
+          : i.book.id === book.id && !i.ebookOption
+      )
       if (existing)
-        return prev.map(i => i.book.id === book.id ? { ...i, quantity: i.quantity + qty } : i)
-      return [...prev, { book, quantity: qty }]
+        return prev.map(i => {
+          const iKey = i.ebookOption ? `${i.book.id}::${i.ebookOption.isbnEbook}` : i.book.id
+          return iKey === key ? { ...i, quantity: i.quantity + qty } : i
+        })
+      return [...prev, { book, quantity: qty, ebookOption }]
     })
   }
 
-  const updateQty = (bookId: string, qty: number) => {
-    if (qty < 1) { removeFromCart(bookId); return }
-    setItems(prev => prev.map(i => i.book.id === bookId ? { ...i, quantity: qty } : i))
+  const updateQty = (itemKey: string, qty: number) => {
+    if (qty < 1) { removeFromCart(itemKey); return }
+    setItems(prev => prev.map(i => getItemKey(i) === itemKey ? { ...i, quantity: qty } : i))
   }
 
-  const removeFromCart = (bookId: string) =>
-    setItems(prev => prev.filter(i => i.book.id !== bookId))
+  const removeFromCart = (itemKey: string) =>
+    setItems(prev => prev.filter(i => getItemKey(i) !== itemKey))
 
   /* ── OPs ── */
   const addOPToCart = (group: Omit<OPCartGroup, 'id'>) => {

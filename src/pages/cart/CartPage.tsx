@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import styled, { keyframes } from 'styled-components'
-import { useCart, REMISE_RATES } from '@/contexts/CartContext'
+import { useCart, REMISE_RATES, getItemKey } from '@/contexts/CartContext'
 import { useOrders } from '@/contexts/OrdersContext'
 import { useAuth } from '@/hooks/useAuth'
 import { BookCover } from '@/components/catalogue/BookCover'
@@ -100,8 +100,9 @@ const SectionTitle = styled.h2`
   margin-bottom: ${({ theme }) => theme.spacing.md};
 `
 
-const ItemCard = styled.div`
-  background: ${({ theme }) => theme.colors.white};
+const ItemCard = styled.div<{ $ebook?: boolean }>`
+  background: ${({ $ebook }) => $ebook ? '#EDF4FF' : '#fff'};
+  border: 1px solid ${({ $ebook }) => $ebook ? '#BEDAFF' : '#E6E1DA'};
   border-radius: ${({ theme }) => theme.radii.lg};
   box-shadow: ${({ theme }) => theme.shadows.sm};
   padding: ${({ theme }) => theme.spacing.md};
@@ -109,6 +110,34 @@ const ItemCard = styled.div`
   gap: ${({ theme }) => theme.spacing.md};
   align-items: flex-start;
   margin-bottom: ${({ theme }) => theme.spacing.sm};
+`
+
+const EbookFormatBadge = styled.span`
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #1E3A5F;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  border-radius: 4px;
+  padding: 2px 8px;
+  margin-bottom: 3px;
+`
+
+const EbookPlatformTag = styled.span<{ $color: string }>`
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 10px;
+  font-weight: 600;
+  color: ${({ $color }) => $color};
+  background: ${({ $color }) => $color}18;
+  border: 1px solid ${({ $color }) => $color}35;
+  border-radius: 20px;
+  padding: 2px 8px;
+  margin-left: 6px;
 `
 
 const ItemInfo = styled.div`flex: 1; min-width: 0;`
@@ -646,16 +675,41 @@ export function CartPage() {
             {items.length} titre{items.length > 1 ? 's' : ''} à l'unité
           </SectionTitle>
 
-          {items.map(({ book, quantity }) => {
-            const remise  = REMISE_RATES[book.universe]
-            const ligneHT = book.price * quantity
+          {items.map((item) => {
+            const { book, quantity, ebookOption } = item
+            const key     = getItemKey(item)
+            const isEbook = !!ebookOption
+            const unitPrice = isEbook ? ebookOption!.price : book.price
+            const remise    = REMISE_RATES[book.universe]
+            const ligneHT   = unitPrice * quantity
+
+            const platformColor =
+              ebookOption?.hebergeur === 'OpenEdition' ? '#D4500A' :
+              ebookOption?.hebergeur === 'Cairn'       ? '#1A5E8A' :
+              ebookOption?.hebergeur === 'Izneo'       ? '#6B3FA0' :
+              ebookOption?.hebergeur === 'Numilog'     ? '#2D7A3A' : '#555'
+
+            const showPlatformTag = isEbook && ebookOption!.hebergeur !== 'Amalivre'
+
             return (
-              <ItemCard key={book.id}>
+              <ItemCard key={key} $ebook={isEbook}>
                 <BookCover isbn={book.isbn} alt={book.title} width={56} height={80} />
                 <ItemInfo>
+                  {isEbook && (
+                    <div style={{ marginBottom: 4 }}>
+                      <EbookFormatBadge>
+                        💻 EBOOK · {ebookOption!.format}
+                      </EbookFormatBadge>
+                      {showPlatformTag && (
+                        <EbookPlatformTag $color={platformColor}>
+                          {ebookOption!.hebergeur}
+                        </EbookPlatformTag>
+                      )}
+                    </div>
+                  )}
                   <ItemTitle>{book.title}</ItemTitle>
                   <ItemAuthor>{book.authors.join(', ')} — {book.publisher}</ItemAuthor>
-                  <ItemIsbn>ISBN {book.isbn}</ItemIsbn>
+                  <ItemIsbn>ISBN {isEbook ? ebookOption!.isbnEbook : book.isbn}</ItemIsbn>
                   <ItemFooter>
                     <div>
                       <ItemPrice>{fmt(ligneHT)}</ItemPrice>
@@ -663,11 +717,11 @@ export function CartPage() {
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <QtyControl>
-                        <QtyBtn onClick={() => updateQty(book.id, quantity - 1)} disabled={quantity <= 1} aria-label="Diminuer">−</QtyBtn>
+                        <QtyBtn onClick={() => updateQty(key, quantity - 1)} disabled={quantity <= 1} aria-label="Diminuer">−</QtyBtn>
                         <QtyValue>{quantity}</QtyValue>
-                        <QtyBtn onClick={() => updateQty(book.id, quantity + 1)} aria-label="Augmenter">+</QtyBtn>
+                        <QtyBtn onClick={() => updateQty(key, quantity + 1)} aria-label="Augmenter">+</QtyBtn>
                       </QtyControl>
-                      <DeleteBtn onClick={() => removeFromCart(book.id)} aria-label="Supprimer">🗑</DeleteBtn>
+                      <DeleteBtn onClick={() => removeFromCart(key)} aria-label="Supprimer">🗑</DeleteBtn>
                     </div>
                   </ItemFooter>
                 </ItemInfo>
