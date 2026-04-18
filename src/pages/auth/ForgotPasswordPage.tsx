@@ -4,12 +4,11 @@ import { forgotPasswordSchema, getZodErrors, type ForgotPasswordInput } from '@/
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import styled from 'styled-components'
+import { Wordmark } from '@/components/brand/Wordmark'
 import {
   AuthPage,
   AuthCard,
   AuthLogo,
-  AuthLogoCircle,
-  AuthLogoText,
   AuthTitle,
   AuthSubtitle,
   AuthForm,
@@ -55,8 +54,7 @@ export function ForgotPasswordPage() {
     <AuthPage>
       <AuthCard>
         <AuthLogo>
-          <AuthLogoCircle>B</AuthLogoCircle>
-          <AuthLogoText>BookFlow</AuthLogoText>
+          <Wordmark size="lg" showBaseline />
         </AuthLogo>
 
         <AuthTitle>Mot de passe oublié</AuthTitle>

@@ -41,7 +41,7 @@ export const AuthLogoCircle = styled.span`
   border-radius: ${({ theme }) => theme.radii.full};
   font-weight: ${({ theme }) => theme.typography.weights.bold};
   font-size: ${({ theme }) => theme.typography.sizes.lg};
-  color: ${({ theme }) => theme.colors.navy};
+  color: ${({ theme }) => theme.colors.white};
 `
 
 export const AuthLogoText = styled.span`

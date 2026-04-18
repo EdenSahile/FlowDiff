@@ -238,7 +238,7 @@ const AddBtn = styled.button`
   border: none;
   border-radius: ${({ theme }) => theme.radii.md};
   background: ${({ theme }) => theme.colors.primary};
-  color: ${({ theme }) => theme.colors.navy};
+  color: #fff;
   font-family: ${({ theme }) => theme.typography.fontFamily};
   font-size: ${({ theme }) => theme.typography.sizes.sm};
   font-weight: ${({ theme }) => theme.typography.weights.bold};
@@ -246,7 +246,7 @@ const AddBtn = styled.button`
   transition: background 0.15s;
   white-space: nowrap;
 
-  &:hover { background: #e6ac00; }
+  &:hover { background: ${({ theme }) => theme.colors.primaryHover}; }
 `
 
 function IconCartFI() {

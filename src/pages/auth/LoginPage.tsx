@@ -6,12 +6,11 @@ import { useAuth } from '@/hooks/useAuth'
 import { loginSchema, getZodErrors, type LoginInput } from '@/lib/authUtils'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
+import { Wordmark } from '@/components/brand/Wordmark'
 import {
   AuthPage,
   AuthCard,
   AuthLogo,
-  AuthLogoCircle,
-  AuthLogoText,
   AuthTitle,
   AuthSubtitle,
   AuthForm,
@@ -143,8 +142,7 @@ export function LoginPage() {
     <AuthPage>
       <AuthCard>
         <AuthLogo>
-          <AuthLogoCircle>B</AuthLogoCircle>
-          <AuthLogoText>BookFlow</AuthLogoText>
+          <Wordmark size="lg" showBaseline />
         </AuthLogo>
 
         <AuthTitle>Connexion</AuthTitle>
@@ -211,12 +209,12 @@ export function LoginPage() {
         </AuthForm>
 
         <AuthLink>
-          Pas encore de compte ?{' '}
+         
           <a
             href="#"
             onClick={e => { e.preventDefault(); setBlockedMsg('La création de compte a été bloquée.') }}
           >
-            Créer un accès
+            Demander un accès
           </a>
         </AuthLink>
       </AuthCard>

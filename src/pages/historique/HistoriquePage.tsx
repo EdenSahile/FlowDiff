@@ -315,7 +315,7 @@ const DupliquerButton = styled.button<{ $done?: boolean }>`
   gap: 6px;
   padding: 8px 16px;
   background-color: ${({ $done, theme }) => $done ? '#2E7D32' : theme.colors.primary};
-  color: ${({ $done, theme }) => $done ? theme.colors.white : theme.colors.navy};
+  color: ${({ theme }) => theme.colors.white};
   border: none;
   border-radius: ${({ theme }) => theme.radii.md};
   font-size: ${({ theme }) => theme.typography.sizes.sm};

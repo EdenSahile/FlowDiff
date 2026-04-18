@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { useParams, useNavigate } from 'react-router-dom'
 import styled, { keyframes } from 'styled-components'
 import { getBookById } from '@/data/mockBooks'
+import { slugifyAuthor } from '@/pages/auteur/AuteurPage'
 import { BookCover } from '@/components/catalogue/BookCover'
 import { useCart } from '@/contexts/CartContext'
 import { useToast } from '@/components/ui/Toast'
@@ -456,8 +457,8 @@ const AddBtn = styled.button<{ $added: boolean }>`
   height: 48px;
   border: none;
   border-radius: 12px;
-  background: ${({ $added }) => $added ? '#1E7045' : '#FFC000'};
-  color: ${({ $added }) => $added ? '#fff' : '#1E3A5F'};
+  background: ${({ $added }) => $added ? '#162D20' : '#0E2117'};
+  color: #fff;
   font-family: ${({ theme }) => theme.typography.fontFamily};
   font-size: 15px;
   font-weight: 800;
@@ -468,11 +469,8 @@ const AddBtn = styled.button<{ $added: boolean }>`
   justify-content: center;
   gap: 8px;
   letter-spacing: 0.01em;
-  box-shadow: ${({ $added }) => $added
-    ? '0 4px 16px rgba(30,112,69,0.3)'
-    : '0 4px 16px rgba(255,192,0,0.4)'};
   &:hover:not(:disabled) {
-    background: ${({ $added }) => $added ? '#16603A' : '#e6ac00'};
+    background: ${({ $added }) => $added ? '#0a1a11' : '#162D20'};
     transform: translateY(-1px);
   }
   &:disabled { opacity: .5; cursor: not-allowed; box-shadow: none; }
@@ -1112,7 +1110,7 @@ export function FicheProduitPage() {
           {/* ── Couverture ── */}
           <CoverCol>
             <CoverShadow>
-              <BookCover isbn={book.isbn} alt={`Couverture de ${book.title}`} width={168} height={242} />
+              <BookCover isbn={book.isbn} alt={book.title} width={168} height={242} universe={book.universe} authors={book.authors} publisher={book.publisher} />
             </CoverShadow>
 
             <SecondaryActions>
@@ -1127,6 +1125,9 @@ export function FicheProduitPage() {
                   </SecBtn>
                 </>
               )}
+              <SecBtn onClick={() => navigate(`/auteur/${slugifyAuthor(book.authors[0])}`)}>
+                📚 Parutions de l'auteur
+              </SecBtn>
               <SecBtn>🤍 Ma liste</SecBtn>
             </SecondaryActions>
           </CoverCol>

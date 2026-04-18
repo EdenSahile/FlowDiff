@@ -35,7 +35,7 @@ const textBadgeVariants = {
   `,
   new: css`
     background-color: ${({ theme }) => theme.colors.primary};
-    color: ${({ theme }) => theme.colors.navy};
+    color: ${({ theme }) => theme.colors.white};
   `,
 }
 

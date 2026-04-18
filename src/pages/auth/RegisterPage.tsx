@@ -4,12 +4,11 @@ import { useAuth } from '@/hooks/useAuth'
 import { registerSchema, getZodErrors, type RegisterInput } from '@/lib/authUtils'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
+import { Wordmark } from '@/components/brand/Wordmark'
 import {
   AuthPage,
   AuthCard,
   AuthLogo,
-  AuthLogoCircle,
-  AuthLogoText,
   AuthTitle,
   AuthSubtitle,
   AuthForm,
@@ -86,8 +85,7 @@ export function RegisterPage() {
     <AuthPage>
       <AuthCard>
         <AuthLogo>
-          <AuthLogoCircle>B</AuthLogoCircle>
-          <AuthLogoText>BookFlow</AuthLogoText>
+          <Wordmark size="lg" showBaseline />
         </AuthLogo>
 
         <AuthTitle>Créer votre accès</AuthTitle>

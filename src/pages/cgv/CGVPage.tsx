@@ -67,11 +67,11 @@ export function CGVPage() {
           <ArticleTitle>Article 1 — Objet</ArticleTitle>
           <ArticleText>
             Les présentes Conditions Générales de Vente (CGV) régissent les relations
-            commerciales entre BookFlow (ci-après "l'Éditeur") et les libraires
-            professionnels (ci-après "le Client") utilisant l'application BookFlow.
+            commerciales entre FlowDiff (ci-après "l'Éditeur") et les libraires
+            professionnels (ci-après "le Client") utilisant l'application FlowDiff.
           </ArticleText>
           <ArticleText>
-            L'application BookFlow est réservée exclusivement aux professionnels de la
+            L'application FlowDiff est réservée exclusivement aux professionnels de la
             librairie disposant d'un code client valide. Toute utilisation à des fins
             personnelles ou grand public est strictement interdite.
           </ArticleText>

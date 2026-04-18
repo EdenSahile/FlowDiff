@@ -41,7 +41,7 @@ const Avatar = styled.div`
   justify-content: center;
   font-size: ${({ theme }) => theme.typography.sizes['2xl']};
   font-weight: ${({ theme }) => theme.typography.weights.bold};
-  color: ${({ theme }) => theme.colors.navy};
+  color: #E0EDE7;
   flex-shrink: 0;
 `
 

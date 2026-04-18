@@ -79,7 +79,7 @@ const SummaryValue = styled.span``
 
 const RemiseBadge = styled.span`
   background: ${({ theme }) => theme.colors.primary};
-  color: ${({ theme }) => theme.colors.navy};
+  color: ${({ theme }) => theme.colors.white};
   font-size: ${({ theme }) => theme.typography.sizes.xs};
   font-weight: ${({ theme }) => theme.typography.weights.bold};
   border-radius: ${({ theme }) => theme.radii.sm};
@@ -254,7 +254,7 @@ const OPHeaderLeft = styled.div`
 const OPTag = styled.span`
   display: inline-block;
   background: ${({ theme }) => theme.colors.primary};
-  color: ${({ theme }) => theme.colors.navy};
+  color: ${({ theme }) => theme.colors.white};
   font-size: 9px;
   font-weight: 800;
   letter-spacing: 0.10em;
@@ -736,7 +736,7 @@ export function CartPage() {
 
             return (
               <ItemCard key={key} $ebook={isEbook}>
-                <BookCover isbn={book.isbn} alt={book.title} width={56} height={80} />
+                <BookCover isbn={book.isbn} alt={book.title} width={56} height={80} universe={book.universe} authors={book.authors} publisher={book.publisher} />
                 <ItemInfo>
                   {isEbook && (
                     <div style={{ marginBottom: 4 }}>
@@ -752,7 +752,7 @@ export function CartPage() {
                   )}
                   <ItemTitle>{book.title}</ItemTitle>
                   <ItemAuthor>{book.authors.join(', ')} — {book.publisher}</ItemAuthor>
-                  <ItemIsbn>ISBN {isEbook ? ebookOption!.isbnEbook : book.isbn}</ItemIsbn>
+                  <ItemIsbn>ISBN {isEbook ? ebookOption!.isbnEbook : book.isbn} · {isEbook ? ebookOption!.format : book.format}</ItemIsbn>
                   <ItemFooter>
                     <div>
                       <ItemPrice>{fmt(ligneHT)}</ItemPrice>
@@ -830,7 +830,7 @@ export function CartPage() {
                   {op.books.map(({ book, quantity }) => (
                     <OPRow key={book.id} $variant="book">
                       <OPCover>
-                        <BookCover isbn={book.isbn} alt={book.title} width={34} height={48} />
+                        <BookCover isbn={book.isbn} alt={book.title} width={34} height={48} universe={book.universe} authors={book.authors} publisher={book.publisher} />
                       </OPCover>
                       <OPText>
                         <OPRowTitle>{book.title}</OPRowTitle>

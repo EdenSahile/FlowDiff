@@ -1,25 +1,35 @@
 export const theme = {
   colors: {
-    primary:      '#E8960C',   // Ambre doré — chaud, lisible sur blanc
-    primaryHover: '#CB7D08',   // Ambre foncé hover
-    primaryLight: '#FEF5E0',   // Ambre très clair (fond de badge)
-    navy:         '#1C3252',   // Bleu marine classique — Fnac-like, pas oppressant
-    navyHover:    '#263F69',   // Légèrement plus clair
-    navyLight:    '#EBF2FC',   // Bleu pâle pour fonds légers
-    white:        '#FFFFFF',   // Blanc pur pour les cartes
+    /* ── Palette Forêt & Lin ── */
+    primary:      '#226241',   // Vert forêt — CTA, boutons, sidebar
+    primaryHover: '#2D5C44',   // Vert légèrement plus clair au hover
+    primaryLight: '#E6EFE9',   // Fond très clair (badges, highlights)
+    accent:       '#C9A84C',   // Or — signal nouveauté, badges, accents
+    accentLight:  '#F7F0DC',   // Fond or très clair
+
+    /* Sidebar / header dark */
+    navy:         '#226241',   // Vert forêt — fond sidebar/header
+    navyHover:    '#2D5C44',   // Légèrement plus clair
+    navyLight:    '#E6EFE9',   // Vert pâle pour surfaces alternées
+
+    /* Surfaces & texte */
+    white:        '#F4F4F0',   // Lin — fond de page
     error:        '#C0392B',
-    success:      '#1E7045',   // Vert forêt
+    success:      '#226241',
+
     gray: {
-      50:  '#FAFAF8',   // Blanc cassé très léger — fond de page aéré
-      100: '#F3F0EC',   // Séparateurs très discrets
-      200: '#E6E1DA',   // Séparateurs visibles
-      400: '#B5AFA7',   // Gris moyen
-      600: '#706A62',   // Texte secondaire
-      800: '#2C2820',   // Texte principal — excellente lisibilité
+      50:  '#F4F4F0',   // Fond page (lin neutre)
+      100: '#EAEAE6',   // Surface légèrement teintée
+      200: '#D8D8D4',   // Bordures, séparateurs
+      400: '#9A9A96',   // Texte tertiaire, placeholders
+      600: '#555550',   // Texte secondaire
+      800: '#111111',   // Texte principal
     },
   },
   typography: {
-    fontFamily: "'Roboto', Arial, sans-serif",
+    fontFamily:      "'Roboto', Arial, sans-serif",
+    fontFamilySerif: "'Playfair Display', Georgia, serif",
+    fontFamilyMono:  "'DM Mono', 'Courier New', monospace",
     sizes: {
       xs:   '0.75rem',
       sm:   '0.875rem',
@@ -36,7 +46,7 @@ export const theme = {
       bold:     700,
     },
     lineHeights: {
-      tight:   1.25,
+      tight:   1.2,
       normal:  1.5,
       relaxed: 1.75,
     },
@@ -51,25 +61,25 @@ export const theme = {
     '3xl':'64px',
   },
   radii: {
-    sm:   '4px',
-    md:   '8px',
-    lg:   '12px',
-    xl:   '16px',
+    sm:   '0px',
+    md:   '0px',
+    lg:   '0px',
+    xl:   '0px',
     full: '9999px',
   },
   shadows: {
-    sm:  '0 1px 3px rgba(28, 50, 82, 0.08)',
-    md:  '0 4px 14px rgba(28, 50, 82, 0.10)',
-    lg:  '0 10px 28px rgba(28, 50, 82, 0.14)',
-    nav: '0 -2px 8px rgba(28, 50, 82, 0.08)',
+    sm:  'none',
+    md:  'none',
+    lg:  'none',
+    nav: 'none',
   },
   breakpoints: {
     mobile: '768px',
   },
   layout: {
     sidebarWidth:    '220px',
-    headerHeight:    '60px',
-    bottomNavHeight: '68px',
+    headerHeight:    '56px',
+    bottomNavHeight: '64px',
   },
 } as const
 

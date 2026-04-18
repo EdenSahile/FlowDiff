@@ -25,15 +25,7 @@ import { CGVPage } from '@/pages/cgv/CGVPage'
 import { NewsletterPage } from '@/pages/newsletter/NewsletterPage'
 import { SelectionsPage } from '@/pages/selections/SelectionsPage'
 import { TopVentesPage } from '@/pages/top-ventes/TopVentesPage'
-
-function Placeholder({ title }: { title: string }) {
-  return (
-    <div style={{ padding: '32px 24px', fontFamily: 'Arial, sans-serif', color: '#1E3A5F' }}>
-      <h1 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '8px' }}>{title}</h1>
-      <p style={{ color: '#757575' }}>Cette section sera développée dans les phases suivantes.</p>
-    </div>
-  )
-}
+import { AuteurPage } from '@/pages/auteur/AuteurPage'
 
 function ProtectedLayout() {
   return (
@@ -68,6 +60,7 @@ export default function App() {
                     <Route path="/panier" element={<CartPage />} />
                     <Route path="/top-ventes" element={<TopVentesPage />} />
                     <Route path="/selections" element={<SelectionsPage />} />
+                    <Route path="/auteur/:auteurSlug" element={<AuteurPage />} />
                     <Route path="/flash-infos" element={<FlashInfosPage />} />
                     <Route path="/compte" element={<MonComptePage />} />
                     <Route path="/historique" element={<HistoriquePage />} />

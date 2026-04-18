@@ -1,6 +1,6 @@
 import type { Universe } from './mockBooks'
 
-export type FlashCategory = 'Auteurs' | 'Fonds' | 'Nouveautés' | 'BookFlow'
+export type FlashCategory = 'Auteurs' | 'Fonds' | 'Nouveautés' | 'FlowDiff'
 
 export interface FlashInfo {
   id: string
@@ -61,9 +61,9 @@ export const MOCK_FLASH_INFOS: FlashInfo[] = [
   },
   {
     id: 'fi-bd-04',
-    title: 'BookFlow — Nouveau filtre par collection',
+    title: 'FlowDiff — Nouveau filtre par collection',
     universe: 'BD/Mangas',
-    category: 'BookFlow',
+    category: 'FlowDiff',
     imageUrl: null,
     videoUrl: null,
     text: 'Vous pouvez désormais filtrer le catalogue BD/Mangas par collection (Shōnen, Seinen, Album…). Retrouvez plus facilement les titres de vos collections phares.',
@@ -143,9 +143,9 @@ export const MOCK_FLASH_INFOS: FlashInfo[] = [
   },
   {
     id: 'fi-lit-04',
-    title: 'BookFlow — Export panier en PDF',
+    title: 'FlowDiff — Export panier en PDF',
     universe: 'Littérature',
-    category: 'BookFlow',
+    category: 'FlowDiff',
     imageUrl: null,
     videoUrl: null,
     text: 'Nouvelle fonctionnalité : exportez votre bon de commande en PDF directement depuis le panier. Idéal pour vos archives ou pour l\'envoyer par email à votre équipe.',
@@ -189,4 +189,4 @@ export const MOCK_FLASH_INFOS: FlashInfo[] = [
   },
 ]
 
-export const FLASH_CATEGORIES: FlashCategory[] = ['Auteurs', 'Fonds', 'Nouveautés', 'BookFlow']
+export const FLASH_CATEGORIES: FlashCategory[] = ['Auteurs', 'Fonds', 'Nouveautés', 'FlowDiff']

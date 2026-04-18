@@ -86,7 +86,7 @@ export function AidePage() {
   return (
     <Page>
       <Title>Aide</Title>
-      <Subtitle>Découvrez comment utiliser BookFlow au quotidien.</Subtitle>
+      <Subtitle>Découvrez comment utiliser FlowDiff au quotidien.</Subtitle>
 
       <Section>
         <SectionHeader>

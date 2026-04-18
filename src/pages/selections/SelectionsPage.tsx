@@ -1329,7 +1329,7 @@ export function SelectionsPage() {
                 {serieBooks.map(book => (
                   <OPTRow key={book.id}>
                     <OPTCover>
-                      <BookCover isbn={book.isbn} alt={book.title} width={36} height={50} />
+                      <BookCover isbn={book.isbn} alt={book.title} width={36} height={50} universe={book.universe} authors={book.authors} publisher={book.publisher} />
                     </OPTCover>
                     <OPTText>
                       <OPTTitle>{book.title}</OPTTitle>
@@ -1439,7 +1439,7 @@ export function SelectionsPage() {
 
                 return (
                   <BookRow key={book.id} onClick={() => navigate(`/livre/${book.id}`)}>
-                    <BookCover isbn={book.isbn} alt={book.title} width={52} height={72} />
+                    <BookCover isbn={book.isbn} alt={book.title} width={52} height={72} universe={book.universe} authors={book.authors} publisher={book.publisher} />
                     <BookRowInfo>
                       <BookRowTitle>{book.title}</BookRowTitle>
                       <BookRowMeta>{book.authors.join(', ')}</BookRowMeta>

@@ -256,7 +256,7 @@ export function ContactPage() {
 
       <InfoCard>
         <InfoTitle>
-          {recipient === 'representant' ? 'Votre représentant commercial' : 'Service clients BookFlow'}
+          {recipient === 'representant' ? 'Votre représentant commercial' : 'Service clients FlowDiff'}
         </InfoTitle>
         {recipient === 'representant' ? (
           <>

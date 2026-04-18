@@ -720,7 +720,7 @@ export function BookCardRow({ book, selected, onToggle }: Props) {
 
         {/* Sidebar couverture */}
         <CoverSidebar>
-          <BookCover isbn={book.isbn} alt={book.title} width={110} height={154} />
+          <BookCover isbn={book.isbn} alt={book.title} width={110} height={154} universe={book.universe} authors={book.authors} publisher={book.publisher} />
           <CoverDots><Dot $active /><Dot /></CoverDots>
         </CoverSidebar>
 
