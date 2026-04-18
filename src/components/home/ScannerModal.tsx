@@ -3,6 +3,7 @@ import styled, { keyframes } from 'styled-components'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
+import { MOCK_BOOKS } from '@/data/mockBooks'
 
 /* ─────────────────────────────────────────
    Types
@@ -128,7 +129,8 @@ export function ScannerModal({ onClose }: Props) {
     controlsRef.current?.stop()
     streamRef.current?.getTracks().forEach(t => t.stop())
     onClose()
-    navigate(`/recherche?q=${encodeURIComponent(ean)}`)
+    const found = MOCK_BOOKS.find(b => b.isbn === ean.trim())
+    navigate(found ? `/livre/${found.id}` : `/recherche?q=${encodeURIComponent(ean)}`)
   }
 
   useEffect(() => {
@@ -259,7 +261,8 @@ export function ScannerModal({ onClose }: Props) {
     const ean = manualEan.trim().replace(/\s/g, '')
     if (!/^\d{8,14}$/.test(ean)) { setManualErr('EAN invalide — 8 à 14 chiffres.'); return }
     onClose()
-    navigate(`/recherche?q=${encodeURIComponent(ean)}`)
+    const found = MOCK_BOOKS.find(b => b.isbn === ean)
+    navigate(found ? `/livre/${found.id}` : `/recherche?q=${encodeURIComponent(ean)}`)
   }
 
   return (

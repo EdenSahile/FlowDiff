@@ -127,11 +127,22 @@ const Page = styled.div`
   margin: 0 auto;
 `
 
+const PageHeader = styled.div`
+  margin-bottom: ${({ theme }) => theme.spacing.lg};
+`
+
 const PageTitle = styled.h1`
   font-size: ${({ theme }) => theme.typography.sizes['2xl']};
   font-weight: ${({ theme }) => theme.typography.weights.bold};
   color: ${({ theme }) => theme.colors.navy};
-  margin-bottom: ${({ theme }) => theme.spacing.lg};
+  margin: 0 0 4px;
+`
+
+const PageSubtitle = styled.p`
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: ${({ theme }) => theme.typography.sizes.sm};
+  color: ${({ theme }) => theme.colors.gray[600]};
+  margin: 0;
 `
 
 /* ── Champ de recherche ── */
@@ -253,9 +264,11 @@ const Section = styled.div`
 
 const SectionHeader = styled.div`
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   margin-bottom: ${({ theme }) => theme.spacing.md};
+  padding-bottom: 10px;
+  border-bottom: 2px solid ${({ theme }) => theme.colors.primary};
 `
 
 const SectionTitle = styled.h2`
@@ -268,7 +281,10 @@ const SectionTitle = styled.h2`
 const SectionCount = styled.span`
   font-size: ${({ theme }) => theme.typography.sizes.xs};
   color: ${({ theme }) => theme.colors.gray[400]};
-  font-weight: ${({ theme }) => theme.typography.weights.medium};
+  font-weight: 600;
+  background: ${({ theme }) => theme.colors.gray[100]};
+  padding: 2px 8px;
+  border-radius: 10px;
 `
 
 /* ── Scroll horizontal — 5 max visibles ── */
@@ -291,7 +307,7 @@ const HScroll = styled.div`
 const Tile = styled.button`
   position: relative;
   border: none;
-  border-radius: ${({ theme }) => theme.radii.lg};
+  border-radius: 12px;
   overflow: hidden;
   /* ~5 tiles visibles dans 900px : (900 - 32*2 - 14*4) / 5 ≈ 150px */
   width: 148px;
@@ -300,16 +316,17 @@ const Tile = styled.button`
   cursor: pointer;
   padding: 0;
   background: ${({ theme }) => theme.colors.navyLight};
-  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
   scroll-snap-align: start;
+  box-shadow: 0 2px 8px rgba(30, 58, 95, 0.12);
 
   &:hover {
-    transform: translateY(-4px) scale(1.02);
-    box-shadow: 0 8px 24px rgba(30, 58, 95, 0.22);
+    transform: translateY(-6px) scale(1.03);
+    box-shadow: 0 16px 40px rgba(30, 58, 95, 0.28);
   }
-  &:active { transform: translateY(0) scale(1); }
+  &:active { transform: translateY(-2px) scale(1.01); }
 
-  @media (max-width: 480px) { width: 110px; height: 165px; }
+  @media (max-width: 480px) { width: 112px; height: 168px; }
 `
 
 const TileGradient = styled.div`
@@ -317,11 +334,14 @@ const TileGradient = styled.div`
   inset: 0;
   background: linear-gradient(
     to bottom,
-    transparent 40%,
-    rgba(15, 28, 55, 0.55) 60%,
-    rgba(15, 28, 55, 0.95) 100%
+    transparent 35%,
+    rgba(10, 20, 45, 0.45) 55%,
+    rgba(10, 20, 45, 0.92) 100%
   );
   z-index: 1;
+  transition: opacity 0.22s ease;
+
+  ${Tile}:hover & { opacity: 0.9; }
 `
 
 const TileLabel = styled.div`
@@ -329,16 +349,16 @@ const TileLabel = styled.div`
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 8px 10px 12px;
+  padding: 10px 10px 14px;
   z-index: 2;
 `
 
 const TileName = styled.div`
   font-size: 12px;
-  font-weight: ${({ theme }) => theme.typography.weights.bold};
+  font-weight: 700;
   color: #fff;
   line-height: 1.25;
-  text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+  text-shadow: 0 1px 6px rgba(0,0,0,0.6);
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -347,8 +367,8 @@ const TileName = styled.div`
 
 const TileAuthor = styled.div`
   font-size: 10px;
-  color: rgba(255,255,255,0.65);
-  margin-top: 2px;
+  color: rgba(255,255,255,0.70);
+  margin-top: 3px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -356,20 +376,20 @@ const TileAuthor = styled.div`
 
 const TileCount = styled.div`
   font-size: 10px;
-  color: rgba(255,255,255,0.45);
-  margin-top: 1px;
+  color: rgba(255,255,255,0.50);
+  margin-top: 2px;
 `
 
 /* Badge Offre spéciale */
 const OffreBadge = styled.div`
   position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 10px;
-  height: 10px;
+  top: 9px;
+  right: 9px;
+  width: 11px;
+  height: 11px;
   border-radius: 50%;
   background-color: #43A047;
-  box-shadow: 0 0 0 2px rgba(255,255,255,0.85);
+  box-shadow: 0 0 0 2.5px rgba(255,255,255,0.9), 0 2px 6px rgba(0,0,0,0.25);
   z-index: 3;
 `
 
@@ -378,16 +398,17 @@ const PrixBadge = styled.div`
   position: absolute;
   top: 8px;
   left: 8px;
-  background: rgba(123, 31, 162, 0.9);
-  backdrop-filter: blur(4px);
+  background: rgba(103, 25, 140, 0.92);
+  backdrop-filter: blur(6px);
   color: #fff;
   font-size: 9px;
-  font-weight: 700;
-  padding: 2px 6px;
-  border-radius: 4px;
+  font-weight: 800;
+  padding: 3px 7px;
+  border-radius: 5px;
   z-index: 3;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
 `
 
 /* ══════════════════════════════════════════════
@@ -522,6 +543,12 @@ const BookRowControls = styled.div`
   flex-shrink: 0;
 `
 
+const PriceStepRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`
+
 const StepperRow = styled.div`
   display: flex;
   align-items: center;
@@ -589,8 +616,8 @@ const AddToCartBtn = styled.button<{ $added?: boolean }>`
   padding: 6px 11px;
   border: none;
   border-radius: ${({ theme }) => theme.radii.md};
-  background: ${({ $added, theme }) => $added ? theme.colors.success : theme.colors.navy};
-  color: #fff;
+  background: ${({ $added, theme }) => $added ? theme.colors.success : theme.colors.primary};
+  color: ${({ $added, theme }) => $added ? '#fff' : theme.colors.navy};
   font-size: ${({ theme }) => theme.typography.sizes.xs};
   font-weight: ${({ theme }) => theme.typography.weights.semibold};
   font-family: ${({ theme }) => theme.typography.fontFamily};
@@ -749,8 +776,8 @@ const OPAddBtn = styled.button<{ $added?: boolean }>`
   width: 100%;
   margin-top: ${({ theme }) => theme.spacing.md};
   padding: 14px 20px;
-  background: ${({ $added, theme }) => $added ? theme.colors.success : theme.colors.navy};
-  color: #fff;
+  background: ${({ $added, theme }) => $added ? theme.colors.success : theme.colors.primary};
+  color: ${({ $added, theme }) => $added ? '#fff' : theme.colors.navy};
   border: none;
   border-radius: ${({ theme }) => theme.radii.lg};
   font-size: ${({ theme }) => theme.typography.sizes.md};
@@ -771,6 +798,8 @@ const EmptyState = styled.div`
   text-align: center;
   padding: ${({ theme }) => theme.spacing['3xl']};
   color: ${({ theme }) => theme.colors.gray[400]};
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: ${({ theme }) => theme.typography.sizes.sm};
 `
 
 /* ═══════════════════════════════════════════════
@@ -1419,16 +1448,18 @@ export function SelectionsPage() {
                       </BookRowMeta>
                     </BookRowInfo>
                     <BookRowControls onClick={e => e.stopPropagation()}>
-                      <PriceBadge>{formatEur(book.priceTTC * qty)}</PriceBadge>
-                      <StepperRow>
-                        <StepBtn onClick={() => changeQty(-1)} aria-label="Diminuer">−</StepBtn>
-                        <StepNum
-                          type="number" min={1} max={999} value={qty}
-                          onChange={e => setQty(parseInt(e.target.value, 10))}
-                          aria-label="Quantité"
-                        />
-                        <StepBtn onClick={() => changeQty(+1)} aria-label="Augmenter">+</StepBtn>
-                      </StepperRow>
+                      <PriceStepRow>
+                        <PriceBadge>{formatEur(book.priceTTC * qty)}</PriceBadge>
+                        <StepperRow>
+                          <StepBtn onClick={() => changeQty(-1)} aria-label="Diminuer">−</StepBtn>
+                          <StepNum
+                            type="number" min={1} max={999} value={qty}
+                            onChange={e => setQty(parseInt(e.target.value, 10))}
+                            aria-label="Quantité"
+                          />
+                          <StepBtn onClick={() => changeQty(+1)} aria-label="Augmenter">+</StepBtn>
+                        </StepperRow>
+                      </PriceStepRow>
                       <AddToCartBtn
                         $added={!!addedMap[book.id]}
                         onClick={e => handleAdd(book.id, qty, e)}
@@ -1461,7 +1492,10 @@ export function SelectionsPage() {
 
   return (
     <Page>
-      <PageTitle>Sélections</PageTitle>
+      <PageHeader>
+        <PageTitle>Sélections</PageTitle>
+        <PageSubtitle>Sélections éditoriales thématiques et opérations commerciales</PageSubtitle>
+      </PageHeader>
 
       {/* Champ de recherche */}
       <SearchBar>

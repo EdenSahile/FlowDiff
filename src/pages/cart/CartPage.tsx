@@ -507,8 +507,7 @@ const fmt = (n: number) => n.toFixed(2).replace('.', ',') + ' €'
 const today = new Date().toISOString().split('T')[0]
 
 export function CartPage() {
-  const { items, opGroups, totalItems, subtotalHT, remiseAmount, netHT, tva, totalTTC,
-          updateQty, removeFromCart, removeOP, clearCart } = useCart()
+  const { items, opGroups, totalItems, updateQty, removeFromCart, removeOP, clearCart } = useCart()
   const { addOrder } = useOrders()
   const { user } = useAuth()
   const navigate = useNavigate()
@@ -517,7 +516,45 @@ export function CartPage() {
   const [delivery, setDelivery] = useState<DeliveryMode>('standard')
   const [specificDate, setSpecific] = useState('')
 
-  const remisePct     = subtotalHT > 0 ? (remiseAmount / subtotalHT) * 100 : 0
+  /* ── Taux de remise par univers (compte connecté, sinon REMISE_RATES) ── */
+  const getUserRate = (universe: string): number => {
+    if (user?.remisesParUnivers) {
+      const rate = user.remisesParUnivers[universe]
+      if (rate !== undefined) return rate / 100
+    }
+    return REMISE_RATES[universe as keyof typeof REMISE_RATES] ?? 0
+  }
+
+  /* ── Totaux recalculés avec les taux personnalisés ── */
+  const subtotalTTC = items.reduce((s, { book, quantity }) => s + book.priceTTC * quantity, 0)
+    + opGroups.reduce((s, op) =>
+        s + op.books.reduce((ss, { book, quantity }) => ss + book.priceTTC * quantity, 0)
+          + op.plv.pricePerUnit * op.plv.quantity, 0)
+
+  const remiseTotal = items.reduce((s, { book, quantity }) =>
+      s + book.priceTTC * quantity * getUserRate(book.universe), 0)
+    + opGroups.reduce((s, op) =>
+        s + op.books.reduce((ss, { book, quantity }) =>
+            ss + book.priceTTC * quantity * getUserRate(book.universe), 0), 0)
+
+  /* Net TTC après remise → TVA extraite (5,5% inclus dans le TTC, pas ajouté par-dessus) */
+  const netTTC     = subtotalTTC - remiseTotal
+  const netHT      = netTTC / 1.055
+  const tvaCalc    = netTTC - netHT
+  const totalCalc  = netTTC
+  /* Exclusion PLV du dénominateur : PLV n'est pas remisée */
+  const booksTTCOnly = items.reduce((s, { book, quantity }) => s + book.priceTTC * quantity, 0)
+    + opGroups.reduce((s, op) => s + op.books.reduce((ss, { book, quantity }) => ss + book.priceTTC * quantity, 0), 0)
+  const remisePct  = booksTTCOnly > 0 ? (remiseTotal / booksTTCOnly) * 100 : 0
+
+  /* Remises multiples → vérifier items ET livres OP */
+  const allUniverses = [
+    ...items.map(i => i.book.universe),
+    ...opGroups.flatMap(op => op.books.map(b => b.book.universe)),
+  ]
+  const universeRates = [...new Set(allUniverses)].map(u => getUserRate(u) * 100)
+  const hasMultiRates = new Set(universeRates).size > 1
+
   const deliveryLabel = delivery === 'standard'
     ? 'Délai habituel (1–3 jours ouvrés)'
     : specificDate || 'Date à préciser'
@@ -572,7 +609,7 @@ export function CartPage() {
         {items.map(({ book, quantity }) => (
           <ConfirmRow key={book.id}>
             <span>{book.title} × {quantity}</span>
-            <span>{fmt(book.price * quantity)}</span>
+            <span>{fmt(book.priceTTC * quantity)}</span>
           </ConfirmRow>
         ))}
 
@@ -586,7 +623,7 @@ export function CartPage() {
             {op.books.map(({ book, quantity }) => (
               <ConfirmRow key={book.id} style={{ paddingLeft: 12 }}>
                 <span>{book.title} × {quantity}</span>
-                <span>{fmt(book.price * quantity)}</span>
+                <span>{fmt(book.priceTTC * quantity)}</span>
               </ConfirmRow>
             ))}
             <ConfirmRow style={{ paddingLeft: 12, color: '#2E7D32' }}>
@@ -602,12 +639,12 @@ export function CartPage() {
 
         <div style={{ borderTop: '1px solid #eee', marginTop: '12px', paddingTop: '12px' }}>
           <ConfirmRow><span>Livraison</span><span>{deliveryLabel}</span></ConfirmRow>
-          <ConfirmRow><span>Montant HT</span><span>{fmt(subtotalHT)}</span></ConfirmRow>
-          <ConfirmRow><span>Remise ({remisePct.toFixed(1)}%)</span><span>− {fmt(remiseAmount)}</span></ConfirmRow>
+          <ConfirmRow><span>Sous-total TTC</span><span>{fmt(subtotalTTC)}</span></ConfirmRow>
+          <ConfirmRow><span>Remise</span><span>− {fmt(remiseTotal)}</span></ConfirmRow>
           <ConfirmRow><span>Net HT</span><span>{fmt(netHT)}</span></ConfirmRow>
-          <ConfirmRow><span>TVA 5,5%</span><span>{fmt(tva)}</span></ConfirmRow>
+          <ConfirmRow><span>TVA 5,5%</span><span>{fmt(tvaCalc)}</span></ConfirmRow>
           <ConfirmRow style={{ fontWeight: 700, fontSize: '1rem', color: '#1E3A5F', paddingTop: '8px' }}>
-            <span>Total TTC</span><span>{fmt(totalTTC)}</span>
+            <span>Total TTC</span><span>{fmt(totalCalc)}</span>
           </ConfirmRow>
         </div>
       </ConfirmBox>
@@ -618,7 +655,7 @@ export function CartPage() {
             codeClient: user?.codeClient ?? '',
             adresseLivraison: user?.adresseLivraison ?? '',
             items,
-            subtotalHT, remiseAmount, netHT, tva, totalTTC,
+            subtotalHT: subtotalTTC, remiseAmount: remiseTotal, netHT: netHT, tva: tvaCalc, totalTTC: totalCalc,
             deliveryMode: delivery,
             deliveryDate: delivery === 'specific' ? specificDate : undefined,
           })
@@ -647,12 +684,18 @@ export function CartPage() {
       <SummaryCard>
         <SummaryTitle>Récapitulatif</SummaryTitle>
         <SummaryRow>
-          <SummaryLabel>Montant HT</SummaryLabel>
-          <SummaryValue>{fmt(subtotalHT)}</SummaryValue>
+          <SummaryLabel>Sous-total TTC</SummaryLabel>
+          <SummaryValue>{fmt(subtotalTTC)}</SummaryValue>
         </SummaryRow>
         <SummaryRow>
-          <SummaryLabel>Remise <RemiseBadge>−{remisePct.toFixed(1)}%</RemiseBadge></SummaryLabel>
-          <SummaryValue>− {fmt(remiseAmount)}</SummaryValue>
+          <SummaryLabel>
+            Remise{' '}
+            {hasMultiRates
+              ? <RemiseBadge>variable / thématique</RemiseBadge>
+              : <RemiseBadge>−{remisePct.toFixed(1)}%</RemiseBadge>
+            }
+          </SummaryLabel>
+          <SummaryValue>− {fmt(remiseTotal)}</SummaryValue>
         </SummaryRow>
         <SummaryRow>
           <SummaryLabel>Net HT</SummaryLabel>
@@ -660,11 +703,11 @@ export function CartPage() {
         </SummaryRow>
         <SummaryRow>
           <SummaryLabel>TVA 5,5%</SummaryLabel>
-          <SummaryValue>{fmt(tva)}</SummaryValue>
+          <SummaryValue>{fmt(tvaCalc)}</SummaryValue>
         </SummaryRow>
         <SummaryRow $total>
           <SummaryLabel>Total TTC</SummaryLabel>
-          <SummaryValue>{fmt(totalTTC)}</SummaryValue>
+          <SummaryValue>{fmt(totalCalc)}</SummaryValue>
         </SummaryRow>
       </SummaryCard>
 
@@ -678,9 +721,9 @@ export function CartPage() {
           {items.map((item) => {
             const { book, quantity, ebookOption } = item
             const key     = getItemKey(item)
-            const isEbook = !!ebookOption
-            const unitPrice = isEbook ? ebookOption!.price : book.price
-            const remise    = REMISE_RATES[book.universe]
+            const isEbook   = !!ebookOption
+            const unitPrice = isEbook ? ebookOption!.price : book.priceTTC
+            const remise    = getUserRate(book.universe)
             const ligneHT   = unitPrice * quantity
 
             const platformColor =
@@ -739,12 +782,13 @@ export function CartPage() {
           </SectionTitle>
 
           {opGroups.map(op => {
-            const opBooksHT  = op.books.reduce((s, { book, quantity }) =>
-              s + book.price * quantity, 0)
+            const opBooksTTC = op.books.reduce((s, { book, quantity }) =>
+              s + book.priceTTC * quantity, 0)
             const opRemise   = op.books.reduce((s, { book, quantity }) =>
-              s + book.price * quantity * REMISE_RATES[book.universe], 0)
+              s + book.priceTTC * quantity * getUserRate(book.universe), 0)
             const opPLVPrice = op.plv.pricePerUnit * op.plv.quantity
-            const opTotalTTC = (opBooksHT - opRemise) * 1.055 + opPLVPrice
+            /* net TTC books après remise + PLV (déjà TTC, pas de TVA à ajouter) */
+            const opTotalTTC = (opBooksTTC - opRemise) + opPLVPrice
 
             return (
               <OPBlock key={op.id}>
@@ -793,9 +837,9 @@ export function CartPage() {
                         <OPRowMeta>{book.authors[0]} · {book.format}</OPRowMeta>
                         <OPRowIsbn>ISBN {book.isbn}</OPRowIsbn>
                       </OPText>
-                      <OPCell>{fmt(book.price)}</OPCell>
+                      <OPCell>{fmt(book.priceTTC)}</OPCell>
                       <OPCell style={{ textAlign: 'center' }}>{quantity}</OPCell>
-                      <OPCell $bold>{fmt(book.price * quantity)}</OPCell>
+                      <OPCell $bold>{fmt(book.priceTTC * quantity)}</OPCell>
                     </OPRow>
                   ))}
 

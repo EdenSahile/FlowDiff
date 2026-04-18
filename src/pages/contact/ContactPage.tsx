@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import styled from 'styled-components'
+import { useLocation } from 'react-router-dom'
 import { useAuthContext } from '@/contexts/AuthContext'
 import { useToast } from '@/components/ui/Toast'
 
@@ -152,14 +153,32 @@ const InfoLine = styled.div`
 `
 
 /* ── Component ── */
+interface FromBook {
+  title: string
+  isbn: string
+  publisher: string
+  authors: string
+  programme?: string
+}
+
 type Recipient = 'representant' | 'service'
 
 export function ContactPage() {
   const { user } = useAuthContext()
   const { showToast } = useToast()
+  const location = useLocation()
+
+  const fromBook = (location.state as { fromBook?: FromBook } | null)?.fromBook
+
   const [recipient, setRecipient] = useState<Recipient>('representant')
-  const [sujet, setSujet] = useState('')
-  const [message, setMessage] = useState('')
+  const [sujet, setSujet] = useState(
+    fromBook ? `Renseignement — ${fromBook.title}` : ''
+  )
+  const [message, setMessage] = useState(
+    fromBook
+      ? `Bonjour,\n\nJe souhaite obtenir des informations sur l'ouvrage suivant :\n\nTitre : ${fromBook.title}\nAuteur(s) : ${fromBook.authors}\nÉditeur : ${fromBook.publisher}\nISBN : ${fromBook.isbn}${fromBook.programme ? `\nProgramme : ${fromBook.programme}` : ''}\n\nMerci de me contacter.\n\nCordialement,\n${user?.nomLibrairie}`
+      : ''
+  )
   const [sending, setSending] = useState(false)
 
   function handleSubmit(e: React.FormEvent) {

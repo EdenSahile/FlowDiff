@@ -12,12 +12,23 @@ const Page = styled.div`
   margin: 0 auto;
 `
 
+const PageHeader = styled.div`
+  margin-bottom: ${({ theme }) => theme.spacing.lg};
+`
+
 const PageTitle = styled.h1`
   font-family: ${({ theme }) => theme.typography.fontFamily};
   font-size: ${({ theme }) => theme.typography.sizes['2xl']};
   font-weight: ${({ theme }) => theme.typography.weights.bold};
   color: ${({ theme }) => theme.colors.navy};
-  margin-bottom: ${({ theme }) => theme.spacing.lg};
+  margin: 0 0 4px;
+`
+
+const PageSubtitle = styled.p`
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: ${({ theme }) => theme.typography.sizes.sm};
+  color: ${({ theme }) => theme.colors.gray[600]};
+  margin: 0;
 `
 
 const Controls = styled.div`
@@ -32,15 +43,28 @@ const ResultCount = styled.p`
   font-size: ${({ theme }) => theme.typography.sizes.sm};
   color: ${({ theme }) => theme.colors.gray[600]};
   margin-bottom: ${({ theme }) => theme.spacing.md};
+
+  strong {
+    color: ${({ theme }) => theme.colors.navy};
+    font-weight: 700;
+  }
 `
 
 const Grid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: ${({ theme }) => theme.spacing.md};
 
+  @media (min-width: 480px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
   @media (min-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  }
+
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   }
 `
 
@@ -49,26 +73,32 @@ const EmptyState = styled.div`
   padding: ${({ theme }) => theme.spacing['3xl']};
   color: ${({ theme }) => theme.colors.gray[400]};
   font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: ${({ theme }) => theme.typography.sizes.sm};
+
+  &::before {
+    content: '🔍';
+    display: block;
+    font-size: 2.5rem;
+    margin-bottom: 12px;
+  }
 `
 
 const SearchWrapper = styled.div`
   position: relative;
 
   input {
-    padding-left: 40px;
+    padding-left: 42px;
   }
 `
 
 const SearchIcon = styled.span`
   position: absolute;
-  left: 12px;
+  left: 14px;
   top: 50%;
   transform: translateY(-50%);
   color: ${({ theme }) => theme.colors.gray[400]};
   font-size: 1rem;
   pointer-events: none;
-  /* Adjust for error margin */
-  margin-top: -1px;
 `
 
 export function FondsPage() {
@@ -88,7 +118,10 @@ export function FondsPage() {
 
   return (
     <Page>
-      <PageTitle>Fonds</PageTitle>
+      <PageHeader>
+        <PageTitle>Fonds</PageTitle>
+        <PageSubtitle>Titres déjà parus, disponibles à la commande immédiate</PageSubtitle>
+      </PageHeader>
 
       <Controls>
         <SearchWrapper>
@@ -107,7 +140,8 @@ export function FondsPage() {
       </Controls>
 
       <ResultCount>
-        {books.length} titre{books.length > 1 ? 's' : ''} disponible{books.length > 1 ? 's' : ''}
+        <strong>{books.length}</strong> titre{books.length > 1 ? 's' : ''} disponible{books.length > 1 ? 's' : ''}
+        {universe && ` en ${universe}`}
       </ResultCount>
 
       {books.length > 0 ? (

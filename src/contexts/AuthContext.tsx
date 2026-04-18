@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useRef, useState } from 'react'
 import bcrypt from 'bcryptjs'
 import { MOCK_USERS, VALID_CLIENT_CODES, type MockUser } from '@/lib/mockUsers'
 import {
@@ -47,9 +47,6 @@ const AuthContext = createContext<AuthContextValue | null>(null)
 
 /* ── Provider ── */
 
-// Stockage en mémoire pour les comptes créés durant la session (mock)
-let sessionUsers: MockUser[] = []
-
 function toAuthUser(u: MockUser): AuthUser {
   return {
     id: u.id,
@@ -63,23 +60,23 @@ function toAuthUser(u: MockUser): AuthUser {
   }
 }
 
-function findUser(identifier: string): MockUser | undefined {
+function findUser(identifier: string, sessionUsers: MockUser[]): MockUser | undefined {
   const id = identifier.trim().toLowerCase()
   const match = (u: MockUser) =>
     u.email.toLowerCase() === id || u.codeClient.toLowerCase() === id
-  // Les comptes enregistrés en session ont priorité sur les mocks
   return sessionUsers.find(match) ?? MOCK_USERS.find(match)
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const sessionUsersRef = useRef<MockUser[]>([])
 
   // Restaurer la session au montage
   useEffect(() => {
     // DEV : auto-login avec LIB001 si ?dev-login dans l'URL
     if (import.meta.env.DEV && window.location.search.includes('dev-login')) {
-      const devUser = findUser('LIB001')
+      const devUser = findUser('LIB001', sessionUsersRef.current)
       if (devUser) {
         const token = createMockToken(devUser.id, devUser.codeClient)
         localStorage.setItem(TOKEN_KEY, token)
@@ -92,7 +89,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (token) {
       const payload = parseMockToken(token)
       if (payload) {
-        const found = findUser(payload.codeClient)
+        const found = findUser(payload.codeClient, sessionUsersRef.current)
         if (found) {
           setUser(toAuthUser(found))
         } else {
@@ -111,7 +108,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return { success: false, fieldErrors: getZodErrors(result) }
     }
 
-    const found = findUser(result.data.identifier)
+    const found = findUser(result.data.identifier, sessionUsersRef.current)
     if (!found) {
       return { success: false, error: 'Code client ou email introuvable.' }
     }
@@ -150,29 +147,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     // Vérifier que le compte n'a pas déjà été créé en session
-    const existing = sessionUsers.find((u) => u.codeClient === codeClient)
+    const existing = sessionUsersRef.current.find((u) => u.codeClient === codeClient)
     if (existing) {
       return { success: false, error: 'Un compte existe déjà pour ce code client.' }
     }
 
     // Créer le compte (session uniquement — remplacé par Prisma en Phase 12)
     const base = MOCK_USERS.find((u) => u.codeClient === codeClient)!
-    const newUser: MockUser = {
-      ...base,
-      passwordHash: await bcrypt.hash(password, BCRYPT_COST),
+    try {
+      const newUser: MockUser = {
+        ...base,
+        passwordHash: await bcrypt.hash(password, BCRYPT_COST),
+      }
+      sessionUsersRef.current.push(newUser)
+      const token = createMockToken(newUser.id, newUser.codeClient)
+      localStorage.setItem(TOKEN_KEY, token)
+      setUser(toAuthUser(newUser))
+    } catch {
+      return { success: false, error: 'Erreur lors de la création du compte.' }
     }
-    sessionUsers.push(newUser)
-
-    const token = createMockToken(newUser.id, newUser.codeClient)
-    localStorage.setItem(TOKEN_KEY, token)
-    setUser(toAuthUser(newUser))
     return { success: true }
   }
 
   const logout = () => {
     localStorage.removeItem(TOKEN_KEY)
     setUser(null)
-    sessionUsers = []
+    /* sessionUsersRef conservé — les comptes restent disponibles pour une reconnexion */
   }
 
   return (

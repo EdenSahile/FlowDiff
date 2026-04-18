@@ -3,10 +3,10 @@ import type { Book, Universe } from '@/data/mockBooks'
 
 /* ── Remises mock par univers (en attendant AS400/CRM) ── */
 export const REMISE_RATES: Record<Universe, number> = {
-  'BD/Mangas':       0.30,
-  'Jeunesse':        0.28,
-  'Littérature':     0.25,
-  'Adulte-pratique': 0.20,
+  'BD/Mangas':       0.10,
+  'Jeunesse':        0.08,
+  'Littérature':     0.09,
+  'Adulte-pratique': 0.09,
 }
 
 /* ── Types ── */
@@ -60,7 +60,7 @@ interface CartContextValue {
   removeOP: (opId: string) => void
   clearCart: () => void
   /* Totaux calculés */
-  subtotalHT: number
+  subtotalTTC: number
   remiseAmount: number
   netHT: number
   tva: number
@@ -72,27 +72,29 @@ const CartContext = createContext<CartContextValue | null>(null)
 const STORAGE_KEY = 'bookflow_cart'
 
 function computeTotals(items: CartItem[], opGroups: OPCartGroup[]) {
-  /* Titres individuels */
-  const booksHT = items.reduce(
-    (sum, { book, quantity }) => sum + book.price * quantity, 0)
+  /* Titres individuels — base TTC (prix public) */
+  const booksTTC = items.reduce(
+    (sum, { book, quantity }) => sum + book.priceTTC * quantity, 0)
   const booksRemise = items.reduce(
-    (sum, { book, quantity }) => sum + book.price * quantity * REMISE_RATES[book.universe], 0)
+    (sum, { book, quantity }) => sum + book.priceTTC * quantity * REMISE_RATES[book.universe], 0)
 
   /* OPs : ouvrages + PLV (remise sur ouvrages, pas sur PLV) */
-  const opBooksHT = opGroups.reduce((sum, op) =>
-    sum + op.books.reduce((s, { book, quantity }) => s + book.price * quantity, 0), 0)
+  const opBooksTTC = opGroups.reduce((sum, op) =>
+    sum + op.books.reduce((s, { book, quantity }) => s + book.priceTTC * quantity, 0), 0)
   const opBooksRemise = opGroups.reduce((sum, op) =>
     sum + op.books.reduce((s, { book, quantity }) =>
-      s + book.price * quantity * REMISE_RATES[book.universe], 0), 0)
-  const opPLVHT = opGroups.reduce((sum, op) =>
+      s + book.priceTTC * quantity * REMISE_RATES[book.universe], 0), 0)
+  const opPLVTTC = opGroups.reduce((sum, op) =>
     sum + op.plv.pricePerUnit * op.plv.quantity, 0)
 
-  const subtotalHT  = booksHT + opBooksHT + opPLVHT
+  const subtotalTTC  = booksTTC + opBooksTTC + opPLVTTC
   const remiseAmount = booksRemise + opBooksRemise
-  const netHT       = subtotalHT - remiseAmount
-  const tva         = netHT * 0.055
-  const totalTTC    = netHT + tva
-  return { subtotalHT, remiseAmount, netHT, tva, totalTTC }
+  /* Net TTC après remise → extraction TVA (5,5% inclus dans le TTC) */
+  const netTTC       = subtotalTTC - remiseAmount
+  const netHT        = netTTC / 1.055
+  const tva          = netTTC - netHT
+  const totalTTC     = netTTC
+  return { subtotalTTC, remiseAmount, netHT, tva, totalTTC }
 }
 
 interface StoredCart {
@@ -101,24 +103,20 @@ interface StoredCart {
 }
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>(() => {
+  const [{ items, opGroups }, setCart] = useState<StoredCart>(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY)
-      if (!stored) return []
+      if (!stored) return { items: [], opGroups: [] }
       const parsed = JSON.parse(stored) as StoredCart | CartItem[]
-      // Retrocompat : ancien format était un tableau direct
-      return Array.isArray(parsed) ? parsed : (parsed.items ?? [])
-    } catch { return [] }
+      if (Array.isArray(parsed)) return { items: parsed, opGroups: [] }
+      return { items: parsed.items ?? [], opGroups: parsed.opGroups ?? [] }
+    } catch { return { items: [], opGroups: [] } }
   })
 
-  const [opGroups, setOpGroups] = useState<OPCartGroup[]>(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY)
-      if (!stored) return []
-      const parsed = JSON.parse(stored) as StoredCart | CartItem[]
-      return Array.isArray(parsed) ? [] : (parsed.opGroups ?? [])
-    } catch { return [] }
-  })
+  const setItems   = (fn: (prev: CartItem[]) => CartItem[]) =>
+    setCart(c => ({ ...c, items: fn(c.items) }))
+  const setOpGroups = (fn: (prev: OPCartGroup[]) => OPCartGroup[]) =>
+    setCart(c => ({ ...c, opGroups: fn(c.opGroups) }))
 
   /* Persistance localStorage */
   useEffect(() => {
@@ -160,7 +158,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const removeOP = (opId: string) =>
     setOpGroups(prev => prev.filter(op => op.id !== opId))
 
-  const clearCart = () => { setItems([]); setOpGroups([]) }
+  const clearCart = () => setCart({ items: [], opGroups: [] })
 
   const itemsTotal    = items.reduce((sum, i) => sum + i.quantity, 0)
   const opBooksTotal  = opGroups.reduce((sum, op) =>

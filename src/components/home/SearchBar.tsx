@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import styled from 'styled-components'
 import { useNavigate } from 'react-router-dom'
+import { MOCK_BOOKS } from '@/data/mockBooks'
 
 function SearchIcon() {
   return (
@@ -106,7 +107,9 @@ export function SearchBar() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     const q = query.trim()
-    if (q) navigate(`/recherche?q=${encodeURIComponent(q)}`)
+    if (!q) return
+    const found = MOCK_BOOKS.find(b => b.isbn === q.replace(/\s/g, ''))
+    navigate(found ? `/livre/${found.id}` : `/recherche?q=${encodeURIComponent(q)}`)
   }
 
   return (

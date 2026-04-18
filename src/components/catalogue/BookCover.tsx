@@ -9,10 +9,10 @@ const pulse = keyframes`
 const Wrapper = styled.div<{ $width: number; $height: number }>`
   width: ${({ $width }) => $width}px;
   height: ${({ $height }) => $height}px;
-  border-radius: ${({ theme }) => theme.radii.md};
+  border-radius: 6px;
   overflow: hidden;
   background-color: ${({ theme }) => theme.colors.navyLight};
-  box-shadow: ${({ theme }) => theme.shadows.sm};
+  box-shadow: 3px 4px 14px rgba(28, 58, 95, 0.18);
   flex-shrink: 0;
   display: flex;
   align-items: center;

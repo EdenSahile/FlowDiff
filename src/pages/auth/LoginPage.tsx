@@ -1,5 +1,7 @@
 import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { createPortal } from 'react-dom'
+import { useNavigate } from 'react-router-dom'
+import styled from 'styled-components'
 import { useAuth } from '@/hooks/useAuth'
 import { loginSchema, getZodErrors, type LoginInput } from '@/lib/authUtils'
 import { Input } from '@/components/ui/Input'
@@ -16,31 +18,96 @@ import {
   AuthError,
   AuthLink,
   PasswordWrapper,
-  PasswordToggle,
 } from './AuthLayout'
 
-function EyeIcon({ visible }: { visible: boolean }) {
-  return visible ? (
-    <svg width="18" height="18" viewBox="0 0 22 22" fill="none" aria-hidden="true">
-      <path d="M1 11S4.5 4 11 4s10 7 10 7-3.5 7-10 7S1 11 1 11z" stroke="currentColor" strokeWidth="2" />
-      <circle cx="11" cy="11" r="3" stroke="currentColor" strokeWidth="2" />
-    </svg>
-  ) : (
-    <svg width="18" height="18" viewBox="0 0 22 22" fill="none" aria-hidden="true">
-      <path d="M1 1l20 20M9.88 9.88A3 3 0 0 0 11 14a3 3 0 0 0 2.12-5.12M6.94 6.94C4.23 8.3 2.27 10.22 1 11c0 0 3.5 7 10 7a9.87 9.87 0 0 0 4.34-.98M9.9 4.24A9.12 9.12 0 0 1 11 4c6.5 0 10 7 10 7a18.5 18.5 0 0 1-2.16 3.19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-    </svg>
+/* ── Blocked modal ── */
+const Overlay = styled.div`
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 24px;
+`
+
+const Modal = styled.div`
+  background: #fff;
+  border-radius: 16px;
+  padding: 32px 28px 24px;
+  max-width: 360px;
+  width: 100%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+  text-align: center;
+`
+
+const ModalIcon = styled.div`
+  width: 52px;
+  height: 52px;
+  background: #FFF3E0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+  font-size: 24px;
+`
+
+const ModalTitle = styled.p`
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1E3A5F;
+  margin-bottom: 8px;
+`
+
+const ModalBody = styled.p`
+  font-size: 0.875rem;
+  color: #616161;
+  line-height: 1.5;
+  margin-bottom: 24px;
+`
+
+const ModalClose = styled.button`
+  background: #1E3A5F;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 11px 32px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+
+  &:hover {
+    background: #16304f;
+  }
+`
+
+function BlockedModal({ message, onClose }: { message: string; onClose: () => void }) {
+  return createPortal(
+    <Overlay onClick={onClose}>
+      <Modal onClick={e => e.stopPropagation()}>
+        <ModalIcon>🔒</ModalIcon>
+        <ModalTitle>Accès restreint</ModalTitle>
+        <ModalBody>{message}</ModalBody>
+        <ModalClose onClick={onClose}>Fermer</ModalClose>
+      </Modal>
+    </Overlay>,
+    document.body
   )
 }
 
+/* ── Page ── */
 export function LoginPage() {
   const navigate = useNavigate()
   const { login } = useAuth()
 
-  const [form, setForm] = useState<LoginInput>({ identifier: '', password: '' })
+  const [form, setForm] = useState<LoginInput>({ identifier: 'LIB001', password: 'Libraire123!' })
   const [fieldErrors, setFieldErrors] = useState<Partial<Record<keyof LoginInput, string>>>({})
   const [serverError, setServerError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [showPassword, setShowPassword] = useState(false)
+  const [blockedMsg, setBlockedMsg] = useState<string | null>(null)
 
   const handleChange = (field: keyof LoginInput) => (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm((prev) => ({ ...prev, [field]: e.target.value }))
@@ -83,19 +150,33 @@ export function LoginPage() {
         <AuthTitle>Connexion</AuthTitle>
         <AuthSubtitle>Accès réservé aux libraires</AuthSubtitle>
 
+        <div style={{
+          background: '#FFF8E1',
+          border: '1px solid #FFD54F',
+          borderRadius: '8px',
+          padding: '10px 14px',
+          fontSize: '0.8125rem',
+          color: '#5D4037',
+          marginBottom: '4px',
+          lineHeight: 1.4,
+        }}>
+          Les identifiants sont pré-remplis. Cliquez directement sur le bouton de connexion.
+        </div>
+
         {serverError && <AuthError role="alert">{serverError}</AuthError>}
 
         <AuthForm onSubmit={handleSubmit} noValidate>
           <Input
             id="identifier"
             label="Code client ou email"
-            type="text"
+            type="password"
             placeholder="LIB001 ou contact@malib.fr"
             value={form.identifier}
             onChange={handleChange('identifier')}
             error={fieldErrors.identifier}
             autoComplete="username"
             autoFocus
+            disabled
           />
 
           <div>
@@ -103,32 +184,25 @@ export function LoginPage() {
               <Input
                 id="password"
                 label="Mot de passe"
-                type={showPassword ? 'text' : 'password'}
+                type="password"
                 placeholder="••••••••"
                 value={form.password}
                 onChange={handleChange('password')}
                 error={fieldErrors.password}
                 autoComplete="current-password"
-                style={{ paddingRight: '44px' }}
+                disabled
               />
-              <PasswordToggle
-                type="button"
-                onClick={() => setShowPassword((v) => !v)}
-                aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
-                style={{ top: fieldErrors.password ? 'calc(50% - 10px)' : '50%' }}
-              >
-                <EyeIcon visible={showPassword} />
-              </PasswordToggle>
             </PasswordWrapper>
           </div>
 
           <div style={{ textAlign: 'right', marginTop: '-4px' }}>
-            <Link
-              to="/forgot-password"
-              style={{ fontSize: '0.875rem', color: '#1E3A5F', textDecoration: 'underline' }}
+            <a
+              href="#"
+              onClick={e => { e.preventDefault(); setBlockedMsg('La réinitialisation de mot de passe a été bloquée.') }}
+              style={{ fontSize: '0.875rem', color: '#1E3A5F', textDecoration: 'underline', cursor: 'pointer' }}
             >
               Mot de passe oublié ?
-            </Link>
+            </a>
           </div>
 
           <Button type="submit" fullWidth disabled={isSubmitting}>
@@ -138,9 +212,16 @@ export function LoginPage() {
 
         <AuthLink>
           Pas encore de compte ?{' '}
-          <Link to="/register">Créer un accès</Link>
+          <a
+            href="#"
+            onClick={e => { e.preventDefault(); setBlockedMsg('La création de compte a été bloquée.') }}
+          >
+            Créer un accès
+          </a>
         </AuthLink>
       </AuthCard>
+
+      {blockedMsg && <BlockedModal message={blockedMsg} onClose={() => setBlockedMsg(null)} />}
     </AuthPage>
   )
 }

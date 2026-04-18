@@ -19,7 +19,7 @@ export const theme = {
     },
   },
   typography: {
-    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, sans-serif",
+    fontFamily: "'Roboto', Arial, sans-serif",
     sizes: {
       xs:   '0.75rem',
       sm:   '0.875rem',
