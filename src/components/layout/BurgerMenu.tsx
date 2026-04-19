@@ -1,4 +1,5 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import styled, { css, keyframes } from 'styled-components'
 import { useNavigate } from 'react-router-dom'
 import { useAuthContext } from '@/contexts/AuthContext'
@@ -55,7 +56,8 @@ const Avatar = styled.div`
   width: 52px;
   height: 52px;
   border-radius: ${({ theme }) => theme.radii.full};
-  background-color: ${({ theme }) => theme.colors.primary};
+  background-color: rgba(255, 255, 255, 0.15);
+  border: 2px solid rgba(255, 255, 255, 0.25);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -122,7 +124,7 @@ const NavItem = styled.button<{ $danger?: boolean }>`
   }
 
   &:focus-visible {
-    outline: 2px solid ${({ theme }) => theme.colors.primary};
+    outline: 2px solid rgba(255, 255, 255, 0.5);
     outline-offset: -2px;
   }
 `
@@ -176,6 +178,90 @@ const SocialLink = styled.a`
   }
 `
 
+/* ── Modale de confirmation déconnexion ── */
+const ConfirmOverlay = styled.div`
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 500;
+  padding: 24px;
+  animation: ${fadeIn} 0.15s ease;
+`
+
+const ConfirmBox = styled.div`
+  background: #fff;
+  border-radius: 16px;
+  padding: 28px 24px 20px;
+  max-width: 320px;
+  width: 100%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  text-align: center;
+`
+
+const ConfirmIcon = styled.div`
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #FFF0F0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 14px;
+  color: #E53935;
+`
+
+const ConfirmTitle = styled.p`
+  font-size: 1rem;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 6px;
+`
+
+const ConfirmBody = styled.p`
+  font-size: 0.875rem;
+  color: #666;
+  line-height: 1.5;
+  margin-bottom: 20px;
+`
+
+const ConfirmButtons = styled.div`
+  display: flex;
+  gap: 10px;
+`
+
+const BtnCancel = styled.button`
+  flex: 1;
+  padding: 11px;
+  border: 1.5px solid #E0E0E0;
+  border-radius: 8px;
+  background: #fff;
+  color: #333;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+  &:hover { background: #F5F5F5; }
+`
+
+const BtnConfirm = styled.button`
+  flex: 1;
+  padding: 11px;
+  border: none;
+  border-radius: 8px;
+  background: #E53935;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+  &:hover { background: #C62828; }
+`
+
 /* ── Icons ── */
 function IconCompte()       { return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg> }
 function IconHistorique()   { return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg> }
@@ -208,16 +294,20 @@ interface BurgerMenuProps {
 export function BurgerMenu({ open, onClose }: BurgerMenuProps) {
   const navigate = useNavigate()
   const { user, logout } = useAuthContext()
+  const [confirmLogout, setConfirmLogout] = useState(false)
 
   // Fermer sur Escape
   useEffect(() => {
     if (!open) return
     const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
+      if (e.key === 'Escape') {
+        if (confirmLogout) setConfirmLogout(false)
+        else onClose()
+      }
     }
     document.addEventListener('keydown', handler)
     return () => document.removeEventListener('keydown', handler)
-  }, [open, onClose])
+  }, [open, onClose, confirmLogout])
 
   // Bloquer le scroll du body quand le menu est ouvert
   useEffect(() => {
@@ -235,6 +325,7 @@ export function BurgerMenu({ open, onClose }: BurgerMenuProps) {
   }
 
   function handleLogout() {
+    setConfirmLogout(false)
     onClose()
     logout()
     navigate('/login')
@@ -295,7 +386,7 @@ export function BurgerMenu({ open, onClose }: BurgerMenuProps) {
           </NavSection>
 
           <NavSection>
-            <NavItem $danger onClick={handleLogout}>
+            <NavItem $danger onClick={() => setConfirmLogout(true)}>
               <IconDeconnexion />
               <NavLabel>Se déconnecter</NavLabel>
             </NavItem>
@@ -318,6 +409,22 @@ export function BurgerMenu({ open, onClose }: BurgerMenuProps) {
           </SocialLink>
         </SocialFooter>
       </Panel>
+      {confirmLogout && createPortal(
+        <ConfirmOverlay onClick={() => setConfirmLogout(false)}>
+          <ConfirmBox onClick={e => e.stopPropagation()}>
+            <ConfirmIcon>
+              <IconDeconnexion />
+            </ConfirmIcon>
+            <ConfirmTitle>Se déconnecter ?</ConfirmTitle>
+            <ConfirmBody>Vous serez redirigé vers la page de connexion.</ConfirmBody>
+            <ConfirmButtons>
+              <BtnCancel onClick={() => setConfirmLogout(false)}>Annuler</BtnCancel>
+              <BtnConfirm onClick={handleLogout}>Se déconnecter</BtnConfirm>
+            </ConfirmButtons>
+          </ConfirmBox>
+        </ConfirmOverlay>,
+        document.body
+      )}
     </>
   )
 }

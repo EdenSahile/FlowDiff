@@ -39,11 +39,38 @@ const HeaderBar = styled.header`
 const LogoWrap = styled.div`
   display: flex;
   align-items: center;
-  cursor: pointer;
+  gap: 10px;
 
   @media (min-width: ${({ theme }) => theme.breakpoints.mobile}) {
     display: none;
   }
+`
+
+const BurgerBtn = styled.button`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 36px;
+  height: 36px;
+  background: rgba(255,255,255,0.10);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  padding: 8px;
+  flex-shrink: 0;
+  transition: background 0.15s;
+
+  span {
+    display: block;
+    width: 100%;
+    height: 2px;
+    background: #fff;
+    border-radius: 2px;
+  }
+
+  &:hover { background: rgba(255,255,255,0.18); }
+  &:active { background: rgba(255,255,255,0.25); }
 `
 
 const RightSection = styled.div`
@@ -540,7 +567,10 @@ export function Header({ cartCount = 0, onBurgerClick, onCartClick, hasNotif = t
 
   return (
     <HeaderBar>
-      <LogoWrap onClick={onBurgerClick}>
+      <LogoWrap>
+        <BurgerBtn onClick={onBurgerClick} aria-label="Ouvrir le menu">
+          <span /><span /><span />
+        </BurgerBtn>
         <Wordmark onDark size="sm" />
       </LogoWrap>
 

@@ -221,7 +221,8 @@ const SummaryLabel = styled.span`opacity: .8;`
 const SummaryValue = styled.span``
 
 const RemiseBadge = styled.span`
-  background: ${({ theme }) => theme.colors.primary};
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   color: ${({ theme }) => theme.colors.white};
   font-size: ${({ theme }) => theme.typography.sizes.xs};
   font-weight: ${({ theme }) => theme.typography.weights.bold};

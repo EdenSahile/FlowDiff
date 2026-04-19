@@ -72,7 +72,7 @@ const ItemText = styled.div`
 const Badge = styled.span`
   display: inline-block;
   background-color: ${({ theme }) => theme.colors.primary};
-  color: ${({ theme }) => theme.colors.navy};
+  color: #fff;
   font-size: ${({ theme }) => theme.typography.sizes.xs};
   font-weight: ${({ theme }) => theme.typography.weights.bold};
   padding: 2px 8px;
@@ -105,27 +105,6 @@ export function AidePage() {
           <ItemText>
             Saisissez directement le code ISBN (13 chiffres) dans la barre de recherche
             pour accéder instantanément à la fiche produit.
-          </ItemText>
-        </Item>
-      </Section>
-
-      <Section>
-        <SectionHeader>
-          <SectionIcon>📷</SectionIcon>
-          <SectionTitle>Scanner un code-barres</SectionTitle>
-        </SectionHeader>
-        <Item>
-          <ItemTitle>Lancer le scanner</ItemTitle>
-          <ItemText>
-            Depuis l'accueil, appuyez sur le bouton "Scanner". Pointez votre caméra
-            vers le code-barres du livre — la fiche produit s'affiche automatiquement.
-          </ItemText>
-        </Item>
-        <Item>
-          <ItemTitle>Compatibilité</ItemTitle>
-          <ItemText>
-            Fonctionne sur Chrome, Edge (détection native) et Firefox, Safari (via ZXing).
-            Autorisez l'accès à la caméra si demandé.
           </ItemText>
         </Item>
       </Section>

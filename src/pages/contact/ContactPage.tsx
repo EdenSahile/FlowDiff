@@ -246,7 +246,7 @@ export function ContactPage() {
 
           <SendButton
             type="submit"
-            disabled={sending || !sujet.trim() || !message.trim()}
+            disabled={sending}
             style={{ marginTop: '24px' }}
           >
             {sending ? 'Envoi en cours…' : `Envoyer à ${recipient === 'representant' ? 'mon représentant' : 'le service clients'}`}

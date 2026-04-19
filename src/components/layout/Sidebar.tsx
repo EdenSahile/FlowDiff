@@ -1,4 +1,6 @@
-import styled from 'styled-components'
+import { useState } from 'react'
+import { createPortal } from 'react-dom'
+import styled, { keyframes } from 'styled-components'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuthContext } from '@/contexts/AuthContext'
 import { Wordmark } from '@/components/brand/Wordmark'
@@ -152,20 +154,57 @@ const LogoutBtn = styled.button`
   background: none;
   border: none;
   cursor: pointer;
-  color: rgba(255,255,255,0.28);
+  color: rgba(255, 107, 107, 0.80);
   font-family: ${({ theme }) => theme.typography.fontFamily};
   font-size: 12px;
-  font-weight: ${({ theme }) => theme.typography.weights.normal};
+  font-weight: ${({ theme }) => theme.typography.weights.medium};
   padding: 6px 10px;
   border-radius: 6px;
   text-align: left;
   transition: color 0.15s ease, background-color 0.15s ease;
 
   &:hover {
-    color: #E8820C;
-    background-color: rgba(232,130,12,0.08);
+    color: #FF6B6B;
+    background-color: rgba(255, 107, 107, 0.10);
   }
 `
+
+/* ── Modale confirmation ── */
+const fadeIn = keyframes`from { opacity: 0; } to { opacity: 1; }`
+
+const ConfirmOverlay = styled.div`
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 500;
+  padding: 24px;
+  animation: ${fadeIn} 0.15s ease;
+`
+const ConfirmBox = styled.div`
+  background: #fff;
+  border-radius: 16px;
+  padding: 28px 24px 20px;
+  max-width: 320px;
+  width: 100%;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  text-align: center;
+`
+const ConfirmIconWrap = styled.div`
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  background: #FFF0F0;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 14px;
+  color: #E53935;
+`
+const ConfirmTitle = styled.p`font-size:1rem;font-weight:700;color:#111;margin-bottom:6px;`
+const ConfirmBody  = styled.p`font-size:.875rem;color:#666;line-height:1.5;margin-bottom:20px;`
+const ConfirmBtns  = styled.div`display:flex;gap:10px;`
+const BtnCancel    = styled.button`flex:1;padding:11px;border:1.5px solid #E0E0E0;border-radius:8px;background:#fff;color:#333;font-size:.9rem;font-weight:600;cursor:pointer;font-family:inherit;transition:background .15s;&:hover{background:#F5F5F5;}`
+const BtnConfirm   = styled.button`flex:1;padding:11px;border:none;border-radius:8px;background:#E53935;color:#fff;font-size:.9rem;font-weight:600;cursor:pointer;font-family:inherit;transition:background .15s;&:hover{background:#C62828;}`
 
 const UserBlock = styled.div`
   display: flex;
@@ -270,15 +309,18 @@ const infoItems = [
 export function Sidebar() {
   const { user, logout } = useAuthContext()
   const navigate = useNavigate()
+  const [confirmLogout, setConfirmLogout] = useState(false)
 
   const initiale = user?.nomLibrairie?.[0]?.toUpperCase() ?? 'L'
 
   function handleLogout() {
+    setConfirmLogout(false)
     logout()
     navigate('/login')
   }
 
   return (
+    <>
     <SidebarContainer>
 
       {/* ── Zone logo ── */}
@@ -319,7 +361,7 @@ export function Sidebar() {
       {/* ── Logout + footer identité ── */}
       <SidebarBottom>
         <BottomDivider />
-        <LogoutBtn onClick={handleLogout}>
+        <LogoutBtn onClick={() => setConfirmLogout(true)}>
           <IconLogout /> Se déconnecter
         </LogoutBtn>
         <UserBlock>
@@ -337,5 +379,21 @@ export function Sidebar() {
       </SidebarBottom>
 
     </SidebarContainer>
+
+    {confirmLogout && createPortal(
+      <ConfirmOverlay onClick={() => setConfirmLogout(false)}>
+        <ConfirmBox onClick={e => e.stopPropagation()}>
+          <ConfirmIconWrap><IconLogout /></ConfirmIconWrap>
+          <ConfirmTitle>Se déconnecter ?</ConfirmTitle>
+          <ConfirmBody>Vous serez redirigé vers la page de connexion.</ConfirmBody>
+          <ConfirmBtns>
+            <BtnCancel onClick={() => setConfirmLogout(false)}>Annuler</BtnCancel>
+            <BtnConfirm onClick={handleLogout}>Se déconnecter</BtnConfirm>
+          </ConfirmBtns>
+        </ConfirmBox>
+      </ConfirmOverlay>,
+      document.body
+    )}
+    </>
   )
 }

@@ -99,6 +99,11 @@ const CoverSidebar = styled.div`
   padding: 16px 16px 12px;
   border-right: 1px solid #E6E1DA;
   gap: 10px;
+
+  @media (max-width: 767px) {
+    width: 90px;
+    padding: 12px 10px 8px;
+  }
 `
 
 const CoverDots = styled.div`
@@ -118,6 +123,10 @@ const TextGrid = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   min-width: 0;
+
+  @media (max-width: 767px) {
+    grid-template-columns: 1fr;
+  }
 `
 
 const Col = styled.div<{ $border?: boolean }>`
@@ -127,6 +136,10 @@ const Col = styled.div<{ $border?: boolean }>`
   flex-direction: column;
   gap: 3px;
   border-left: ${({ $border }) => $border ? '1px solid #E6E1DA' : 'none'};
+
+  @media (max-width: 767px) {
+    ${({ $border }) => $border && 'display: none;'}
+  }
 `
 
 /* ── Col 1 : bibliographie ── */
@@ -297,6 +310,13 @@ const OrderBar = styled.div`
   height: 38px;
   border-top: 1px solid #E6E1DA;
   background: #FAFAF8;
+
+  @media (max-width: 767px) {
+    flex-wrap: wrap;
+    height: auto;
+    padding: 8px 10px;
+    gap: 6px;
+  }
 `
 
 const AvailStatus = styled.div`
@@ -323,6 +343,10 @@ const VLine = styled.span`
   width: 1px; height: 18px;
   background: #E6E1DA;
   flex-shrink: 0;
+
+  @media (max-width: 767px) {
+    display: none;
+  }
 `
 
 /* ── Custom dropdown ── */
@@ -333,11 +357,21 @@ const FormatSelectWrap = styled.div`
   justify-content: center;
   padding: 0 12px;
   position: relative;
+
+  @media (max-width: 767px) {
+    width: 100%;
+    flex: none;
+    padding: 0;
+  }
 `
 
 const DropdownTrigger = styled.button<{ $open: boolean; $isEbook: boolean }>`
   width: 447px;
   height: 32px;
+
+  @media (max-width: 767px) {
+    width: 100%;
+  }
   padding: 0 36px 0 14px;
   border: 1.5px solid ${({ $open, $isEbook }) => $open ? '#1E3A5F' : $isEbook ? '#BEDAFF' : '#D8D3CC'};
   border-radius: 7px;
@@ -390,6 +424,12 @@ const DropdownPanel = styled.div<{ $top: number; $left: number }>`
   box-shadow: 0 8px 24px rgba(28,50,82,0.18);
   z-index: 9999;
   overflow: hidden;
+
+  @media (max-width: 767px) {
+    left: 8px !important;
+    right: 8px;
+    width: auto;
+  }
 `
 
 const DropGroupLabel = styled.div`
@@ -447,6 +487,14 @@ const RightControls = styled.div`
   gap: 0;
   padding-left: 12px;
   border-left: 1px solid #E6E1DA;
+
+  @media (max-width: 767px) {
+    width: 100%;
+    padding-left: 0;
+    border-left: none;
+    border-top: 1px solid #E6E1DA;
+    padding-top: 6px;
+  }
 `
 
 const CtrlItem = styled.div`
@@ -522,6 +570,16 @@ const AMBox = styled.div`
   max-height: 80vh;
   display: flex; flex-direction: column;
   overflow: hidden;
+
+  @media (max-width: 767px) {
+    max-width: calc(100vw - 16px);
+    border-radius: 10px;
+  }
+`
+
+const AMBodyScroll = styled.div`
+  overflow-x: auto;
+  flex: 1;
 `
 
 const AMHead = styled.div`
@@ -534,7 +592,7 @@ const AMHeadLeft = styled.div`display: flex; flex-direction: column; gap: 2px;`
 
 const AMHeadLabel = styled.span`
   font-size: 9px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase;
-  color: ${({ theme }) => theme.colors.primary};
+  color: rgba(255, 255, 255, 0.6);
 `
 
 const AMHeadTitle = styled.span`
@@ -915,7 +973,7 @@ export function BookCardRow({ book, selected, onToggle }: Props) {
             <AMCloseBtn onClick={() => setAmOpen(false)} aria-label="Fermer">✕</AMCloseBtn>
           </AMHead>
 
-          <AMBody>
+          <AMBodyScroll>
             {bookOrders.length === 0 ? (
               <AMEmpty>Aucune commande passée pour ce titre.</AMEmpty>
             ) : (
@@ -964,7 +1022,7 @@ export function BookCardRow({ book, selected, onToggle }: Props) {
                 </tbody>
               </AMTable>
             )}
-          </AMBody>
+          </AMBodyScroll>
 
           <AMFooter>
             <span>{bookOrders.length} commande{bookOrders.length > 1 ? 's' : ''} trouvée{bookOrders.length > 1 ? 's' : ''}</span>
