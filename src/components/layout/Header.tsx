@@ -236,10 +236,25 @@ const AdvancedPanel = styled.div`
     width: 100vw;
     left: 0;
     border-radius: 0 0 16px 16px;
-    padding: 16px;
-    gap: 14px;
+    padding: 0;
+    gap: 0;
     max-height: calc(100dvh - ${({ theme }) => theme.layout.mobileHeaderHeight});
+    overflow: hidden;
+  }
+`
+
+const PanelScrollBody = styled.div`
+  display: contents;
+
+  @media (max-width: calc(${({ theme }) => theme.breakpoints.mobile} - 1px)) {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    flex: 1;
+    min-height: 0;
     overflow-y: auto;
+    padding: 14px 16px 8px;
+    -webkit-overflow-scrolling: touch;
   }
 `
 
@@ -302,12 +317,10 @@ const PanelFooter = styled.div`
   padding-top: 2px;
 
   @media (max-width: calc(${({ theme }) => theme.breakpoints.mobile} - 1px)) {
-    position: sticky;
-    bottom: 0;
-    background: #fff;
-    padding: 12px 0 0;
+    flex-shrink: 0;
+    padding: 12px 16px 16px;
     border-top: 1px solid ${({ theme }) => theme.colors.gray[100]};
-    margin-top: 4px;
+    background: #fff;
   }
 `
 
@@ -373,7 +386,9 @@ const MobilePanelTop = styled.div`
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-bottom: 4px;
+    padding: 14px 16px 10px;
+    flex-shrink: 0;
+    border-bottom: 1px solid ${({ theme }) => theme.colors.gray[100]};
   }
 `
 
@@ -768,93 +783,94 @@ export function Header({ cartCount = 0, onBurgerClick, onCartClick, hasNotif = t
                 <ClosePanelBtn onClick={() => setShowPanel(false)} aria-label="Fermer les filtres">✕</ClosePanelBtn>
               </MobilePanelTop>
 
-              {/* Thématique */}
-              <PanelSection>
-                <PanelLabel>Thématique</PanelLabel>
-                <ChipGroup>
-                  <Chip $active={selUniverse === null} onClick={() => setSelUniverse(null)}>Toutes</Chip>
-                  {UNIVERSES.map(u => (
-                    <Chip
-                      key={u}
-                      $active={selUniverse === u}
-                      disabled={!availableUniverses.has(u)}
-                      onClick={() => setSelUniverse(selUniverse === u ? null : u)}
-                    >
-                      {u}
-                    </Chip>
-                  ))}
-                </ChipGroup>
-              </PanelSection>
-
-              {selUniverse && (
+              <PanelScrollBody>
                 <PanelSection>
-                  <PanelLabel>Genre</PanelLabel>
+                  <PanelLabel>Thématique</PanelLabel>
                   <ChipGroup>
-                    {GENRE_BY_UNIVERSE[selUniverse].map(g => (
+                    <Chip $active={selUniverse === null} onClick={() => setSelUniverse(null)}>Toutes</Chip>
+                    {UNIVERSES.map(u => (
                       <Chip
-                        key={g}
-                        $active={selGenre === g}
-                        disabled={!availableGenres.has(g)}
-                        onClick={() => setSelGenre(selGenre === g ? null : g)}
+                        key={u}
+                        $active={selUniverse === u}
+                        disabled={!availableUniverses.has(u)}
+                        onClick={() => setSelUniverse(selUniverse === u ? null : u)}
                       >
-                        {g}
+                        {u}
                       </Chip>
                     ))}
                   </ChipGroup>
                 </PanelSection>
-              )}
 
-              <PanelDivider />
+                {selUniverse && (
+                  <PanelSection>
+                    <PanelLabel>Genre</PanelLabel>
+                    <ChipGroup>
+                      {GENRE_BY_UNIVERSE[selUniverse].map(g => (
+                        <Chip
+                          key={g}
+                          $active={selGenre === g}
+                          disabled={!availableGenres.has(g)}
+                          onClick={() => setSelGenre(selGenre === g ? null : g)}
+                        >
+                          {g}
+                        </Chip>
+                      ))}
+                    </ChipGroup>
+                  </PanelSection>
+                )}
 
-              <PanelSection>
-                <PanelLabel>Langue</PanelLabel>
-                <ChipGroup>
-                  {LANGUAGES.map(l => (
-                    <Chip
-                      key={l}
-                      $active={selLangue === l}
-                      disabled={!availableLangues.has(l)}
-                      onClick={() => setSelLangue(selLangue === l ? null : l)}
-                    >
-                      {l}
-                    </Chip>
-                  ))}
-                </ChipGroup>
-              </PanelSection>
+                <PanelDivider />
 
-              <PanelSection>
-                <PanelLabel>Prix</PanelLabel>
-                <ChipGroup>
-                  {PRICE_RANGES.map(r => (
-                    <Chip
-                      key={r.label}
-                      $active={selPrix === r.label}
-                      disabled={!availablePrix.has(r.label)}
-                      onClick={() => setSelPrix(selPrix === r.label ? null : r.label)}
-                    >
-                      {r.label}
-                    </Chip>
-                  ))}
-                </ChipGroup>
-              </PanelSection>
+                <PanelSection>
+                  <PanelLabel>Langue</PanelLabel>
+                  <ChipGroup>
+                    {LANGUAGES.map(l => (
+                      <Chip
+                        key={l}
+                        $active={selLangue === l}
+                        disabled={!availableLangues.has(l)}
+                        onClick={() => setSelLangue(selLangue === l ? null : l)}
+                      >
+                        {l}
+                      </Chip>
+                    ))}
+                  </ChipGroup>
+                </PanelSection>
 
-              <PanelSection>
-                <PanelLabel>Format</PanelLabel>
-                <ChipGroup>
-                  {FORMATS.map(f => (
-                    <Chip
-                      key={f}
-                      $active={selFormat === f}
-                      disabled={!availableFormats.has(f)}
-                      onClick={() => setSelFormat(selFormat === f ? null : f)}
-                    >
-                      {f}
-                    </Chip>
-                  ))}
-                </ChipGroup>
-              </PanelSection>
+                <PanelSection>
+                  <PanelLabel>Prix</PanelLabel>
+                  <ChipGroup>
+                    {PRICE_RANGES.map(r => (
+                      <Chip
+                        key={r.label}
+                        $active={selPrix === r.label}
+                        disabled={!availablePrix.has(r.label)}
+                        onClick={() => setSelPrix(selPrix === r.label ? null : r.label)}
+                      >
+                        {r.label}
+                      </Chip>
+                    ))}
+                  </ChipGroup>
+                </PanelSection>
 
-              <PanelDivider />
+                <PanelSection>
+                  <PanelLabel>Format</PanelLabel>
+                  <ChipGroup>
+                    {FORMATS.map(f => (
+                      <Chip
+                        key={f}
+                        $active={selFormat === f}
+                        disabled={!availableFormats.has(f)}
+                        onClick={() => setSelFormat(selFormat === f ? null : f)}
+                      >
+                        {f}
+                      </Chip>
+                    ))}
+                  </ChipGroup>
+                </PanelSection>
+
+                <PanelDivider />
+              </PanelScrollBody>
 
               <PanelFooter>
                 <ResetLink onClick={handleReset}>Réinitialiser les filtres</ResetLink>
