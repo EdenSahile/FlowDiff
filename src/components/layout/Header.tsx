@@ -361,7 +361,7 @@ const MobileBackdrop = styled.div`
     inset: 0;
     top: ${({ theme }) => theme.layout.mobileHeaderHeight};
     background: rgba(0,0,0,0.45);
-    z-index: 150;
+    z-index: 99;
   }
 `
 
