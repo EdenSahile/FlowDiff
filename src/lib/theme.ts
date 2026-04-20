@@ -78,8 +78,8 @@ export const theme = {
   },
   layout: {
     sidebarWidth:        '220px',
-    headerHeight:        '56px',
-    mobileHeaderHeight:  '96px',
+    headerHeight:        '68px',
+    mobileHeaderHeight:  '112px',
     bottomNavHeight:     '64px',
   },
 } as const

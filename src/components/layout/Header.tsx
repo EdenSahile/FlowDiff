@@ -38,7 +38,7 @@ const HeaderBar = styled.header`
   @media (max-width: calc(${({ theme }) => theme.breakpoints.mobile} - 1px)) {
     flex-wrap: wrap;
     height: auto;
-    padding: 10px ${({ theme }) => theme.spacing.md};
+    padding: 14px ${({ theme }) => theme.spacing.md};
     gap: 8px 0;
     align-items: center;
   }
