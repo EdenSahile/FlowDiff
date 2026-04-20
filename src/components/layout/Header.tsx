@@ -133,44 +133,57 @@ const SearchWrap = styled.div`
 
 const SearchIconWrap = styled.span`
   position: absolute;
-  left: 9px;
+  left: 11px;
   display: flex;
   align-items: center;
   pointer-events: none;
-  opacity: 0.5;
+  color: #555;
+
+  @media (max-width: calc(${({ theme }) => theme.breakpoints.mobile} - 1px)) {
+    color: rgba(255,255,255,0.7);
+    left: 11px;
+  }
 `
 
 const SearchInput = styled.input`
-  width: 340px;
-  padding: 6px 12px 6px 30px;
-  background: rgba(255,255,255,0.10);
+  width: 380px;
+  padding: 9px 14px 9px 34px;
+  background: #dcdcdc;
   border: none;
-  border-radius: 6px;
-  color: #fff;
+  border-radius: 8px;
+  color: #111;
   font-family: ${({ theme }) => theme.typography.fontFamily};
-  font-size: 12px;
+  font-size: 13px;
   outline: none;
-  transition: width 0.2s ease, background 0.15s ease;
+  transition: width 0.2s ease, background 0.15s ease, box-shadow 0.15s ease;
   appearance: none;
 
   &::placeholder {
-    color: rgba(255,255,255,0.45);
-    font-size: 12px;
+    color: #777;
+    font-size: 13px;
   }
 
   &::-webkit-search-cancel-button { display: none; }
 
   &:focus {
-    width: 420px;
-    background: rgba(255,255,255,0.15);
+    width: 480px;
+    background: #ebebeb;
+    box-shadow: 0 0 0 2px rgba(34,98,65,0.25);
     outline: none;
   }
 
   @media (max-width: calc(${({ theme }) => theme.breakpoints.mobile} - 1px)) {
     width: 100%;
-    &:focus { width: 100%; }
+    background: rgba(255,255,255,0.18);
+    color: #fff;
+    &::placeholder { color: rgba(255,255,255,0.6); }
+    &:focus {
+      width: 100%;
+      background: rgba(255,255,255,0.24);
+      box-shadow: none;
+    }
     font-size: 14px;
-    padding: 8px 12px 8px 34px;
+    padding: 9px 12px 9px 36px;
   }
 `
 
@@ -506,8 +519,8 @@ const CartBadge = styled.span`
 /* ── Icônes SVG ── */
 function IconSearch() {
   return (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
-      stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
       <circle cx="11" cy="11" r="8"/>
       <path d="m21 21-4.35-4.35"/>
     </svg>
