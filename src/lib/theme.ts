@@ -21,7 +21,7 @@ export const theme = {
       50:  '#F4F4F0',   // Fond page (lin neutre)
       100: '#EAEAE6',   // Surface légèrement teintée
       200: '#D8D8D4',   // Bordures, séparateurs
-      400: '#9A9A96',   // Texte tertiaire, placeholders
+      400: '#6B6B68',   // Texte tertiaire, placeholders — 5.3:1 sur blanc (WCAG AA)
       600: '#555550',   // Texte secondaire
       800: '#111111',   // Texte principal
     },

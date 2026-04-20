@@ -159,7 +159,7 @@ const SearchInput = styled.input`
   appearance: none;
 
   &::placeholder {
-    color: #777;
+    color: #555;
     font-size: 13px;
   }
 
