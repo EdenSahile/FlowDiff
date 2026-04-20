@@ -78,6 +78,11 @@ const RightSection = styled.div`
   display: flex;
   align-items: center;
   gap: 12px;
+  min-width: 0;
+
+  @media (max-width: 479px) {
+    gap: 6px;
+  }
 `
 
 /* ── Search container (wraps input + filters btn + panel) ── */
@@ -129,9 +134,14 @@ const SearchInput = styled.input`
     outline: none;
   }
 
-  @media (max-width: 640px) {
-    width: 160px;
-    &:focus { width: 190px; }
+  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
+    width: 130px;
+    &:focus { width: 160px; }
+  }
+
+  @media (max-width: 479px) {
+    width: 80px;
+    &:focus { width: 110px; }
   }
 `
 
@@ -157,6 +167,16 @@ const AdvancedBtn = styled.button<{ $active: boolean }>`
     color: #fff;
     border-color: rgba(255,255,255,0.30);
   }
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
+    padding: 5px 8px;
+  }
+`
+
+const AdvBtnLabel = styled.span`
+  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
+    display: none;
+  }
 `
 
 const ActiveBadge = styled.span`
@@ -172,23 +192,26 @@ const ActiveBadge = styled.span`
 
 /* ── Advanced panel ── */
 const AdvancedPanel = styled.div`
-  position: absolute;
-  top: calc(100% + 10px);
+  position: fixed;
+  top: ${({ theme }) => theme.layout.headerHeight};
   right: 0;
   z-index: 200;
   background: #fff;
-  border-radius: 14px;
+  border-radius: 0 0 14px 14px;
   box-shadow: 0 12px 40px rgba(28,58,95,0.20), 0 2px 8px rgba(28,58,95,0.08);
   border: 1px solid rgba(28,58,95,0.08);
   width: 480px;
+  max-width: 100vw;
   padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 18px;
 
-  @media (max-width: 560px) {
-    width: calc(100vw - 32px);
-    right: -8px;
+  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
+    width: 100vw;
+    border-radius: 0 0 14px 14px;
+    padding: 16px;
+    gap: 14px;
   }
 `
 
@@ -306,6 +329,10 @@ const NotifBtn = styled.button`
   transition: background 0.15s;
 
   &:hover { background: rgba(255,255,255,0.14); }
+
+  @media (max-width: 479px) {
+    width: 28px; height: 28px;
+  }
 `
 
 const NotifDot = styled.span`
@@ -318,6 +345,12 @@ const NotifDot = styled.span`
 `
 
 /* ── Panier ── */
+const CartLabel = styled.span`
+  @media (max-width: 479px) {
+    display: none;
+  }
+`
+
 const CartBtn = styled.button<{ $hasItems: boolean }>`
   display: flex;
   align-items: center;
@@ -331,6 +364,12 @@ const CartBtn = styled.button<{ $hasItems: boolean }>`
   font-weight: 600;
   flex-shrink: 0;
   transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+
+  @media (max-width: 479px) {
+    padding: 0 10px;
+    min-height: 36px;
+    gap: 4px;
+  }
 
   ${({ $hasItems }) => $hasItems ? `
     background: ${GOLD};
@@ -611,7 +650,7 @@ export function Header({ cartCount = 0, onBurgerClick, onCartClick, hasNotif = t
             aria-expanded={showPanel}
           >
             <IconSliders />
-            Filtres
+            <AdvBtnLabel>Filtres</AdvBtnLabel>
             {activeCount > 0 && <ActiveBadge>{activeCount}</ActiveBadge>}
           </AdvancedBtn>
 
@@ -736,7 +775,7 @@ export function Header({ cartCount = 0, onBurgerClick, onCartClick, hasNotif = t
           aria-label={`Panier — ${cartCount} article${cartCount !== 1 ? 's' : ''}`}
         >
           <IconCartSvg filled={cartCount > 0} />
-          Panier
+          <CartLabel>Panier</CartLabel>
           {cartCount > 0 && (
             <CartBadge>{cartCount > 99 ? '99+' : cartCount}</CartBadge>
           )}

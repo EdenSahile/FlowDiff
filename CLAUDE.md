@@ -185,12 +185,12 @@ En permanence : **Menu Burger** (gauche) + **Panier** (droite, avec badge quanti
 | 1bis | **Migration React/Vite** — remplacement Next.js par Vite + React Router | ✅ Fait |
 | 2 | Layout global (nav bottom mobile / sidebar desktop) + design system | ✅ Fait |
 | 3 | Authentification mock (inscription + connexion + mot de passe oublié) | ✅ Fait |
-| 4 | Accueil (recherche + scanner UI) | ✅ Fait |
+| 4 | Accueil (recherche) | ✅ Fait |
 | 5 | Catalogue Fonds + Nouveautés (liste, filtres, fiche produit) | ✅ Fait |
 | 6 | Panier + commande | ✅ Fait |
 | 7 | Flash Infos | ✅ Fait |
 | 8 | Menu Burger + Mon compte + Historique | ✅ Fait |
-| 9 | Scanner caméra (lecture code-barres réelle) | ✅ Fait |
+| 9 | ~~Scanner caméra (lecture code-barres réelle)~~ — **supprimé** | 🚫 Annulé |
 | 10 | PWA — vite-plugin-pwa (manifest + service worker + icônes) | ⬜ À faire |
 | 11 | Tests + recette fonctionnelle | ✅ Fait (Vitest — computeTotals + isOrderable) |
 | 12 | ~~Migration Next.js 14~~ — **annulé**, projet reste sur Vite (test Vercel) | 🚫 Annulé |
