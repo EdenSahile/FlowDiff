@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 
-export const AuthPage = styled.div`
+export const AuthPage = styled.main`
   min-height: 100vh;
   background-color: ${({ theme }) => theme.colors.navy};
   display: flex;
