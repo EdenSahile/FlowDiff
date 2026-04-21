@@ -589,6 +589,7 @@ const ListsPanel = styled.div<{ $top: number; $right: number }>`
   max-width: calc(100vw - 16px);
   padding: 0;
   overflow: hidden;
+  overflow: hidden;
 `
 
 const ListsPanelHead = styled.div`
@@ -692,6 +693,77 @@ const ListRowDelete = styled.button`
     color: #e24b4a;
     background: rgba(226,75,74,0.08);
   }
+`
+
+/* ── Confirmation suppression liste ── */
+const ConfirmOverlay = styled.div`
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(2px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  z-index: 10;
+  padding: 24px;
+`
+
+const ConfirmText = styled.p`
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 14px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.navy};
+  text-align: center;
+  margin: 0;
+`
+
+const ConfirmSub = styled.p`
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 12px;
+  color: ${({ theme }) => theme.colors.gray[400]};
+  text-align: center;
+  margin: -6px 0 0;
+`
+
+const ConfirmRow = styled.div`
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  max-width: 260px;
+`
+
+const ConfirmCancel = styled.button`
+  flex: 1;
+  padding: 9px;
+  border: 1.5px solid rgba(28,58,95,0.18);
+  border-radius: 8px;
+  background: transparent;
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 13px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.navy};
+  cursor: pointer;
+  transition: background 0.12s;
+
+  &:hover { background: rgba(28,58,95,0.05); }
+`
+
+const ConfirmDelete = styled.button`
+  flex: 1;
+  padding: 9px;
+  border: none;
+  border-radius: 8px;
+  background: #e24b4a;
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.12s;
+
+  &:hover { background: #c73a39; }
 `
 
 /* ── Vue détail d'une liste ── */
@@ -1004,6 +1076,7 @@ export function Header({ cartCount = 0, onBurgerClick, onCartClick, hasNotif = t
   const navigate = useNavigate()
   const { lists, deleteList, removeFromList } = useWishlist()
   const { addToCart } = useCart()
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
 
   const exportListCSV = (list: { name: string; items: Array<{ book: { isbn: string; title: string; authors: string[]; priceTTC: number; publicationDate: string }; addedBy?: string }> }) => {
     const header = ['ISBN', 'Titre', 'Auteur', 'Prix TTC', 'Date parution', 'Nom de la liste', 'Ajouté par']
@@ -1417,6 +1490,19 @@ export function Header({ cartCount = 0, onBurgerClick, onCartClick, hasNotif = t
           role="dialog"
           aria-label="Mes listes de commandes"
         >
+          {confirmDeleteId && (() => {
+            const target = lists.find(l => l.id === confirmDeleteId)
+            return (
+              <ConfirmOverlay>
+                <ConfirmText>Supprimer la liste&nbsp;?</ConfirmText>
+                <ConfirmSub>« {target?.name} » et ses {target?.items.length ?? 0} titre{(target?.items.length ?? 0) !== 1 ? 's' : ''} seront supprimés.</ConfirmSub>
+                <ConfirmRow>
+                  <ConfirmCancel onClick={() => setConfirmDeleteId(null)}>Annuler</ConfirmCancel>
+                  <ConfirmDelete onClick={() => { deleteList(confirmDeleteId); setConfirmDeleteId(null) }}>Supprimer</ConfirmDelete>
+                </ConfirmRow>
+              </ConfirmOverlay>
+            )
+          })()}
           {selectedListId ? (() => {
             const list = lists.find(l => l.id === selectedListId)
             if (!list) { setSelectedListId(null); return null }
@@ -1523,7 +1609,7 @@ export function Header({ cartCount = 0, onBurgerClick, onCartClick, hasNotif = t
                         <ListRowCount>{list.items.length} titre{list.items.length !== 1 ? 's' : ''}</ListRowCount>
                       </ListRowInfo>
                       <ListRowDelete
-                        onClick={e => { e.stopPropagation(); deleteList(list.id) }}
+                        onClick={e => { e.stopPropagation(); setConfirmDeleteId(list.id) }}
                         aria-label={`Supprimer la liste ${list.name}`}
                         title="Supprimer cette liste"
                       >
