@@ -1123,11 +1123,12 @@ const STOCK_OVERRIDES: Record<string, StockStatut> = {
   'f-lit-sapiens':     'sur_commande',    // Sapiens
   'f-bd-naruto':       'sur_commande',    // Naruto T.1
 
-  /* En réimpression */
+  /* En réimpression — uniquement fonds (une nouveauté qui vient de paraître
+     ne peut pas être déjà en réimpression) */
   'f-lit-bovary':      'en_reimp',        // Madame Bovary
   'f-lit-alchimiste':  'en_reimp',        // L'Alchimiste
   'f-lit-gatsby':      'en_reimp',        // Gatsby le Magnifique
-  'n-lit-02':          'en_reimp',        // Chanson douce
+  'f-lit-millenium':   'en_reimp',        // Millénium T.1
   'f-bd-onepiece':     'en_reimp',        // One Piece T.1
 
   /* Épuisé */
@@ -1138,10 +1139,24 @@ const STOCK_OVERRIDES: Record<string, StockStatut> = {
   'f-lit-musso':       'epuise',          // La Jeune Femme et la Nuit
 }
 
+/* Statuts interdits pour une nouveauté — un titre qui vient de paraître
+   ne peut pas déjà être en réimpression ou sur commande spéciale.
+   Ces statuts n'apparaissent que sur les titres de fonds. */
+const NOUVEAUTE_FORBIDDEN: readonly StockStatut[] = ['sur_commande', 'en_reimp']
+
+function resolveStatut(book: Book): StockStatut {
+  const override = STOCK_OVERRIDES[book.id]
+  if (!override) return 'disponible'
+  if (book.type === 'nouveaute' && NOUVEAUTE_FORBIDDEN.includes(override)) {
+    return 'disponible'
+  }
+  return override
+}
+
 export const MOCK_BOOKS: Book[] = _RAW_MOCK_BOOKS.map(b =>
   b.type === 'a-paraitre'
     ? b
-    : { ...b, statut: STOCK_OVERRIDES[b.id] ?? 'disponible' }
+    : { ...b, statut: resolveStatut(b) }
 )
 
 /* ─── Helpers ─── */
