@@ -9,7 +9,7 @@ import { useAuthContext } from '@/contexts/AuthContext'
 import { ORDER_STATUS_LABELS } from '@/data/mockOrders'
 import { useWishlist } from '@/contexts/WishlistContext'
 import { ListPickerPopover } from './ListPickerPopover'
-import { StockBadge } from './StockBadge'
+import { StockStatus } from '@/components/ui/StockStatus'
 
 /* ══════════════════════════════════════════════════════
    TYPES & DONNÉES
@@ -182,8 +182,8 @@ const MetaItalic = styled(MetaLine)`
 `
 
 const IsbnLine = styled.p`
-  font-size: 11px;
-  color: ${({ theme }) => theme.colors.gray[600]};
+  font-size: 12px;
+  color: #666666;
   margin-top: 2px;
   letter-spacing: 0.01em;
 `
@@ -847,7 +847,7 @@ export function BookCardRow({ book, selected, onToggle }: Props) {
             <IsbnLine>ISBN {isbnDisplay}</IsbnLine>
             {book.statut && !isAParaitre && (
               <div style={{ marginTop: 6 }}>
-                <StockBadge statut={book.statut} />
+                <StockStatus statut={book.statut} delaiReimp={book.delaiReimp} />
               </div>
             )}
           </Col>
@@ -912,12 +912,12 @@ export function BookCardRow({ book, selected, onToggle }: Props) {
 
         {/* Statut disponibilité */}
         <AvailStatus>
-          <GreenDot />
-          <AvailText>{
-            isAParaitre ? 'À paraître' :
-            isEpuise    ? 'Épuisé'     :
-                          'Available'
-          }</AvailText>
+          {isAParaitre
+            ? <AvailText>À paraître</AvailText>
+            : book.statut
+              ? <StockStatus statut={book.statut} delaiReimp={book.delaiReimp} />
+              : <AvailText>Disponible</AvailText>
+          }
         </AvailStatus>
 
         <VLine />
