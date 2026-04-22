@@ -640,7 +640,6 @@ const AMCloseBtn = styled.button`
   &:hover { background: rgba(255,255,255,0.22); color: #fff; }
 `
 
-const AMBody = styled.div`overflow-y: auto; flex: 1;`
 
 const AMTable = styled.table`
   width: 100%; border-collapse: collapse; font-size: 12px;

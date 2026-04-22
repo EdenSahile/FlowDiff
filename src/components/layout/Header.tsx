@@ -15,8 +15,6 @@ import { useWishlist } from '@/contexts/WishlistContext'
 import { useCart } from '@/contexts/CartContext'
 
 const GOLD        = '#C9A84C'
-const GOLD_BG     = 'rgba(201,168,76,0.15)'
-const GOLD_BORDER = 'rgba(201,168,76,0.4)'
 
 const UNIVERSES: Universe[] = ['Littérature', 'BD/Mangas', 'Jeunesse', 'Adulte-pratique']
 const FORMATS = ['Poche', 'Grand format', 'Broché', 'Relié', 'Numérique']
@@ -1224,23 +1222,23 @@ export function Header({ cartCount = 0, onBurgerClick, onCartClick, hasNotif = t
   }, [booksForPrix])
   const availableFormats   = useMemo(() => new Set(booksForFormat.map(b => b.format).filter(Boolean) as string[]), [booksForFormat])
 
-  /* ── Auto-clear selections that become unavailable ── */
+  /* ── Auto-clear selections that become unavailable ──
+     Note: setState-in-effect est intentionnel ici pour synchroniser
+     les sélections filtrées avec les options disponibles. */
+  /* eslint-disable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps */
   useEffect(() => {
     setSelGenre(prev => prev.filter(g => availableGenres.has(g)))
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [availableGenres])
   useEffect(() => {
     setSelLangue(prev => prev.filter(l => availableLangues.has(l)))
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [availableLangues])
   useEffect(() => {
     setSelPrix(prev => prev.filter(p => availablePrix.has(p)))
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [availablePrix])
   useEffect(() => {
     setSelFormat(prev => prev.filter(f => availableFormats.has(f)))
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [availableFormats])
+  /* eslint-enable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps */
 
   /* ── Filtered count (all filters applied) ── */
   const filteredCount = useMemo(() => {

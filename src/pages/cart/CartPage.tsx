@@ -347,19 +347,6 @@ const ItemFooter = styled.div`
   gap: ${({ theme }) => theme.spacing.sm};
 `
 
-const ItemPrice = styled.span`
-  font-family: ${({ theme }) => theme.typography.fontFamily};
-  font-size: ${({ theme }) => theme.typography.sizes.sm};
-  font-weight: ${({ theme }) => theme.typography.weights.bold};
-  color: ${({ theme }) => theme.colors.navy};
-`
-
-const ItemRemise = styled.span`
-  font-family: ${({ theme }) => theme.typography.fontFamily};
-  font-size: ${({ theme }) => theme.typography.sizes.xs};
-  color: #226241;
-`
-
 const PriceStrip = styled.div`
   display: inline-flex;
   align-items: stretch;

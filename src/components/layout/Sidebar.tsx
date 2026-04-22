@@ -58,14 +58,6 @@ const SidebarLogoBtn = styled.button`
   &:hover { opacity: 0.85; }
 `
 
-const SidebarTagline = styled.p`
-  font-family: ${({ theme }) => theme.typography.fontFamily};
-  font-size: 10px;
-  color: rgba(255,255,255,0.45);
-  margin: 0;
-  line-height: 1.4;
-`
-
 /* ══════════════════════════════════════
    ZONE NAVIGATION (corps)
 ══════════════════════════════════════ */

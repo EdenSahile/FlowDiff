@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef, useEffect } from 'react'
+import { useState, useMemo } from 'react'
 import styled, { keyframes } from 'styled-components'
 import { useAuthContext } from '@/contexts/AuthContext'
 import { useCart, REMISE_RATES } from '@/contexts/CartContext'
@@ -341,138 +341,6 @@ const SuccessAlert = styled.div`
   animation: ${fadeSlideIn} 0.2s ease forwards;
 `
 
-/* ── Modal export ── */
-const Overlay = styled.div`
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  padding: ${({ theme }) => theme.spacing.lg};
-`
-
-const ModalBox = styled.div`
-  background: ${({ theme }) => theme.colors.white};
-  border-radius: ${({ theme }) => theme.radii.xl};
-  width: 100%;
-  max-width: 640px;
-  max-height: 80vh;
-  display: flex;
-  flex-direction: column;
-  box-shadow: ${({ theme }) => theme.shadows.lg};
-  overflow: hidden;
-`
-
-const ModalHeader = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: ${({ theme }) => theme.spacing.md} ${({ theme }) => theme.spacing.lg};
-  border-bottom: 1px solid ${({ theme }) => theme.colors.gray[200]};
-`
-
-const ModalTitle = styled.div`
-  font-size: ${({ theme }) => theme.typography.sizes.md};
-  font-weight: ${({ theme }) => theme.typography.weights.bold};
-  color: ${({ theme }) => theme.colors.navy};
-`
-
-const ModalSubtitle = styled.div`
-  font-size: ${({ theme }) => theme.typography.sizes.xs};
-  color: ${({ theme }) => theme.colors.gray[400]};
-  margin-top: 2px;
-`
-
-const CloseButton = styled.button`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border: none;
-  border-radius: 50%;
-  background: ${({ theme }) => theme.colors.gray[100]};
-  color: ${({ theme }) => theme.colors.navy};
-  cursor: pointer;
-  flex-shrink: 0;
-  font-size: 16px;
-  line-height: 1;
-  &:hover { background: ${({ theme }) => theme.colors.gray[200]}; }
-`
-
-const ModalBody = styled.div`
-  flex: 1;
-  overflow: auto;
-  padding: ${({ theme }) => theme.spacing.md} ${({ theme }) => theme.spacing.lg};
-`
-
-const CSVTextarea = styled.textarea`
-  width: 100%;
-  height: 280px;
-  font-family: 'Courier New', Courier, monospace;
-  font-size: 11px;
-  line-height: 1.5;
-  color: ${({ theme }) => theme.colors.navy};
-  background: ${({ theme }) => theme.colors.gray[50]};
-  border: 1px solid ${({ theme }) => theme.colors.gray[200]};
-  border-radius: ${({ theme }) => theme.radii.md};
-  padding: 10px 12px;
-  resize: none;
-  box-sizing: border-box;
-  outline: none;
-`
-
-const ModalFooter = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: ${({ theme }) => theme.spacing.sm};
-  padding: ${({ theme }) => theme.spacing.md} ${({ theme }) => theme.spacing.lg};
-  border-top: 1px solid ${({ theme }) => theme.colors.gray[200]};
-  flex-wrap: wrap;
-`
-
-const CopyButton = styled.button<{ $copied?: boolean }>`
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  padding: 10px 20px;
-  background-color: ${({ $copied, theme }) => $copied ? '#2E7D32' : theme.colors.navy};
-  color: #fdfdfd;
-  border: none;
-  border-radius: ${({ theme }) => theme.radii.md};
-  font-size: ${({ theme }) => theme.typography.sizes.sm};
-  font-weight: ${({ theme }) => theme.typography.weights.semibold};
-  font-family: ${({ theme }) => theme.typography.fontFamily};
-  cursor: pointer;
-  transition: background-color 0.2s;
-  &:hover { opacity: 0.9; }
-`
-
-const DownloadLink = styled.button`
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 10px 16px;
-  background: transparent;
-  color: ${({ theme }) => theme.colors.gray[600]};
-  border: 1.5px solid ${({ theme }) => theme.colors.gray[200]};
-  border-radius: ${({ theme }) => theme.radii.md};
-  font-size: ${({ theme }) => theme.typography.sizes.sm};
-  font-weight: ${({ theme }) => theme.typography.weights.medium};
-  font-family: ${({ theme }) => theme.typography.fontFamily};
-  cursor: pointer;
-  &:hover { border-color: ${({ theme }) => theme.colors.navy}; color: ${({ theme }) => theme.colors.navy}; }
-`
-
-const ModalHint = styled.div`
-  font-size: ${({ theme }) => theme.typography.sizes.xs};
-  color: ${({ theme }) => theme.colors.gray[400]};
-  width: 100%;
-`
-
 const ExportButton = styled.button`
   display: flex;
   align-items: center;
@@ -581,10 +449,6 @@ function IconCheck() {
 function IconDownload() {
   return <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
 }
-function IconCopy() {
-  return <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-}
-
 /* ── Stepper component ── */
 function OrderStepper({ status }: { status: OrderStatus }) {
   const currentIndex = ORDER_STATUSES.indexOf(status)
@@ -614,77 +478,6 @@ function OrderStepper({ status }: { status: OrderStatus }) {
         )
       })}
     </StepperWrap>
-  )
-}
-
-/* ── Export Modal ── */
-function ExportModal({
-  csv, filename, onClose,
-}: { csv: string; filename: string; onClose: () => void }) {
-  const [copied, setCopied] = useState(false)
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
-
-  // Fermer avec Échap
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
-    window.addEventListener('keydown', handler)
-    return () => window.removeEventListener('keydown', handler)
-  }, [onClose])
-
-  function handleCopy() {
-    if (textareaRef.current) {
-      navigator.clipboard.writeText(csv).then(() => {
-        setCopied(true)
-        setTimeout(() => setCopied(false), 2500)
-      })
-    }
-  }
-
-  function handleDownload() {
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = filename
-    a.style.visibility = 'hidden'
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    window.URL.revokeObjectURL(url)
-  }
-
-  return (
-    <Overlay onClick={e => { if (e.target === e.currentTarget) onClose() }}>
-      <ModalBox>
-        <ModalHeader>
-          <div>
-            <ModalTitle>Exporter — {filename}</ModalTitle>
-            <ModalSubtitle>Copie le contenu puis colle-le dans Excel, Numbers ou Google Sheets</ModalSubtitle>
-          </div>
-          <CloseButton onClick={onClose} aria-label="Fermer">✕</CloseButton>
-        </ModalHeader>
-
-        <ModalBody>
-          <CSVTextarea
-            ref={textareaRef}
-            readOnly
-            value={csv}
-            onClick={e => (e.target as HTMLTextAreaElement).select()}
-          />
-        </ModalBody>
-
-        <ModalFooter>
-          <ModalHint>Séparateur : point-virgule (;) — encodage UTF-8</ModalHint>
-          <DownloadLink onClick={handleDownload}>
-            <IconDownload /> Télécharger .csv
-          </DownloadLink>
-          <CopyButton $copied={copied} onClick={handleCopy}>
-            {copied ? <IconCheck /> : <IconCopy />}
-            {copied ? 'Copié !' : 'Copier tout'}
-          </CopyButton>
-        </ModalFooter>
-      </ModalBox>
-    </Overlay>
   )
 }
 

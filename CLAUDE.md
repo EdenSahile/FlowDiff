@@ -53,13 +53,25 @@ Application B2B **FlowDiff** à destination exclusive des **libraires**, permett
 
 ## Charte graphique
 
-| Élément | Valeur |
-|---------|--------|
-| Fond principal | Jaune `#FFC000` |
-| Textes / encadrés | Bleu marine `#1E3A5F` |
-| Boutons d'action | Jaune fond + texte blanc ou bleu |
-| Accents | Blanc |
-| Logo | "BookFlow" (cercle orange/jaune, texte bleu) |
+> Palette actuelle — source de vérité : `src/lib/theme.ts`
+
+| Rôle | Token | Valeur | Usage |
+|------|-------|--------|-------|
+| Bleu foncé principal | `primary` / `navy` | `#232f3e` | Fond header, sidebar, CTA primaires, texte titres |
+| Bleu hover | `primaryHover` | `#42556c` | Hover CTA primaires |
+| Or / accent | `accent` | `#C9A84C` | Liens actifs sidebar, badges "nouveauté", accents |
+| Or clair | `accentLight` | `#F7F0DC` | Fonds or très clair |
+| Vert pâle | `primaryLight` / `navyLight` | `#E6EFE9` | Surfaces alternées, fond badges |
+| Lin (fond page) | `gray.50` | `#F4F4F0` | Fond général de l'application |
+| Gris surface | `gray.100` | `#EAEAE6` | Zones neutres |
+| Gris bordure | `gray.200` | `#D8D8D4` | Bordures, séparateurs |
+| Gris texte 3 | `gray.400` | `#6B6B68` | Placeholders, texte tertiaire (WCAG AA sur blanc) |
+| Gris texte 2 | `gray.600` | `#555550` | Texte secondaire |
+| Gris texte 1 | `gray.800` | `#111111` | Texte principal |
+| Erreur | `error` | `#C0392B` | Messages d'erreur, actions destructrices |
+| Blanc | `white` | `#FFFFFF` | Surfaces cards, fond inputs |
+
+**Règle** : ne jamais hardcoder les couleurs dans les composants — toujours passer par `theme.colors.*`.
 
 ---
 
@@ -85,14 +97,13 @@ Application B2B **FlowDiff** à destination exclusive des **libraires**, permett
 | Top Ventes | Meilleures ventes par thématique |
 | Sélections | Sélections éditoriales thématiques |
 
-En permanence : **Panier** (droite, avec badge quantité) + **Barre de recherche**.
+En permanence : **Panier** (droite, avec badge quantité) +  à gauche du panier, la **Barre de recherche** et **recherche Avancée**
 
 ---
 
 ## Écrans et fonctionnalités
 
 ### Accueil
-- Barre de recherche (EAN, titre, éditeur, collection) avec micro (recherche vocale)
 - Raccourcis page
 - Nouveautés
 
@@ -150,7 +161,7 @@ En permanence : **Panier** (droite, avec badge quantité) + **Barre de recherche
 
 - Les **titres à paraître ne sont PAS commandables** via l'app — consultation catalogue uniquement
 - Les **titres de fonds et nouveautés du mois sont commandables** directement
-- Les remises sont **personnalisées par libraire** et s'appliquent automatiquement selon la thématique
+- Les remises sont **personnalisées par librairie** et s'appliquent automatiquement selon la thématique
 - L'app est **B2B exclusif** : aucun accès grand public
 
 ---

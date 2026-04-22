@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { forgotPasswordSchema, getZodErrors, type ForgotPasswordInput } from '@/lib/authUtils'
+import { forgotPasswordSchema, getZodErrors } from '@/lib/authUtils'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import styled from 'styled-components'

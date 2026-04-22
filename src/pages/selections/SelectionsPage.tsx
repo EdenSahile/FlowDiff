@@ -594,21 +594,6 @@ const StepNum = styled.input`
   &::-webkit-inner-spin-button, &::-webkit-outer-spin-button { -webkit-appearance: none; }
 `
 
-const OPEarned = styled.div<{ $active: boolean }>`
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 11px;
-  font-weight: 700;
-  color: ${({ $active }) => $active ? '#1B5E20' : 'rgba(30,58,95,0.30)'};
-  background: ${({ $active }) => $active ? '#E8F5E9' : 'transparent'};
-  padding: 2px 6px 2px 4px;
-  border-radius: 4px;
-  min-height: 18px;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-`
-
 const AddToCartBtn = styled.button<{ $added?: boolean }>`
   display: flex;
   align-items: center;

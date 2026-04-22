@@ -40,7 +40,7 @@ export const StyledInput = styled.input<InputWrapperProps>`
     border-color: ${({ theme, hasError }) =>
       hasError ? theme.colors.error : theme.colors.primary};
     box-shadow: 0 0 0 3px
-      ${({ theme, hasError }) =>
+      ${({ hasError }) =>
         hasError
           ? 'rgba(211, 47, 47, 0.15)'
           : 'rgba(255, 192, 0, 0.25)'};

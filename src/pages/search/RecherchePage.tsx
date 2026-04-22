@@ -3,7 +3,6 @@ import { useSearchParams, useNavigate } from 'react-router-dom'
 import styled, { keyframes } from 'styled-components'
 import { MOCK_BOOKS, PRICE_RANGES, type Book, type Universe } from '@/data/mockBooks'
 import { BookCard } from '@/components/catalogue/BookCard'
-import { useCart } from '@/contexts/CartContext'
 
 /* ══════════════════════════════════════════════════════
    UTILS
@@ -416,7 +415,6 @@ const UNIVERSES: Universe[] = ['BD/Mangas', 'Jeunesse', 'Littérature', 'Adulte-
 export function RecherchePage() {
   const [params]  = useSearchParams()
   const navigate  = useNavigate()
-  const { addToCart } = useCart()
 
   const q        = (params.get('q') ?? '').trim()
   const pUniverse = (params.get('universe') ?? '') as Universe | ''
@@ -452,6 +450,8 @@ export function RecherchePage() {
     if (pFormats.length) books = books.filter(b => b.format && pFormats.includes(b.format))
 
     return books
+  // paramsStr est dérivé de pUniverse/pGenres/pLangues/pPrix/pFormats — changement unique
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [q, paramsStr])
 
   const results = useMemo(() =>
