@@ -9,7 +9,7 @@ import { useCart } from '@/contexts/CartContext'
 import { useToast } from '@/components/ui/Toast'
 import { useWishlist } from '@/contexts/WishlistContext'
 import { ListPickerPopover } from '@/components/catalogue/ListPickerPopover'
-import { StockBadge } from '@/components/catalogue/StockBadge'
+import { StockStatus } from '@/components/ui/StockStatus'
 import { StockAlertModal } from '@/components/ui/StockAlertModal'
 
 /* ── Formats physiques ── */
@@ -1198,7 +1198,7 @@ export function FicheProduitPage() {
                 {book.statut && !isAParaitre && (
                   <>
                     <MetaDt>Disponibilité</MetaDt>
-                    <MetaDd><StockBadge statut={book.statut} size="md" /></MetaDd>
+                    <MetaDd><StockStatus statut={book.statut} delaiReimp={book.delaiReimp} /></MetaDd>
                   </>
                 )}
               </MetaGrid>
