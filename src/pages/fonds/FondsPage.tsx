@@ -6,6 +6,7 @@ import { getBooksByType, searchBooks } from '@/data/mockBooks'
 import type { Universe, StockStatut } from '@/data/mockBooks'
 import { Input } from '@/components/ui/Input'
 
+// Labels must stay in sync with STATUT_CONFIG in src/components/ui/StockStatus.tsx
 const DISPO_OPTIONS: Array<{ value: StockStatut; label: string }> = [
   { value: 'disponible',   label: '✅ Disponible' },
   { value: 'stock_limite', label: '⚠️ Stock limité' },
@@ -188,11 +189,12 @@ export function FondsPage() {
 
           <VDivider aria-hidden="true" />
 
-          <DispoPill $active={statut === null} onClick={() => setStatut(null)}>
+          <DispoPill type="button" $active={statut === null} onClick={() => setStatut(null)}>
             Tous
           </DispoPill>
           {DISPO_OPTIONS.map(opt => (
             <DispoPill
+              type="button"
               key={opt.value}
               $active={statut === opt.value}
               onClick={() => setStatut(statut === opt.value ? null : opt.value)}
