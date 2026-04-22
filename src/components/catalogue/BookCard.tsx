@@ -179,7 +179,7 @@ const PillRow = styled.div`
 const MetaPill = styled.span`
   display: inline-flex;
   align-items: center;
-  padding: 2px 8px 2px 0;
+  padding: 4px 10px 4px 10px;
   border-radius: 20px;
   background: #f0f0f0;
   color: #666666;

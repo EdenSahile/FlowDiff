@@ -95,10 +95,13 @@ export function StockStatus({ statut, delaiReimp, className }: StockStatusProps)
       {hasTooltip && (
         <InfoIcon
           ref={iconRef}
+          tabIndex={0}
+          role="button"
+          aria-label={tooltipText ?? undefined}
           onMouseEnter={showTooltip}
           onMouseLeave={hideTooltip}
-          aria-label={tooltipText ?? undefined}
-          role="img"
+          onFocus={showTooltip}
+          onBlur={hideTooltip}
         >
           ⓘ
         </InfoIcon>
