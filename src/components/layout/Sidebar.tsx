@@ -4,8 +4,9 @@ import styled, { keyframes } from 'styled-components'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuthContext } from '@/contexts/AuthContext'
 import { Wordmark } from '@/components/brand/Wordmark'
+import { theme } from '@/lib/theme'
 
-const GOLD = '#C9A84C'
+const GOLD = theme.colors.accent
 
 /* ══════════════════════════════════════
    CONTENEUR PRINCIPAL

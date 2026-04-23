@@ -6,7 +6,8 @@ import { useOrders } from '@/contexts/OrdersContext'
 import { useAuth } from '@/hooks/useAuth'
 import { BookCover } from '@/components/catalogue/BookCover'
 import { Button } from '@/components/ui/Button'
-import { useToast } from '@/components/ui/Toast'
+import { useToast } from '@/contexts/ToastContext'
+import { theme } from '@/lib/theme'
 
 /* ── Confirm Dialog ── */
 const Overlay = styled.div`
@@ -116,7 +117,7 @@ function IconTrash() {
 
 function IconCheck() {
   return (
-    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ margin: '0 auto 12px', display: 'block', color: '#226241' }}>
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ margin: '0 auto 12px', display: 'block', color: theme.colors.success }}>
       <circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>
     </svg>
   )
@@ -834,7 +835,7 @@ export function CartPage() {
         {/* OPs */}
         {opGroups.map(op => (
           <div key={op.id} style={{ margin: '8px 0', padding: '8px 0', borderTop: '1px dashed #eee' }}>
-            <ConfirmRow style={{ fontWeight: 700, color: '#226241' }}>
+            <ConfirmRow style={{ fontWeight: 700, color: theme.colors.success }}>
               <span>OP — {op.opTitle}</span>
               <span></span>
             </ConfirmRow>
@@ -844,7 +845,7 @@ export function CartPage() {
                 <span>{fmt(book.priceTTC * quantity)}</span>
               </ConfirmRow>
             ))}
-            <ConfirmRow style={{ paddingLeft: 12, color: '#226241' }}>
+            <ConfirmRow style={{ paddingLeft: 12, color: theme.colors.success }}>
               <span>{op.cadeau.emoji} {op.cadeau.label} × {op.cadeau.quantity} (offert)</span>
               <span>0,00 €</span>
             </ConfirmRow>
@@ -861,7 +862,7 @@ export function CartPage() {
           <ConfirmRow><span>Remise</span><span>− {fmt(remiseTotal)}</span></ConfirmRow>
           <ConfirmRow><span>Net HT</span><span>{fmt(netHT)}</span></ConfirmRow>
           <ConfirmRow><span>TVA 5,5%</span><span>{fmt(tvaCalc)}</span></ConfirmRow>
-          <ConfirmRow style={{ fontWeight: 700, fontSize: '1rem', color: '#226241', paddingTop: '8px' }}>
+          <ConfirmRow style={{ fontWeight: 700, fontSize: '1rem', color: theme.colors.success, paddingTop: '8px' }}>
             <span>Total TTC</span><span>{fmt(totalCalc)}</span>
           </ConfirmRow>
         </div>
@@ -874,7 +875,7 @@ export function CartPage() {
             codeClient: user?.codeClient ?? '',
             adresseLivraison: user?.adresseLivraison ?? '',
             items,
-            subtotalHT: subtotalTTC, remiseAmount: remiseTotal, netHT: netHT, tva: tvaCalc, totalTTC: totalCalc,
+            subtotalHT: subtotalTTC / 1.055, remiseAmount: remiseTotal, netHT: netHT, tva: tvaCalc, totalTTC: totalCalc,
             deliveryMode: delivery,
             deliveryDate: delivery === 'specific' ? specificDate : undefined,
           })
@@ -1123,13 +1124,13 @@ export function CartPage() {
                       <span style={{ fontSize: 24, lineHeight: 1 }}>{op.cadeau.emoji}</span>
                     </OPCover>
                     <OPText>
-                      <OPRowTitle style={{ color: '#226241' }}>{op.cadeau.label}</OPRowTitle>
+                      <OPRowTitle style={{ color: theme.colors.success }}>{op.cadeau.label}</OPRowTitle>
                       <OPRowMeta>Offert au lecteur final</OPRowMeta>
                       <OPRowIsbn>ISBN {op.cadeau.isbn}</OPRowIsbn>
                     </OPText>
-                    <OPCell $color="#226241">0,00 €</OPCell>
-                    <OPCell $color="#226241" style={{ textAlign: 'center' }}>{op.cadeau.quantity}</OPCell>
-                    <OPCell $bold $color="#226241">0,00 €</OPCell>
+                    <OPCell $color={theme.colors.success}>0,00 €</OPCell>
+                    <OPCell $color={theme.colors.success} style={{ textAlign: 'center' }}>{op.cadeau.quantity}</OPCell>
+                    <OPCell $bold $color={theme.colors.success}>0,00 €</OPCell>
                   </OPRow>
 
                   {/* PLV */}

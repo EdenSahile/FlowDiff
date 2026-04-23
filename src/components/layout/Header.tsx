@@ -13,8 +13,9 @@ import {
 } from '@/data/mockBooks'
 import { useWishlist } from '@/contexts/WishlistContext'
 import { useCart } from '@/contexts/CartContext'
+import { theme } from '@/lib/theme'
 
-const GOLD        = '#C9A84C'
+const GOLD = theme.colors.accent
 
 const UNIVERSES: Universe[] = ['Littérature', 'BD/Mangas', 'Jeunesse', 'Adulte-pratique']
 const FORMATS = ['Poche', 'Grand format', 'Broché', 'Relié', 'Numérique']
@@ -195,7 +196,7 @@ const AdvancedBtn = styled.button<{ $active: boolean }>`
   align-items: center;
   gap: 6px;
   align-self: stretch;
-  background: ${({ $active }) => $active ? '#1E3A5F' : '#c8c8c8'};
+  background: ${({ $active, theme }) => $active ? theme.colors.navy : '#c8c8c8'};
   border: none;
   border-radius: 8px;
   padding: 0 16px;
@@ -495,7 +496,7 @@ const CartBtn = styled.button<{ $hasItems: boolean }>`
   ${({ $hasItems }) => $hasItems ? `
     background: ${GOLD};
     border: 1.5px solid ${GOLD};
-    color: #1E3A5F;
+    color: ${theme.colors.navy};
     box-shadow: 0 2px 8px rgba(201,168,76,0.35);
     &:hover { background: #d4b05a; border-color: #d4b05a; box-shadow: 0 4px 14px rgba(201,168,76,0.45); }
     &:active { background: #b8962e; border-color: #b8962e; }
@@ -510,7 +511,7 @@ const CartBtn = styled.button<{ $hasItems: boolean }>`
 `
 
 const CartBadge = styled.span`
-  background: #1E3A5F;
+  background: ${({ theme }) => theme.colors.navy};
   color: #fff;
   font-family: ${({ theme }) => theme.typography.fontFamilyMono};
   font-size: 10px;
@@ -546,8 +547,8 @@ const ListsBtn = styled.button<{ $hasLists: boolean }>`
 
   ${({ $hasLists }) => $hasLists && `
     border-color: rgba(201,168,76,0.5);
-    color: #C9A84C;
-    &:hover { border-color: #C9A84C; }
+    color: ${GOLD};
+    &:hover { border-color: ${GOLD}; }
   `}
 
   @media (max-width: 479px) {
@@ -557,8 +558,8 @@ const ListsBtn = styled.button<{ $hasLists: boolean }>`
 `
 
 const ListsBadge = styled.span`
-  background: #C9A84C;
-  color: #1E3A5F;
+  background: ${GOLD};
+  color: \${({ theme }) => theme.colors.navy};
   font-family: ${({ theme }) => theme.typography.fontFamilyMono};
   font-size: 10px;
   font-weight: 700;
@@ -1032,7 +1033,7 @@ function IconLists() {
 function IconStarSmall() {
   return (
     <svg width="14" height="14" viewBox="0 0 24 24"
-      fill="#C9A84C" stroke="#C9A84C"
+      fill={GOLD} stroke={GOLD}
       strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
     </svg>

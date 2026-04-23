@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { theme } from '@/lib/theme'
 import styled from 'styled-components'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
@@ -7,7 +8,7 @@ import { MOCK_BOOKS } from '@/data/mockBooks'
 import { MOCK_FLASH_INFOS } from '@/data/mockFlashInfos'
 import { BookCard } from '@/components/catalogue/BookCard'
 
-const GREEN = '#226241'
+const GREEN = theme.colors.success
 
 const nouveautes = MOCK_BOOKS
   .filter(b => b.type === 'nouveaute')

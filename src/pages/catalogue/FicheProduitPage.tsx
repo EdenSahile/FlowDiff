@@ -3,14 +3,15 @@ import { createPortal } from 'react-dom'
 import { useParams, useNavigate } from 'react-router-dom'
 import styled, { keyframes } from 'styled-components'
 import { getBookById } from '@/data/mockBooks'
-import { slugifyAuthor } from '@/pages/auteur/AuteurPage'
+import { slugifyAuthor } from '@/lib/slugify'
 import { BookCover } from '@/components/catalogue/BookCover'
 import { useCart } from '@/contexts/CartContext'
-import { useToast } from '@/components/ui/Toast'
+import { useToast } from '@/contexts/ToastContext'
 import { useWishlist } from '@/contexts/WishlistContext'
 import { ListPickerPopover } from '@/components/catalogue/ListPickerPopover'
 import { StockStatus } from '@/components/ui/StockStatus'
 import { StockAlertModal } from '@/components/ui/StockAlertModal'
+import { theme } from '@/lib/theme'
 
 /* ── Formats physiques ── */
 type FormatId = 'broche' | 'poche'
@@ -295,7 +296,7 @@ const FormatPill = styled.button<{ $active: boolean }>`
   gap: 3px;
   padding: 13px 18px;
   border-radius: 12px;
-  border: 2px solid ${({ $active }) => $active ? '#1E3A5F' : '#E0DBD4'};
+  border: 2px solid ${({ $active, theme }) => $active ? theme.colors.navy : '#E0DBD4'};
   background: ${({ $active }) => $active ? '#EEF2FA' : '#FAFAF8'};
   cursor: pointer;
   transition: border-color .18s, background .18s, transform .12s;
@@ -303,7 +304,7 @@ const FormatPill = styled.button<{ $active: boolean }>`
   text-align: left;
   box-shadow: ${({ $active }) => $active ? '0 2px 8px rgba(28,58,95,0.12)' : 'none'};
   &:hover {
-    border-color: #1E3A5F;
+    border-color: ${({ theme }) => theme.colors.navy};
     background: ${({ $active }) => $active ? '#EEF2FA' : '#F2EEE8'};
     transform: translateY(-1px);
   }
@@ -633,7 +634,7 @@ const PdfPage = styled.div`
 /* Page 0 — Argumentaire */
 const ArgHeader = styled.div`
   text-align: center;
-  border-bottom: 2px solid #1E3A5F;
+  border-bottom: 2px solid ${({ theme }) => theme.colors.navy};
   padding-bottom: 20px;
   margin-bottom: 24px;
 `
@@ -651,7 +652,7 @@ const ArgLabel = styled.p`
 const ArgTitle = styled.h2`
   font-size: 20px;
   font-weight: 700;
-  color: #1E3A5F;
+  color: ${({ theme }) => theme.colors.navy};
   margin-bottom: 6px;
   line-height: 1.25;
 `
@@ -714,7 +715,7 @@ const ArgMetaLabel = styled.span`
 const ArgMetaValue = styled.span`
   font-size: 13px;
   font-weight: 700;
-  color: #1E3A5F;
+  color: ${({ theme }) => theme.colors.navy};
   font-family: 'Roboto', Arial, sans-serif;
 `
 
@@ -733,7 +734,7 @@ const InteriorChapter = styled.h3`
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: #1E3A5F;
+  color: ${({ theme }) => theme.colors.navy};
   text-align: center;
   margin-bottom: 20px;
 `
@@ -745,7 +746,7 @@ const InteriorDrop = styled.span`
   line-height: 0.85;
   margin-right: 8px;
   margin-top: 4px;
-  color: #1E3A5F;
+  color: ${({ theme }) => theme.colors.navy};
 `
 
 const InteriorParagraph = styled.p`
@@ -769,10 +770,10 @@ const PdfNav = styled.div`
 
 const NavArrow = styled.button<{ $disabled?: boolean }>`
   width: 40px; height: 40px;
-  border: 1.5px solid ${({ $disabled }) => $disabled ? '#E6E1DA' : '#1E3A5F'};
+  border: 1.5px solid ${({ $disabled, theme }) => $disabled ? '#E6E1DA' : theme.colors.navy};
   border-radius: 10px;
   background: ${({ $disabled }) => $disabled ? '#F5F2EE' : '#fff'};
-  color: ${({ $disabled }) => $disabled ? '#D5CFC7' : '#1E3A5F'};
+  color: ${({ $disabled, theme }) => $disabled ? '#D5CFC7' : theme.colors.navy};
   font-size: 16px;
   font-weight: 700;
   cursor: ${({ $disabled }) => $disabled ? 'not-allowed' : 'pointer'};
@@ -781,7 +782,7 @@ const NavArrow = styled.button<{ $disabled?: boolean }>`
   justify-content: center;
   transition: background .12s, border-color .12s;
   &:hover:not([disabled]) {
-    background: #1E3A5F;
+    background: ${({ theme }) => theme.colors.navy};
     color: #fff;
   }
 `
@@ -796,7 +797,7 @@ const PageDot = styled.span<{ $active: boolean }>`
   width: ${({ $active }) => $active ? '20px' : '7px'};
   height: 7px;
   border-radius: 4px;
-  background: ${({ $active }) => $active ? '#1E3A5F' : '#D5CFC7'};
+  background: ${({ $active, theme }) => $active ? theme.colors.navy : '#D5CFC7'};
   transition: all 0.2s ease;
 `
 
@@ -1001,7 +1002,7 @@ export function FicheProduitPage() {
   const isEpuise       = book.statut === 'epuise'
   const needsConfirm   = book.statut === 'sur_commande' || book.statut === 'en_reimp'
   const isOrderable    = !isAParaitre && !isEpuise
-  const uvColor        = UNIVERSE_COLOR[book.universe] ?? '#1E3A5F'
+  const uvColor        = UNIVERSE_COLOR[book.universe] ?? theme.colors.navy
   const typeLabel      = book.type === 'nouveaute' ? 'Nouveauté' : book.type === 'fonds' ? 'Fonds' : 'À paraître'
 
   const formattedDate = new Date(book.publicationDate).toLocaleDateString('fr-FR', {
@@ -1165,8 +1166,8 @@ export function FicheProduitPage() {
                 aria-label="Ajouter à une liste"
               >
                 <svg width="14" height="14" viewBox="0 0 24 24"
-                  fill={book && isInAnyList(book.id) ? '#C9A84C' : 'none'}
-                  stroke={book && isInAnyList(book.id) ? '#C9A84C' : 'currentColor'}
+                  fill={book && isInAnyList(book.id) ? theme.colors.accent : 'none'}
+                  stroke={book && isInAnyList(book.id) ? theme.colors.accent : 'currentColor'}
                   strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
                 </svg>

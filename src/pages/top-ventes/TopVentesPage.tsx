@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { theme } from '@/lib/theme'
 import styled from 'styled-components'
 import { MOCK_BOOKS, type Book, type Universe } from '@/data/mockBooks'
 import { BookCard } from '@/components/catalogue/BookCard'
 import { BookCover } from '@/components/catalogue/BookCover'
 import { useCart } from '@/contexts/CartContext'
-import { useToast } from '@/components/ui/Toast'
+import { useToast } from '@/contexts/ToastContext'
 
 /* ══════════════════════════════════════════════════════
    DONNÉES MOCK — ventes rolling 30 jours
@@ -45,14 +46,14 @@ const UNIVERSES: Universe[] = ['BD/Mangas', 'Jeunesse', 'Littérature', 'Adulte-
 const UNIVERSE_COLORS: Record<Universe, { bg: string; text: string; dot: string }> = {
   'BD/Mangas':       { bg: '#F7F0DC', text: '#8B6914', dot: '#8B6914' },
   'Jeunesse':        { bg: '#EFF4F1', text: '#2D6A52', dot: '#2D6A52' },
-  'Littérature':     { bg: '#E6EFE9', text: '#226241', dot: '#226241' },
+  'Littérature':     { bg: '#E6EFE9', text: theme.colors.success, dot: theme.colors.success },
   'Adulte-pratique': { bg: '#F0EDE8', text: '#6B5440', dot: '#6B5440' },
 }
 
 const SECTION_BORDER: Record<Universe, string> = {
   'BD/Mangas':       '#8B6914',
   'Jeunesse':        '#2D6A52',
-  'Littérature':     '#226241',
+  'Littérature':     theme.colors.success,
   'Adulte-pratique': '#6B5440',
 }
 
@@ -379,7 +380,7 @@ const UnivDot = styled.span<{ $color: string }>`
   flex-shrink: 0;
 `
 
-const TrendUp     = styled.span`color: #226241; display: inline-flex; align-items: center;`
+const TrendUp     = styled.span`color: ${({ theme }) => theme.colors.success}; display: inline-flex; align-items: center;`
 const TrendDown   = styled.span`color: #C0392B; display: inline-flex; align-items: center;`
 const TrendStable = styled.span`color: ${({ theme }) => theme.colors.gray[400]}; display: inline-flex; align-items: center;`
 

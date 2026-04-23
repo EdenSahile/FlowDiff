@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { theme } from '@/lib/theme'
 import styled, { keyframes } from 'styled-components'
 import { useAuthContext } from '@/contexts/AuthContext'
 import { useCart, REMISE_RATES } from '@/contexts/CartContext'
@@ -17,7 +18,7 @@ const STATUS_COLORS: Record<OrderStatus, { bg: string; text: string; dot: string
   'en cours': { bg: '#F7F0DC', text: '#8B6914', dot: '#8B6914' },   // or — en attente
   'reçu':     { bg: '#EFF4F1', text: '#2D6A52', dot: '#2D6A52' },   // vert doux — reçu
   'facturé':  { bg: '#EAEAE6', text: '#555550', dot: '#555550' },   // gris neutre — admin
-  'expédié':  { bg: '#E6EFE9', text: '#226241', dot: '#226241' },   // vert forêt — terminé
+  'expédié':  { bg: '#E6EFE9', text: theme.colors.success, dot: theme.colors.success },   // vert forêt — terminé
 }
 
 /* ── Styled ── */
@@ -126,7 +127,6 @@ const ResultCount = styled.div`
 const OrderCard = styled.div`
   background-color: ${({ theme }) => theme.colors.white};
   border-radius: ${({ theme }) => theme.radii.xl};
-  box-shadow: ${({ theme }) => theme.shadows.sm};
   margin-bottom: ${({ theme }) => theme.spacing.lg};
   overflow: hidden;
 `

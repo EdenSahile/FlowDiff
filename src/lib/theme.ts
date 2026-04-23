@@ -15,7 +15,7 @@ export const theme = {
     /* Surfaces & texte */
     white:        '#FFFFFF',    // Blanc pur — surfaces cards
     error:        '#C0392B',
-    success:      '#232f3e',
+    success:      '#226241',   // Vert forêt — états positifs, disponibilité, "expédié"
 
     gray: {
       50:  '#F4F4F0',   // Fond page (lin neutre)
@@ -60,18 +60,14 @@ export const theme = {
     '2xl':'48px',
     '3xl':'64px',
   },
+  /* Design plat assumé : radii sm/md/lg/xl = '0px', full = pill.
+     box-shadow: none !important dans index.css annule toute ombre globalement. */
   radii: {
     sm:   '0px',
     md:   '0px',
     lg:   '0px',
     xl:   '0px',
     full: '9999px',
-  },
-  shadows: {
-    sm:  'none',
-    md:  'none',
-    lg:  'none',
-    nav: 'none',
   },
   breakpoints: {
     mobile: '768px',

@@ -1,4 +1,5 @@
 import { type JSX } from 'react'
+import { theme } from '@/lib/theme'
 import styled from 'styled-components'
 import type { Universe } from '@/data/mockBooks'
 import { UNIVERSES } from '@/data/mockBooks'
@@ -50,7 +51,7 @@ const UNIVERSE_ICONS: Record<Universe, JSX.Element> = {
 const UNIVERSE_ACTIVE_COLORS: Record<Universe, string> = {
   'BD/Mangas':       '#8B6914',   // or foncé
   'Jeunesse':        '#2D6A52',   // vert profond
-  'Littérature':     '#226241',   // vert forêt (primary)
+  'Littérature':     theme.colors.success,   // vert forêt (primary)
   'Adulte-pratique': '#6B5440',   // brun foncé
 }
 

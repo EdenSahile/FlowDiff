@@ -7,6 +7,23 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 À chaque fin de session ou sur demande, ajoute un bloc daté en haut du fichier résumant : ce qui a été fait, l’état actuel du code, et les prochaines étapes.
 
 ---
+### Session du 2026-04-23 — Refactoring contextes + sécurité + design system (Commits 3–6)
+
+**Ce qui a été fait :**
+- Commit 3 : `ToastProvider`/`useToast` → `ToastContext.tsx` ; `slugifyAuthor` → `slugify.ts` ; `ThemeContext.tsx` créé
+- Commit 4 : bug `subtotalHT` corrigé (était TTC) ; isolation inter-librairies (`WishlistContext` NAME_KEY suffixé) ; `logout()` nettoie la clé username wishlists ; `CartContext` saute la persistence pour les guests
+- Commit 5 : validation Zod sur tous les formulaires non-auth (`contactSchema`, `newsletterSchema`, `wishlistNameSchema`, `cartQtySchema`) ; validation Zod sur tous les reads localStorage (`storedCartSchema`, `storedOrdersSchema`, `storedWishlistsSchema`)
+- Commit 6 : design system — toutes les couleurs hardcodées remplacées par des tokens (`theme.colors.accent/navy/success/primaryHover`) ; `theme.shadows` supprimé ; `theme.colors.success` corrigé (`#226241`)
+
+**Décisions design prises :**
+- Design **plat assumé** : `box-shadow: none !important` dans `index.css` + `theme.radii.*` = `’0px’` — aucune ombre, bordures droites partout
+- Les dégradés de `SelectionsPage.tsx` (`#226241 0%, #2D6A52 100%`) sont conservés en dur — usage contextuel décoratif, pas sémantique
+
+**État actuel :** TypeScript clean, 0 erreur, build OK, 21/21 tests Vitest passent.
+
+**Prochaines étapes :** Phase 10 (PWA — vite-plugin-pwa), puis Phase 13 (recette finale + déploiement Vercel)
+
+---
 ### Session du 2026-04-20 — Audit architecture BDD
 
 **Décisions prises :**

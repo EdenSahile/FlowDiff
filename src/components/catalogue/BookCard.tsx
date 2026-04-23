@@ -4,11 +4,12 @@ import styled from 'styled-components'
 import type { Book } from '@/data/mockBooks'
 import { BookCover } from './BookCover'
 import { useCart } from '@/contexts/CartContext'
-import { useToast } from '@/components/ui/Toast'
+import { useToast } from '@/contexts/ToastContext'
 import { useWishlist } from '@/contexts/WishlistContext'
 import { ListPickerPopover } from './ListPickerPopover'
 import { StockStatus } from '@/components/ui/StockStatus'
 import { StockAlertModal } from '@/components/ui/StockAlertModal'
+import { theme } from '@/lib/theme'
 
 /* ── Palette catégories — ajouter ici pour étendre ── */
 const CATEGORY_COLORS: Record<string, { bg: string; text: string }> = {
@@ -116,7 +117,7 @@ const NouveauteBadge = styled.span`
   align-items: center;
   padding: 3px 10px;
   border-radius: 20px;
-  background: #C9A84C;
+  background: ${({ theme }) => theme.colors.accent};
   color: #3d2f00;
   font-family: ${({ theme }) => theme.typography.fontFamily};
   font-size: 11px;
@@ -161,7 +162,7 @@ const Authors = styled.p`
 
 const Publisher = styled.p`
   font-family: ${({ theme }) => theme.typography.fontFamily};
-  font-size: 11px;
+  font-size: 12px;
   color: #6B6B68;
   white-space: nowrap;
   overflow: hidden;
@@ -178,7 +179,7 @@ const IsbnStockRow = styled.div`
 `
 
 const IsbnText = styled.span`
-  font-size: 11px;
+  font-size: 13px;
   color: #6B6B68;
   font-variant-numeric: tabular-nums;
   flex-shrink: 0;
@@ -239,7 +240,7 @@ const QtyBtn = styled.button`
   border: none;
   font-size: 15px;
   font-weight: 500;
-  color: #226241;
+  color: ${({ theme }) => theme.colors.success};
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -265,7 +266,7 @@ const AjouterBtn = styled.button<{ $epuise?: boolean }>`
   margin-top: 8px;
   border: none;
   border-radius: 7px;
-  background: ${({ $epuise }) => $epuise ? '#C9C9C2' : '#232f3e'};
+  background: ${({ $epuise, theme }) => $epuise ? '#C9C9C2' : theme.colors.navy};
   color: ${({ $epuise }) => $epuise ? '#6B6B68' : '#fdfdfd'};
   font-family: ${({ theme }) => theme.typography.fontFamily};
   font-size: 13px;
@@ -280,7 +281,7 @@ const AjouterBtn = styled.button<{ $epuise?: boolean }>`
   gap: 6px;
 
   &:hover {
-    background: ${({ $epuise }) => $epuise ? '#C9C9C2' : '#42556c'};
+    background: ${({ $epuise, theme }) => $epuise ? '#C9C9C2' : theme.colors.primaryHover};
   }
   &:active { transform: ${({ $epuise }) => $epuise ? 'none' : 'scale(0.97)'}; }
 `
@@ -307,8 +308,8 @@ function IconCart() {
 function IconStar({ filled }: { filled: boolean }) {
   return (
     <svg width="14" height="14" viewBox="0 0 24 24"
-      fill={filled ? '#C9A84C' : 'none'}
-      stroke={filled ? '#C9A84C' : '#1E3A5F'}
+      fill={filled ? theme.colors.accent : 'none'}
+      stroke={filled ? theme.colors.accent : theme.colors.navy}
       strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
     </svg>

@@ -35,7 +35,7 @@ const Text = styled.span<{ $size: WordmarkSize; $onDark: boolean }>`
   font-weight: 800;
   letter-spacing: ${({ $size }) => sizes[$size].letterSpacing};
   line-height: 1;
-  color: ${({ $onDark }) => ($onDark ? '#FAFAF7' : '#1E3A5F')};
+  color: ${({ $onDark, theme }) => ($onDark ? '#FAFAF7' : theme.colors.navy)};
 `
 
 const Diff = styled.span`

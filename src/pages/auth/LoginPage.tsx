@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { DemoBanner } from '@/components/ui/DemoBanner'
 import { Wordmark } from '@/components/brand/Wordmark'
+import { theme } from '@/lib/theme'
 import {
   AuthPage,
   AuthCard,
@@ -57,7 +58,7 @@ const ModalIcon = styled.div`
 const ModalTitle = styled.p`
   font-size: 1rem;
   font-weight: 700;
-  color: #1E3A5F;
+  color: \${({ theme }) => theme.colors.navy};
   margin-bottom: 8px;
 `
 
@@ -69,7 +70,7 @@ const ModalBody = styled.p`
 `
 
 const ModalClose = styled.button`
-  background: #1E3A5F;
+  background: ${({ theme }) => theme.colors.navy};
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -199,7 +200,7 @@ export function LoginPage() {
             <a
               href="#"
               onClick={e => { e.preventDefault(); setBlockedMsg('La réinitialisation de mot de passe a été bloquée.') }}
-              style={{ fontSize: '0.875rem', color: '#1E3A5F', textDecoration: 'underline', cursor: 'pointer' }}
+              style={{ fontSize: '0.875rem', color: theme.colors.navy, textDecoration: 'underline', cursor: 'pointer' }}
             >
               Mot de passe oublié ?
             </a>

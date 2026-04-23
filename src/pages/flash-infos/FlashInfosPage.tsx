@@ -1,4 +1,5 @@
 import { useState, type JSX } from 'react'
+import { theme } from '@/lib/theme'
 import styled from 'styled-components'
 import { MOCK_FLASH_INFOS, FLASH_CATEGORIES } from '@/data/mockFlashInfos'
 import type { FlashCategory } from '@/data/mockFlashInfos'
@@ -6,7 +7,7 @@ import { UniverseFilter } from '@/components/catalogue/UniverseFilter'
 import { getBookById } from '@/data/mockBooks'
 import type { Universe } from '@/data/mockBooks'
 import { useCart } from '@/contexts/CartContext'
-import { useToast } from '@/components/ui/Toast'
+import { useToast } from '@/contexts/ToastContext'
 
 /* ── Layout ── */
 const Page = styled.div`
@@ -83,13 +84,11 @@ const EmptyState = styled.div`
 const Card = styled.article`
   background: ${({ theme }) => theme.colors.white};
   border-radius: ${({ theme }) => theme.radii.lg};
-  box-shadow: ${({ theme }) => theme.shadows.sm};
   overflow: hidden;
   transition: box-shadow 0.18s ease, transform 0.18s ease;
   cursor: pointer;
 
   &:hover {
-    box-shadow: ${({ theme }) => theme.shadows.md};
     transform: translateY(-2px);
   }
 `
@@ -341,8 +340,8 @@ function IconCartFI() {
 
 /* ── Couleurs univers — palette Forêt & Lin ── */
 const UNIVERSE_COLORS: Record<Universe, string> = {
-  'Littérature':     '#226241',   // vert forêt
-  'BD/Mangas':       '#C9A84C',   // or
+  'Littérature':     theme.colors.success,   // vert forêt
+  'BD/Mangas':       theme.colors.accent,   // or
   'Jeunesse':        '#4A8C6F',   // vert clair
   'Adulte-pratique': '#8B7355',   // brun lin
 }
@@ -356,7 +355,7 @@ const UNIVERSE_BG: Record<Universe, string> = {
 
 const CATEGORY_COLORS: Record<FlashCategory, { bg: string; text: string }> = {
   'Auteurs':    { bg: '#F7F0DC', text: '#8B6914' },   // or pâle / or foncé
-  'Fonds':      { bg: '#E6EFE9', text: '#226241' },   // vert pâle / vert forêt
+  'Fonds':      { bg: '#E6EFE9', text: theme.colors.success },   // vert pâle / vert forêt
   'Nouveautés': { bg: '#E6EFE9', text: '#1A4D32' },   // vert pâle / vert profond
   'FlowDiff':   { bg: '#EAEAE6', text: '#555550' },   // gris neutre
 }
