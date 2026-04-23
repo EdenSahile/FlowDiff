@@ -224,8 +224,10 @@ const SeeAllLink = styled(Link)`
   &:hover { text-decoration: underline; }
 `
 
+/* max-width = 3 cards × 200px + 2 gaps × 16px = 632px — no partial card at rest */
 const CarouselWrapper = styled.div`
   position: relative;
+  max-width: calc(3 * 200px + 2 * ${({ theme }) => theme.spacing.md});
 `
 
 const CardScroll = styled.div`
@@ -310,6 +312,7 @@ export function HomePage() {
 
   function scrollBy(delta: number) {
     scrollRef.current?.scrollBy({ left: delta, behavior: 'smooth' })
+    setTimeout(updateArrows, 50)
   }
 
   return (
