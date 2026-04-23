@@ -2,7 +2,8 @@ import { useState } from 'react'
 import styled from 'styled-components'
 import { useLocation } from 'react-router-dom'
 import { useAuthContext } from '@/contexts/AuthContext'
-import { useToast } from '@/components/ui/Toast'
+import { useToast } from '@/contexts/ToastContext'
+import { contactSchema } from '@/lib/formSchemas'
 
 /* ── Styled ── */
 const Page = styled.div`
@@ -126,6 +127,12 @@ const SendButton = styled.button`
   }
 `
 
+const ErrorText = styled.p`
+  margin-top: 4px;
+  font-size: 12px;
+  color: ${({ theme }) => theme.colors.error};
+`
+
 const InfoCard = styled.div`
   background-color: ${({ theme }) => theme.colors.primaryLight};
   border: 1px solid ${({ theme }) => theme.colors.gray[200]};
@@ -180,11 +187,19 @@ export function ContactPage() {
       : ''
   )
   const [sending, setSending] = useState(false)
+  const [errors, setErrors] = useState<{ sujet?: string; message?: string }>({})
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!sujet.trim() || !message.trim()) return
-
+    const validation = contactSchema.safeParse({ sujet, message })
+    if (!validation.success) {
+      const issues = Object.fromEntries(
+        validation.error.issues.map(i => [i.path[0], i.message])
+      ) as { sujet?: string; message?: string }
+      setErrors(issues)
+      return
+    }
+    setErrors({})
     setSending(true)
     // Simulation d'envoi (mock)
     setTimeout(() => {
@@ -228,9 +243,9 @@ export function ContactPage() {
               type="text"
               placeholder="Ex : Demande de renseignement, problème de commande…"
               value={sujet}
-              onChange={e => setSujet(e.target.value)}
-              required
+              onChange={e => { setSujet(e.target.value); setErrors(p => ({ ...p, sujet: undefined })) }}
             />
+            {errors.sujet && <ErrorText>{errors.sujet}</ErrorText>}
           </FieldGroup>
 
           <FieldGroup style={{ marginBottom: 0 }}>
@@ -239,9 +254,9 @@ export function ContactPage() {
               id="message"
               placeholder="Votre message…"
               value={message}
-              onChange={e => setMessage(e.target.value)}
-              required
+              onChange={e => { setMessage(e.target.value); setErrors(p => ({ ...p, message: undefined })) }}
             />
+            {errors.message && <ErrorText>{errors.message}</ErrorText>}
           </FieldGroup>
 
           <SendButton

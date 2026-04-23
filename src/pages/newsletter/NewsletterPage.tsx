@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import styled from 'styled-components'
 import { useAuthContext } from '@/contexts/AuthContext'
-import { useToast } from '@/components/ui/Toast'
+import { useToast } from '@/contexts/ToastContext'
+import { newsletterSchema } from '@/lib/formSchemas'
 
 /* ── Styled ── */
 const Page = styled.div`
@@ -107,6 +108,12 @@ const Input = styled.input`
   }
 `
 
+const ErrorText = styled.p`
+  margin-top: 4px;
+  font-size: 12px;
+  color: ${({ theme }) => theme.colors.error};
+`
+
 const SubmitButton = styled.button`
   width: 100%;
   margin-top: ${({ theme }) => theme.spacing.lg};
@@ -145,6 +152,7 @@ export function NewsletterPage() {
   const [email, setEmail] = useState(user?.email ?? '')
   const [selected, setSelected] = useState<Set<string>>(new Set(['nouveautes', 'flashinfos']))
   const [saving, setSaving] = useState(false)
+  const [emailError, setEmailError] = useState('')
 
   function toggle(id: string) {
     setSelected(prev => {
@@ -156,7 +164,13 @@ export function NewsletterPage() {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!email.trim() || selected.size === 0) return
+    const validation = newsletterSchema.safeParse({ email, selected: [...selected] })
+    if (!validation.success) {
+      const issues = Object.fromEntries(validation.error.issues.map(i => [i.path[0], i.message]))
+      setEmailError(issues.email ?? issues.selected ?? '')
+      return
+    }
+    setEmailError('')
     setSaving(true)
     setTimeout(() => {
       setSaving(false)
@@ -195,9 +209,9 @@ export function NewsletterPage() {
               id="nl-email"
               type="email"
               value={email}
-              onChange={e => setEmail(e.target.value)}
-              required
+              onChange={e => { setEmail(e.target.value); setEmailError('') }}
             />
+            {emailError && <ErrorText>{emailError}</ErrorText>}
           </FieldGroup>
         </Card>
 

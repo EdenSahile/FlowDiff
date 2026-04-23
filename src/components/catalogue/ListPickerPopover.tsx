@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import styled, { keyframes } from 'styled-components'
 import type { Book } from '@/data/mockBooks'
 import { useWishlist } from '@/contexts/WishlistContext'
+import { wishlistNameSchema } from '@/lib/formSchemas'
 
 const popIn = keyframes`
   from { opacity: 0; transform: translateY(-6px) scale(0.97); }
@@ -140,6 +141,12 @@ const CreateLabel = styled.p`
 
 const CreateRow = styled.div`
   display: flex;
+  flex-direction: column;
+  gap: 4px;
+`
+
+const CreateInputRow = styled.div`
+  display: flex;
   gap: 6px;
 `
 
@@ -186,6 +193,7 @@ interface Props {
 export function ListPickerPopover({ book, anchorRect, onClose }: Props) {
   const { lists, createList, addToList, removeFromList, isInList, currentUserName, setCurrentUserName } = useWishlist()
   const [newName, setNewName] = useState('')
+  const [nameError, setNameError] = useState('')
   const [userName, setUserName] = useState(currentUserName)
   const panelRef = useRef<HTMLDivElement>(null)
   const nameRef  = useRef<HTMLInputElement>(null)
@@ -249,9 +257,13 @@ export function ListPickerPopover({ book, anchorRect, onClose }: Props) {
   }
 
   function handleCreate() {
-    const trimmed = newName.trim()
-    if (!trimmed) return
-    const created = createList(trimmed)
+    const validation = wishlistNameSchema.safeParse(newName)
+    if (!validation.success) {
+      setNameError(validation.error.issues[0].message)
+      return
+    }
+    setNameError('')
+    const created = createList(validation.data)
     addToList(created.id, book, userName.trim() || undefined)
     setNewName('')
     onClose()
@@ -300,16 +312,21 @@ export function ListPickerPopover({ book, anchorRect, onClose }: Props) {
       <CreateArea>
         <CreateLabel>Créer une nouvelle liste</CreateLabel>
         <CreateRow>
-          <CreateInput
-            type="text"
-            placeholder="Ex : Saint-Valentin…"
-            value={newName}
-            onChange={e => setNewName(e.target.value)}
-            onKeyDown={handleCreateKeyDown}
-          />
-          <CreateBtn onClick={handleCreate} disabled={!newName.trim()}>
-            +
-          </CreateBtn>
+          <CreateInputRow>
+            <CreateInput
+              type="text"
+              placeholder="Ex : Saint-Valentin…"
+              value={newName}
+              onChange={e => { setNewName(e.target.value); setNameError('') }}
+              onKeyDown={handleCreateKeyDown}
+            />
+            <CreateBtn onClick={handleCreate} disabled={!newName.trim()}>
+              +
+            </CreateBtn>
+          </CreateInputRow>
+          {nameError && (
+            <span style={{ fontSize: 11, color: '#C0392B', paddingLeft: 2 }}>{nameError}</span>
+          )}
         </CreateRow>
       </CreateArea>
     </Panel>,

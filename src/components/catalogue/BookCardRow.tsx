@@ -10,6 +10,8 @@ import { ORDER_STATUS_LABELS } from '@/data/mockOrders'
 import { useWishlist } from '@/contexts/WishlistContext'
 import { ListPickerPopover } from './ListPickerPopover'
 import { StockStatus } from '@/components/ui/StockStatus'
+import { cartQtySchema } from '@/lib/formSchemas'
+import { theme } from '@/lib/theme'
 
 /* ══════════════════════════════════════════════════════
    TYPES & DONNÉES
@@ -147,7 +149,7 @@ const Col = styled.div<{ $border?: boolean }>`
 
 /* ── Col 1 : bibliographie ── */
 const BookTitle = styled.h3`
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   color: ${({ theme }) => theme.colors.navy};
   line-height: 1.3;
@@ -161,7 +163,7 @@ const BookTitle = styled.h3`
 `
 
 const Authors = styled.p`
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 500;
   color: ${({ theme }) => theme.colors.gray[800]};
   margin-bottom: 3px;
@@ -370,10 +372,10 @@ const DropdownTrigger = styled.button<{ $open: boolean; $isEbook: boolean }>`
     width: 100%;
   }
   padding: 0 36px 0 14px;
-  border: 1.5px solid ${({ $open, $isEbook }) => $open ? '#1E3A5F' : $isEbook ? '#BEDAFF' : '#D8D3CC'};
+  border: 1.5px solid ${({ $open, $isEbook, theme }) => $open ? theme.colors.navy : $isEbook ? '#BEDAFF' : '#D8D3CC'};
   border-radius: 7px;
   background-color: ${({ $isEbook }) => $isEbook ? '#EDF4FF' : '#fff'};
-  color: #1E3A5F;
+  color: ${({ theme }) => theme.colors.navy};
   font-family: inherit;
   font-size: 12.5px;
   font-weight: 600;
@@ -387,7 +389,7 @@ const DropdownTrigger = styled.button<{ $open: boolean; $isEbook: boolean }>`
   transition: border-color .15s, box-shadow .15s, background-color .15s;
   position: relative;
 
-  &:hover { border-color: #1E3A5F; }
+  &:hover { border-color: ${({ theme }) => theme.colors.navy}; }
 
   &::after {
     content: '';
@@ -398,7 +400,7 @@ const DropdownTrigger = styled.button<{ $open: boolean; $isEbook: boolean }>`
     width: 0; height: 0;
     border-left: 5px solid transparent;
     border-right: 5px solid transparent;
-    border-top: 5px solid #1E3A5F;
+    border-top: 5px solid ${({ theme }) => theme.colors.navy};
     transition: transform .15s;
   }
 `
@@ -416,7 +418,7 @@ const DropdownPanel = styled.div<{ $top: number; $left: number }>`
   left: ${({ $left }) => $left}px;
   width: 447px;
   background: #fff;
-  border: 1.5px solid #1E3A5F;
+  border: 1.5px solid ${({ theme }) => theme.colors.navy};
   border-radius: 9px;
   box-shadow: 0 8px 24px rgba(28,50,82,0.18);
   z-index: 9999;
@@ -447,7 +449,7 @@ const DropOption = styled.div<{ $active: boolean; $isEbook?: boolean }>`
   gap: 9px;
   font-size: 12.5px;
   font-weight: ${({ $active }) => $active ? 700 : 500};
-  color: #1E3A5F;
+  color: ${({ theme }) => theme.colors.navy};
   background: ${({ $active, $isEbook }) =>
     $active && $isEbook ? '#D6EAFF' :
     $active ? '#F0EDE8' : '#fff'};
@@ -466,14 +468,14 @@ const DropOptionText = styled.span`flex: 1; min-width: 0;`
 const DropOptionPrice = styled.span`
   font-size: 12px;
   font-weight: 700;
-  color: #1E3A5F;
+  color: ${({ theme }) => theme.colors.navy};
   opacity: 0.75;
   flex-shrink: 0;
 `
 
 const DropCheckmark = styled.span`
   font-size: 11px;
-  color: #1E3A5F;
+  color: ${({ theme }) => theme.colors.navy};
   flex-shrink: 0;
   width: 14px;
 `
@@ -566,7 +568,7 @@ const StarRowBtn = styled.button<{ $active: boolean }>`
 
   &:hover {
     background: ${({ $active }) => $active ? 'rgba(201,168,76,0.2)' : 'rgba(28,58,95,0.06)'};
-    border-color: ${({ $active }) => $active ? '#C9A84C' : 'rgba(28,58,95,0.3)'};
+    border-color: ${({ $active }) => $active ? theme.colors.accent : 'rgba(28,58,95,0.3)'};
     transform: scale(1.08);
   }
   &:active { transform: scale(0.93); }
@@ -727,8 +729,8 @@ interface Props {
 function IconStarRow({ filled }: { filled: boolean }) {
   return (
     <svg width="13" height="13" viewBox="0 0 24 24"
-      fill={filled ? '#C9A84C' : 'none'}
-      stroke={filled ? '#C9A84C' : '#1E3A5F'}
+      fill={filled ? theme.colors.accent : 'none'}
+      stroke={filled ? theme.colors.accent : theme.colors.navy}
       strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
     </svg>
@@ -998,7 +1000,10 @@ export function BookCardRow({ book, selected, onToggle }: Props) {
                   type="number"
                   min={1}
                   value={qty}
-                  onChange={e => setQty(Math.max(1, parseInt(e.target.value) || 1))}
+                  onChange={e => {
+                    const raw = parseInt(e.target.value) || 1
+                    setQty(cartQtySchema.catch(raw < 1 ? 1 : 30).parse(raw))
+                  }}
                 />
               </CtrlItem>
             )}
