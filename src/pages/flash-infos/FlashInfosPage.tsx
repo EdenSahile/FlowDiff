@@ -373,11 +373,53 @@ function formatDate(iso: string): string {
   return `${d}/${m}/${y}`
 }
 
+/* ── Stepper quantité ── */
+const QtyControl = styled.div`
+  display: flex;
+  align-items: center;
+  border-radius: ${({ theme }) => theme.radii.md};
+  overflow: hidden;
+  flex-shrink: 0;
+  background: ${({ theme }) => theme.colors.gray[100]};
+  padding: 2px 4px;
+`
+
+const QtyBtn = styled.button`
+  width: 24px; height: 24px;
+  background: none;
+  border: none;
+  font-size: 15px;
+  font-weight: 500;
+  color: ${({ theme }) => theme.colors.navy};
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity .12s;
+
+  &:hover    { opacity: 0.6; }
+  &:disabled { opacity: .3; cursor: not-allowed; }
+`
+
+const QtyValue = styled.span`
+  width: 22px;
+  text-align: center;
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 13px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.navy};
+`
+
 export function FlashInfosPage() {
   const [universe, setUniverse] = useState<Universe | null>(null)
   const [category, setCategory] = useState<FlashCategory | null>(null)
+  const [qtys, setQtys] = useState<Record<string, number>>({})
   const { addToCart } = useCart()
   const { showToast } = useToast()
+
+  const getQty = (id: string) => qtys[id] ?? 1
+  const changeQty = (id: string, delta: number) =>
+    setQtys(prev => ({ ...prev, [id]: Math.max(1, (prev[id] ?? 1) + delta) }))
 
   const filtered = MOCK_FLASH_INFOS.filter(fi => {
     if (universe && fi.universe !== universe) return false
@@ -385,11 +427,12 @@ export function FlashInfosPage() {
     return true
   })
 
-  const handleAdd = (bookId: string) => {
+  const handleAdd = (fiId: string, bookId: string) => {
     const book = getBookById(bookId)
     if (!book) return
-    addToCart(book, 1)
+    addToCart(book, getQty(fiId))
     showToast('Ouvrage ajouté au panier')
+    setQtys(prev => ({ ...prev, [fiId]: 1 }))
   }
 
   return (
@@ -476,9 +519,23 @@ export function FlashInfosPage() {
                       </LinkBtn>
                     )}
                     {fi.bookId && (
-                      <AddBtn onClick={() => handleAdd(fi.bookId!)}>
-                        <IconCartFI /> Ajouter au panier
-                      </AddBtn>
+                      <>
+                        <QtyControl>
+                          <QtyBtn
+                            onClick={() => changeQty(fi.id, -1)}
+                            disabled={getQty(fi.id) <= 1}
+                            aria-label="Diminuer la quantité"
+                          >−</QtyBtn>
+                          <QtyValue>{getQty(fi.id)}</QtyValue>
+                          <QtyBtn
+                            onClick={() => changeQty(fi.id, +1)}
+                            aria-label="Augmenter la quantité"
+                          >+</QtyBtn>
+                        </QtyControl>
+                        <AddBtn onClick={() => handleAdd(fi.id, fi.bookId!)}>
+                          <IconCartFI /> Ajouter au panier
+                        </AddBtn>
+                      </>
                     )}
                   </CardActions>
                 </CardBody>
