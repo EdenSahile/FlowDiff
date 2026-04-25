@@ -8,6 +8,9 @@ import { ORDER_STATUSES, ORDER_STATUS_LABELS, type OrderStatus, type Order } fro
 import { TrackingModal } from '@/components/historique/TrackingModal'
 import type { Shipment } from '@/data/mockOrders'
 import { MOCK_BOOKS } from '@/data/mockBooks'
+import { useReturns } from '@/contexts/ReturnsContext'
+import { ReturnCard } from '@/components/historique/ReturnCard'
+import { NewReturnModal } from '@/components/historique/NewReturnModal'
 
 /* ── Animations ── */
 const fadeSlideIn = keyframes`
@@ -417,6 +420,64 @@ const EmptyState = styled.div`
   color: ${({ theme }) => theme.colors.gray[600]};
 `
 
+const TabsBar = styled.div`
+  display: flex; gap: 0;
+  border-bottom: 2px solid ${({ theme }) => theme.colors.gray[200]};
+  margin-bottom: ${({ theme }) => theme.spacing.xl};
+`
+
+const TabBtn = styled.button<{ $active: boolean }>`
+  padding: 10px 20px;
+  background: none; border: none; cursor: pointer;
+  font-size: ${({ theme }) => theme.typography.sizes.sm};
+  font-weight: ${({ $active, theme }) => $active ? theme.typography.weights.bold : theme.typography.weights.normal};
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  color: ${({ $active, theme }) => $active ? theme.colors.navy : theme.colors.gray[600]};
+  border-bottom: 2px solid ${({ $active, theme }) => $active ? theme.colors.success : 'transparent'};
+  margin-bottom: -2px;
+  transition: color 0.15s;
+  &:hover { color: ${({ theme }) => theme.colors.navy}; }
+`
+
+const TabBadge = styled.span`
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 18px; height: 18px; padding: 0 5px;
+  background: ${({ theme }) => theme.colors.accent};
+  color: white; border-radius: ${({ theme }) => theme.radii.full};
+  font-size: 11px; font-weight: 700;
+  margin-left: 6px;
+`
+
+const StatsGrid = styled.div`
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: ${({ theme }) => theme.spacing.md};
+  margin-bottom: ${({ theme }) => theme.spacing.xl};
+`
+
+const StatCard = styled.div`
+  background: ${({ theme }) => theme.colors.white};
+  border-radius: ${({ theme }) => theme.radii.lg};
+  padding: ${({ theme }) => theme.spacing.md};
+  text-align: center;
+`
+
+const StatValue = styled.div`
+  font-size: ${({ theme }) => theme.typography.sizes.xl};
+  font-weight: ${({ theme }) => theme.typography.weights.bold};
+  color: ${({ theme }) => theme.colors.navy};
+`
+
+const StatLabel = styled.div`
+  font-size: ${({ theme }) => theme.typography.sizes.xs};
+  color: ${({ theme }) => theme.colors.gray[600]};
+  margin-top: 4px;
+`
+
+const StatSub = styled.div`
+  font-size: 10px; color: ${({ theme }) => theme.colors.gray[400]};
+  margin-top: 2px;
+`
+
 /* ── CSV Export ── */
 function buildCSVRows(orders: Order[]): string {
   const BOM = '\uFEFF'
@@ -533,6 +594,8 @@ export function HistoriquePage() {
   const [addedMap, setAddedMap]             = useState<Record<string, boolean>>({})
   const [trackingModal, setTrackingModal]   = useState<Shipment | null>(null)
   const [newReturnOrderId, setNewReturnOrderId] = useState<string | null>(null)
+  const [activeTab, setActiveTab] = useState<'commandes' | 'retours'>('commandes')
+  const { returns, loading: returnsLoading, stats: returnsStats } = useReturns()
 
   // Tous les hooks avant tout return conditionnel
   const allOrders = useMemo(
@@ -593,12 +656,16 @@ export function HistoriquePage() {
     downloadCSV(buildCSVRows([order]), `${order.numero}_commande.csv`)
   }
 
+  function handleReturnSuccess() {
+    setActiveTab('retours')
+  }
+
   return (
     <>
     <Page>
       <TitleRow>
         <Title style={{ marginBottom: 0 }}>Mon historique</Title>
-        {allOrders.length > 0 && (
+        {activeTab === 'commandes' && allOrders.length > 0 && (
           <ExportAllButton onClick={handleExportAll} title="Exporter toutes les commandes en CSV">
             <IconDownload />
             Exporter tout
@@ -606,6 +673,19 @@ export function HistoriquePage() {
         )}
       </TitleRow>
 
+      <TabsBar>
+        <TabBtn $active={activeTab === 'commandes'} onClick={() => setActiveTab('commandes')}>
+          Mes commandes
+          {allOrders.length > 0 && <TabBadge>{allOrders.length}</TabBadge>}
+        </TabBtn>
+        <TabBtn $active={activeTab === 'retours'} onClick={() => setActiveTab('retours')}>
+          Mes retours
+          {returns.length > 0 && <TabBadge>{returns.length}</TabBadge>}
+        </TabBtn>
+      </TabsBar>
+
+      {activeTab === 'commandes' && (
+        <>
       {allOrders.length > 0 && (
         <FiltersBar>
           {/* Recherche */}
@@ -769,9 +849,55 @@ export function HistoriquePage() {
           )
         })
       )}
+        </>
+      )}
+
+      {activeTab === 'retours' && (
+        <>
+          {returnsStats && returns.length > 0 && (
+            <StatsGrid>
+              <StatCard>
+                <StatValue>{returnsStats.activeCount}</StatValue>
+                <StatLabel>Retours en cours</StatLabel>
+              </StatCard>
+              <StatCard>
+                <StatValue>
+                  {new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(returnsStats.avoirYTD)}
+                </StatValue>
+                <StatLabel>Avoirs reçus (année)</StatLabel>
+              </StatCard>
+              <StatCard>
+                <StatValue>{Math.round(returnsStats.returnRatio * 100)}%</StatValue>
+                <StatLabel>Taux de retour</StatLabel>
+                <StatSub>Secteur : {Math.round(returnsStats.sectorAverage * 100)}%</StatSub>
+              </StatCard>
+            </StatsGrid>
+          )}
+
+          {returnsLoading ? (
+            <EmptyState>Chargement…</EmptyState>
+          ) : returns.length === 0 ? (
+            <EmptyState>
+              <div style={{ fontSize: '2.5rem', marginBottom: '12px' }}>📦</div>
+              <p>Aucun retour pour le moment.</p>
+            </EmptyState>
+          ) : (
+            returns.map(ret => <ReturnCard key={ret.id} ret={ret} />)
+          )}
+        </>
+      )}
     </Page>
     {trackingModal && (
       <TrackingModal shipment={trackingModal} onClose={() => setTrackingModal(null)} />
+    )}
+    {newReturnOrderId !== null && (
+      <NewReturnModal
+        orders={allOrders}
+        preselectedOrderId={newReturnOrderId}
+        codeClient={user.codeClient}
+        onClose={() => setNewReturnOrderId(null)}
+        onSuccess={handleReturnSuccess}
+      />
     )}
     </>
   )
