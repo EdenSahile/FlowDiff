@@ -63,9 +63,15 @@ export function ReturnsProvider({ children }: { children: React.ReactNode }) {
       : DEFAULT_STATS
     )
 
-    const created = await serviceCreateReturn(payload)
-    setReturns(prev => prev.map(r => r.id === optimistic.id ? created : r))
-    return created
+    try {
+      const created = await serviceCreateReturn(payload)
+      setReturns(prev => prev.map(r => r.id === optimistic.id ? created : r))
+      return created
+    } catch (err) {
+      setReturns(prev => prev.filter(r => r.id !== optimistic.id))
+      setStats(prev => prev ? { ...prev, activeCount: Math.max(0, prev.activeCount - 1) } : null)
+      throw err
+    }
   }
 
   return (

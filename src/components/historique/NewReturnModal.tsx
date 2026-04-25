@@ -216,18 +216,22 @@ export function NewReturnModal({ orders, preselectedOrderId, codeClient, onClose
       reason: itemStates[i.isbn].reason!,
     }))
 
-    await addReturn({
-      codeClient,
-      orderId: selectedOrder.id,
-      orderNumero: selectedOrder.numero,
-      items: returnItems,
-      notes: notes.trim() || null,
-    })
-
-    showToast('Demande de retour envoyée', 'success')
-    setSubmitting(false)
-    onClose()
-    onSuccess()
+    try {
+      await addReturn({
+        codeClient,
+        orderId: selectedOrder.id,
+        orderNumero: selectedOrder.numero,
+        items: returnItems,
+        notes: notes.trim() || null,
+      })
+      showToast('Demande de retour envoyée', 'success')
+      onClose()
+      onSuccess()
+    } catch {
+      showToast('Erreur lors de l\'envoi — réessayez', 'error')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return createPortal(
