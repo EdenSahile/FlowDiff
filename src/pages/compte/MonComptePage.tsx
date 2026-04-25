@@ -34,13 +34,13 @@ const Avatar = styled.div`
   width: 60px;
   height: 60px;
   border-radius: ${({ theme }) => theme.radii.full};
-  background-color: ${({ theme }) => theme.colors.primary};
+  background-color: ${({ theme }) => theme.colors.accent};
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: ${({ theme }) => theme.typography.sizes['2xl']};
   font-weight: ${({ theme }) => theme.typography.weights.bold};
-  color: #E0EDE7;
+  color: #3d2f00;
   flex-shrink: 0;
 `
 

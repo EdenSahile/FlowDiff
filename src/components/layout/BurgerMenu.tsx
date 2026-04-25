@@ -56,14 +56,13 @@ const Avatar = styled.div`
   width: 52px;
   height: 52px;
   border-radius: ${({ theme }) => theme.radii.full};
-  background-color: rgba(255, 255, 255, 0.15);
-  border: 2px solid rgba(255, 255, 255, 0.25);
+  background-color: ${({ theme }) => theme.colors.accent};
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: ${({ theme }) => theme.typography.sizes['2xl']};
   font-weight: ${({ theme }) => theme.typography.weights.bold};
-  color: #E0EDE7;
+  color: #3d2f00;
   flex-shrink: 0;
 `
 
