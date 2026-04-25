@@ -6,6 +6,7 @@ import { CartProvider } from '@/contexts/CartContext'
 import { OrdersProvider } from '@/contexts/OrdersContext'
 import { ReturnsProvider } from '@/contexts/ReturnsContext'
 import { WishlistProvider } from '@/contexts/WishlistContext'
+import { RdvProvider } from '@/contexts/RdvContext'
 import { ToastProvider } from '@/contexts/ToastContext'
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
 import { AppLayout } from '@/components/layout/AppLayout'
@@ -31,6 +32,7 @@ const SelectionsPage   = lazy(() => import('@/pages/selections/SelectionsPage').
 const TopVentesPage    = lazy(() => import('@/pages/top-ventes/TopVentesPage').then(m => ({ default: m.TopVentesPage })))
 const AuteurPage       = lazy(() => import('@/pages/auteur/AuteurPage').then(m => ({ default: m.AuteurPage })))
 const FacturationPage  = lazy(() => import('@/pages/facturation/FacturationPage').then(m => ({ default: m.FacturationPage })))
+const RdvPage          = lazy(() => import('@/pages/rdv/RdvPage').then(m => ({ default: m.RdvPage })))
 
 function ProtectedLayout() {
   return (
@@ -50,6 +52,7 @@ export default function App() {
           <AuthProvider>
             <CartProvider>
               <WishlistProvider>
+              <RdvProvider>
               <OrdersProvider>
               <ReturnsProvider>
               <Suspense fallback={null}>
@@ -80,12 +83,14 @@ export default function App() {
                     <Route path="/cgv" element={<CGVPage />} />
                     <Route path="/newsletter" element={<NewsletterPage />} />
                     <Route path="/facturation" element={<FacturationPage />} />
+                    <Route path="/rdv-representant" element={<RdvPage />} />
                   </Route>
                 </Route>
               </Routes>
               </Suspense>
               </ReturnsProvider>
               </OrdersProvider>
+              </RdvProvider>
               </WishlistProvider>
             </CartProvider>
           </AuthProvider>

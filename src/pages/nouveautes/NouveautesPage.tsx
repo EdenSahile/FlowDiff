@@ -1,16 +1,19 @@
 import { useState, useDeferredValue } from 'react'
 import styled from 'styled-components'
+import { useNavigate } from 'react-router-dom'
 import { BookCard } from '@/components/catalogue/BookCard'
 import { UniverseFilter } from '@/components/catalogue/UniverseFilter'
 import { getBooksByType, searchBooks } from '@/data/mockBooks'
 import type { Universe } from '@/data/mockBooks'
 import { Input } from '@/components/ui/Input'
+import { useRdv } from '@/contexts/RdvContext'
 
 /* ── Tabs ── */
 type Tab = 'mois' | 'a-paraitre'
 
 const Page = styled.div`
   padding: ${({ theme }) => theme.spacing.lg};
+  padding-bottom: 80px;  /* espace pour le floating RDV bar */
   max-width: 1200px;
   margin: 0 auto;
 `
@@ -153,9 +156,69 @@ const ParaitreInfo = styled.div`
   font-size: ${({ theme }) => theme.typography.sizes.sm};
   color: ${({ theme }) => theme.colors.navy};
   display: flex;
-  align-items: flex-start;
-  gap: ${({ theme }) => theme.spacing.sm};
+  align-items: center;
+  justify-content: space-between;
+  gap: ${({ theme }) => theme.spacing.md};
   line-height: 1.5;
+  flex-wrap: wrap;
+`
+
+const RdvSelectionBtn = styled.button`
+  flex-shrink: 0;
+  padding: 7px 14px;
+  border: 1.5px solid ${({ theme }) => theme.colors.accent};
+  border-radius: ${({ theme }) => theme.radii.md};
+  background: transparent;
+  color: ${({ theme }) => theme.colors.navy};
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: ${({ theme }) => theme.typography.sizes.sm};
+  font-weight: ${({ theme }) => theme.typography.weights.semibold};
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background .15s, color .15s;
+
+  &:hover {
+    background: ${({ theme }) => theme.colors.accent};
+    color: #3d2f00;
+  }
+`
+
+const FloatingRdvBar = styled.div`
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: ${({ theme }) => theme.colors.navy};
+  color: ${({ theme }) => theme.colors.white};
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 24px;
+  z-index: 100;
+  gap: 16px;
+  flex-wrap: wrap;
+`
+
+const FloatingRdvText = styled.span`
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: ${({ theme }) => theme.typography.sizes.sm};
+  flex: 1;
+`
+
+const FloatingRdvBtn = styled.button`
+  padding: 8px 18px;
+  background: ${({ theme }) => theme.colors.accent};
+  color: #3d2f00;
+  border: none;
+  border-radius: ${({ theme }) => theme.radii.md};
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: ${({ theme }) => theme.typography.sizes.sm};
+  font-weight: ${({ theme }) => theme.typography.weights.semibold};
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity .15s;
+
+  &:hover { opacity: 0.88; }
 `
 
 const ProgrammeSection = styled.section`
@@ -180,6 +243,8 @@ export function NouveautesPage() {
   const [universe, setUniverse] = useState<Universe | null>(null)
   const [query, setQuery]       = useState('')
   const deferred = useDeferredValue(query)
+  const navigate = useNavigate()
+  const { rdvCount, totalExemplaires } = useRdv()
 
   let nouveautes = deferred.trim()
     ? searchBooks(deferred).filter(b => b.type === 'nouveaute')
@@ -257,8 +322,15 @@ export function NouveautesPage() {
       {tab === 'a-paraitre' && (
         <>
           <ParaitreInfo>
-            <IconInfo />
-            <span>Les titres à paraître sont consultables uniquement. La commande se fait via votre représentant commercial. Vous pouvez recevoir le catalogue par email.</span>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', flex: 1 }}>
+              <IconInfo />
+              <span>Les titres à paraître sont consultables uniquement. La commande se fait via votre représentant commercial. Vous pouvez recevoir le catalogue par email.</span>
+            </div>
+            {rdvCount > 0 && (
+              <RdvSelectionBtn onClick={() => navigate('/rdv-representant')} aria-label="Voir ma sélection RDV">
+                Ma sélection ({rdvCount} titre{rdvCount > 1 ? 's' : ''}) →
+              </RdvSelectionBtn>
+            )}
           </ParaitreInfo>
 
           {programmes.length === 0 && (
@@ -282,6 +354,17 @@ export function NouveautesPage() {
             )
           })}
         </>
+      )}
+
+      {tab === 'a-paraitre' && rdvCount > 0 && (
+        <FloatingRdvBar>
+          <FloatingRdvText>
+            <strong>{rdvCount} titre{rdvCount > 1 ? 's' : ''}</strong> sélectionné{rdvCount > 1 ? 's' : ''} — {totalExemplaires} ex. au total
+          </FloatingRdvText>
+          <FloatingRdvBtn onClick={() => navigate('/rdv-representant')}>
+            Voir ma sélection →
+          </FloatingRdvBtn>
+        </FloatingRdvBar>
       )}
     </Page>
   )

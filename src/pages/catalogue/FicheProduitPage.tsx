@@ -8,6 +8,7 @@ import { BookCover } from '@/components/catalogue/BookCover'
 import { useCart } from '@/contexts/CartContext'
 import { useToast } from '@/contexts/ToastContext'
 import { useWishlist } from '@/contexts/WishlistContext'
+import { useRdv } from '@/contexts/RdvContext'
 import { ListPickerPopover } from '@/components/catalogue/ListPickerPopover'
 import { StockStatus } from '@/components/ui/StockStatus'
 import { StockAlertModal } from '@/components/ui/StockAlertModal'
@@ -719,6 +720,36 @@ const ArgMetaValue = styled.span`
   font-family: 'Roboto', Arial, sans-serif;
 `
 
+/* ── Cart zone dans la modal ── */
+const PdfCartZone = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+`
+
+const PdfAddBtn = styled.button<{ $added: boolean }>`
+  height: 40px;
+  padding: 0 14px;
+  border: 1.5px solid ${({ $added, theme }) => $added ? theme.colors.primaryHover : theme.colors.accent};
+  border-radius: ${({ theme }) => theme.radii.lg};
+  background: ${({ $added, theme }) => $added ? theme.colors.primaryLight : 'transparent'};
+  color: ${({ theme }) => theme.colors.navy};
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  transition: background .2s, border-color .2s;
+  &:hover:not(:disabled) {
+    background: ${({ theme }) => theme.colors.accent};
+    color: #3d2f00;
+  }
+`
+
 /* Pages intérieures */
 const InteriorPageNum = styled.p`
   text-align: center;
@@ -760,12 +791,11 @@ const InteriorParagraph = styled.p`
 const PdfNav = styled.div`
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 12px;
   padding: 12px 20px;
   border-top: 1px solid #EDE9E2;
   background: #FAFAF8;
   border-radius: 0 0 ${({ theme }) => theme.radii.xl} ${({ theme }) => theme.radii.xl};
+  gap: 12px;
 `
 
 const NavArrow = styled.button<{ $disabled?: boolean }>`
@@ -964,9 +994,12 @@ export function FicheProduitPage() {
   const { addToCart } = useCart()
   const { showToast } = useToast()
   const { isInAnyList } = useWishlist()
+  const { addToRdv, isInRdv } = useRdv()
 
   const [qty, setQty]             = useState(1)
   const [added, setAdded]         = useState(false)
+  const [pdfQty, setPdfQty]       = useState(1)
+  const [pdfAdded, setPdfAdded]   = useState(false)
   const [formatId, setFormatId]   = useState<FormatId>('broche')
   const [resumeOpen, setResumeOpen] = useState(true)
   const [listAnchor, setListAnchor] = useState<DOMRect | null>(null)
@@ -1032,6 +1065,12 @@ export function FicheProduitPage() {
       return
     }
     performAdd(false)
+  }
+
+  const handlePdfRdv = () => {
+    addToRdv(book, pdfQty)
+    setPdfAdded(true)
+    setTimeout(() => setPdfAdded(false), 2000)
   }
 
   const handleContactRep = () => {
@@ -1144,7 +1183,6 @@ export function FicheProduitPage() {
             </CoverShadow>
 
             <SecondaryActions>
-              {/* Pages intérieures + Bande annonce : uniquement pour À paraître */}
               {isAParaitre && (
                 <>
                   <SecBtn onClick={() => { setPagesOpen(true); setPageIdx(0) }}>
@@ -1337,29 +1375,55 @@ export function FicheProduitPage() {
             </PdfPageWrap>
 
             <PdfNav>
-              <NavArrow
-                $disabled={pageIdx === 0}
-                disabled={pageIdx === 0}
-                onClick={() => setPageIdx(i => Math.max(0, i - 1))}
-                aria-label="Page précédente"
-              >
-                ‹
-              </NavArrow>
+              {/* Spacer gauche pour centrer les flèches */}
+              <div style={{ flex: 1 }} />
 
-              <PageDots>
-                {Array.from({ length: TOTAL_PAGES }).map((_, i) => (
-                  <PageDot key={i} $active={pageIdx === i} onClick={() => setPageIdx(i)} style={{ cursor: 'pointer' }} />
-                ))}
-              </PageDots>
+              {/* Navigation centrale */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <NavArrow
+                  $disabled={pageIdx === 0}
+                  disabled={pageIdx === 0}
+                  onClick={() => setPageIdx(i => Math.max(0, i - 1))}
+                  aria-label="Page précédente"
+                >
+                  ‹
+                </NavArrow>
 
-              <NavArrow
-                $disabled={pageIdx === TOTAL_PAGES - 1}
-                disabled={pageIdx === TOTAL_PAGES - 1}
-                onClick={() => setPageIdx(i => Math.min(TOTAL_PAGES - 1, i + 1))}
-                aria-label="Page suivante"
-              >
-                ›
-              </NavArrow>
+                <PageDots>
+                  {Array.from({ length: TOTAL_PAGES }).map((_, i) => (
+                    <PageDot key={i} $active={pageIdx === i} onClick={() => setPageIdx(i)} style={{ cursor: 'pointer' }} />
+                  ))}
+                </PageDots>
+
+                <NavArrow
+                  $disabled={pageIdx === TOTAL_PAGES - 1}
+                  disabled={pageIdx === TOTAL_PAGES - 1}
+                  onClick={() => setPageIdx(i => Math.min(TOTAL_PAGES - 1, i + 1))}
+                  aria-label="Page suivante"
+                >
+                  ›
+                </NavArrow>
+              </div>
+
+              {/* Zone RDV à droite */}
+              <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
+                {isAParaitre && (
+                  <PdfCartZone>
+                    <QtyControl>
+                      <QtyBtn onClick={() => setPdfQty(q => Math.max(1, q - 1))} disabled={pdfQty <= 1} aria-label="Diminuer">−</QtyBtn>
+                      <QtyValue style={{ minWidth: 36, fontSize: 15 }}>{pdfQty}</QtyValue>
+                      <QtyBtn onClick={() => setPdfQty(q => q + 1)} aria-label="Augmenter">+</QtyBtn>
+                    </QtyControl>
+                    <PdfAddBtn
+                      $added={pdfAdded || isInRdv(book.id)}
+                      onClick={handlePdfRdv}
+                      aria-label="Ajouter à ma sélection RDV"
+                    >
+                      {pdfAdded ? '✓ Ajouté !' : isInRdv(book.id) ? '✓ Dans ma sélection' : 'Sélectionner pour RDV'}
+                    </PdfAddBtn>
+                  </PdfCartZone>
+                )}
+              </div>
             </PdfNav>
 
           </PdfModal>

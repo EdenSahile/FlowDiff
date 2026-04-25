@@ -10,6 +10,8 @@ import { ListPickerPopover } from './ListPickerPopover'
 import { StockStatus } from '@/components/ui/StockStatus'
 import { StockAlertModal } from '@/components/ui/StockAlertModal'
 import { theme } from '@/lib/theme'
+import { useRdv } from '@/contexts/RdvContext'
+import { RdvPopup } from '@/components/catalogue/RdvPopup'
 
 const CATEGORY_COLORS: Record<string, { bg: string; text: string }> = {
   'Littérature':     { bg: '#E8EDF3', text: '#1C3252' },
@@ -276,12 +278,49 @@ const EpuiseNote = styled.p`
   text-align: center;
 `
 
-const AParaitreNote = styled.p`
+const AParaitreFooter = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+`
+
+const RdvBadge = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  background: ${({ theme }) => theme.colors.accentLight};
+  border: 1px solid ${({ theme }) => theme.colors.accent};
+  border-radius: ${({ theme }) => theme.radii.md};
+  font-family: ${({ theme }) => theme.typography.fontFamily};
   font-size: 11px;
-  color: ${({ theme }) => theme.colors.gray[400]};
-  font-style: italic;
-  text-align: center;
-  padding: 4px 0;
+  font-weight: 600;
+  color: #7a5c00;
+`
+
+const RdvBtn = styled.button`
+  width: 100%;
+  padding: 8px;
+  border: 1.5px solid ${({ theme }) => theme.colors.accent};
+  border-radius: ${({ theme }) => theme.radii.md};
+  background: transparent;
+  color: ${({ theme }) => theme.colors.navy};
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 12.5px;
+  font-weight: ${({ theme }) => theme.typography.weights.semibold};
+  cursor: pointer;
+  transition: background .15s, color .15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  letter-spacing: 0.02em;
+
+  &:hover {
+    background: ${({ theme }) => theme.colors.accent};
+    color: #3d2f00;
+  }
+  &:active { transform: scale(0.97); }
 `
 
 /* ── Icônes ── */
@@ -306,6 +345,22 @@ function IconStar({ filled }: { filled: boolean }) {
   )
 }
 
+function IconPlus() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+      <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+    </svg>
+  )
+}
+
+function IconCheck() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="20 6 9 17 4 12"/>
+    </svg>
+  )
+}
+
 interface Props {
   book: Book
   showType?: boolean
@@ -316,10 +371,13 @@ export function BookCard({ book, showType = false }: Props) {
   const { addToCart } = useCart()
   const { showToast } = useToast()
   const { isInAnyList, getListsContaining, removeFromList } = useWishlist()
+  const { isInRdv, getQty } = useRdv()
   const [qty, setQty] = useState(1)
   const [popoverAnchor, setPopoverAnchor] = useState<DOMRect | null>(null)
   const [alertOpen, setAlertOpen] = useState(false)
+  const [rdvAnchor, setRdvAnchor] = useState<DOMRect | null>(null)
   const starRef = useRef<HTMLDivElement>(null)
+  const rdvBtnRef = useRef<HTMLButtonElement>(null)
 
   const isAParaitre  = book.type === 'a-paraitre'
   const isEpuise     = book.statut === 'epuise'
@@ -423,7 +481,23 @@ export function BookCard({ book, showType = false }: Props) {
           )}
 
           {isAParaitre ? (
-            <AParaitreNote>Consultation catalogue uniquement</AParaitreNote>
+            <AParaitreFooter>
+              {isInRdv(book.id) && (
+                <RdvBadge>
+                  <IconCheck /> {getQty(book.id)} ex. sélectionné{getQty(book.id) > 1 ? 's' : ''}
+                </RdvBadge>
+              )}
+              <RdvBtn
+                ref={rdvBtnRef}
+                onClick={e => {
+                  e.stopPropagation()
+                  if (rdvBtnRef.current) setRdvAnchor(rdvBtnRef.current.getBoundingClientRect())
+                }}
+                aria-label="Ajouter à ma sélection RDV"
+              >
+                <IconPlus /> {isInRdv(book.id) ? 'Modifier la sélection' : 'Ajouter à ma sélection'}
+              </RdvBtn>
+            </AParaitreFooter>
           ) : (
             <>
               <PriceRow>
@@ -478,6 +552,14 @@ export function BookCard({ book, showType = false }: Props) {
           statut={book.statut}
           onConfirm={() => { setAlertOpen(false); confirmAdd(book.statut === 'en_reimp') }}
           onCancel={() => setAlertOpen(false)}
+        />
+      )}
+
+      {rdvAnchor && (
+        <RdvPopup
+          book={book}
+          anchorRect={rdvAnchor}
+          onClose={() => setRdvAnchor(null)}
         />
       )}
     </>

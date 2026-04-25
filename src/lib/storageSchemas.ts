@@ -42,3 +42,12 @@ const storedWishlistSchema = z.object({
 })
 
 export const storedWishlistsSchema = z.array(storedWishlistSchema)
+
+/* ── StoredRdv ── */
+
+const rdvItemSchema = z.object({
+  book: z.object({ id: z.string() }).catchall(z.unknown()),
+  quantity: z.number().int().min(1),
+}).catchall(z.unknown())
+
+export const storedRdvSchema = z.array(rdvItemSchema).default([])
