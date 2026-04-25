@@ -14,6 +14,9 @@ import {
 import { useWishlist } from '@/contexts/WishlistContext'
 import { useCart } from '@/contexts/CartContext'
 import { theme } from '@/lib/theme'
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
+import { IconTrash, IconCart, IconSearch } from '@/components/ui/icons'
+import { exportToCSV } from '@/lib/csv'
 
 const GOLD = theme.colors.accent
 
@@ -688,76 +691,6 @@ const ListRowDelete = styled.button`
   }
 `
 
-/* ── Confirmation suppression liste ── */
-const ConfirmOverlay = styled.div`
-  position: absolute;
-  inset: 0;
-  background: rgba(255,255,255,0.92);
-  backdrop-filter: blur(2px);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  z-index: 10;
-  padding: 24px;
-`
-
-const ConfirmText = styled.p`
-  font-family: ${({ theme }) => theme.typography.fontFamily};
-  font-size: 14px;
-  font-weight: 600;
-  color: ${({ theme }) => theme.colors.navy};
-  text-align: center;
-  margin: 0;
-`
-
-const ConfirmSub = styled.p`
-  font-family: ${({ theme }) => theme.typography.fontFamily};
-  font-size: 12px;
-  color: ${({ theme }) => theme.colors.gray[400]};
-  text-align: center;
-  margin: -6px 0 0;
-`
-
-const ConfirmRow = styled.div`
-  display: flex;
-  gap: 10px;
-  width: 100%;
-  max-width: 260px;
-`
-
-const ConfirmCancel = styled.button`
-  flex: 1;
-  padding: 9px;
-  border: 1.5px solid rgba(28,58,95,0.18);
-  border-radius: ${({ theme }) => theme.radii.md};
-  background: transparent;
-  font-family: ${({ theme }) => theme.typography.fontFamily};
-  font-size: 13px;
-  font-weight: 600;
-  color: ${({ theme }) => theme.colors.navy};
-  cursor: pointer;
-  transition: background 0.12s;
-
-  &:hover { background: rgba(28,58,95,0.05); }
-`
-
-const ConfirmDelete = styled.button`
-  flex: 1;
-  padding: 9px;
-  border: none;
-  border-radius: ${({ theme }) => theme.radii.md};
-  background: #e24b4a;
-  font-family: ${({ theme }) => theme.typography.fontFamily};
-  font-size: 13px;
-  font-weight: 600;
-  color: #fff;
-  cursor: pointer;
-  transition: background 0.12s;
-
-  &:hover { background: #c73a39; }
-`
 
 /* ── Vue détail d'une liste ── */
 const DetailHead = styled.div`
@@ -976,15 +909,6 @@ const ExportCsvBtn = styled.button`
 `
 
 /* ── Icônes SVG ── */
-function IconSearch() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-      stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="11" cy="11" r="8"/>
-      <path d="m21 21-4.35-4.35"/>
-    </svg>
-  )
-}
 
 function IconSliders() {
   return (
@@ -1045,28 +969,6 @@ function IconStarSmall() {
   )
 }
 
-function IconTrash() {
-  return (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
-      stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="3 6 5 6 21 6"/>
-      <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/>
-      <path d="M10 11v6M14 11v6"/>
-      <path d="M9 6V4h6v2"/>
-    </svg>
-  )
-}
-
-function IconCartSvg({ filled }: { filled: boolean }) {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-      stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="9" cy="21" r="1" fill={filled ? 'currentColor' : 'none'}/>
-      <circle cx="20" cy="21" r="1" fill={filled ? 'currentColor' : 'none'}/>
-      <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-    </svg>
-  )
-}
 
 /* ── Props ── */
 interface HeaderProps {
@@ -1081,27 +983,6 @@ export function Header({ cartCount = 0, onBurgerClick, onCartClick, hasNotif = t
   const { lists, deleteList, removeFromList } = useWishlist()
   const { addToCart } = useCart()
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
-
-  const exportListCSV = (list: { name: string; items: Array<{ book: { isbn: string; title: string; authors: string[]; priceTTC: number; publicationDate: string }; addedBy?: string }> }) => {
-    const header = ['ISBN', 'Titre', 'Auteur', 'Prix TTC', 'Date parution', 'Nom de la liste', 'Ajouté par']
-    const rows = list.items.map(({ book, addedBy }) => [
-      book.isbn,
-      `"${book.title.replace(/"/g, '""')}"`,
-      `"${book.authors.join(', ').replace(/"/g, '""')}"`,
-      book.priceTTC.toFixed(2).replace('.', ','),
-      book.publicationDate,
-      `"${list.name.replace(/"/g, '""')}"`,
-      addedBy ? `"${addedBy.replace(/"/g, '""')}"` : '',
-    ])
-    const csv = [header.join(';'), ...rows.map(r => r.join(';'))].join('\n')
-    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' })
-    const url  = URL.createObjectURL(blob)
-    const a    = document.createElement('a')
-    a.href     = url
-    a.download = `${list.name.replace(/[^a-z0-9]/gi, '_')}.csv`
-    a.click()
-    URL.revokeObjectURL(url)
-  }
 
   const [search, setSearch] = useState('')
   const [showPanel, setShowPanel]           = useState(false)
@@ -1311,7 +1192,7 @@ export function Header({ cartCount = 0, onBurgerClick, onCartClick, hasNotif = t
 
         <SearchContainer ref={containerRef}>
           <SearchGroup>
-            <SearchIconWrap><IconSearch /></SearchIconWrap>
+            <SearchIconWrap><IconSearch size={14} /></SearchIconWrap>
             <SearchInput
               id="header-search-input"
               type="search"
@@ -1368,7 +1249,7 @@ export function Header({ cartCount = 0, onBurgerClick, onCartClick, hasNotif = t
             onClick={onCartClick}
             aria-label={`Panier — ${cartCount} article${cartCount !== 1 ? 's' : ''}`}
           >
-            <IconCartSvg filled={cartCount > 0} />
+            <IconCart size={16} filled={cartCount > 0} />
             <CartLabel>Panier</CartLabel>
             {cartCount > 0 && (
               <CartBadge>{cartCount > 99 ? '99+' : cartCount}</CartBadge>
@@ -1504,19 +1385,6 @@ export function Header({ cartCount = 0, onBurgerClick, onCartClick, hasNotif = t
           role="dialog"
           aria-label="Mes listes de commandes"
         >
-          {confirmDeleteId && (() => {
-            const target = lists.find(l => l.id === confirmDeleteId)
-            return (
-              <ConfirmOverlay>
-                <ConfirmText>Supprimer la liste&nbsp;?</ConfirmText>
-                <ConfirmSub>« {target?.name} » et ses {target?.items.length ?? 0} titre{(target?.items.length ?? 0) !== 1 ? 's' : ''} seront supprimés.</ConfirmSub>
-                <ConfirmRow>
-                  <ConfirmCancel onClick={() => setConfirmDeleteId(null)}>Annuler</ConfirmCancel>
-                  <ConfirmDelete onClick={() => { deleteList(confirmDeleteId); setConfirmDeleteId(null) }}>Supprimer</ConfirmDelete>
-                </ConfirmRow>
-              </ConfirmOverlay>
-            )
-          })()}
           {selectedListId ? (() => {
             const list = lists.find(l => l.id === selectedListId)
             if (!list) { setSelectedListId(null); return null }
@@ -1568,7 +1436,7 @@ export function Header({ cartCount = 0, onBurgerClick, onCartClick, hasNotif = t
                             aria-label={`Ajouter ${book.title} au panier`}
                             title="Ajouter au panier"
                           >
-                            <IconCartSvg filled={false} />
+                            <IconCart size={16} filled={false} />
                           </BookRowCartBtn>
                         )}
                         <BookRowRemove
@@ -1576,7 +1444,7 @@ export function Header({ cartCount = 0, onBurgerClick, onCartClick, hasNotif = t
                           aria-label={`Retirer ${book.title}`}
                           title="Retirer de la liste"
                         >
-                          <IconTrash />
+                          <IconTrash size={12} />
                         </BookRowRemove>
                       </BookRow>
                     ))
@@ -1591,12 +1459,24 @@ export function Header({ cartCount = 0, onBurgerClick, onCartClick, hasNotif = t
                           .forEach(i => addToCart(i.book, 1))
                       }}
                     >
-                      <IconCartSvg filled={false} />
+                      <IconCart size={16} filled={false} />
                       Tout ajouter au panier
                     </AddAllBtn>
                   )}
                   <ExportCsvBtn
-                    onClick={() => exportListCSV(list)}
+                    onClick={() => {
+                      const headers = ['ISBN', 'Titre', 'Auteur', 'Prix TTC', 'Date parution', 'Nom de la liste', 'Ajouté par']
+                      const rows = list.items.map(({ book, addedBy }) => [
+                        book.isbn,
+                        book.title,
+                        book.authors.join(', '),
+                        book.priceTTC.toFixed(2).replace('.', ','),
+                        book.publicationDate,
+                        list.name,
+                        addedBy ?? '',
+                      ])
+                      exportToCSV(`${list.name.replace(/[^a-z0-9]/gi, '_')}.csv`, headers, rows)
+                    }}
                     aria-label={`Exporter la liste "${list.name}" en CSV`}
                     title="Exporter en CSV"
                   >
@@ -1627,7 +1507,7 @@ export function Header({ cartCount = 0, onBurgerClick, onCartClick, hasNotif = t
                         aria-label={`Supprimer la liste ${list.name}`}
                         title="Supprimer cette liste"
                       >
-                        <IconTrash />
+                        <IconTrash size={12} />
                       </ListRowDelete>
                     </ListRow>
                   ))
@@ -1638,6 +1518,21 @@ export function Header({ cartCount = 0, onBurgerClick, onCartClick, hasNotif = t
         </ListsPanel>,
         document.body
       )}
+
+      {(() => {
+        const target = confirmDeleteId ? lists.find(l => l.id === confirmDeleteId) : null
+        return (
+          <ConfirmDialog
+            open={!!confirmDeleteId}
+            title="Supprimer la liste ?"
+            message={target ? `« ${target.name} » et ses ${target.items.length} titre${target.items.length !== 1 ? 's' : ''} seront supprimés.` : ''}
+            confirmLabel="Supprimer"
+            destructive
+            onConfirm={() => { if (confirmDeleteId) { deleteList(confirmDeleteId); setConfirmDeleteId(null) } }}
+            onCancel={() => setConfirmDeleteId(null)}
+          />
+        )
+      })()}
     </>
   )
 }
