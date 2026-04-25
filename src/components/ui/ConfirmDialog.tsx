@@ -16,7 +16,7 @@ const Dialog = styled.div`
   padding: ${({ theme }) => theme.spacing.xl};
   max-width: 360px;
   width: 100%;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  box-shadow: none;
 `
 
 const DialogTitle = styled.h3`
@@ -51,8 +51,8 @@ const DialogBtn = styled.button<{ $destructive?: boolean }>`
   border: none;
   transition: background .15s, color .15s;
   background: ${({ $destructive, theme }) => $destructive ? theme.colors.error : theme.colors.gray[100]};
-  color: ${({ $destructive }) => $destructive ? '#fff' : '#374151'};
-  &:hover { filter: brightness(0.92); }
+  color: ${({ $destructive, theme }) => $destructive ? '#fff' : theme.colors.gray[600]};
+  &:hover { opacity: 0.88; }
   &:focus-visible {
     outline: 2px solid ${({ $destructive, theme }) => $destructive ? theme.colors.error : theme.colors.navy};
     outline-offset: 2px;
