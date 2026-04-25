@@ -22,8 +22,8 @@ describe('exportToCSV', () => {
   it('insère le BOM UTF-8 pour Excel', () => {
     let capturedContent = ''
     const OriginalBlob = global.Blob
-    vi.spyOn(global, 'Blob').mockImplementation(function(parts: BlobPart[]) {
-      capturedContent = parts[0] as string
+    vi.spyOn(global, 'Blob').mockImplementation(function(parts?: BlobPart[]) {
+      capturedContent = (parts?.[0] ?? '') as string
       return new OriginalBlob(parts)
     })
     vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:test')
@@ -40,8 +40,8 @@ describe('exportToCSV', () => {
   it('échappe les guillemets doubles dans les valeurs', () => {
     let capturedContent = ''
     const OriginalBlob = global.Blob
-    vi.spyOn(global, 'Blob').mockImplementation(function(parts: BlobPart[]) {
-      capturedContent = parts[0] as string
+    vi.spyOn(global, 'Blob').mockImplementation(function(parts?: BlobPart[]) {
+      capturedContent = (parts?.[0] ?? '') as string
       return new OriginalBlob(parts)
     })
     vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:test')
@@ -58,8 +58,8 @@ describe('exportToCSV', () => {
   it('utilise le point-virgule comme séparateur (convention française)', () => {
     let capturedContent = ''
     const OriginalBlob = global.Blob
-    vi.spyOn(global, 'Blob').mockImplementation(function(parts: BlobPart[]) {
-      capturedContent = parts[0] as string
+    vi.spyOn(global, 'Blob').mockImplementation(function(parts?: BlobPart[]) {
+      capturedContent = (parts?.[0] ?? '') as string
       return new OriginalBlob(parts)
     })
     vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:test')
