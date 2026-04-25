@@ -19,5 +19,5 @@ export function exportToCSV(
   a.href     = url
   a.download = filename.endsWith('.csv') ? filename : `${filename}.csv`
   a.click()
-  URL.revokeObjectURL(url)
+  setTimeout(() => URL.revokeObjectURL(url), 100)
 }
