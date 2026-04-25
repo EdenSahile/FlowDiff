@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { exportToCSV } from '@/lib/csv'
 import { theme } from '@/lib/theme'
 import styled, { keyframes } from 'styled-components'
 import { useAuthContext } from '@/contexts/AuthContext'
@@ -442,26 +443,15 @@ const StatSub = styled.div`
 `
 
 /* ── CSV Export ── */
-function buildCSVRows(orders: Order[]): string {
-  const BOM = '\uFEFF'
-  const SEP = ';'
+function buildRows(orders: Order[]): (string | number)[][] {
   const multiOrder = orders.length > 1
-
-  const headers = [
-    ...(multiOrder ? ['Numéro'] : []),
-    'Date cmd.',
-    'ISBN', 'Titre', 'Auteur', 'Date de parution',
-    'Prix TTC (€)', 'Prix remisé TTC (€)', 'Quantité',
-  ]
-
-  const rows: string[][] = orders.flatMap(order =>
+  return orders.flatMap(order =>
     order.items.map(item => {
       const book = MOCK_BOOKS.find(b => b.id === item.bookId)
       const pubDate = book ? book.publicationDate : ''
       const remiseRate = REMISE_RATES[item.universe as keyof typeof REMISE_RATES] ?? 0
-      const prixTTC = (item.unitPriceHT * 1.055).toFixed(2).replace('.', ',')
+      const prixTTC    = (item.unitPriceHT * 1.055).toFixed(2).replace('.', ',')
       const prixRemise = (item.unitPriceHT * (1 - remiseRate) * 1.055).toFixed(2).replace('.', ',')
-
       return [
         ...(multiOrder ? [order.numero] : []),
         order.date,
@@ -471,18 +461,19 @@ function buildCSVRows(orders: Order[]): string {
         pubDate,
         prixTTC,
         prixRemise,
-        String(item.quantity),
+        item.quantity,
       ]
     })
   )
-
-  const escape = (v: string) => v.includes(SEP) || v.includes('"') || v.includes('\n')
-    ? `"${v.replace(/"/g, '""')}"` : v
-
-  const csv = [headers, ...rows].map(r => r.map(escape).join(SEP)).join('\r\n')
-  return BOM + csv
 }
 
+function getHeaders(multiOrder: boolean): string[] {
+  return [
+    ...(multiOrder ? ['Numéro'] : []),
+    'Date cmd.', 'ISBN', 'Titre', 'Auteur', 'Date de parution',
+    'Prix TTC (€)', 'Prix remisé TTC (€)', 'Quantité',
+  ]
+}
 
 /* ── Utils ── */
 function formatDate(iso: string) {
@@ -563,22 +554,12 @@ export function HistoriquePage() {
 
   const hasFilters = !!(search || dateFrom || dateTo || selectedStatus)
 
-  function downloadCSV(csv: string, filename: string) {
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-    const url  = URL.createObjectURL(blob)
-    const a    = document.createElement('a')
-    a.href     = url
-    a.download = filename
-    a.click()
-    URL.revokeObjectURL(url)
-  }
-
   function handleExportAll() {
-    downloadCSV(buildCSVRows(filtered), 'bookflow_historique_complet.csv')
+    exportToCSV('bookflow_historique_complet.csv', getHeaders(true), buildRows(filtered))
   }
 
   function handleExportOrder(order: Order) {
-    downloadCSV(buildCSVRows([order]), `${order.numero}_commande.csv`)
+    exportToCSV(`${order.numero}_commande.csv`, getHeaders(false), buildRows([order]))
   }
 
   function handleReturnSuccess() {
