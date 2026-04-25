@@ -854,7 +854,7 @@ export function HistoriquePage() {
 
       {activeTab === 'retours' && (
         <>
-          {returnsStats && returns.length > 0 && (
+          {!returnsLoading && returnsStats && returns.length > 0 && (
             <StatsGrid>
               <StatCard>
                 <StatValue>{returnsStats.activeCount}</StatValue>
