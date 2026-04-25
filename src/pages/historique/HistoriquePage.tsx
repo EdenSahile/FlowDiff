@@ -5,6 +5,8 @@ import { useAuthContext } from '@/contexts/AuthContext'
 import { useCart, REMISE_RATES } from '@/contexts/CartContext'
 import { useClientOrders } from '@/contexts/OrdersContext'
 import { ORDER_STATUSES, ORDER_STATUS_LABELS, type OrderStatus, type Order } from '@/data/mockOrders'
+import { TrackingModal } from '@/components/historique/TrackingModal'
+import type { Shipment } from '@/data/mockOrders'
 import { MOCK_BOOKS } from '@/data/mockBooks'
 
 /* ── Animations ── */
@@ -374,6 +376,34 @@ const ExportAllButton = styled(ExportButton)`
   font-size: ${({ theme }) => theme.typography.sizes.xs};
 `
 
+const TrackingLink = styled.button`
+  background: none; border: none; cursor: pointer; padding: 0;
+  font-size: ${({ theme }) => theme.typography.sizes.xs};
+  font-family: ${({ theme }) => theme.typography.fontFamilyMono};
+  color: ${({ theme }) => theme.colors.success};
+  letter-spacing: 0.04em;
+  display: flex; align-items: center; gap: 4px;
+  &:hover { text-decoration: underline; }
+`
+
+const ReturnButton = styled.button`
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 14px;
+  background: transparent;
+  border: 1.5px solid ${({ theme }) => theme.colors.gray[200]};
+  border-radius: ${({ theme }) => theme.radii.md};
+  font-size: ${({ theme }) => theme.typography.sizes.sm};
+  font-weight: ${({ theme }) => theme.typography.weights.semibold};
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  color: ${({ theme }) => theme.colors.navy};
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+  &:hover {
+    background: ${({ theme }) => theme.colors.gray[50]};
+    border-color: ${({ theme }) => theme.colors.navy};
+  }
+`
+
 const TitleRow = styled.div`
   display: flex;
   align-items: center;
@@ -433,6 +463,9 @@ function buildCSVRows(orders: Order[]): string {
 /* ── Utils ── */
 function formatDate(iso: string) {
   return new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' }).format(new Date(iso))
+}
+function formatDateLong(iso: string) {
+  return new Intl.DateTimeFormat('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date(iso))
 }
 function formatMonthKey(iso: string) { return iso.slice(0, 7) }
 function formatMonthLabel(key: string) {
@@ -498,6 +531,8 @@ export function HistoriquePage() {
   const [selectedMonth, setSelectedMonth]   = useState<string | null>(null)
   const [selectedStatus, setSelectedStatus] = useState<OrderStatus | null>(null)
   const [addedMap, setAddedMap]             = useState<Record<string, boolean>>({})
+  const [trackingModal, setTrackingModal]   = useState<Shipment | null>(null)
+  const [newReturnOrderId, setNewReturnOrderId] = useState<string | null>(null)
 
   // Tous les hooks avant tout return conditionnel
   const allOrders = useMemo(
@@ -642,6 +677,11 @@ export function HistoriquePage() {
                   <OrderNumero>{order.numero}</OrderNumero>
                   <OrderDate>{formatDate(order.date)}</OrderDate>
                 </div>
+                {order.shipment && (
+                  <TrackingLink onClick={() => setTrackingModal(order.shipment!)} aria-label="Voir le suivi">
+                    📦 {order.shipment.trackingNumber}
+                  </TrackingLink>
+                )}
               </OrderCardHeader>
 
               {/* Stepper statut */}
@@ -649,8 +689,13 @@ export function HistoriquePage() {
 
               {/* Livraison */}
               <DeliveryBanner>
-                <span>🚚</span>
-                {order.deliveryMode === 'specific' && order.deliveryDate ? (
+                {order.shipment ? (
+                  order.shipment.deliveredAt ? (
+                    <>✅ <DeliveryLabel>Livré le {formatDate(order.shipment.deliveredAt.split('T')[0])}</DeliveryLabel></>
+                  ) : (
+                    <>🚚 Livraison estimée :&nbsp;<DeliveryLabel>{formatDateLong(order.shipment.estimatedDelivery)}</DeliveryLabel></>
+                  )
+                ) : order.deliveryMode === 'specific' && order.deliveryDate ? (
                   <>Livraison prévue le&nbsp;<DeliveryLabel>{formatDate(order.deliveryDate)}</DeliveryLabel></>
                 ) : (
                   <>Délai de livraison&nbsp;:&nbsp;<DeliveryLabel>1–3 jours ouvrés</DeliveryLabel></>
@@ -687,6 +732,11 @@ export function HistoriquePage() {
                     Total TTC : <TotalAmount>{formatEur(order.totalTTC)}</TotalAmount>
                   </TotalLine>
                   <FooterRight>
+                    {(order.status === 'facturé' || order.status === 'expédié') && (
+                      <ReturnButton onClick={() => setNewReturnOrderId(order.id)}>
+                        ↩ Retour
+                      </ReturnButton>
+                    )}
                     <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                       <ExportButton
                         onClick={() => handleExportOrder(order)}
@@ -720,6 +770,9 @@ export function HistoriquePage() {
         })
       )}
     </Page>
+    {trackingModal && (
+      <TrackingModal shipment={trackingModal} onClose={() => setTrackingModal(null)} />
+    )}
     </>
   )
 }
