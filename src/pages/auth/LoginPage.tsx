@@ -222,7 +222,7 @@ export function LoginPage() {
         </AuthLink>
       </AuthCard>
 
-      <DemoBanner />
+      <DemoBanner position="bottom" />
       </AuthStack>
 
       {blockedMsg && <BlockedModal message={blockedMsg} onClose={() => setBlockedMsg(null)} />}
