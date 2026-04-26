@@ -11,6 +11,7 @@ import {
   getFluxCounts,
   formatEDITypeLabel,
   formatEDIStatusLabel,
+  getBusinessStatus,
   type EDIMessage,
   type EDIFilter,
 } from '@/lib/ediUtils'
@@ -366,12 +367,12 @@ const StatusBadgeTable = styled.span<{ $status: string }>`
   font-size: 0.75rem;
   font-weight: ${({ theme }) => theme.typography.weights.medium};
   background: ${({ $status, theme }) =>
-    $status === 'ERROR'   ? '#FDECEA' :
-    $status === 'PENDING' ? theme.colors.accentLight :
+    $status === 'ERROR'  ? '#FDECEA' :
+    $status === 'ORDERS' ? theme.colors.accentLight :
     theme.colors.primaryLight};
   color: ${({ $status, theme }) =>
-    $status === 'ERROR'   ? theme.colors.error :
-    $status === 'PENDING' ? '#8B6914' :
+    $status === 'ERROR'  ? theme.colors.error :
+    $status === 'ORDERS' ? '#8B6914' :
     theme.colors.success};
 `
 
@@ -853,6 +854,7 @@ export function EDIPage() {
                   <Th>N° document</Th>
                   <Th>Statut</Th>
                   <Th>Détail</Th>
+                  <Th>Voir</Th>
                 </tr>
               </thead>
               <tbody>
@@ -867,12 +869,12 @@ export function EDIPage() {
                       {msg.documentRef}
                     </Td>
                     <Td>
-                      <StatusBadgeTable $status={msg.status}>
-                        {formatEDIStatusLabel(msg.status)}
+                      <StatusBadgeTable $status={msg.status === 'ERROR' ? 'ERROR' : msg.type}>
+                        {getBusinessStatus(msg.type)}
                       </StatusBadgeTable>
                     </Td>
+                    <Td>{msg.detail}</Td>
                     <Td>
-                      {msg.detail}
                       <EyeBtn onClick={() => setSelectedMessage(msg)} aria-label="Voir le message">
                         👁
                       </EyeBtn>
@@ -881,7 +883,7 @@ export function EDIPage() {
                 ))}
                 {previewRows.length === 0 && (
                   <tr>
-                    <Td colSpan={6} style={{ textAlign: 'center', color: '#6B6B68', padding: '24px' }}>
+                    <Td colSpan={7} style={{ textAlign: 'center', color: '#6B6B68', padding: '24px' }}>
                       Aucun message pour ce filtre.
                     </Td>
                   </tr>
