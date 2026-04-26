@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
 import { createPortal } from 'react-dom'
 import styled from 'styled-components'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { Wordmark } from '@/components/brand/Wordmark'
 import {
   MOCK_BOOKS,
@@ -1187,7 +1187,9 @@ export function Header({ cartCount = 0, onBurgerClick, onCartClick, hasNotif = t
           <BurgerBtn onClick={onBurgerClick} aria-label="Ouvrir le menu">
             <span /><span /><span />
           </BurgerBtn>
-          <Wordmark onDark size="sm" />
+          <Link to="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
+            <Wordmark onDark size="sm" />
+          </Link>
         </LogoWrap>
 
         <SearchContainer ref={containerRef}>

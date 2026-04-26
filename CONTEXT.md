@@ -8,7 +8,7 @@
 
 ## État du build
 TS clean · 109/109 tests Vitest · dernière session 2026-04-26  
-Refonte HomePage complète (étapes 1→10) + corrections post-refonte.
+Refonte HomePage complète + logo cliquable → accueil.
 
 ---
 
