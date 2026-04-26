@@ -34,11 +34,11 @@ function fmtTime(iso: string): string {
 }
 
 const DIFFUSEURS = [
-  'Interforum (Editis)',
-  'Hachette Livre',
-  'Média-Participations',
-  'Autodiffusion',
-  'UD Union Distribution',
+  'Diffuseur 1',
+  'Diffuseur 2',
+  'Diffuseur 3',
+  'Diffuseur 4',
+  'Diffuseur 5',
 ]
 
 /* ════════════════════════════════════════════════════
