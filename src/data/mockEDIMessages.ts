@@ -41,7 +41,13 @@ export const MOCK_EDI_MESSAGES: EDIMessage[] = [
     diffuseur: 'Diffuseur 1',
     detail: 'Complète (10 ex.)',
     createdAt: '2026-04-23T09:00:00.000Z',
-    payload: { documentRef: 'DESADV-2026-0423-001', totalQty: 10, status: 'complete' },
+    payload: {
+      desadvRef: 'DESADV-2026-0423-001',
+      lines: [
+        { isbn: '9782070360024', qtyShipped: 5 },
+        { isbn: '9782075017346', qtyShipped: 5 },
+      ],
+    },
   },
   {
     id: 'edi-old-5',
@@ -141,7 +147,13 @@ export const MOCK_EDI_MESSAGES: EDIMessage[] = [
     diffuseur: 'Diffuseur 4',
     detail: 'Partielle (18 ex.)',
     createdAt: '2026-04-27T09:15:00.000Z',
-    payload: { desadvRef: 'DESADV-2026-0427-001', shippedQty: 18, status: 'partial' },
+    payload: {
+      desadvRef: 'DESADV-2026-0427-001',
+      lines: [
+        { isbn: '9781234567890', qtyShipped: 5 },
+        { isbn: '9781234567891', qtyShipped: 13 },
+      ],
+    },
   },
   {
     id: 'edi-rec-5',

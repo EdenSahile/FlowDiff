@@ -3,6 +3,16 @@ export type EDIStatus = 'PENDING' | 'SENT' | 'RECEIVED' | 'ERROR'
 export type ORDRSPLineStatus = 'ACCEPTED' | 'BACKORDERED' | 'REJECTED'
 export type ORDRSPGlobalStatus = 'ACCEPTED' | 'PARTIAL' | 'REJECTED'
 
+export interface DESADVLine {
+  isbn: string
+  qtyShipped: number
+}
+
+export interface DESADVPayload {
+  desadvRef: string
+  lines: DESADVLine[]
+}
+
 export interface ORDRSPLine {
   lineNumber: number
   ean: string
@@ -146,16 +156,20 @@ const EDIFACT_TEMPLATES: Record<EDIMessageType, (msg: EDIMessage) => string> = {
     return segments.join('\n')
   },
 
-  DESADV: (msg) => [
-    `UNB+UNOA:1+GLN-DIFFUSEUR:14+301234XXXXXXX:14+${fmtEdifactDate(msg.createdAt)}:${fmtEdifactTime(msg.createdAt)}+1'`,
-    `UNH+1+DESADV:D:96A:UN'`,
-    `BGM+351+${msg.documentRef}+9'`,
-    `DTM+137:${fmtEdifactDate(msg.createdAt)}:102'`,
-    `CPS+1'`,
-    `QTY+52:5'`,
-    `UNS+S'`,
-    `UNZ+6+1'`,
-  ].join('\n'),
+  DESADV: (msg) => {
+    const p = msg.payload as Partial<DESADVPayload>
+    const lines = p.lines ?? []
+    const segments: string[] = [
+      `UNH+1+DESADV:D:96A:UN'`,
+      `BGM+351+${p.desadvRef ?? msg.documentRef}'`,
+    ]
+    lines.forEach((line, i) => {
+      segments.push(`LIN+${i + 1}++${line.isbn}:EN'`)
+      segments.push(`QTY+52:${line.qtyShipped}'`)
+    })
+    segments.push(`UNT+${segments.length + 1}+1'`)
+    return segments.join('\n')
+  },
 
   INVOIC: (msg) => [
     `UNB+UNOA:1+GLN-DIFFUSEUR:14+301234XXXXXXX:14+${fmtEdifactDate(msg.createdAt)}:${fmtEdifactTime(msg.createdAt)}+1'`,

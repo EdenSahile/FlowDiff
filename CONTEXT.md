@@ -8,14 +8,13 @@
 
 ## État du build
 TS clean · 109/109 tests Vitest · dernière session 2026-04-26  
-Mocks ORDRSP (3 cas), badges Détail, navigation accueil → EDI ORDRSP, seed version localStorage.
+Format DESADV corrigé (JSON lines + EDIFACT dynamique), seed localStorage v3.
 
 ---
 
 ## Session en cours
 
-### Fix : "expéditions en retard" → /edi?filter=DESADV
-- [x] HomePage : clic "expéditions en retard" → `/edi?filter=DESADV`
+Aucune tâche en cours.
 
 ---
 
