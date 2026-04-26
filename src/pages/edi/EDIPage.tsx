@@ -744,11 +744,11 @@ export function EDIPage() {
             </ConnectedBadge>
             <MetaRow>
               <MetaLabel>Identifiant Dilicom</MetaLabel>
-              <MetaValue>3012345678901</MetaValue>
+              <MetaValue>301234XXXXXXX</MetaValue>
             </MetaRow>
             <MetaRow>
               <MetaLabel>Code librairie (GLN)</MetaLabel>
-              <MetaValue>3012345678901</MetaValue>
+              <MetaValue>301234XXXXXXX</MetaValue>
             </MetaRow>
             <MetaRow>
               <MetaLabel>Statut</MetaLabel>

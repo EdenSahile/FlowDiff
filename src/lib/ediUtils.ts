@@ -83,11 +83,11 @@ function fmtEdifactTime(iso: string): string {
 
 const EDIFACT_TEMPLATES: Record<EDIMessageType, (msg: EDIMessage) => string> = {
   ORDERS: (msg) => [
-    `UNB+UNOA:1+3012345678901:14+GLN-DIFFUSEUR:14+${fmtEdifactDate(msg.createdAt)}:${fmtEdifactTime(msg.createdAt)}+1'`,
+    `UNB+UNOA:1+301234XXXXXXX:14+GLN-DIFFUSEUR:14+${fmtEdifactDate(msg.createdAt)}:${fmtEdifactTime(msg.createdAt)}+1'`,
     `UNH+1+ORDERS:D:96A:UN'`,
     `BGM+220+${msg.documentRef}+9'`,
     `DTM+137:${fmtEdifactDate(msg.createdAt)}:102'`,
-    `NAD+BY+3012345678901::9'`,
+    `NAD+BY+301234XXXXXXX::9'`,
     `NAD+SU+GLN-DIFFUSEUR::9'`,
     `LIN+1++9782070360024:EN'`,
     `QTY+21:5'`,
@@ -96,7 +96,7 @@ const EDIFACT_TEMPLATES: Record<EDIMessageType, (msg: EDIMessage) => string> = {
   ].join('\n'),
 
   ORDRSP: (msg) => [
-    `UNB+UNOA:1+GLN-DIFFUSEUR:14+3012345678901:14+${fmtEdifactDate(msg.createdAt)}:${fmtEdifactTime(msg.createdAt)}+1'`,
+    `UNB+UNOA:1+GLN-DIFFUSEUR:14+301234XXXXXXX:14+${fmtEdifactDate(msg.createdAt)}:${fmtEdifactTime(msg.createdAt)}+1'`,
     `UNH+1+ORDRSP:D:96A:UN'`,
     `BGM+231+${msg.documentRef}+9'`,
     `DTM+137:${fmtEdifactDate(msg.createdAt)}:102'`,
@@ -107,7 +107,7 @@ const EDIFACT_TEMPLATES: Record<EDIMessageType, (msg: EDIMessage) => string> = {
   ].join('\n'),
 
   DESADV: (msg) => [
-    `UNB+UNOA:1+GLN-DIFFUSEUR:14+3012345678901:14+${fmtEdifactDate(msg.createdAt)}:${fmtEdifactTime(msg.createdAt)}+1'`,
+    `UNB+UNOA:1+GLN-DIFFUSEUR:14+301234XXXXXXX:14+${fmtEdifactDate(msg.createdAt)}:${fmtEdifactTime(msg.createdAt)}+1'`,
     `UNH+1+DESADV:D:96A:UN'`,
     `BGM+351+${msg.documentRef}+9'`,
     `DTM+137:${fmtEdifactDate(msg.createdAt)}:102'`,
@@ -118,12 +118,12 @@ const EDIFACT_TEMPLATES: Record<EDIMessageType, (msg: EDIMessage) => string> = {
   ].join('\n'),
 
   INVOIC: (msg) => [
-    `UNB+UNOA:1+GLN-DIFFUSEUR:14+3012345678901:14+${fmtEdifactDate(msg.createdAt)}:${fmtEdifactTime(msg.createdAt)}+1'`,
+    `UNB+UNOA:1+GLN-DIFFUSEUR:14+301234XXXXXXX:14+${fmtEdifactDate(msg.createdAt)}:${fmtEdifactTime(msg.createdAt)}+1'`,
     `UNH+1+INVOIC:D:96A:UN'`,
     `BGM+380+${msg.documentRef}+9'`,
     `DTM+137:${fmtEdifactDate(msg.createdAt)}:102'`,
     `NAD+SE+GLN-DIFFUSEUR::9'`,
-    `NAD+BY+3012345678901::9'`,
+    `NAD+BY+301234XXXXXXX::9'`,
     `MOA+79:856.00:EUR'`,
     `TAX+7+VAT+++:::5.5+S'`,
     `UNS+S'`,

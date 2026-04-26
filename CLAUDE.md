@@ -2,9 +2,12 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Règle de démarrage
+À chaque début de session, lire CONTEXT.md et reprendre là où on s'est arrêtés sans attendre que je le demande.
 
 ## Résumé
-À chaque fin de session ou sur demande, ajoute un bloc daté en haut du fichier résumant : ce qui a été fait, l’état actuel du code, et les prochaines étapes.
+À chaque commit ou sur demande, ajoute un bloc daté en haut du fichier résumant : ce qui a été fait, l’état actuel du code, et les prochaines étapes.
+
 
 ---
 ### Session du 2026-04-26 — Page EDI : viewer split-view + statut métier + étape transmission checkout
