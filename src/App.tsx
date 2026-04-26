@@ -5,6 +5,7 @@ import { AuthProvider } from '@/contexts/AuthContext'
 import { CartProvider } from '@/contexts/CartContext'
 import { OrdersProvider } from '@/contexts/OrdersContext'
 import { ReturnsProvider } from '@/contexts/ReturnsContext'
+import { EDIProvider } from '@/contexts/EDIContext'
 import { WishlistProvider } from '@/contexts/WishlistContext'
 import { RdvProvider } from '@/contexts/RdvContext'
 import { ToastProvider } from '@/contexts/ToastContext'
@@ -33,6 +34,7 @@ const TopVentesPage    = lazy(() => import('@/pages/top-ventes/TopVentesPage').t
 const AuteurPage       = lazy(() => import('@/pages/auteur/AuteurPage').then(m => ({ default: m.AuteurPage })))
 const FacturationPage  = lazy(() => import('@/pages/facturation/FacturationPage').then(m => ({ default: m.FacturationPage })))
 const RdvPage          = lazy(() => import('@/pages/rdv/RdvPage').then(m => ({ default: m.RdvPage })))
+const EDIPage          = lazy(() => import('@/pages/edi/EDIPage').then(m => ({ default: m.EDIPage })))
 
 function ProtectedLayout() {
   return (
@@ -54,6 +56,7 @@ export default function App() {
               <WishlistProvider>
               <RdvProvider>
               <OrdersProvider>
+              <EDIProvider>
               <ReturnsProvider>
               <Suspense fallback={null}>
               <Routes>
@@ -84,11 +87,13 @@ export default function App() {
                     <Route path="/newsletter" element={<NewsletterPage />} />
                     <Route path="/facturation" element={<FacturationPage />} />
                     <Route path="/rdv-representant" element={<RdvPage />} />
+                    <Route path="/edi" element={<EDIPage />} />
                   </Route>
                 </Route>
               </Routes>
               </Suspense>
               </ReturnsProvider>
+              </EDIProvider>
               </OrdersProvider>
               </RdvProvider>
               </WishlistProvider>

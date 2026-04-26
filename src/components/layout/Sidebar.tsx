@@ -232,6 +232,11 @@ const accountItems = [
   { to: '/facturation',   label: 'Facturation'    },
 ]
 
+const toolItems = [
+  { to: '/panier', label: 'Panier' },
+  { to: '/edi',    label: 'EDI'    },
+]
+
 const infoItems = [
   { to: '/contact',     label: 'Contact'    },
   { to: '/newsletter',  label: 'Newsletter' },
@@ -276,6 +281,15 @@ export function Sidebar() {
         <SectionLabel>Mon espace</SectionLabel>
         <nav aria-label="Mon espace">
           {accountItems.map(({ to, label }) => (
+            <StyledNavLink key={to} to={to}>{label}</StyledNavLink>
+          ))}
+        </nav>
+
+        <Divider />
+
+        <SectionLabel>Outils</SectionLabel>
+        <nav aria-label="Outils">
+          {toolItems.map(({ to, label }) => (
             <StyledNavLink key={to} to={to}>{label}</StyledNavLink>
           ))}
         </nav>
