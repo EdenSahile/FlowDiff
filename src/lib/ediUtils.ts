@@ -222,7 +222,7 @@ const EDIFACT_TEMPLATES: Record<EDIMessageType, (msg: EDIMessage) => string> = {
   ORDERS: (msg) => {
     const p = msg.payload as Partial<ORDERSPayload> & { totalQty?: number }
     const header = [
-      `UNB+UNOA:1+301234XXXXXXX:14+GLN-DIFFUSEUR:14+${fmtEdifactDate(msg.createdAt)}:${fmtEdifactTime(msg.createdAt)}+1'`,
+      `UNB+UNOC:3+301234XXXXXXX:14+GLN-DIFFUSEUR:14+${fmtEdifactDate(msg.createdAt)}:${fmtEdifactTime(msg.createdAt)}+1'`,
       `UNH+1+ORDERS:D:96A:UN'`,
       `BGM+220+${msg.documentRef}+9'`,
       `DTM+137:${fmtEdifactDate(msg.createdAt)}:102'`,
@@ -235,35 +235,40 @@ const EDIFACT_TEMPLATES: Record<EDIMessageType, (msg: EDIMessage) => string> = {
           `QTY+21:${line.qtyRequested}'`,
         ])
       : [`LIN+1++9782070360024:EN'`, `QTY+21:${p.totalQty ?? 5}'`]
-    const footer = [`UNS+S'`, `UNZ+${header.length + lineSegments.length + 2}+1'`]
+    // UNT compte UNH→UNT inclus : (header - UNB) + lignes + UNS + UNT
+    const untCount = header.length + lineSegments.length + 1
+    const footer = [`UNS+S'`, `UNT+${untCount}+1'`, `UNZ+1+1'`]
     return [...header, ...lineSegments, ...footer].join('\n')
   },
 
   ORDRSP: (msg) => {
     const p = msg.payload as Partial<ORDRSPPayload>
     const lines = p.lines ?? []
-    const bgmStatus = p.globalStatus === 'REJECTED' ? '5' : '4'
+    const bgmStatus = '4'
     const segments: string[] = [
-      `UNB+UNOA:1+GLN-DIFFUSEUR:14+301234XXXXXXX:14+${fmtEdifactDate(msg.createdAt)}:${fmtEdifactTime(msg.createdAt)}+1'`,
+      `UNB+UNOC:3+GLN-DIFFUSEUR:14+301234XXXXXXX:14+${fmtEdifactDate(msg.createdAt)}:${fmtEdifactTime(msg.createdAt)}+1'`,
       `UNH+1+ORDRSP:D:96A:UN'`,
       `BGM+231+${msg.documentRef}+${bgmStatus}'`,
       `DTM+137:${fmtEdifactDate(msg.createdAt)}:102'`,
       `RFF+ON:${p.orderId ?? msg.documentRef}'`,
+      `NAD+SE+GLN-DIFFUSEUR::9'`,
+      `NAD+BY+301234XXXXXXX::9'`,
     ]
     if (p.rejectionReason) {
       segments.push(`FTX+ZZZ+++${p.rejectionReason}'`)
     }
     lines.forEach((line, i) => {
       segments.push(`LIN+${i + 1}++${line.ean}:EN'`)
-      segments.push(`QTY+21:${line.qtyConfirmed}'`)
-      segments.push(`QTY+1:${line.qtyRequested}'`)
+      segments.push(`QTY+21:${line.qtyRequested}'`)
+      segments.push(`QTY+1:${line.qtyConfirmed}'`)
       if (line.backorderQty) segments.push(`QTY+83:${line.backorderQty}'`)
       if (line.estimatedDelivery) segments.push(`DTM+358:${line.estimatedDelivery.replace(/-/g, '')}:102'`)
-      segments.push(`PIA+1+${line.status}:ZZZ'`)
       if (line.note) segments.push(`FTX+ZZZ+++${line.note}'`)
     })
     segments.push(`UNS+S'`)
-    segments.push(`UNZ+${segments.length}+1'`)
+    // UNT : segments.length inclut UNB (non compté) mais pas UNT → net = segments.length
+    segments.push(`UNT+${segments.length}+1'`)
+    segments.push(`UNZ+1+1'`)
     return segments.join('\n')
   },
 
@@ -271,19 +276,25 @@ const EDIFACT_TEMPLATES: Record<EDIMessageType, (msg: EDIMessage) => string> = {
     const p = msg.payload as Partial<DESADVPayload>
     const lines = p.lines ?? []
     const segments: string[] = [
+      `UNB+UNOC:3+GLN-DIFFUSEUR:14+301234XXXXXXX:14+${fmtEdifactDate(msg.createdAt)}:${fmtEdifactTime(msg.createdAt)}+1'`,
       `UNH+1+DESADV:D:96A:UN'`,
       `BGM+351+${p.desadvRef ?? msg.documentRef}'`,
+      `DTM+137:${fmtEdifactDate(msg.createdAt)}:102'`,
+      `DTM+11:${fmtEdifactDate(msg.createdAt)}:102'`,
     ]
+    if (p.orderId) segments.push(`RFF+ON:${p.orderId}'`)
     lines.forEach((line, i) => {
       segments.push(`LIN+${i + 1}++${line.isbn}:EN'`)
-      segments.push(`QTY+52:${line.qtyShipped}'`)
+      segments.push(`QTY+12:${line.qtyShipped}'`)
     })
-    segments.push(`UNT+${segments.length + 1}+1'`)
+    // UNT : segments.length - 1 (UNB non compté) + 1 (UNT lui-même) = segments.length
+    segments.push(`UNT+${segments.length}+1'`)
+    segments.push(`UNZ+1+1'`)
     return segments.join('\n')
   },
 
   INVOIC: (msg) => [
-    `UNB+UNOA:1+GLN-DIFFUSEUR:14+301234XXXXXXX:14+${fmtEdifactDate(msg.createdAt)}:${fmtEdifactTime(msg.createdAt)}+1'`,
+    `UNB+UNOC:3+GLN-DIFFUSEUR:14+301234XXXXXXX:14+${fmtEdifactDate(msg.createdAt)}:${fmtEdifactTime(msg.createdAt)}+1'`,
     `UNH+1+INVOIC:D:96A:UN'`,
     `BGM+380+${msg.documentRef}+9'`,
     `DTM+137:${fmtEdifactDate(msg.createdAt)}:102'`,
