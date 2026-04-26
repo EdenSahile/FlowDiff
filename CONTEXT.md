@@ -36,12 +36,12 @@ Améliorer la page **`/edi`** déjà en place :
 
 | Task | Contenu | Fichiers | Statut |
 |------|---------|---------|--------|
-| 1 | Retirer STOCK de `ediUtils.ts` + tests | `ediUtils.ts`, `ediUtils.test.ts` | ⬜ À faire |
-| 2 | Ajouter `getBusinessStatus` (TDD) | `ediUtils.ts`, `ediUtils.test.ts` | ⬜ À faire |
-| 3 | Ajouter `generateEdifactPlaceholder` (TDD) | `ediUtils.ts`, `ediUtils.test.ts` | ⬜ À faire |
-| 4 | Créer `EDIViewer.tsx` | `src/components/edi/EDIViewer.tsx` | ⬜ À faire |
-| 5 | Refactorer `EDIMessageModal.tsx` en wrapper | `src/components/edi/EDIMessageModal.tsx` | ⬜ À faire |
-| 6 | Mettre à jour `EDIPage.tsx` | `src/pages/edi/EDIPage.tsx` | ⬜ À faire |
+| 1 | Retirer STOCK de `ediUtils.ts` + tests | `ediUtils.ts`, `ediUtils.test.ts` | ✅ commit `f0eba76` |
+| 2 | Ajouter `getBusinessStatus` (TDD) | `ediUtils.ts`, `ediUtils.test.ts` | ✅ commit `24128f2` |
+| 3 | Ajouter `generateEdifactPlaceholder` (TDD) | `ediUtils.ts`, `ediUtils.test.ts` | ✅ commits `c25f101` + fix `fa110ca` |
+| 4 | Créer `EDIViewer.tsx` | `src/components/edi/EDIViewer.tsx` | ✅ commit `925767e` |
+| 5 | Refactorer `EDIMessageModal.tsx` en wrapper | `src/components/edi/EDIMessageModal.tsx` | ✅ commit `a785913` |
+| 6 | Mettre à jour `EDIPage.tsx` | `src/pages/edi/EDIPage.tsx` | ✅ commit `ae214a7` |
 
 ---
 

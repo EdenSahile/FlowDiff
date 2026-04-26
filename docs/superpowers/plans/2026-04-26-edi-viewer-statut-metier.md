@@ -625,7 +625,7 @@ git commit -m "feat(edi): créer EDIViewer — split view JSON / EDIFACT termina
 **Files:**
 - Modify: `src/components/edi/EDIMessageModal.tsx`
 
-- [ ] **Step 5.1 — Réécrire `EDIMessageModal.tsx`**
+- [x] **Step 5.1 — Réécrire `EDIMessageModal.tsx`**
 
 Remplacer l'intégralité du contenu par :
 
@@ -660,7 +660,7 @@ export function EDIMessageModal({ message, onClose }: Props) {
 }
 ```
 
-- [ ] **Step 5.2 — Vérifier TypeScript**
+- [x] **Step 5.2 — Vérifier TypeScript**
 
 ```bash
 npx tsc --noEmit
@@ -668,7 +668,7 @@ npx tsc --noEmit
 
 Résultat attendu : 0 erreurs. `EDIPage.tsx` continue d'importer `EDIMessageModal` avec la même interface — aucune modification nécessaire dans `EDIPage`.
 
-- [ ] **Step 5.3 — Commit**
+- [x] **Step 5.3 — Commit**
 
 ```bash
 git add src/components/edi/EDIMessageModal.tsx
@@ -682,7 +682,7 @@ git commit -m "refactor(edi): EDIMessageModal → wrapper Overlay + EDIViewer"
 **Files:**
 - Modify: `src/pages/edi/EDIPage.tsx`
 
-- [ ] **Step 6.1 — Ajouter l'import de `getBusinessStatus`**
+- [x] **Step 6.1 — Ajouter l'import de `getBusinessStatus`**
 
 Dans les imports de `src/pages/edi/EDIPage.tsx`, ajouter `getBusinessStatus` à l'import existant depuis `@/lib/ediUtils` :
 
@@ -698,7 +698,7 @@ import {
 } from '@/lib/ediUtils'
 ```
 
-- [ ] **Step 6.2 — Supprimer l'onglet STOCK des tabs**
+- [x] **Step 6.2 — Supprimer l'onglet STOCK des tabs**
 
 Dans `TabsRow`, retirer l'entrée `{ key: 'STOCK', label: 'Stocks (STOCK)' }` du tableau. Le tableau doit devenir :
 
@@ -716,7 +716,7 @@ Dans `TabsRow`, retirer l'entrée `{ key: 'STOCK', label: 'Stocks (STOCK)' }` du
 ))}
 ```
 
-- [ ] **Step 6.3 — Remplacer le badge Statut dans le tableau**
+- [x] **Step 6.3 — Remplacer le badge Statut dans le tableau**
 
 Remplacer le `StatusBadgeTable` existant (basé sur `msg.status`) par un badge basé sur `msg.type` :
 
@@ -766,7 +766,7 @@ const StatusBadgeTable = styled.span<{ $status: string }>`
 </StatusBadgeTable>
 ```
 
-- [ ] **Step 6.4 — Déplacer le bouton 👁 dans sa propre colonne**
+- [x] **Step 6.4 — Déplacer le bouton 👁 dans sa propre colonne**
 
 Dans `<thead>`, ajouter une colonne après "Détail" :
 
@@ -816,7 +816,7 @@ Et mettre à jour la cellule "Aucun message" pour couvrir 7 colonnes :
 </Td>
 ```
 
-- [ ] **Step 6.5 — Vérifier TypeScript**
+- [x] **Step 6.5 — Vérifier TypeScript**
 
 ```bash
 npx tsc --noEmit
@@ -824,7 +824,7 @@ npx tsc --noEmit
 
 Résultat attendu : 0 erreurs.
 
-- [ ] **Step 6.6 — Lancer tous les tests**
+- [x] **Step 6.6 — Lancer tous les tests**
 
 ```bash
 npx vitest run
@@ -832,7 +832,7 @@ npx vitest run
 
 Résultat attendu : tous les tests passent.
 
-- [ ] **Step 6.7 — Commit**
+- [x] **Step 6.7 — Commit**
 
 ```bash
 git add src/pages/edi/EDIPage.tsx
