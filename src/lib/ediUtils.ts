@@ -114,7 +114,7 @@ const EDIFACT_TEMPLATES: Record<EDIMessageType, (msg: EDIMessage) => string> = {
     `CPS+1'`,
     `QTY+52:5'`,
     `UNS+S'`,
-    `UNZ+7+1'`,
+    `UNZ+6+1'`,
   ].join('\n'),
 
   INVOIC: (msg) => [
@@ -127,7 +127,7 @@ const EDIFACT_TEMPLATES: Record<EDIMessageType, (msg: EDIMessage) => string> = {
     `MOA+79:856.00:EUR'`,
     `TAX+7+VAT+++:::5.5+S'`,
     `UNS+S'`,
-    `UNZ+9+1'`,
+    `UNZ+8+1'`,
   ].join('\n'),
 }
 
