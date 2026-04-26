@@ -4,6 +4,7 @@ import {
   getFluxCounts,
   formatEDITypeLabel,
   formatEDIStatusLabel,
+  getBusinessStatus,
   type EDIMessage,
 } from '@/lib/ediUtils'
 
@@ -65,4 +66,19 @@ describe('formatEDIStatusLabel', () => {
   it('RECEIVED → Reçu', () => expect(formatEDIStatusLabel('RECEIVED')).toBe('Reçu'))
   it('PENDING → En attente', () => expect(formatEDIStatusLabel('PENDING')).toBe('En attente'))
   it('ERROR → Erreur', ()  => expect(formatEDIStatusLabel('ERROR')).toBe('Erreur'))
+})
+
+describe('getBusinessStatus', () => {
+  it('ORDERS → Commande envoyée', () => {
+    expect(getBusinessStatus('ORDERS')).toBe('Commande envoyée')
+  })
+  it('ORDRSP → Réponse commande reçue', () => {
+    expect(getBusinessStatus('ORDRSP')).toBe('Réponse commande reçue')
+  })
+  it('DESADV → Info expédition reçue', () => {
+    expect(getBusinessStatus('DESADV')).toBe('Info expédition reçue')
+  })
+  it('INVOIC → Facture reçue', () => {
+    expect(getBusinessStatus('INVOIC')).toBe('Facture reçue')
+  })
 })

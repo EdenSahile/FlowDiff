@@ -61,3 +61,14 @@ const STATUS_LABELS: Record<EDIStatus, string> = {
 export function formatEDIStatusLabel(status: EDIStatus): string {
   return STATUS_LABELS[status]
 }
+
+const BUSINESS_STATUS: Record<EDIMessageType, string> = {
+  ORDERS: 'Commande envoyée',
+  ORDRSP: 'Réponse commande reçue',
+  DESADV: 'Info expédition reçue',
+  INVOIC: 'Facture reçue',
+}
+
+export function getBusinessStatus(type: EDIMessageType): string {
+  return BUSINESS_STATUS[type]
+}
