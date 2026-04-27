@@ -15,7 +15,7 @@ Pour CMD-2026-0427-001 : 2 DESADV cohérents, les deux ISBN soldés exactement �
 
 ## Session en cours
 
-- [x] Supprimer DESADV-2026-0507-001 du mock (quantités basées sur backorderQty non confirmé)
+Aucune tâche en cours.
 
 ---
 
