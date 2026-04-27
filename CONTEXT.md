@@ -8,9 +8,9 @@
 
 ## État du build
 TS clean · 117/117 tests Vitest · dernière session 2026-04-27  
-Feature Offices complète : page `/offices`, route, sidebar, carte dashboard.  
-Carte panier vide : état neutre (gris, opacité 0.55, non-cliquable) — grille toujours 5 colonnes.  
-Carte « office à valider » en 1re position avec date limite en rouge.
+Page "À paraître" autonome : route `/a-paraitre`, sidebar avant "Nouveautés", titre + sous-titre "Les titres seront enregistrés en notés", regroupement par programme.  
+BookCard "à paraître" : prix + stepper + "Ajouter au panier" + note "Le titre sera enregistré en notés".  
+NouveautesPage simplifiée : onglet "À paraître" supprimé.
 
 ---
 

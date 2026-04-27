@@ -36,6 +36,7 @@ const FacturationPage  = lazy(() => import('@/pages/facturation/FacturationPage'
 const RdvPage          = lazy(() => import('@/pages/rdv/RdvPage').then(m => ({ default: m.RdvPage })))
 const EDIPage          = lazy(() => import('@/pages/edi/EDIPage').then(m => ({ default: m.EDIPage })))
 const OfficesPage      = lazy(() => import('@/pages/offices/OfficesPage').then(m => ({ default: m.OfficesPage })))
+const AParaitrePage    = lazy(() => import('@/pages/a-paraitre/AParaitrePage').then(m => ({ default: m.AParaitrePage })))
 
 function ProtectedLayout() {
   return (
@@ -71,6 +72,7 @@ export default function App() {
                   <Route element={<ProtectedLayout />}>
                     <Route path="/" element={<HomePage />} />
                     <Route path="/recherche" element={<RecherchePage />} />
+                    <Route path="/a-paraitre" element={<AParaitrePage />} />
                     <Route path="/nouveautes" element={<NouveautesPage />} />
                     <Route path="/fonds" element={<FondsPage />} />
                     <Route path="/livre/:id" element={<FicheProduitPage />} />

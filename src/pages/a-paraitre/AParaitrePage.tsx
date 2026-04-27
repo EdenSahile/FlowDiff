@@ -68,18 +68,10 @@ function IconSearch() {
 function IconEmpty() {
   return (
     <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ margin: '0 auto 12px', display: 'block', opacity: 0.4 }}>
-      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.5 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.44 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.4a16 16 0 0 0 6.29 6.29l.77-.77a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+      <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/>
     </svg>
   )
 }
-
-const ResultCount = styled.p`
-  font-family: ${({ theme }) => theme.typography.fontFamily};
-  font-size: 19px;
-  font-weight: 700;
-  color: ${({ theme }) => theme.colors.navy};
-  margin-bottom: ${({ theme }) => theme.spacing.md};
-`
 
 const Grid = styled.div`
   display: grid;
@@ -107,59 +99,90 @@ const EmptyState = styled.div`
   font-size: ${({ theme }) => theme.typography.sizes.sm};
 `
 
-export function NouveautesPage() {
+const ProgrammeSection = styled.section`
+  margin-bottom: ${({ theme }) => theme.spacing['2xl']};
+`
+
+const ProgrammeTitle = styled.h2`
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: ${({ theme }) => theme.typography.sizes.lg};
+  font-weight: ${({ theme }) => theme.typography.weights.bold};
+  color: ${({ theme }) => theme.colors.navy};
+  margin-bottom: ${({ theme }) => theme.spacing.md};
+  padding-bottom: ${({ theme }) => theme.spacing.sm};
+  border-bottom: 2px solid ${({ theme }) => theme.colors.primary};
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`
+
+const ProgrammeCount = styled.span`
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 12px;
+  font-weight: ${({ theme }) => theme.typography.weights.normal};
+  color: ${({ theme }) => theme.colors.gray[600]};
+`
+
+export function AParaitrePage() {
   const [universe, setUniverse] = useState<Universe | null>(null)
   const [query, setQuery]       = useState('')
   const deferred = useDeferredValue(query)
 
-  let nouveautes = deferred.trim()
-    ? searchBooks(deferred).filter(b => b.type === 'nouveaute')
-    : getBooksByType('nouveaute')
+  let aParaitre = deferred.trim()
+    ? searchBooks(deferred).filter(b => b.type === 'a-paraitre')
+    : getBooksByType('a-paraitre')
 
   if (universe) {
-    nouveautes = nouveautes.filter(b => b.universe === universe)
+    aParaitre = aParaitre.filter(b => b.universe === universe)
   }
+
+  const programmes = [...new Set(aParaitre.map(b => b.programme ?? 'Autres'))].sort()
 
   return (
     <Page>
       <PageHeader>
-        <PageTitle>Nouveautés</PageTitle>
-        <PageSubtitle>Titres du mois disponibles à la commande immédiate</PageSubtitle>
+        <PageTitle>À paraître</PageTitle>
+        <PageSubtitle>Les titres seront enregistrés en notés</PageSubtitle>
       </PageHeader>
 
       <Controls>
         <SearchWrapper>
           <SearchIcon><IconSearch /></SearchIcon>
           <Input
-            id="nouveautes-search"
+            id="a-paraitre-search"
             type="search"
             placeholder="Titre, auteur, ISBN, éditeur…"
             value={query}
             onChange={e => setQuery(e.target.value)}
-            aria-label="Rechercher dans les nouveautés"
+            aria-label="Rechercher dans les titres à paraître"
           />
         </SearchWrapper>
         <UniverseFilter value={universe} onChange={setUniverse} />
       </Controls>
 
-      {nouveautes.length > 0 && (
-        <ResultCount>
-          {nouveautes.length} titre{nouveautes.length > 1 ? 's' : ''} ce mois-ci
-        </ResultCount>
-      )}
-
-      {nouveautes.length > 0 ? (
-        <Grid>
-          {nouveautes.map(book => <BookCard key={book.id} book={book} showType />)}
-        </Grid>
-      ) : (
+      {programmes.length === 0 && (
         <EmptyState>
           <IconEmpty />
           {deferred.trim()
             ? `Aucun résultat pour « ${deferred} »`
-            : 'Aucun titre pour cet univers ce mois-ci.'}
+            : 'Aucun titre à paraître pour cet univers.'}
         </EmptyState>
       )}
+
+      {programmes.map(prog => {
+        const books = aParaitre.filter(b => (b.programme ?? 'Autres') === prog)
+        return (
+          <ProgrammeSection key={prog}>
+            <ProgrammeTitle>
+              <span>{prog}</span>
+              <ProgrammeCount>{books.length} titre{books.length > 1 ? 's' : ''}</ProgrammeCount>
+            </ProgrammeTitle>
+            <Grid>
+              {books.map(book => <BookCard key={book.id} book={book} />)}
+            </Grid>
+          </ProgrammeSection>
+        )
+      })}
     </Page>
   )
 }

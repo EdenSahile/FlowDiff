@@ -278,6 +278,15 @@ const EpuiseNote = styled.p`
   text-align: center;
 `
 
+const NotesNote = styled.p`
+  font-size: 10.5px;
+  color: ${({ theme }) => theme.colors.gray[400]};
+  font-style: italic;
+  text-align: center;
+  margin: 0;
+  line-height: 1.3;
+`
+
 const AParaitreFooter = styled.div`
   display: flex;
   flex-direction: column;
@@ -382,7 +391,7 @@ export function BookCard({ book, showType = false }: Props) {
   const isAParaitre  = book.type === 'a-paraitre'
   const isEpuise     = book.statut === 'epuise'
   const needsConfirm = book.statut === 'sur_commande' || book.statut === 'en_reimp'
-  const isOrderable  = !isAParaitre && !isEpuise
+  const isOrderable  = !isEpuise
   const catColors    = CATEGORY_COLORS[book.universe] ?? CATEGORY_COLORS['Autres']
   const inList       = isInAnyList(book.id)
 
@@ -482,21 +491,28 @@ export function BookCard({ book, showType = false }: Props) {
 
           {isAParaitre ? (
             <AParaitreFooter>
-              {isInRdv(book.id) && (
-                <RdvBadge>
-                  <IconCheck /> {getQty(book.id)} ex. sélectionné{getQty(book.id) > 1 ? 's' : ''}
-                </RdvBadge>
-              )}
-              <RdvBtn
-                ref={rdvBtnRef}
-                onClick={e => {
-                  e.stopPropagation()
-                  if (rdvBtnRef.current) setRdvAnchor(rdvBtnRef.current.getBoundingClientRect())
-                }}
-                aria-label="Ajouter à ma sélection RDV"
-              >
-                <IconPlus /> {isInRdv(book.id) ? 'Modifier la sélection' : 'Ajouter à ma sélection'}
-              </RdvBtn>
+              <PriceRow>
+                <PriceInfo>
+                  <Price>{book.priceTTC.toFixed(2)} €</Price>
+                  <PriceLabel>Prix public TTC</PriceLabel>
+                </PriceInfo>
+                <QtyControl>
+                  <QtyBtn
+                    onClick={e => handleQty(e, -1)}
+                    disabled={qty <= 1}
+                    aria-label="Diminuer la quantité"
+                  >−</QtyBtn>
+                  <QtyValue>{qty}</QtyValue>
+                  <QtyBtn
+                    onClick={e => handleQty(e, +1)}
+                    aria-label="Augmenter la quantité"
+                  >+</QtyBtn>
+                </QtyControl>
+              </PriceRow>
+              <AjouterBtn onClick={handleAdd} aria-label="Ajouter au panier">
+                <IconCart /> Ajouter au panier
+              </AjouterBtn>
+              <NotesNote>Le titre sera enregistré en notés</NotesNote>
             </AParaitreFooter>
           ) : (
             <>

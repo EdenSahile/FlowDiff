@@ -219,6 +219,7 @@ const UserCode = styled.div`
 /* ── Nav data ── */
 const navItems = [
   { to: '/',            label: 'Accueil',      end: true },
+  { to: '/a-paraitre',  label: 'À paraître'              },
   { to: '/nouveautes',  label: 'Nouveautés'              },
   { to: '/fonds',       label: 'Fonds'                   },
   { to: '/top-ventes',  label: 'Top Ventes'              },
