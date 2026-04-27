@@ -237,12 +237,41 @@ const ItemTitle = styled.div`
   text-overflow: ellipsis;
 `
 
-const ItemIsbn = styled.div`
+const ItemIsbnRow = styled.div`
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 2px;
+`
+
+const ItemIsbn = styled.span`
   font-size: ${({ theme }) => theme.typography.sizes.xs};
   color: ${({ theme }) => theme.colors.gray[600]};
-  margin-top: 2px;
   font-family: monospace;
   letter-spacing: 0.03em;
+`
+
+const BookTypeTag = styled.span<{ $type: 'nouveaute' | 'fonds' }>`
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 7px;
+  border-radius: ${({ theme }) => theme.radii.full};
+  font-size: 10px;
+  font-weight: ${({ theme }) => theme.typography.weights.semibold};
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  background-color: ${({ $type, theme }) =>
+    $type === 'nouveaute' ? theme.colors.accentLight : theme.colors.navyLight};
+  color: ${({ $type, theme }) =>
+    $type === 'nouveaute' ? theme.colors.accent : theme.colors.navy};
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
+`
+
+const PubDateNote = styled.span`
+  font-size: 10px;
+  color: ${({ theme }) => theme.colors.gray[600]};
+  font-family: ${({ theme }) => theme.typography.fontFamily};
 `
 
 const ItemStatutLine = styled.div<{ $variant: 'sur_commande' | 'reimp' }>`
@@ -769,7 +798,25 @@ export function HistoriquePage() {
                             🔄 Commande spéciale en cours
                           </ItemStatutLine>
                         ) : null}
-                        <ItemIsbn>ISBN {item.isbn}</ItemIsbn>
+                        <ItemIsbnRow>
+                          <ItemIsbn>ISBN {item.isbn}</ItemIsbn>
+                          {(() => {
+                            const book = MOCK_BOOKS.find(b => b.id === item.bookId)
+                            if (!book || book.type === 'a-paraitre') return null
+                            return (
+                              <>
+                                <BookTypeTag $type={book.type}>
+                                  {book.type === 'nouveaute' ? 'Nouveauté' : 'Fonds'}
+                                </BookTypeTag>
+                                {book.type === 'nouveaute' && book.publicationDate && (
+                                  <PubDateNote>
+                                    (paru le {new Date(book.publicationDate).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })})
+                                  </PubDateNote>
+                                )}
+                              </>
+                            )
+                          })()}
+                        </ItemIsbnRow>
                         {isMixed && (
                           <ReturnDeadlineText style={{ textAlign: 'left', marginTop: '3px' }}>
                             Date limite retour : {getItemReturnDeadline(item, order.date)}
