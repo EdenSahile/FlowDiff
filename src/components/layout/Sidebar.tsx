@@ -217,20 +217,19 @@ const UserCode = styled.div`
 
 
 /* ── Nav data ── */
-const navItems = [
-  { to: '/',            label: 'Accueil',      end: true },
-  { to: '/a-paraitre',  label: 'À paraître'              },
-  { to: '/nouveautes',  label: 'Nouveautés'              },
-  { to: '/fonds',       label: 'Fonds'                   },
-  { to: '/top-ventes',  label: 'Top Ventes'              },
-  { to: '/selections',  label: 'Sélections'              },
-  { to: '/flash-infos', label: 'Flash Infos'             },
+const catalogueItems = [
+  { to: '/a-paraitre',  label: 'À paraître'  },
+  { to: '/nouveautes',  label: 'Nouveautés'  },
+  { to: '/fonds',       label: 'Fonds'       },
+  { to: '/top-ventes',  label: 'Top Ventes'  },
+  { to: '/selections',  label: 'Sélections'  },
 ]
 
 const accountItems = [
   { to: '/compte',        label: 'Mon compte'     },
   { to: '/historique',    label: 'Mon historique' },
   { to: '/facturation',   label: 'Facturation'    },
+  { to: '/parametres',    label: 'Paramètres'     },
 ]
 
 const toolItems = [
@@ -240,9 +239,8 @@ const toolItems = [
 ]
 
 const infoItems = [
-  { to: '/contact',     label: 'Contact'    },
-  { to: '/newsletter',  label: 'Newsletter' },
-  { to: '/parametres',  label: 'Paramètres' },
+  { to: '/contact',     label: 'Contact'     },
+  { to: '/flash-infos', label: 'Flash Infos' },
 ]
 
 export function Sidebar() {
@@ -269,12 +267,18 @@ export function Sidebar() {
         </SidebarLogoBtn>
       </SidebarHeaderZone>
 
-      {/* ── Navigation (corps #1e3a2a) ── */}
+      {/* ── Navigation ── */}
       <ScrollArea>
-        <SectionLabel>Navigation</SectionLabel>
-        <nav aria-label="Navigation principale">
-          {navItems.map(({ to, label, end }) => (
-            <StyledNavLink key={to} to={to} end={end}>{label}</StyledNavLink>
+        <nav aria-label="Accueil">
+          <StyledNavLink to="/" end>Accueil</StyledNavLink>
+        </nav>
+
+        <Divider />
+
+        <SectionLabel>Catalogue</SectionLabel>
+        <nav aria-label="Catalogue">
+          {catalogueItems.map(({ to, label }) => (
+            <StyledNavLink key={to} to={to}>{label}</StyledNavLink>
           ))}
         </nav>
 

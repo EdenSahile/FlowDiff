@@ -16,7 +16,11 @@ NouveautesPage simplifiée : onglet "À paraître" supprimé.
 
 ## Session en cours
 
-Aucune tâche en cours.
+### Feature : Fusion Paramètres + Newsletter
+
+- [x] T1 · `ParametresPage.tsx` — 3 sections : Notifications (toggles) · Newsletters (checkboxes + email) · Univers suivis (toggles) + un seul bouton "Enregistrer les préférences"
+- [x] T2 · `Sidebar.tsx` — retirer "Newsletter" de `infoItems`
+- [x] T3 · Vérification TypeScript
 
 ---
 
