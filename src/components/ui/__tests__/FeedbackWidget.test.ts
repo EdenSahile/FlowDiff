@@ -48,16 +48,12 @@ describe('getPageName', () => {
 })
 
 describe('isFeedbackValid', () => {
-  it('refuse une chaîne vide', () => {
-    expect(isFeedbackValid('')).toBe(false)
+  it('accepte une chaîne vide', () => {
+    expect(isFeedbackValid('')).toBe(true)
   })
 
-  it('refuse un message trop court (< 10 caractères)', () => {
-    expect(isFeedbackValid('court')).toBe(false)
-  })
-
-  it('accepte un message de 10 caractères exactement', () => {
-    expect(isFeedbackValid('a'.repeat(10))).toBe(true)
+  it('accepte un message court', () => {
+    expect(isFeedbackValid('court')).toBe(true)
   })
 
   it('accepte un message de longueur normale', () => {

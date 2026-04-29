@@ -23,8 +23,7 @@ export function getPageName(pathname: string): string {
 }
 
 export function isFeedbackValid(message: string): boolean {
-  const len = message.trim().length
-  return len >= 10 && len <= 500
+  return message.trim().length <= 500
 }
 
 // ─── Animations ───────────────────────────────────────────────────────────────
@@ -70,8 +69,7 @@ const FAB = styled.button<{ $open: boolean }>`
   }
 
   svg {
-    transition: transform 200ms ease;
-    transform: ${({ $open }) => ($open ? 'rotate(45deg)' : 'rotate(0deg)')};
+    transition: opacity 150ms ease;
   }
 
   @media (min-width: ${({ theme }) => theme.breakpoints.mobile}) {
@@ -107,6 +105,25 @@ const PanelHeader = styled.div`
   display: flex;
   align-items: center;
   gap: 10px;
+`
+
+const HeaderCloseBtn = styled.button`
+  background: none;
+  border: none;
+  color: ${({ theme }) => theme.colors.white};
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 6px;
+  opacity: 0.75;
+  transition: opacity 150ms ease;
+  flex-shrink: 0;
+
+  &:hover {
+    opacity: 1;
+  }
 `
 
 const PanelTitle = styled.h3`
@@ -363,6 +380,9 @@ export function FeedbackWidget() {
           <PanelHeader>
             <IconMessage />
             <PanelTitle>Votre avis</PanelTitle>
+            <HeaderCloseBtn onClick={handleClose} aria-label="Fermer">
+              <IconClose />
+            </HeaderCloseBtn>
           </PanelHeader>
 
           {status === 'success' ? (
@@ -392,7 +412,7 @@ export function FeedbackWidget() {
                 </label>
                 <Textarea
                   id="feedback-msg"
-                  placeholder="Décrivez votre retour (min. 10 caractères)…"
+                  placeholder="Décrivez votre retour…"
                   value={message}
                   onChange={(e) => {
                     setMessage(e.target.value)

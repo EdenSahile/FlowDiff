@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { theme } from '@/lib/theme'
 import styled from 'styled-components'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
@@ -203,7 +202,7 @@ const Content = styled.div`
   max-width: 1100px;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 2.5rem;
 `
 
 /* ── Greeting row ── */
