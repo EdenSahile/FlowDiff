@@ -1452,7 +1452,7 @@ export function HomePage() {
     'kpi-montant': {
       icon: <IconEuro />,
       iconBg: '#DCFCE7', iconColor: '#16a34a',
-      label: 'Montant total commandé',
+      label: 'Montant total commandé (TTC)',
       value: fmtEur(kpi.montantTotal),
       trend: compareKpi
         ? <KpiTrendLine current={kpi.montantTotal} compare={compareKpi.montantTotal} mode={periodFilter.compareMode} />
