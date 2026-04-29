@@ -4,6 +4,7 @@
     "comptable": {
       "source": "romainsimon/paperasse",
       "sourceType": "github",
+      "skillPath": "comptable/SKILL.md",
       "computedHash": "89d09fc70e2bce85c61d695fbe0547b6889baec70460732ac37acbed6631dff3"
     }
   }

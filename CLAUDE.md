@@ -20,7 +20,7 @@
 1. Lister les tâches avec `- [ ]` dans CONTEXT.md **avant** de commencer
 2. Ne pas écrire une seule ligne de code avant que CONTEXT.md soit mis à jour
 
-### Pendant le travail
+### Pendant le/ travail
 3. Cocher `- [x]` dès qu'une tâche est terminée (TS clean)
 4. S'arrêter après chaque tâche et demander validation avant de passer à la suivante
 5. Ne jamais committer sans validation

@@ -20,6 +20,8 @@ export interface DashboardOrder {
 
 export interface PeriodKPI {
   nbCommandes: number
+  nbActive: number
+  nbCancelled: number
   montantTotal: number
   nbExemplaires: number
   panierMoyen: number
@@ -178,6 +180,8 @@ export function computeKPIs(orders: DashboardOrder[]): PeriodKPI {
 
   return {
     nbCommandes,
+    nbActive:      active.length,
+    nbCancelled:   cancelled.length,
     montantTotal:  Math.round(montantTotal * 100) / 100,
     nbExemplaires,
     panierMoyen:   Math.round(panierMoyen * 100) / 100,
@@ -233,17 +237,31 @@ export function computeDonutData(orders: DashboardOrder[]): DonutSegment[] {
   const total  = active.reduce((s, o) => s + o.montantTTC, 0)
 
   const universes: Universe[] = ['BD/Mangas', 'Littérature', 'Jeunesse', 'Adulte-pratique']
-  return universes.map(univ => {
-    const montant = active
-      .filter(o => o.universe === univ)
-      .reduce((s, o) => s + o.montantTTC, 0)
-    return {
-      label:   univ,
-      color:   UNIVERSE_COLORS[univ],
-      percent: total > 0 ? Math.round((montant / total) * 100) : 0,
-      montant: Math.round(montant * 100) / 100,
-    }
+
+  if (total === 0) {
+    return universes.map(univ => ({
+      label: univ, color: UNIVERSE_COLORS[univ], percent: 0, montant: 0,
+    }))
+  }
+
+  const rows = universes.map(univ => {
+    const montant  = active.filter(o => o.universe === univ).reduce((s, o) => s + o.montantTTC, 0)
+    const exactPct = (montant / total) * 100
+    return { univ, montant, exactPct, floor: Math.floor(exactPct), remainder: exactPct % 1 }
   })
+
+  // largest remainder: distribute leftover points to segments with biggest fractional part
+  const leftover = 100 - rows.reduce((s, r) => s + r.floor, 0)
+  const winners  = new Set(
+    [...rows].sort((a, b) => b.remainder - a.remainder).slice(0, leftover).map(r => r.univ)
+  )
+
+  return rows.map(r => ({
+    label:   r.univ,
+    color:   UNIVERSE_COLORS[r.univ],
+    percent: r.floor + (winners.has(r.univ) ? 1 : 0),
+    montant: Math.round(r.montant * 100) / 100,
+  }))
 }
 
 /* ─────────────────────────────────────────
