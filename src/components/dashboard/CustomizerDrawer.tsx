@@ -40,7 +40,7 @@ const Overlay = styled.div<{ $open: boolean }>`
   background: rgba(0, 0, 0, 0.35);
   z-index: 200;
   opacity: ${({ $open }) => ($open ? 1 : 0)};
-  pointer-events: ${({ $open }) => ($open ? 'auto' : 'none')};
+  pointer-events: none;
   transition: opacity 300ms ease;
 `
 
@@ -86,7 +86,12 @@ const CloseBtn = styled.button`
   background: none;
   border: none;
   cursor: pointer;
-  padding: 4px 8px;
+  padding: 0;
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 18px;
   line-height: 1;
   color: ${({ theme }) => theme.colors.gray[600]};
@@ -101,11 +106,19 @@ const DrawerBody = styled.div`
 
 const SectionLabel = styled.div`
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: ${({ theme }) => theme.colors.gray[400]};
-  padding: 14px 20px 4px;
+  letter-spacing: 0.08em;
+  color: ${({ theme }) => theme.colors.navy};
+  padding: 10px 20px 9px;
+  background: ${({ theme }) => theme.colors.gray[100]};
+  border-top: 1px solid ${({ theme }) => theme.colors.gray[200]};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.gray[200]};
+  margin-top: 4px;
+
+  &:first-child {
+    margin-top: 0;
+  }
 `
 
 const ItemRow = styled.div<{ $dragging: boolean; $dropTarget: boolean }>`
@@ -123,10 +136,10 @@ const ItemRow = styled.div<{ $dragging: boolean; $dropTarget: boolean }>`
 const DragHandle = styled.div`
   cursor: grab;
   color: ${({ theme }) => theme.colors.gray[400]};
-  font-size: 15px;
   flex-shrink: 0;
   user-select: none;
-  line-height: 1;
+  display: flex;
+  align-items: center;
 
   @media (max-width: 768px) {
     display: none;
@@ -148,10 +161,16 @@ const ArrowBtn = styled.button`
   background: none;
   border: 1px solid ${({ theme }) => theme.colors.gray[200]};
   cursor: pointer;
-  padding: 1px 5px;
-  font-size: 9px;
+  padding: 0;
+  min-width: 36px;
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
   color: ${({ theme }) => theme.colors.gray[600]};
-  line-height: 1.5;
+  line-height: 1;
+  touch-action: manipulation;
   &:disabled { opacity: 0.3; cursor: default; }
   &:hover:not(:disabled) {
     background: ${({ theme }) => theme.colors.gray[50]};
@@ -170,11 +189,15 @@ const ToggleBtn = styled.button<{ $visible: boolean }>`
   background: none;
   border: none;
   cursor: pointer;
-  padding: 4px;
+  padding: 0;
+  min-width: 44px;
+  min-height: 44px;
   flex-shrink: 0;
   color: ${({ $visible, theme }) => ($visible ? theme.colors.gray[600] : theme.colors.gray[400])};
   display: flex;
   align-items: center;
+  justify-content: center;
+  touch-action: manipulation;
   &:disabled { cursor: not-allowed; opacity: 0.35; }
   &:hover:not(:disabled) { color: ${({ theme }) => theme.colors.gray[800]}; }
 `
@@ -214,6 +237,19 @@ const CloseFooterBtn = styled.button`
 
 /* ── SVG icons ── */
 
+function IconGrip() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor" aria-hidden="true">
+      <circle cx="4" cy="3" r="1.2" />
+      <circle cx="10" cy="3" r="1.2" />
+      <circle cx="4" cy="7" r="1.2" />
+      <circle cx="10" cy="7" r="1.2" />
+      <circle cx="4" cy="11" r="1.2" />
+      <circle cx="10" cy="11" r="1.2" />
+    </svg>
+  )
+}
+
 function IconEyeOpen() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -247,10 +283,10 @@ interface Props {
 
 export function CustomizerDrawer({ open, onClose, config, onReorder, onToggle, onReset }: Props) {
   const dragRef = useRef<{ zone: DashboardZone; idx: number } | null>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
   const [dragging, setDragging] = useState<{ zone: DashboardZone; idx: number } | null>(null)
   const [dropTarget, setDropTarget] = useState<{ zone: DashboardZone; idx: number } | null>(null)
 
-  // Issue 7: Escape key handler
   useEffect(() => {
     if (!open) return
     function onKeyDown(e: KeyboardEvent) {
@@ -258,6 +294,17 @@ export function CustomizerDrawer({ open, onClose, config, onReorder, onToggle, o
     }
     document.addEventListener('keydown', onKeyDown)
     return () => document.removeEventListener('keydown', onKeyDown)
+  }, [open, onClose])
+
+  useEffect(() => {
+    if (!open) return
+    function onMouseDown(e: MouseEvent) {
+      if (panelRef.current && !panelRef.current.contains(e.target as Node)) {
+        onClose()
+      }
+    }
+    document.addEventListener('mousedown', onMouseDown)
+    return () => document.removeEventListener('mousedown', onMouseDown)
   }, [open, onClose])
 
   function handleDragStart(zone: DashboardZone, idx: number) {
@@ -286,8 +333,9 @@ export function CustomizerDrawer({ open, onClose, config, onReorder, onToggle, o
 
   return (
     <>
-      <Overlay $open={open} onClick={onClose} />
+      <Overlay $open={open} />
       <Panel
+        ref={panelRef}
         $open={open}
         role="dialog"
         aria-modal="true"
@@ -323,7 +371,7 @@ export function CustomizerDrawer({ open, onClose, config, onReorder, onToggle, o
                       onDrop={() => handleDrop(zone, idx)}
                       onDragEnd={handleDragEnd}
                     >
-                      <DragHandle title="Glisser pour réordonner">⠿</DragHandle>
+                      <DragHandle title="Glisser pour réordonner"><IconGrip /></DragHandle>
                       <MobileArrows>
                         <ArrowBtn
                           type="button"

@@ -1,19 +1,47 @@
 # CLAUDE.md
 
-## Règle de démarrage
-Lire CONTEXT.md en début de session et reprendre là où on s'est arrêtés sans attendre que je le demande.
+## ⚠️ RÈGLES ABSOLUES — LIRE EN PREMIER
 
+### Démarrage de session
+- Lire CONTEXT.md immédiatement
+- Confirmer : "✅ CONTEXT.md lu — je reprends à [Task X]"
+- Ne pas attendre d'autres instructions pour continuer
 
-## Règle de gestion des fichiers
-- **CLAUDE.md** : contexte projet permanent + phases + décisions techniques durables. Ne contient jamais de blocs session datés.
-- **CONTEXT.md** : état vivant. Réécrit par Claude en fin de session ou sur demande. Contient uniquement ce qui est en cours ou à faire.
-- Les décisions techniques importantes prises en session → absorbées dans les sections de ce fichier, pas conservées sous forme de log.
+### Quand l'utilisateur dit "continue"
+- Lire CONTEXT.md
+- Reprendre exactement là où on s'est arrêtés
+- Confirmer ce qu'on va faire avant de coder
 
 ---
-## Résumé
-Lister toutes les étapes d'une feature ou mise à jour ou fix bug avant implémentation
-Mettre à jour CONTEXT.md dès qu'une étape est terminée (statut, build, prochaines étapes).
-Ne jamais ajouter de blocs datés dans CLAUDE.md.
+
+## Règles de travail en session
+
+### Avant tout code
+1. Lister les tâches avec `- [ ]` dans CONTEXT.md **avant** de commencer
+2. Ne pas écrire une seule ligne de code avant que CONTEXT.md soit mis à jour
+
+### Pendant le travail
+3. Cocher `- [x]` dès qu'une tâche est terminée (TS clean)
+4. S'arrêter après chaque tâche et demander validation avant de passer à la suivante
+5. Ne jamais committer sans validation
+
+### Fin de session ou feature terminée
+6. Quand toutes les tâches sont [x] et que l'utilisateur le demande :
+   - Vider la section "Session en cours"
+   - Mettre à jour "État du build"
+   - Laisser "Prochaines étapes" vide
+   - Ne jamais ajouter de blocs datés dans CLAUDE.md
+
+---
+
+## Gestion des fichiers
+
+- **CLAUDE.md** : contexte projet permanent + phases + décisions 
+  techniques durables. Ne contient jamais de blocs session datés.
+- **CONTEXT.md** : état vivant. Réécrit par Claude en fin de session 
+  ou sur demande. Contient uniquement ce qui est en cours ou à faire.
+- Les décisions techniques importantes prises en session → absorbées 
+  dans CLAUDE.md, pas conservées sous forme de log.
 
 ---
 
@@ -170,12 +198,10 @@ En permanence : **Panier** (droite, avec badge quantité) +  à gauche du panier
 | Validation | **Zod** (tous les inputs) |
 | Tests | **Vitest** (jsdom) |
 | Déploiement | **Vercel** (build Vite, projet test) |
-| BDD | Prisma ORM installé (non branché — données mock)
 ---
 
 ## Sécurité — règles non négociables
 
-- Mots de passe hashés avec **bcrypt** (cost factor ≥ 12) — actif dès Phase 3
 - Mots de passe hashés avec **bcrypt** (cost factor 12 en prod, 4 en dev pour performance)
 - Mock JWT avec expiration 8h — token en localStorage (acceptable pour projet test)
 - Toute donnée entrante validée avec **Zod** avant traitement

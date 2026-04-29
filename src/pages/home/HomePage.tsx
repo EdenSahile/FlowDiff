@@ -151,6 +151,18 @@ function IconBox() {
   )
 }
 
+function IconLayout() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="3" y="3" width="7" height="7" />
+      <rect x="14" y="3" width="7" height="7" />
+      <rect x="3" y="14" width="7" height="7" />
+      <rect x="14" y="14" width="7" height="7" />
+    </svg>
+  )
+}
+
 function IconBarChart() {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -510,9 +522,13 @@ const KPILink = styled.button`
 `
 
 /* ── Ligne 3 colonnes (étapes 4-5-6 et 7-8-9) ── */
-const ThreeColRow = styled.div`
+const ThreeColRow = styled.div<{ $count: number }>`
   display: grid;
-  grid-template-columns: 45fr 30fr 25fr;
+  grid-template-columns: ${({ $count }) =>
+    $count === 3 ? '45fr 30fr 25fr' :
+    $count === 2 ? '1fr 1fr' :
+    '1fr'
+  };
   gap: 16px;
   align-items: start;
 
@@ -1241,6 +1257,27 @@ function KpiTrendLine({
   )
 }
 
+type ActionCardDef = {
+  icon: React.ReactNode
+  iconBg: string
+  iconColor: string
+  count: React.ReactNode
+  label: string
+  deadline?: string
+  route?: string
+  empty?: boolean
+}
+
+type KpiCardDef = {
+  icon: React.ReactNode
+  iconBg: string
+  iconColor: string
+  label: string
+  value: React.ReactNode
+  trend?: React.ReactNode
+  link?: React.ReactNode
+}
+
 /* ── Component ── */
 export function HomePage() {
   const { user } = useAuth()
@@ -1364,6 +1401,113 @@ export function HomePage() {
     setTimeout(updateNovArrows, 50)
   }
 
+  const actionCardDefs: Record<string, ActionCardDef> = {
+    'action-offices': {
+      icon: <IconPackage />,
+      iconBg: '#F0FDF4', iconColor: '#16A34A',
+      count: 1, label: 'office à valider',
+      deadline: 'Limite : 13 mai 2026',
+      route: '/offices',
+    },
+    'action-panier': {
+      icon: <IconOrders />,
+      iconBg: cartCount === 0 ? '#F3F4F6' : '#FFF7ED',
+      iconColor: cartCount === 0 ? '#9CA3AF' : '#EA580C',
+      count: cartCount,
+      label: cartCount === 0 ? 'Panier vide' : cartCount <= 1 ? 'Ouvrage dans le panier' : 'Ouvrages dans le panier',
+      route: '/panier',
+      empty: cartCount === 0,
+    },
+    'action-commandes': {
+      icon: <IconReceipt />,
+      iconBg: '#FFFBEB', iconColor: '#D97706',
+      count: 2, label: 'commandes à vérifier',
+      route: '/edi?filter=ORDRSP',
+    },
+    'action-edi-error': {
+      icon: <IconAlertClock />,
+      iconBg: '#FEF2F2', iconColor: '#DC2626',
+      count: 1, label: 'erreur EDI à corriger',
+      route: '/edi',
+    },
+    'action-expeditions': {
+      icon: <IconTruck />,
+      iconBg: '#EFF6FF', iconColor: '#2563EB',
+      count: 3, label: 'expéditions en retard',
+      route: '/edi?filter=DESADV',
+    },
+  }
+
+  const kpiCardDefs: Record<string, KpiCardDef> = {
+    'kpi-commandes': {
+      icon: <IconCart />,
+      iconBg: '#DCFCE7', iconColor: '#16a34a',
+      label: 'Commandes passées',
+      value: kpi.nbCommandes,
+      trend: compareKpi
+        ? <KpiTrendLine current={kpi.nbCommandes} compare={compareKpi.nbCommandes} mode={periodFilter.compareMode} />
+        : undefined,
+      link: <KPILink onClick={() => navigate('/historique')}>Voir le détail →</KPILink>,
+    },
+    'kpi-montant': {
+      icon: <IconEuro />,
+      iconBg: '#DCFCE7', iconColor: '#16a34a',
+      label: 'Montant total commandé',
+      value: fmtEur(kpi.montantTotal),
+      trend: compareKpi
+        ? <KpiTrendLine current={kpi.montantTotal} compare={compareKpi.montantTotal} mode={periodFilter.compareMode} />
+        : undefined,
+      link: <KPILink onClick={() => navigate('/historique')}>Voir le détail →</KPILink>,
+    },
+    'kpi-exemplaires': {
+      icon: <IconBox />,
+      iconBg: '#DCFCE7', iconColor: '#16a34a',
+      label: 'Exemplaires commandés',
+      value: kpi.nbExemplaires.toLocaleString('fr-FR'),
+      trend: compareKpi
+        ? <KpiTrendLine current={kpi.nbExemplaires} compare={compareKpi.nbExemplaires} mode={periodFilter.compareMode} />
+        : undefined,
+      link: <KPILink onClick={() => navigate('/historique')}>Voir le détail →</KPILink>,
+    },
+    'kpi-panier-moyen': {
+      icon: <IconBarChart />,
+      iconBg: '#EDE9FE', iconColor: '#7C3AED',
+      label: 'Panier moyen',
+      value: fmtEur(kpi.panierMoyen),
+      trend: compareKpi
+        ? <KpiTrendLine current={kpi.panierMoyen} compare={compareKpi.panierMoyen} mode={periodFilter.compareMode} />
+        : undefined,
+      link: <KPILink onClick={() => navigate('/historique')}>Voir le détail →</KPILink>,
+    },
+    'kpi-delai': {
+      icon: <IconAlertClock />,
+      iconBg: '#FFF7ED', iconColor: '#EA580C',
+      label: 'Délai moyen de livraison',
+      value: `${kpi.delaiMoyen.toFixed(1).replace('.', ',')} j`,
+      trend: compareKpi
+        ? <KpiTrendLine current={kpi.delaiMoyen} compare={compareKpi.delaiMoyen} mode={periodFilter.compareMode} invert />
+        : undefined,
+    },
+    'kpi-rupture': {
+      icon: <IconXCircle />,
+      iconBg: '#FEE2E2', iconColor: '#DC2626',
+      label: 'Taux de rupture',
+      value: `${(kpi.tauxRupture * 100).toFixed(1).replace('.', ',')} %`,
+      trend: compareKpi
+        ? <KpiTrendLine current={kpi.tauxRupture} compare={compareKpi.tauxRupture} mode={periodFilter.compareMode} invert />
+        : undefined,
+    },
+    'kpi-references': {
+      icon: <IconBooks />,
+      iconBg: '#EFF6FF', iconColor: '#2563EB',
+      label: 'Références distinctes',
+      value: kpi.nbReferences.toLocaleString('fr-FR'),
+      trend: compareKpi
+        ? <KpiTrendLine current={kpi.nbReferences} compare={compareKpi.nbReferences} mode={periodFilter.compareMode} />
+        : undefined,
+    },
+  }
+
   return (
     <Page>
       <Content>
@@ -1395,57 +1539,30 @@ export function HomePage() {
             <SeeAllBtn onClick={() => navigate('/historique')}>Voir toutes les actions →</SeeAllBtn>
           </ActionsHeader>
           <ActionsGrid>
-            <ActionCard onClick={() => navigate('/offices')}>
-              <ActionIconWrap $bg="#F0FDF4" $color="#16A34A"><IconPackage /></ActionIconWrap>
-              <ActionBody>
-                <ActionCount>1</ActionCount>
-                <ActionLabel>office à valider</ActionLabel>
-                <ActionDeadline>Limite : 13 mai 2026</ActionDeadline>
-              </ActionBody>
-              <ActionArrow>→</ActionArrow>
-            </ActionCard>
-            <ActionCard
-              $empty={cartCount === 0}
-              onClick={cartCount > 0 ? () => navigate('/panier') : undefined}
-            >
-              <ActionIconWrap
-                $bg={cartCount === 0 ? '#F3F4F6' : '#FFF7ED'}
-                $color={cartCount === 0 ? '#9CA3AF' : '#EA580C'}
-              >
-                <IconOrders />
-              </ActionIconWrap>
-              <ActionBody>
-                <ActionCount>{cartCount}</ActionCount>
-                <ActionLabel>
-                  {cartCount === 0 ? 'Panier vide' : cartCount <= 1 ? 'Ouvrage dans le panier' : 'Ouvrages dans le panier'}
-                </ActionLabel>
-              </ActionBody>
-              {cartCount > 0 && <ActionArrow>→</ActionArrow>}
-            </ActionCard>
-            <ActionCard onClick={() => navigate('/edi?filter=ORDRSP')}>
-              <ActionIconWrap $bg="#FFFBEB" $color="#D97706"><IconReceipt /></ActionIconWrap>
-              <ActionBody>
-                <ActionCount>2</ActionCount>
-                <ActionLabel>commandes à vérifier</ActionLabel>
-              </ActionBody>
-              <ActionArrow>→</ActionArrow>
-            </ActionCard>
-            <ActionCard onClick={() => navigate('/edi')}>
-              <ActionIconWrap $bg="#FEF2F2" $color="#DC2626"><IconAlertClock /></ActionIconWrap>
-              <ActionBody>
-                <ActionCount>1</ActionCount>
-                <ActionLabel>erreur EDI à corriger</ActionLabel>
-              </ActionBody>
-              <ActionArrow>→</ActionArrow>
-            </ActionCard>
-            <ActionCard onClick={() => navigate('/edi?filter=DESADV')}>
-              <ActionIconWrap $bg="#EFF6FF" $color="#2563EB"><IconTruck /></ActionIconWrap>
-              <ActionBody>
-                <ActionCount>3</ActionCount>
-                <ActionLabel>expéditions en retard</ActionLabel>
-              </ActionBody>
-              <ActionArrow>→</ActionArrow>
-            </ActionCard>
+            {dashConfig.config.actionCards
+              .filter(c => c.visible)
+              .map(c => {
+                const def = actionCardDefs[c.id]
+                if (!def) return null
+                return (
+                  <ActionCard
+                    key={c.id}
+                    $empty={def.empty}
+                    onClick={!def.empty && def.route ? () => navigate(def.route!) : undefined}
+                  >
+                    <ActionIconWrap $bg={def.iconBg} $color={def.iconColor}>
+                      {def.icon}
+                    </ActionIconWrap>
+                    <ActionBody>
+                      <ActionCount>{def.count}</ActionCount>
+                      <ActionLabel>{def.label}</ActionLabel>
+                      {def.deadline && <ActionDeadline>{def.deadline}</ActionDeadline>}
+                    </ActionBody>
+                    {!def.empty && def.route && <ActionArrow>→</ActionArrow>}
+                  </ActionCard>
+                )
+              })
+            }
           </ActionsGrid>
         </ActionsBox>
 
@@ -1473,356 +1590,279 @@ export function HomePage() {
                 setCustomCompareEnd={periodFilter.setCustomCompareEnd}
               />
               <CustomizeBtn type="button" onClick={() => setCustomizerOpen(true)}>
-                ⊞ Personnaliser
+                <IconLayout /> Personnaliser
               </CustomizeBtn>
             </DashboardControls>
           </BilanHeader>
           <KPIGrid>
-            <KPICard>
-              <KPITop>
-                <KPIIconWrap $bg="#DCFCE7" $color="#16a34a"><IconCart /></KPIIconWrap>
-                <KPILabel>Commandes passées</KPILabel>
-              </KPITop>
-              <KPIValue>{kpi.nbCommandes}</KPIValue>
-              {compareKpi && (
-                <KpiTrendLine
-                  current={kpi.nbCommandes}
-                  compare={compareKpi.nbCommandes}
-                  mode={periodFilter.compareMode}
-                />
-              )}
-              <KPILink onClick={() => navigate('/historique')}>Voir le détail →</KPILink>
-            </KPICard>
-            <KPICard>
-              <KPITop>
-                <KPIIconWrap $bg="#DCFCE7" $color="#16a34a"><IconEuro /></KPIIconWrap>
-                <KPILabel>Montant total commandé</KPILabel>
-              </KPITop>
-              <KPIValue>{fmtEur(kpi.montantTotal)}</KPIValue>
-              {compareKpi && (
-                <KpiTrendLine
-                  current={kpi.montantTotal}
-                  compare={compareKpi.montantTotal}
-                  mode={periodFilter.compareMode}
-                />
-              )}
-              <KPILink onClick={() => navigate('/historique')}>Voir le détail →</KPILink>
-            </KPICard>
-            <KPICard>
-              <KPITop>
-                <KPIIconWrap $bg="#DCFCE7" $color="#16a34a"><IconBox /></KPIIconWrap>
-                <KPILabel>Exemplaires commandés</KPILabel>
-              </KPITop>
-              <KPIValue>{kpi.nbExemplaires.toLocaleString('fr-FR')}</KPIValue>
-              {compareKpi && (
-                <KpiTrendLine
-                  current={kpi.nbExemplaires}
-                  compare={compareKpi.nbExemplaires}
-                  mode={periodFilter.compareMode}
-                />
-              )}
-              <KPILink onClick={() => navigate('/historique')}>Voir le détail →</KPILink>
-            </KPICard>
-            <KPICard>
-              <KPITop>
-                <KPIIconWrap $bg="#EDE9FE" $color="#7C3AED"><IconBarChart /></KPIIconWrap>
-                <KPILabel>Panier moyen</KPILabel>
-              </KPITop>
-              <KPIValue>{fmtEur(kpi.panierMoyen)}</KPIValue>
-              {compareKpi && (
-                <KpiTrendLine
-                  current={kpi.panierMoyen}
-                  compare={compareKpi.panierMoyen}
-                  mode={periodFilter.compareMode}
-                />
-              )}
-              <KPILink onClick={() => navigate('/historique')}>Voir le détail →</KPILink>
-            </KPICard>
-
-            <KPICard>
-              <KPITop>
-                <KPIIconWrap $bg="#FFF7ED" $color="#EA580C"><IconAlertClock /></KPIIconWrap>
-                <KPILabel>Délai moyen de livraison</KPILabel>
-              </KPITop>
-              <KPIValue>{kpi.delaiMoyen.toFixed(1).replace('.', ',')} j</KPIValue>
-              {compareKpi && (
-                <KpiTrendLine
-                  current={kpi.delaiMoyen}
-                  compare={compareKpi.delaiMoyen}
-                  mode={periodFilter.compareMode}
-                  invert
-                />
-              )}
-            </KPICard>
-
-            <KPICard>
-              <KPITop>
-                <KPIIconWrap $bg="#FEE2E2" $color="#DC2626"><IconXCircle /></KPIIconWrap>
-                <KPILabel>Taux de rupture</KPILabel>
-              </KPITop>
-              <KPIValue>{(kpi.tauxRupture * 100).toFixed(1).replace('.', ',')} %</KPIValue>
-              {compareKpi && (
-                <KpiTrendLine
-                  current={kpi.tauxRupture}
-                  compare={compareKpi.tauxRupture}
-                  mode={periodFilter.compareMode}
-                  invert
-                />
-              )}
-            </KPICard>
-
-            <KPICard>
-              <KPITop>
-                <KPIIconWrap $bg="#EFF6FF" $color="#2563EB"><IconBooks /></KPIIconWrap>
-                <KPILabel>Références distinctes</KPILabel>
-              </KPITop>
-              <KPIValue>{kpi.nbReferences.toLocaleString('fr-FR')}</KPIValue>
-              {compareKpi && (
-                <KpiTrendLine
-                  current={kpi.nbReferences}
-                  compare={compareKpi.nbReferences}
-                  mode={periodFilter.compareMode}
-                />
-              )}
-            </KPICard>
+            {dashConfig.config.kpiCards
+              .filter(c => c.visible)
+              .map(c => {
+                const def = kpiCardDefs[c.id]
+                if (!def) return null
+                return (
+                  <KPICard key={c.id}>
+                    <KPITop>
+                      <KPIIconWrap $bg={def.iconBg} $color={def.iconColor}>
+                        {def.icon}
+                      </KPIIconWrap>
+                      <KPILabel>{def.label}</KPILabel>
+                    </KPITop>
+                    <KPIValue>{def.value}</KPIValue>
+                    {def.trend}
+                    {def.link}
+                  </KPICard>
+                )
+              })
+            }
           </KPIGrid>
         </BilanSection>
 
         {/* Ligne 4-5-6 */}
-        <ThreeColRow>
-
-          {/* 4 — Évolution des commandes */}
-          <PanelCard>
-            <PanelHeader>
-              <PanelTitle>
-                Évolution des commandes
-                <IconCalendar />
-              </PanelTitle>
-            </PanelHeader>
-            {compareChartData && (
-              <ChartLegend>
-                <ChartLegendItem>
-                  <ChartLegendLine $color="#16a34a" />
-                  Période sélectionnée
-                </ChartLegendItem>
-                <ChartLegendItem>
-                  <ChartLegendLine $color="#C9A84C" $dashed />
-                  {compareModeShort(periodFilter.compareMode)}
-                </ChartLegendItem>
-              </ChartLegend>
-            )}
-            <ChartInner>
-              <ChartSvgWrap>
-                <ChartEvolution main={mainChartData} compare={compareChartData} />
-              </ChartSvgWrap>
-              <ChartStatsList>
-                <ChartStatRow>
-                  <ChartStatLabel>Commandes envoyées</ChartStatLabel>
-                  <ChartStatValueRow>
-                    <ChartStatIcon $bg="#DCFCE7" $color="#16a34a"><IconSend /></ChartStatIcon>
-                    <ChartStatNum>{nbEnvoyees}</ChartStatNum>
-                    {cmpEnvoyees !== null && (
-                      <ChartStatDelta $up={nbEnvoyees >= cmpEnvoyees}>
-                        {nbEnvoyees >= cmpEnvoyees ? '▲' : '▼'}
-                        {cmpEnvoyees > 0
-                          ? ` ${Math.abs(Math.round(((nbEnvoyees - cmpEnvoyees) / cmpEnvoyees) * 100))}%`
-                          : ''}
-                      </ChartStatDelta>
-                    )}
-                  </ChartStatValueRow>
-                </ChartStatRow>
-                <ChartStatRow>
-                  <ChartStatLabel>Commandes annulées</ChartStatLabel>
-                  <ChartStatValueRow>
-                    <ChartStatIcon $bg="#FEE2E2" $color="#DC2626"><IconXCircle /></ChartStatIcon>
-                    <ChartStatNum>{nbAnnulees}</ChartStatNum>
-                    {cmpAnnulees !== null && (
-                      <ChartStatDelta $up={nbAnnulees <= cmpAnnulees}>
-                        {nbAnnulees <= cmpAnnulees ? '▼' : '▲'}
-                        {cmpAnnulees > 0
-                          ? ` ${Math.abs(Math.round(((nbAnnulees - cmpAnnulees) / cmpAnnulees) * 100))}%`
-                          : ''}
-                      </ChartStatDelta>
-                    )}
-                  </ChartStatValueRow>
-                </ChartStatRow>
-                <ChartStatRow>
-                  <ChartStatLabel>Taux d'annulation</ChartStatLabel>
-                  <ChartStatValueRow>
-                    <ChartStatIcon $bg="#FEE2E2" $color="#DC2626"><IconXCircle /></ChartStatIcon>
-                    <ChartStatNum>{(kpi.tauxRupture * 100).toFixed(1).replace('.', ',')} %</ChartStatNum>
-                    {compareKpi && (
-                      <ChartStatDelta $up={kpi.tauxRupture <= compareKpi.tauxRupture}>
-                        {kpi.tauxRupture <= compareKpi.tauxRupture ? '▼' : '▲'}
-                        {' '}{Math.abs(Math.round((kpi.tauxRupture - compareKpi.tauxRupture) * 1000) / 10).toFixed(1)} pts
-                      </ChartStatDelta>
-                    )}
-                  </ChartStatValueRow>
-                </ChartStatRow>
-              </ChartStatsList>
-            </ChartInner>
-          </PanelCard>
-
-          {/* 5 — Répartition des achats */}
-          <PanelCard>
-            <PanelHeader>
-              <PanelTitle>Répartition de vos achats</PanelTitle>
-            </PanelHeader>
-            <DonutInner>
-              <ChartDonut main={donutData} compare={compareDonutData} />
-              <DonutLegend>
-                {donutData.map((seg, i) => {
-                  const cmpSeg = compareDonutData?.[i]
-                  return (
-                    <LegendItem key={seg.label}>
-                      <LegendDot $color={seg.color} />
-                      <LegendLabel>{seg.label}</LegendLabel>
-                      <LegendPct>{seg.percent}%</LegendPct>
-                      {cmpSeg && (
-                        <LegendPctCompare>vs {cmpSeg.percent}%</LegendPctCompare>
-                      )}
-                    </LegendItem>
-                  )
-                })}
-              </DonutLegend>
-            </DonutInner>
-          </PanelCard>
-
-          {/* 6 — Top éditeurs */}
-          <PanelCard>
-            <PanelHeader>
-              <PanelTitle>Top éditeurs</PanelTitle>
-              <PanelSeeAll onClick={() => navigate('/fonds')}>Voir tout →</PanelSeeAll>
-            </PanelHeader>
-            <TopEdList>
-              {topPublishers.map(({ name, pct, montant }, i) => (
-                <TopEdRow key={name}>
-                  <TopEdRank>{i + 1}</TopEdRank>
-                  <TopEdName>{name}</TopEdName>
-                  <TopEdPct>{pct}%</TopEdPct>
-                  <TopEdAmount>{fmtEur(montant)}</TopEdAmount>
-                </TopEdRow>
-              ))}
-            </TopEdList>
-            <TopEdFooter>
-              <TopEdFooterLabel>Part du montant</TopEdFooterLabel>
-              <TopEdFooterLabel>Montant commandé</TopEdFooterLabel>
-            </TopEdFooter>
-          </PanelCard>
-
+        <ThreeColRow $count={dashConfig.config.mainPanels.filter(c => c.visible).length}>
+          {dashConfig.config.mainPanels
+            .filter(c => c.visible)
+            .map(c => {
+              if (c.id === 'panel-evolution') return (
+                <PanelCard key={c.id}>
+                  <PanelHeader>
+                    <PanelTitle>
+                      Évolution des commandes
+                      <IconCalendar />
+                    </PanelTitle>
+                  </PanelHeader>
+                  {compareChartData && (
+                    <ChartLegend>
+                      <ChartLegendItem>
+                        <ChartLegendLine $color="#16a34a" />
+                        Période sélectionnée
+                      </ChartLegendItem>
+                      <ChartLegendItem>
+                        <ChartLegendLine $color="#C9A84C" $dashed />
+                        {compareModeShort(periodFilter.compareMode)}
+                      </ChartLegendItem>
+                    </ChartLegend>
+                  )}
+                  <ChartInner>
+                    <ChartSvgWrap>
+                      <ChartEvolution main={mainChartData} compare={compareChartData} />
+                    </ChartSvgWrap>
+                    <ChartStatsList>
+                      <ChartStatRow>
+                        <ChartStatLabel>Commandes envoyées</ChartStatLabel>
+                        <ChartStatValueRow>
+                          <ChartStatIcon $bg="#DCFCE7" $color="#16a34a"><IconSend /></ChartStatIcon>
+                          <ChartStatNum>{nbEnvoyees}</ChartStatNum>
+                          {cmpEnvoyees !== null && (
+                            <ChartStatDelta $up={nbEnvoyees >= cmpEnvoyees}>
+                              {nbEnvoyees >= cmpEnvoyees ? '▲' : '▼'}
+                              {cmpEnvoyees > 0
+                                ? ` ${Math.abs(Math.round(((nbEnvoyees - cmpEnvoyees) / cmpEnvoyees) * 100))}%`
+                                : ''}
+                            </ChartStatDelta>
+                          )}
+                        </ChartStatValueRow>
+                      </ChartStatRow>
+                      <ChartStatRow>
+                        <ChartStatLabel>Commandes annulées</ChartStatLabel>
+                        <ChartStatValueRow>
+                          <ChartStatIcon $bg="#FEE2E2" $color="#DC2626"><IconXCircle /></ChartStatIcon>
+                          <ChartStatNum>{nbAnnulees}</ChartStatNum>
+                          {cmpAnnulees !== null && (
+                            <ChartStatDelta $up={nbAnnulees <= cmpAnnulees}>
+                              {nbAnnulees <= cmpAnnulees ? '▼' : '▲'}
+                              {cmpAnnulees > 0
+                                ? ` ${Math.abs(Math.round(((nbAnnulees - cmpAnnulees) / cmpAnnulees) * 100))}%`
+                                : ''}
+                            </ChartStatDelta>
+                          )}
+                        </ChartStatValueRow>
+                      </ChartStatRow>
+                      <ChartStatRow>
+                        <ChartStatLabel>Taux d'annulation</ChartStatLabel>
+                        <ChartStatValueRow>
+                          <ChartStatIcon $bg="#FEE2E2" $color="#DC2626"><IconXCircle /></ChartStatIcon>
+                          <ChartStatNum>{(kpi.tauxRupture * 100).toFixed(1).replace('.', ',')} %</ChartStatNum>
+                          {compareKpi && (
+                            <ChartStatDelta $up={kpi.tauxRupture <= compareKpi.tauxRupture}>
+                              {kpi.tauxRupture <= compareKpi.tauxRupture ? '▼' : '▲'}
+                              {' '}{Math.abs(Math.round((kpi.tauxRupture - compareKpi.tauxRupture) * 1000) / 10).toFixed(1)} pts
+                            </ChartStatDelta>
+                          )}
+                        </ChartStatValueRow>
+                      </ChartStatRow>
+                    </ChartStatsList>
+                  </ChartInner>
+                </PanelCard>
+              )
+              if (c.id === 'panel-donut') return (
+                <PanelCard key={c.id}>
+                  <PanelHeader>
+                    <PanelTitle>Répartition de vos achats</PanelTitle>
+                  </PanelHeader>
+                  <DonutInner>
+                    <ChartDonut main={donutData} compare={compareDonutData} />
+                    <DonutLegend>
+                      {donutData.map((seg, i) => {
+                        const cmpSeg = compareDonutData?.[i]
+                        return (
+                          <LegendItem key={seg.label}>
+                            <LegendDot $color={seg.color} />
+                            <LegendLabel>{seg.label}</LegendLabel>
+                            <LegendPct>{seg.percent}%</LegendPct>
+                            {cmpSeg && (
+                              <LegendPctCompare>vs {cmpSeg.percent}%</LegendPctCompare>
+                            )}
+                          </LegendItem>
+                        )
+                      })}
+                    </DonutLegend>
+                  </DonutInner>
+                </PanelCard>
+              )
+              if (c.id === 'panel-editeurs') return (
+                <PanelCard key={c.id}>
+                  <PanelHeader>
+                    <PanelTitle>Top éditeurs</PanelTitle>
+                    <PanelSeeAll onClick={() => navigate('/fonds')}>Voir tout →</PanelSeeAll>
+                  </PanelHeader>
+                  <TopEdList>
+                    {topPublishers.map(({ name, pct, montant }, i) => (
+                      <TopEdRow key={name}>
+                        <TopEdRank>{i + 1}</TopEdRank>
+                        <TopEdName>{name}</TopEdName>
+                        <TopEdPct>{pct}%</TopEdPct>
+                        <TopEdAmount>{fmtEur(montant)}</TopEdAmount>
+                      </TopEdRow>
+                    ))}
+                  </TopEdList>
+                  <TopEdFooter>
+                    <TopEdFooterLabel>Part du montant</TopEdFooterLabel>
+                    <TopEdFooterLabel>Montant commandé</TopEdFooterLabel>
+                  </TopEdFooter>
+                </PanelCard>
+              )
+              return null
+            })
+          }
         </ThreeColRow>
 
         {/* Ligne 7-8-9 */}
-        <ThreeColRow>
-
-          {/* 7 — Suivi des flux EDI */}
-          <PanelCard>
-            <PanelHeader>
-              <PanelTitle>Suivi des flux EDI</PanelTitle>
-            </PanelHeader>
-            <EdiStatsGrid>
-              <EdiStatItem>
-                <EdiStatIcon $bg="#DCFCE7" $color="#16a34a"><IconSend /></EdiStatIcon>
-                <div>
-                  <EdiStatNum>12</EdiStatNum>
-                  <EdiStatLabel>Commandes envoyées</EdiStatLabel>
-                </div>
-              </EdiStatItem>
-              <EdiStatItem>
-                <EdiStatIcon $bg="#EFF6FF" $color="#2563EB"><IconTruck /></EdiStatIcon>
-                <div>
-                  <EdiStatNum>5</EdiStatNum>
-                  <EdiStatLabel>Expéditions en cours</EdiStatLabel>
-                </div>
-              </EdiStatItem>
-              <EdiStatItem>
-                <EdiStatIcon $bg="#FFF7ED" $color="#EA580C"><IconReceipt /></EdiStatIcon>
-                <div>
-                  <EdiStatNum>3</EdiStatNum>
-                  <EdiStatLabel>Factures reçues</EdiStatLabel>
-                </div>
-              </EdiStatItem>
-              <EdiStatItem>
-                <EdiStatIcon $bg="#FEF2F2" $color="#DC2626"><IconXCircle /></EdiStatIcon>
-                <div>
-                  <EdiStatNum>1</EdiStatNum>
-                  <EdiStatLabel>Erreur EDI</EdiStatLabel>
-                </div>
-              </EdiStatItem>
-            </EdiStatsGrid>
-            <EdiMetricsRow>
-              <div>
-                <EdiMetricLabel>Délai moyen de livraison</EdiMetricLabel>
-                <EdiMetricValue>3,2 jours</EdiMetricValue>
-              </div>
-              <div>
-                <EdiMetricLabel>Taux de réception</EdiMetricLabel>
-                <EdiMetricValue>92%</EdiMetricValue>
-              </div>
-            </EdiMetricsRow>
-            <EdiLink onClick={() => navigate('/edi')}>Accéder au suivi EDI →</EdiLink>
-          </PanelCard>
-
-          {/* 8 — Nouveautés du mois */}
-          <PanelCard>
-            <PanelHeader>
-              <PanelTitle>Nouveautés du mois</PanelTitle>
-              <PanelSeeAll onClick={() => navigate('/nouveautes')}>Voir tout →</PanelSeeAll>
-            </PanelHeader>
-            <NovelPanelWrap>
-              <NovelArrow $side="right" $visible={canNovRight}
-                onClick={() => scrollNovBy(120)} aria-label="Suivant">
-                <IconChevron dir="right" />
-              </NovelArrow>
-              <NovelScroll ref={novelRef}>
-                {nouveautes.map(book => {
-                  const badge = UNIVERSE_BADGE_COLOR[book.universe] ?? { bg: '#6B7280', text: '#fff' }
-                  return (
-                    <MiniCard key={book.id} onClick={() => navigate(`/livre/${book.id}`)}>
-                      <MiniCoverWrap>
-                        <BookCover
-                          isbn={book.isbn}
-                          alt={book.title}
-                          width={110}
-                          height={150}
-                          universe={book.universe}
-                          authors={book.authors}
-                          publisher={book.publisher}
-                        />
-                      </MiniCoverWrap>
-                      <UniverseBadge $bg={badge.bg} $text={badge.text}>
-                        {book.universe}
-                      </UniverseBadge>
-                      <MiniTitle>{book.title}</MiniTitle>
-                      <MiniAuthor>{book.authors[0]}</MiniAuthor>
-                    </MiniCard>
-                  )
-                })}
-              </NovelScroll>
-            </NovelPanelWrap>
-          </PanelCard>
-
-          {/* 9 — Raccourcis */}
-          <PanelCard>
-            <PanelHeader>
-              <PanelTitle>Raccourcis</PanelTitle>
-            </PanelHeader>
-            <ShortcutList>
-              {([
-                { icon: <IconPackage />, label: 'Passer une commande',      to: '/fonds'      },
-                { icon: <IconCart />,    label: 'Accéder au panier',         to: '/panier'     },
-                { icon: <IconClipboard />, label: 'Gérer mes listes',        to: '/compte'     },
-                { icon: <IconOrders />, label: 'Consulter mon historique',   to: '/historique' },
-              ] as { icon: React.ReactNode; label: string; to: string }[]).map(({ icon, label, to }) => (
-                <ShortcutRow key={to} to={to}>
-                  <ShortcutIconWrap>{icon}</ShortcutIconWrap>
-                  <ShortcutRowLabel>{label}</ShortcutRowLabel>
-                  <ShortcutChevron>›</ShortcutChevron>
-                </ShortcutRow>
-              ))}
-            </ShortcutList>
-          </PanelCard>
-
+        <ThreeColRow $count={dashConfig.config.bottomPanels.filter(c => c.visible).length}>
+          {dashConfig.config.bottomPanels
+            .filter(c => c.visible)
+            .map(c => {
+              if (c.id === 'panel-edi') return (
+                <PanelCard key={c.id}>
+                  <PanelHeader>
+                    <PanelTitle>Suivi des flux EDI</PanelTitle>
+                  </PanelHeader>
+                  <EdiStatsGrid>
+                    <EdiStatItem>
+                      <EdiStatIcon $bg="#DCFCE7" $color="#16a34a"><IconSend /></EdiStatIcon>
+                      <div>
+                        <EdiStatNum>12</EdiStatNum>
+                        <EdiStatLabel>Commandes envoyées</EdiStatLabel>
+                      </div>
+                    </EdiStatItem>
+                    <EdiStatItem>
+                      <EdiStatIcon $bg="#EFF6FF" $color="#2563EB"><IconTruck /></EdiStatIcon>
+                      <div>
+                        <EdiStatNum>5</EdiStatNum>
+                        <EdiStatLabel>Expéditions en cours</EdiStatLabel>
+                      </div>
+                    </EdiStatItem>
+                    <EdiStatItem>
+                      <EdiStatIcon $bg="#FFF7ED" $color="#EA580C"><IconReceipt /></EdiStatIcon>
+                      <div>
+                        <EdiStatNum>3</EdiStatNum>
+                        <EdiStatLabel>Factures reçues</EdiStatLabel>
+                      </div>
+                    </EdiStatItem>
+                    <EdiStatItem>
+                      <EdiStatIcon $bg="#FEF2F2" $color="#DC2626"><IconXCircle /></EdiStatIcon>
+                      <div>
+                        <EdiStatNum>1</EdiStatNum>
+                        <EdiStatLabel>Erreur EDI</EdiStatLabel>
+                      </div>
+                    </EdiStatItem>
+                  </EdiStatsGrid>
+                  <EdiMetricsRow>
+                    <div>
+                      <EdiMetricLabel>Délai moyen de livraison</EdiMetricLabel>
+                      <EdiMetricValue>3,2 jours</EdiMetricValue>
+                    </div>
+                    <div>
+                      <EdiMetricLabel>Taux de réception</EdiMetricLabel>
+                      <EdiMetricValue>92%</EdiMetricValue>
+                    </div>
+                  </EdiMetricsRow>
+                  <EdiLink onClick={() => navigate('/edi')}>Accéder au suivi EDI →</EdiLink>
+                </PanelCard>
+              )
+              if (c.id === 'panel-nouveautes') return (
+                <PanelCard key={c.id}>
+                  <PanelHeader>
+                    <PanelTitle>Nouveautés du mois</PanelTitle>
+                    <PanelSeeAll onClick={() => navigate('/nouveautes')}>Voir tout →</PanelSeeAll>
+                  </PanelHeader>
+                  <NovelPanelWrap>
+                    <NovelArrow $side="right" $visible={canNovRight}
+                      onClick={() => scrollNovBy(120)} aria-label="Suivant">
+                      <IconChevron dir="right" />
+                    </NovelArrow>
+                    <NovelScroll ref={novelRef}>
+                      {nouveautes.map(book => {
+                        const badge = UNIVERSE_BADGE_COLOR[book.universe] ?? { bg: '#6B7280', text: '#fff' }
+                        return (
+                          <MiniCard key={book.id} onClick={() => navigate(`/livre/${book.id}`)}>
+                            <MiniCoverWrap>
+                              <BookCover
+                                isbn={book.isbn}
+                                alt={book.title}
+                                width={110}
+                                height={150}
+                                universe={book.universe}
+                                authors={book.authors}
+                                publisher={book.publisher}
+                              />
+                            </MiniCoverWrap>
+                            <UniverseBadge $bg={badge.bg} $text={badge.text}>
+                              {book.universe}
+                            </UniverseBadge>
+                            <MiniTitle>{book.title}</MiniTitle>
+                            <MiniAuthor>{book.authors[0]}</MiniAuthor>
+                          </MiniCard>
+                        )
+                      })}
+                    </NovelScroll>
+                  </NovelPanelWrap>
+                </PanelCard>
+              )
+              if (c.id === 'panel-raccourcis') return (
+                <PanelCard key={c.id}>
+                  <PanelHeader>
+                    <PanelTitle>Raccourcis</PanelTitle>
+                  </PanelHeader>
+                  <ShortcutList>
+                    {([
+                      { icon: <IconPackage />, label: 'Passer une commande',    to: '/fonds'      },
+                      { icon: <IconCart />,    label: 'Accéder au panier',       to: '/panier'     },
+                      { icon: <IconClipboard />, label: 'Gérer mes listes',      to: '/compte'     },
+                      { icon: <IconOrders />, label: 'Consulter mon historique', to: '/historique' },
+                    ] as { icon: React.ReactNode; label: string; to: string }[]).map(({ icon, label, to }) => (
+                      <ShortcutRow key={to} to={to}>
+                        <ShortcutIconWrap>{icon}</ShortcutIconWrap>
+                        <ShortcutRowLabel>{label}</ShortcutRowLabel>
+                        <ShortcutChevron>›</ShortcutChevron>
+                      </ShortcutRow>
+                    ))}
+                  </ShortcutList>
+                </PanelCard>
+              )
+              return null
+            })
+          }
         </ThreeColRow>
 
         {/* 10 — Footer info bar */}
