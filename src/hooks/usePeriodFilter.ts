@@ -70,6 +70,13 @@ function addDays(d: Date, n: number): Date {
   return r
 }
 
+// new Date('YYYY-MM-DD') parse en UTC → décalage heure locale.
+// Ce helper crée la date en heure locale, comme tous les constructeurs new Date(y,m,d).
+function parseLocalISO(iso: string): Date {
+  const [y, m, d] = iso.split('-').map(Number)
+  return new Date(y, m - 1, d)
+}
+
 function resolvePreset(preset: PeriodPreset): DateRange {
   const today = startOfDay(new Date())
   const year  = today.getFullYear()
@@ -247,8 +254,8 @@ export function usePeriodFilter(extraOrders?: DashboardOrder[]): UsePeriodFilter
   const period = useMemo<DateRange>(() => {
     if (preset === 'custom') {
       return {
-        start: new Date(customStart),
-        end:   endOfDay(new Date(customEnd)),
+        start: parseLocalISO(customStart),
+        end:   endOfDay(parseLocalISO(customEnd)),
       }
     }
     return resolvePreset(preset)
@@ -258,8 +265,8 @@ export function usePeriodFilter(extraOrders?: DashboardOrder[]): UsePeriodFilter
     if (compareMode === 'custom') {
       if (!customCompareStart || !customCompareEnd) return null
       return {
-        start: new Date(customCompareStart),
-        end:   endOfDay(new Date(customCompareEnd)),
+        start: parseLocalISO(customCompareStart),
+        end:   endOfDay(parseLocalISO(customCompareEnd)),
       }
     }
     return resolveComparePeriod(compareMode, period)

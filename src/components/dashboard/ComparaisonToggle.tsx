@@ -20,7 +20,15 @@ function fmtDate(iso: string): string {
   return `${d}/${m}/${y}`
 }
 
-const today = new Date().toISOString().slice(0, 10)
+function toLocalISO(date: Date): string {
+  const y = date.getFullYear()
+  const m = String(date.getMonth() + 1).padStart(2, '0')
+  const d = String(date.getDate()).padStart(2, '0')
+  return `${y}-${m}-${d}`
+}
+
+const _now = new Date()
+const today = toLocalISO(_now)
 
 /* ─────────────────────────────────────────
    Styled
@@ -213,7 +221,7 @@ export function ComparaisonToggle({
   /* Résumé de la période de comparaison calculée */
   const compareSummary =
     !isCustom && isActive && comparePeriod
-      ? `${fmtDate(comparePeriod.start.toISOString().slice(0, 10))} → ${fmtDate(comparePeriod.end.toISOString().slice(0, 10))}`
+      ? `${fmtDate(toLocalISO(comparePeriod.start))} → ${fmtDate(toLocalISO(comparePeriod.end))}`
       : null
 
   return (
