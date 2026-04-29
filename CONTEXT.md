@@ -7,36 +7,36 @@
 ---
 
 ## État du build
-TS clean · 13 nouveaux tests (useDashboardConfig) · dernière session 2026-04-28  
+TS clean · 130 tests passants · dernière session 2026-04-29  
 Feature dashboard complète : sélecteur de période, comparaison N-1, 7 KPI cards dynamiques, graphique, donut, top éditeurs.  
-Fix UTC dates : `parseLocalISO` dans `usePeriodFilter` + `toLocalISO` dans `ComparaisonToggle` (dates début N-1 correctes).
+Feature personnalisation drawer complète : toggle visibilité, réordonnancement drag & drop (desktop) + flèches (mobile), reset, persistance localStorage.  
+Fixes UX drawer : touch targets 44px, icônes SVG (IconGrip, IconLayout), section labels visuels, scroll page background pendant drawer ouvert.
 
 ---
 
-## Session en cours — Feature : Personnalisation du dashboard (drawer)
+## Session en cours
 
-### Plan d'implémentation
-`docs/superpowers/plans/2026-04-28-dashboard-customization.md` — 7 tâches  
-Exécution via **subagent-driven-development** (sous-agents + revues spec + qualité)
+**Feature : Drag & drop direct sur les cards de la HomePage**  
+Plan : `docs/superpowers/plans/2026-04-29-dashboard-card-drag.md`  
+Spec : `docs/superpowers/specs/2026-04-29-dashboard-card-drag-design.md`  
+Exécution : subagent-driven-development (1 sous-agent par tâche)
 
 ### Tâches
 
-- [x] **Task 1** — `useDashboardConfig` hook + tests (`src/hooks/useDashboardConfig.ts`) — commit `ea4366d`
-- [x] **Task 2** — `CustomizerDrawer` composant (`src/components/dashboard/CustomizerDrawer.tsx`) — commits `2d346d2` + `93725af` (fixes a11y)
-- [x] **Task 3** — HomePage : imports, état `customizerOpen`, bouton "⊞ Personnaliser", `CustomizerDrawer` dans JSX — commit `fed19be`
-- [x] **Task 4** — HomePage : zone `actionCards` config-driven
-- [x] **Task 5** — HomePage : zone `kpiCards` config-driven
-- [x] **Task 6** — HomePage : zones `mainPanels` + `bottomPanels` + fix `ThreeColRow` ($count)
-- [ ] **Task 7** — Vérification finale : build + test manuel drawer
+- [x] T1 — Add `IconGrip` + `CardDragHandle` (commit `2009f1e`)
+- [x] T2 — Modify `ActionCard` + add `ActionCardWrap` (commit en cours)
+- [x] T3 — Add DnD props to `KPICard` + `PanelCard` (commit `9257a61`)
+- [x] T4 — Add DnD state + handlers to `HomePage` (commit `110e356`)
+- [x] T5 — Wire DnD on `kpiCards` (commit `21496e9`)
+- [x] T6 — Wire DnD on `actionCards` (commit `2a2d515`)
+- [x] T7 — Wire DnD on `mainPanels` + `bottomPanels` (commit `fa35a15`)
+- [x] T8 — Final verification (tsc clean · 130 tests · 18 drag handles DOM · 18 draggables homepage OK)
 
-### Nota
-- `gray[300]` n'existe pas dans le thème (tokens : 50/100/200/400/600/800) → utiliser `gray[400]`
-- Le commit Task 1 a bundlé par erreur la modif `usePeriodFilter.ts` déjà en attente
+**Fichier modifié :** `src/pages/home/HomePage.tsx` uniquement  
+**Warnings IDE attendus** : `CardDragHandle`, `ActionCardWrap`, `IconGrip` "declared but never read" — disparaîtront dès T5-T7.
 
 ---
 
 ## Prochaines étapes
 
-Reprendre l'exécution du plan à la **Task 4** (zone actionCards dans HomePage.tsx).
-
-
+Reprendre à T3 quand l'utilisateur donne le feu vert.
