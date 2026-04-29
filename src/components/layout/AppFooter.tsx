@@ -38,33 +38,10 @@ const FooterNavLink = styled(NavLink)`
   &:hover { color: ${({ theme }) => theme.colors.navy}; }
 `
 
-const SocialLinks = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 20px;
-`
-
-const SocialLink = styled.a`
-  font-family: ${({ theme }) => theme.typography.fontFamilyMono};
-  font-size: 10.5px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: ${({ theme }) => theme.colors.gray[400]};
-  transition: color 0.12s;
-  white-space: nowrap;
-
-  &:hover { color: ${({ theme }) => theme.colors.navy}; }
-`
-
 export function AppFooter() {
   return (
     <FooterBar>
       <FooterNavLink to="/cgv">CGV</FooterNavLink>
-      <SocialLinks>
-        <SocialLink href="#" aria-label="Site web">Web</SocialLink>
-        <SocialLink href="#" aria-label="Instagram">Insta</SocialLink>
-        <SocialLink href="#" aria-label="Facebook">FB</SocialLink>
-      </SocialLinks>
     </FooterBar>
   )
 }
