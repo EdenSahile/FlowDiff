@@ -1163,6 +1163,38 @@ const ShortcutChevron = styled.span`
   line-height: 1;
 `
 
+/* ── Section reorder controls ── */
+const SectionWrap = styled.div`
+  position: relative;
+`
+
+const SectionControls = styled.div`
+  position: absolute;
+  top: -28px;
+  right: 0;
+  display: flex;
+  gap: 2px;
+`
+
+const SectionArrowBtn = styled.button<{ $disabled?: boolean }>`
+  width: 24px;
+  height: 24px;
+  border: 1px solid ${({ theme }) => theme.colors.gray[200]};
+  background: white;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: ${({ $disabled }) => $disabled ? 'default' : 'pointer'};
+  color: ${({ $disabled, theme }) => $disabled ? theme.colors.gray[200] : theme.colors.gray[600]};
+  padding: 0;
+  flex-shrink: 0;
+  &:hover:not([disabled]) {
+    border-color: ${({ theme }) => theme.colors.gray[400]};
+    color: ${({ theme }) => theme.colors.gray[800]};
+  }
+`
+
 /* ── KPI trend helper ── */
 function compareModeShort(mode: CompareMode): string {
   if (mode === 'previous') return 'période préc.'
@@ -1468,7 +1500,45 @@ export function HomePage() {
           </DateBlock>
         </GreetingRow>
 
-        {/* 2 — Actions en attente */}
+        {/* 2-5 — Sections réordonnables */}
+        {dashConfig.config.sectionOrder.map((sectionId, sectionIdx) => {
+          const isFirst = sectionIdx === 0
+          const isLast  = sectionIdx === dashConfig.config.sectionOrder.length - 1
+
+          const sectionControls = (
+            <SectionControls>
+              <SectionArrowBtn
+                type="button"
+                title="Remonter"
+                aria-label="Remonter cette section"
+                $disabled={isFirst}
+                disabled={isFirst}
+                onClick={() => dashConfig.reorderSection(sectionId, 'up')}
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <polyline points="18 15 12 9 6 15" />
+                </svg>
+              </SectionArrowBtn>
+              <SectionArrowBtn
+                type="button"
+                title="Descendre"
+                aria-label="Descendre cette section"
+                $disabled={isLast}
+                disabled={isLast}
+                onClick={() => dashConfig.reorderSection(sectionId, 'down')}
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <polyline points="6 9 12 15 18 9" />
+                </svg>
+              </SectionArrowBtn>
+            </SectionControls>
+          )
+
+          if (sectionId === 'actions') return (
+        <SectionWrap key="actions">
+          {sectionControls}
         <ActionsBox aria-label="Actions en attente">
           <ActionsHeader>
             <ActionsLeft>
@@ -1520,8 +1590,12 @@ export function HomePage() {
             }
           </ActionsGrid>
         </ActionsBox>
+        </SectionWrap>
+          )
 
-        {/* 3 — Tableau de bord (KPI + graphiques) */}
+          if (sectionId === 'kpi') return (
+        <SectionWrap key="kpi">
+          {sectionControls}
         <BilanSection aria-label="Tableau de bord">
           <BilanHeader>
             <BilanTitle>Tableau de bord</BilanTitle>
@@ -1584,8 +1658,12 @@ export function HomePage() {
             }
           </KPIGrid>
         </BilanSection>
+        </SectionWrap>
+          )
 
-        {/* Ligne 4-5-6 */}
+          if (sectionId === 'mainPanels') return (
+        <SectionWrap key="mainPanels">
+          {sectionControls}
         <ThreeColRow $count={dashConfig.config.mainPanels.filter(c => c.visible).length}>
           {dashConfig.config.mainPanels
             .filter(c => c.visible)
@@ -1749,8 +1827,12 @@ export function HomePage() {
             })
           }
         </ThreeColRow>
+        </SectionWrap>
+          )
 
-        {/* Ligne 7-8-9 */}
+          if (sectionId === 'bottomPanels') return (
+        <SectionWrap key="bottomPanels">
+          {sectionControls}
         <ThreeColRow $count={dashConfig.config.bottomPanels.filter(c => c.visible).length}>
           {dashConfig.config.bottomPanels
             .filter(c => c.visible)
@@ -1903,6 +1985,11 @@ export function HomePage() {
             })
           }
         </ThreeColRow>
+        </SectionWrap>
+          )
+
+          return null
+        })}
 
         {/* 10 — Footer info bar */}
         <FooterBar>

@@ -7,11 +7,16 @@ export interface ConfigItem {
 
 export type DashboardZone = 'actionCards' | 'kpiCards' | 'mainPanels' | 'bottomPanels'
 
+export type SectionId = 'actions' | 'kpi' | 'mainPanels' | 'bottomPanels'
+
+export const DEFAULT_SECTION_ORDER: SectionId[] = ['actions', 'kpi', 'mainPanels', 'bottomPanels']
+
 export interface DashboardConfig {
   actionCards:  ConfigItem[]
   kpiCards:     ConfigItem[]
   mainPanels:   ConfigItem[]
   bottomPanels: ConfigItem[]
+  sectionOrder: SectionId[]
 }
 
 /* ── Pure helpers (exported for tests) ── */
@@ -34,6 +39,7 @@ export function toggleItem(items: ConfigItem[], id: string): ConfigItem[] {
 /* ── Default config ── */
 
 export const DEFAULT_CONFIG: DashboardConfig = {
+  sectionOrder: DEFAULT_SECTION_ORDER,
   actionCards: [
     { id: 'action-offices',     visible: true },
     { id: 'action-panier',      visible: true },
@@ -70,7 +76,12 @@ function loadConfig(): DashboardConfig {
   try {
     const raw = localStorage.getItem(LS_KEY)
     if (!raw) return DEFAULT_CONFIG
-    return JSON.parse(raw) as DashboardConfig
+    const parsed = JSON.parse(raw) as Partial<DashboardConfig>
+    return {
+      ...DEFAULT_CONFIG,
+      ...parsed,
+      sectionOrder: parsed.sectionOrder ?? DEFAULT_SECTION_ORDER,
+    }
   } catch {
     return DEFAULT_CONFIG
   }
@@ -107,10 +118,23 @@ export function useDashboardConfig() {
     })
   }, [])
 
+  const reorderSection = useCallback((id: SectionId, direction: 'up' | 'down') => {
+    setConfig(prev => {
+      const order = [...prev.sectionOrder]
+      const idx = order.indexOf(id)
+      const targetIdx = direction === 'up' ? idx - 1 : idx + 1
+      if (targetIdx < 0 || targetIdx >= order.length) return prev
+      ;[order[idx], order[targetIdx]] = [order[targetIdx], order[idx]]
+      const next = { ...prev, sectionOrder: order }
+      saveConfig(next)
+      return next
+    })
+  }, [])
+
   const reset = useCallback(() => {
     try { localStorage.removeItem(LS_KEY) } catch {}
     setConfig(DEFAULT_CONFIG)
   }, [])
 
-  return { config, reorder, toggle, reset }
+  return { config, reorder, reorderSection, toggle, reset }
 }
