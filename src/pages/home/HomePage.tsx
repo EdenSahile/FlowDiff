@@ -366,9 +366,10 @@ const ActionsGrid = styled.div`
   }
 `
 
-const ActionCard = styled.button<{ $empty?: boolean }>`
+const ActionCard = styled.button<{ $empty?: boolean; $dragging?: boolean; $dropTarget?: boolean }>`
   background: white;
-  border: 1px solid ${({ $empty }) => $empty ? '#E5E7EB' : '#FEE2E2'};
+  border: 1px solid ${({ $empty, $dropTarget, theme }) =>
+    $dropTarget ? theme.colors.navy : $empty ? '#E5E7EB' : '#FEE2E2'};
   padding: 14px 16px;
   display: flex;
   align-items: center;
@@ -376,9 +377,16 @@ const ActionCard = styled.button<{ $empty?: boolean }>`
   cursor: ${({ $empty }) => $empty ? 'default' : 'pointer'};
   text-align: left;
   width: 100%;
-  opacity: ${({ $empty }) => $empty ? 0.55 : 1};
+  opacity: ${({ $empty, $dragging }) => $dragging ? 0.4 : $empty ? 0.55 : 1};
   pointer-events: ${({ $empty }) => $empty ? 'none' : 'auto'};
-  &:hover { border-color: ${({ $empty }) => $empty ? '#E5E7EB' : '#FECACA'}; }
+  transition: opacity 0.1s, border-color 0.1s;
+  &:hover { border-color: ${({ $empty, $dropTarget, theme }) =>
+    $dropTarget ? theme.colors.navy : $empty ? '#E5E7EB' : '#FECACA'}; }
+`
+
+const ActionCardWrap = styled.div`
+  position: relative;
+  &:hover ${CardDragHandle} { opacity: 1; }
 `
 
 const ActionIconWrap = styled.div<{ $bg: string; $color: string }>`
