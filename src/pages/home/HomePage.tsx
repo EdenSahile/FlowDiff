@@ -164,6 +164,19 @@ function IconBarChart() {
   )
 }
 
+function IconGrip() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor" aria-hidden="true">
+      <circle cx="4" cy="3" r="1.2" />
+      <circle cx="10" cy="3" r="1.2" />
+      <circle cx="4" cy="7" r="1.2" />
+      <circle cx="10" cy="7" r="1.2" />
+      <circle cx="4" cy="11" r="1.2" />
+      <circle cx="10" cy="11" r="1.2" />
+    </svg>
+  )
+}
+
 function fmtFrDate(date: Date): string {
   const day = date.getDate()
   const month = date.toLocaleDateString('fr-FR', { month: 'long' })
@@ -257,6 +270,28 @@ function IconInfo() {
     </svg>
   )
 }
+
+/* ── Drag handles ── */
+const CardDragHandle = styled.div`
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  padding: 5px;
+  cursor: grab;
+  color: ${({ theme }) => theme.colors.gray[400]};
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.15s, background 0.15s;
+
+  &:active { cursor: grabbing; }
+  &:hover {
+    background: ${({ theme }) => theme.colors.gray[100]};
+    color: ${({ theme }) => theme.colors.gray[600]};
+  }
+`
 
 /* ── Actions en attente ── */
 const ActionsBox = styled.section`
