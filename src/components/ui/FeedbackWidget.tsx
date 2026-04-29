@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import styled, { keyframes, css } from 'styled-components'
 
@@ -36,6 +36,11 @@ const slideUp = keyframes`
 const fadeIn = keyframes`
   from { opacity: 0; }
   to   { opacity: 1; }
+`
+
+const spin = keyframes`
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
 `
 
 // ─── Styled components ────────────────────────────────────────────────────────
@@ -268,6 +273,94 @@ const ErrorMsg = styled.p`
   padding: 8px 10px;
 `
 
+const Spinner = styled.span`
+  display: block;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2.5px solid rgba(201, 168, 76, 0.3);
+  border-top-color: ${({ theme }) => theme.colors.accent};
+  animation: ${css`${spin}`} 0.7s linear infinite;
+`
+
+const ScreenshotRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+`
+
+const ScreenshotThumb = styled.button`
+  padding: 0;
+  cursor: pointer;
+  border-radius: 6px;
+  overflow: hidden;
+  flex-shrink: 0;
+  width: 80px;
+  height: 60px;
+  border: 1.5px solid ${({ theme }) => theme.colors.gray[200]};
+  transition: border-color 150ms ease;
+  background: none;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  &:hover {
+    border-color: ${({ theme }) => theme.colors.primary};
+  }
+`
+
+const ScreenshotLabel = styled.span`
+  font-size: 0.75rem;
+  color: ${({ theme }) => theme.colors.gray[600]};
+  line-height: 1.45;
+`
+
+const LightboxOverlay = styled.div`
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.88);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: ${css`${fadeIn}`} 150ms ease both;
+  cursor: zoom-out;
+`
+
+const LightboxImg = styled.img`
+  max-width: 95vw;
+  max-height: 90vh;
+  border-radius: 8px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  object-fit: contain;
+  cursor: default;
+`
+
+const LightboxClose = styled.button`
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.18);
+  color: ${({ theme }) => theme.colors.white};
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 150ms ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+`
+
 // ─── SVG Icons ────────────────────────────────────────────────────────────────
 
 function IconMessage() {
@@ -323,11 +416,46 @@ export function FeedbackWidget() {
   const [message, setMessage] = useState('')
   const [status, setStatus] = useState<Status>('idle')
   const [errorText, setErrorText] = useState('')
+  const [screenshot, setScreenshot] = useState<string | null>(null)
+  const [capturing, setCapturing] = useState(false)
+  const [lightboxOpen, setLightboxOpen] = useState(false)
+
+  useEffect(() => {
+    setOpen(false)
+    setLightboxOpen(false)
+    setScreenshot(null)
+    setMessage('')
+    setStatus('idle')
+    setErrorText('')
+  }, [pathname])
 
   const pageName = getPageName(pathname)
   const charCount = message.trim().length
   const tooLong = charCount > 500
   const canSubmit = isFeedbackValid(message) && status !== 'loading'
+
+  async function handleFabClick() {
+    if (open) {
+      handleClose()
+      return
+    }
+    setCapturing(true)
+    try {
+      const { default: html2canvas } = await import('html2canvas')
+      const canvas = await html2canvas(document.body, {
+        useCORS: true,
+        allowTaint: true,
+        scale: 1,
+        logging: false,
+      })
+      setScreenshot(canvas.toDataURL('image/jpeg', 0.65))
+    } catch {
+      setScreenshot(null)
+    } finally {
+      setCapturing(false)
+      setOpen(true)
+    }
+  }
 
   async function handleSubmit() {
     if (!canSubmit) return
@@ -338,7 +466,7 @@ export function FeedbackWidget() {
       const res = await fetch('/api/feedback', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: message.trim(), page: pageName }),
+        body: JSON.stringify({ message: message.trim(), page: pageName, screenshot }),
       })
 
       if (!res.ok) {
@@ -356,6 +484,7 @@ export function FeedbackWidget() {
 
   function handleClose() {
     setOpen(false)
+    setLightboxOpen(false)
     if (status === 'success' || status === 'error') {
       setTimeout(() => {
         setStatus('idle')
@@ -368,12 +497,26 @@ export function FeedbackWidget() {
     <>
       <FAB
         $open={open}
-        onClick={() => (open ? handleClose() : setOpen(true))}
-        aria-label={open ? 'Fermer le feedback' : 'Donner un feedback'}
-        title={open ? 'Fermer' : 'Feedback'}
+        onClick={handleFabClick}
+        disabled={capturing}
+        aria-label={open ? 'Fermer le feedback' : capturing ? 'Capture en cours…' : 'Donner un feedback'}
+        title={open ? 'Fermer' : capturing ? 'Capture en cours…' : 'Feedback'}
       >
-        {open ? <IconClose /> : <IconMessage />}
+        {capturing ? <Spinner /> : open ? <IconClose /> : <IconMessage />}
       </FAB>
+
+      {lightboxOpen && screenshot && (
+        <LightboxOverlay onClick={() => setLightboxOpen(false)}>
+          <LightboxImg
+            src={screenshot}
+            alt="Capture d'écran plein écran"
+            onClick={(e) => e.stopPropagation()}
+          />
+          <LightboxClose aria-label="Fermer la capture d'écran">
+            <IconClose />
+          </LightboxClose>
+        </LightboxOverlay>
+      )}
 
       {open && (
         <Panel role="dialog" aria-label="Formulaire de feedback">
@@ -405,6 +548,19 @@ export function FeedbackWidget() {
                 <IconMapPin />
                 Page actuelle : <span>{pageName}</span>
               </PageLabel>
+
+              {screenshot && (
+                <ScreenshotRow>
+                  <ScreenshotThumb
+                    onClick={() => setLightboxOpen(true)}
+                    title="Voir en grand"
+                    aria-label="Voir la capture d'écran en plein écran"
+                  >
+                    <img src={screenshot} alt="Capture d'écran" />
+                  </ScreenshotThumb>
+                  <ScreenshotLabel>Capture d'écran jointe — cliquer pour agrandir</ScreenshotLabel>
+                </ScreenshotRow>
+              )}
 
               <div>
                 <label htmlFor="feedback-msg" style={{ display: 'none' }}>

@@ -6,7 +6,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
-  const { message, page } = req.body as { message?: string; page?: string }
+  const { message, page, screenshot } = req.body as { message?: string; page?: string; screenshot?: string }
 
   if (!message || typeof message !== 'string' || message.trim().length === 0) {
     return res.status(400).json({ error: 'Message vide' })
@@ -33,10 +33,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const pageName = page && typeof page === 'string' ? page : 'Page inconnue'
   const sentAt = new Date().toLocaleString('fr-FR', { timeZone: 'Europe/Paris' })
 
+  const screenshotAttachment =
+    screenshot &&
+    typeof screenshot === 'string' &&
+    screenshot.startsWith('data:image/')
+      ? [{
+          filename: 'screenshot.jpg',
+          content: Buffer.from(screenshot.replace(/^data:image\/\w+;base64,/, ''), 'base64'),
+        }]
+      : []
+
   await transporter.sendMail({
     from: `"FlowDiff Feedback" <${GMAIL_USER}>`,
     to: FEEDBACK_TO,
     subject: `[Feedback FlowDiff] ${pageName}`,
+    attachments: screenshotAttachment,
     text: [
       `Nouveau feedback reçu sur FlowDiff`,
       ``,
