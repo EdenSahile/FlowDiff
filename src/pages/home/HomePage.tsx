@@ -1543,7 +1543,19 @@ export function HomePage() {
                 const def = kpiCardDefs[c.id]
                 if (!def) return null
                 return (
-                  <KPICard key={c.id}>
+                  <KPICard
+                    key={c.id}
+                    $dragging={cardDrag?.id === c.id}
+                    $dropTarget={cardDrop?.id === c.id}
+                    draggable
+                    onDragStart={() => handleDragStart('kpiCards', c.id)}
+                    onDragOver={e => handleDragOver(e, 'kpiCards', c.id)}
+                    onDrop={() => handleDrop('kpiCards', c.id)}
+                    onDragEnd={handleDragEnd}
+                  >
+                    <CardDragHandle title="Déplacer" aria-label="Déplacer cette carte">
+                      <IconGrip />
+                    </CardDragHandle>
                     <KPITop>
                       <KPIIconWrap $bg={def.iconBg} $color={def.iconColor}>
                         {def.icon}
