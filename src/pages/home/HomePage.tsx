@@ -1487,21 +1487,34 @@ export function HomePage() {
                 const def = actionCardDefs[c.id]
                 if (!def) return null
                 return (
-                  <ActionCard
+                  <ActionCardWrap
                     key={c.id}
-                    $empty={def.empty}
-                    onClick={!def.empty && def.route ? () => navigate(def.route!) : undefined}
+                    draggable
+                    onDragStart={() => handleDragStart('actionCards', c.id)}
+                    onDragOver={e => handleDragOver(e, 'actionCards', c.id)}
+                    onDrop={() => handleDrop('actionCards', c.id)}
+                    onDragEnd={handleDragEnd}
                   >
-                    <ActionIconWrap $bg={def.iconBg} $color={def.iconColor}>
-                      {def.icon}
-                    </ActionIconWrap>
-                    <ActionBody>
-                      <ActionCount>{def.count}</ActionCount>
-                      <ActionLabel>{def.label}</ActionLabel>
-                      {def.deadline && <ActionDeadline>{def.deadline}</ActionDeadline>}
-                    </ActionBody>
-                    {!def.empty && def.route && <ActionArrow>→</ActionArrow>}
-                  </ActionCard>
+                    <CardDragHandle title="Déplacer" aria-label="Déplacer cette carte">
+                      <IconGrip />
+                    </CardDragHandle>
+                    <ActionCard
+                      $empty={def.empty}
+                      $dragging={cardDrag?.id === c.id}
+                      $dropTarget={cardDrop?.id === c.id}
+                      onClick={!def.empty && def.route ? () => navigate(def.route!) : undefined}
+                    >
+                      <ActionIconWrap $bg={def.iconBg} $color={def.iconColor}>
+                        {def.icon}
+                      </ActionIconWrap>
+                      <ActionBody>
+                        <ActionCount>{def.count}</ActionCount>
+                        <ActionLabel>{def.label}</ActionLabel>
+                        {def.deadline && <ActionDeadline>{def.deadline}</ActionDeadline>}
+                      </ActionBody>
+                      {!def.empty && def.route && <ActionArrow>→</ActionArrow>}
+                    </ActionCard>
+                  </ActionCardWrap>
                 )
               })
             }
