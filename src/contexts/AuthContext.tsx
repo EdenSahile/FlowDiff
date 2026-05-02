@@ -1,5 +1,4 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
-import bcrypt from 'bcryptjs'
 import { MOCK_USERS, VALID_CLIENT_CODES, type MockUser } from '@/lib/mockUsers'
 import {
   loginSchema,
@@ -113,6 +112,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return { success: false, error: 'Code client ou email introuvable.' }
     }
 
+    const { default: bcrypt } = await import('bcryptjs')
     const passwordMatch = await bcrypt.compare(result.data.password, found.passwordHash)
     if (!passwordMatch) {
       return { success: false, error: 'Mot de passe incorrect.' }
@@ -155,6 +155,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Créer le compte (session uniquement — remplacé par Prisma en Phase 12)
     const base = MOCK_USERS.find((u) => u.codeClient === codeClient)!
     try {
+      const { default: bcrypt } = await import('bcryptjs')
       const newUser: MockUser = {
         ...base,
         passwordHash: await bcrypt.hash(password, BCRYPT_COST),

@@ -1,4 +1,5 @@
 import { lazy, Suspense } from 'react'
+import { PageSkeleton } from '@/components/ui/PageSkeleton'
 import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom'
 import { ThemeProvider } from '@/providers/ThemeProvider'
 import { AuthProvider } from '@/contexts/AuthContext'
@@ -41,7 +42,7 @@ const AParaitrePage    = lazy(() => import('@/pages/a-paraitre/AParaitrePage').t
 function ProtectedLayout() {
   return (
     <AppLayout>
-      <Suspense fallback={null}>
+      <Suspense fallback={<PageSkeleton />}>
         <Outlet />
       </Suspense>
     </AppLayout>
@@ -60,7 +61,7 @@ export default function App() {
               <OrdersProvider>
               <EDIProvider>
               <ReturnsProvider>
-              <Suspense fallback={null}>
+              <Suspense fallback={<PageSkeleton />}>
               <Routes>
                 {/* Routes publiques */}
                 <Route path="/login" element={<LoginPage />} />

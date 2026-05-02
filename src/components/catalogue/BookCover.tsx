@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import styled from 'styled-components'
 import type { Universe } from '@/data/mockBooks'
 
@@ -181,7 +182,7 @@ interface Props {
   collection?: string
 }
 
-export function BookCover({
+function BookCoverBase({
   isbn,
   alt,
   width = 80,
@@ -223,3 +224,7 @@ export function BookCover({
     </Wrapper>
   )
 }
+
+export const BookCover = memo(BookCoverBase, (prev, next) =>
+  prev.isbn === next.isbn && prev.width === next.width && prev.height === next.height
+)

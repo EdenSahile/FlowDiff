@@ -29,7 +29,7 @@ export default defineConfig({
         manualChunks(id) {
           if (id.includes('node_modules/react') || id.includes('react-router-dom')) return 'vendor-react'
           if (id.includes('styled-components')) return 'vendor-styled'
-          if (id.includes('bcryptjs') || id.includes('/zod/')) return 'vendor-auth'
+          if (id.includes('/zod/')) return 'vendor-auth'
         },
       },
     },
