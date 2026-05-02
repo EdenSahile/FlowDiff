@@ -6,6 +6,7 @@ import type { Book, Universe } from '@/data/mockBooks'
 import { BookCover } from './BookCover'
 import { useOrders } from '@/contexts/OrdersContext'
 import { useAuthContext } from '@/contexts/AuthContext'
+import { REMISE_RATES } from '@/contexts/CartContext'
 import { ORDER_STATUS_LABELS } from '@/data/mockOrders'
 import { useWishlist } from '@/contexts/WishlistContext'
 import { ListPickerPopover } from './ListPickerPopover'
@@ -555,6 +556,13 @@ const StarRowWrap = styled.div`
   align-items: center;
 `
 
+const RowPriceNet = styled.span`
+  display: block;
+  font-size: 11px;
+  color: ${({ theme }) => theme.colors.gray[600]};
+  margin-top: 2px;
+`
+
 const StarRowBtn = styled.button<{ $active: boolean }>`
   width: 30px; height: 30px;
   border-radius: ${({ theme }) => theme.radii.md};
@@ -777,6 +785,13 @@ export function BookCardRow({ book, selected, onToggle }: Props) {
 
   const inList = isInAnyList(book.id)
 
+  const userRate: number = user?.remisesParUnivers?.[book.universe] != null
+    ? user.remisesParUnivers[book.universe] / 100
+    : (REMISE_RATES[book.universe as keyof typeof REMISE_RATES] ?? 0)
+  const priceNet = userRate > 0 && mode === 'print'
+    ? (book.priceTTC * (1 - userRate)).toFixed(2)
+    : null
+
   function handleStarRowClick(e: React.MouseEvent) {
     e.stopPropagation()
     if (starRowRef.current) setStarAnchor(starRowRef.current.getBoundingClientRect())
@@ -936,6 +951,10 @@ export function BookCardRow({ book, selected, onToggle }: Props) {
                   : 'Choisir un format'}
             </TriggerLabel>
           </DropdownTrigger>
+
+          {priceNet && (
+            <RowPriceNet>Net remisé : {priceNet} €</RowPriceNet>
+          )}
 
           {dropOpen && createPortal(
             <DropdownPanel ref={panelRef} $top={panelPos.top} $left={panelPos.left} onMouseDown={e => e.stopPropagation()}>

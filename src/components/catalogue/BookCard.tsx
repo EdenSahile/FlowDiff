@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 import type { Book } from '@/data/mockBooks'
 import { BookCover } from './BookCover'
-import { useCart } from '@/contexts/CartContext'
-import { useToast } from '@/contexts/ToastContext'
+import { useCart, REMISE_RATES } from '@/contexts/CartContext'
+import { useToast, type ToastAction } from '@/contexts/ToastContext'
+import { useAuth } from '@/hooks/useAuth'
 import { useWishlist } from '@/contexts/WishlistContext'
 import { ListPickerPopover } from './ListPickerPopover'
 import { StockStatus } from '@/components/ui/StockStatus'
@@ -210,6 +211,18 @@ const PriceLabel = styled.span`
   color: ${({ theme }) => theme.colors.gray[400]};
 `
 
+const PriceNet = styled.span`
+  font-size: 11px;
+  color: ${({ theme }) => theme.colors.gray[600]};
+  font-weight: 500;
+`
+
+const PriceNetLabel = styled.span`
+  font-size: 10px;
+  color: ${({ theme }) => theme.colors.gray[400]};
+  margin-left: 4px;
+`
+
 const QtyControl = styled.div`
   display: flex;
   align-items: center;
@@ -379,8 +392,14 @@ export function BookCard({ book, showType = false }: Props) {
   const navigate      = useNavigate()
   const { addToCart } = useCart()
   const { showToast } = useToast()
+  const { user }      = useAuth()
   const { isInAnyList, getListsContaining, removeFromList } = useWishlist()
   const { isInRdv, getQty } = useRdv()
+
+  const userRate: number = user?.remisesParUnivers?.[book.universe] != null
+    ? user.remisesParUnivers[book.universe] / 100
+    : (REMISE_RATES[book.universe as keyof typeof REMISE_RATES] ?? 0)
+  const priceNet = userRate > 0 ? (book.priceTTC * (1 - userRate)).toFixed(2) : null
   const [qty, setQty] = useState(1)
   const [popoverAnchor, setPopoverAnchor] = useState<DOMRect | null>(null)
   const [alertOpen, setAlertOpen] = useState(false)
@@ -406,7 +425,8 @@ export function BookCard({ book, showType = false }: Props) {
 
   const confirmAdd = (enReliquat: boolean) => {
     addToCart(book, qty, { enReliquat })
-    showToast('Ouvrage ajouté au panier')
+    const action: ToastAction = { label: 'Voir le panier →', onClick: () => navigate('/panier') }
+    showToast(`"${book.title}" ajouté au panier`, 'success', action)
     setQty(1)
   }
 
@@ -495,6 +515,9 @@ export function BookCard({ book, showType = false }: Props) {
                 <PriceInfo>
                   <Price>{book.priceTTC.toFixed(2)} €</Price>
                   <PriceLabel>Prix public TTC</PriceLabel>
+                  {priceNet && (
+                    <PriceNet>{priceNet} €<PriceNetLabel>Net remisé</PriceNetLabel></PriceNet>
+                  )}
                 </PriceInfo>
                 <QtyControl>
                   <QtyBtn
@@ -520,6 +543,9 @@ export function BookCard({ book, showType = false }: Props) {
                 <PriceInfo>
                   <Price>{book.priceTTC.toFixed(2)} €</Price>
                   <PriceLabel>Prix public TTC</PriceLabel>
+                  {priceNet && (
+                    <PriceNet>{priceNet} €<PriceNetLabel>Net remisé</PriceNetLabel></PriceNet>
+                  )}
                 </PriceInfo>
                 {isOrderable && (
                   <QtyControl>
