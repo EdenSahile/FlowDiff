@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import type { Book, StockStatut, Universe } from '@/data/mockBooks'
 import { useAuthContext } from '@/contexts/AuthContext'
 import { useToast } from '@/contexts/ToastContext'
@@ -178,8 +178,33 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem(key, JSON.stringify({ items, opGroups }))
   }, [items, opGroups, key, user?.codeClient])
 
+  /* Taux effectifs : remisesParUnivers du libraire connecté (÷100) ou taux par défaut */
+  const effectiveRates = useMemo<Record<string, number>>(
+    () => user?.remisesParUnivers
+      ? Object.fromEntries(Object.entries(user.remisesParUnivers).map(([k, v]) => [k, v / 100]))
+      : REMISE_RATES,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [user?.remisesParUnivers]
+  )
+
+  const itemsTotal    = items.reduce((sum, i) => sum + i.quantity, 0)
+  const opBooksTotal  = opGroups.reduce((sum, op) =>
+    sum + op.books.reduce((s, { quantity }) => s + quantity, 0), 0)
+  const totalItems    = itemsTotal + opBooksTotal
+
+  const hasReliquatItems = items.some(i => i.enReliquat)
+
   /* ── Titres individuels ── */
-  const addToCart = (book: Book, qty = 1, opts: AddToCartOptions = {}) => {
+  const removeFromCart = useCallback((itemKey: string) =>
+    setItems(prev => prev.filter(i => getItemKey(i) !== itemKey))
+  , [])
+
+  const updateQty = useCallback((itemKey: string, qty: number) => {
+    if (qty < 1) { removeFromCart(itemKey); return }
+    setItems(prev => prev.map(i => getItemKey(i) === itemKey ? { ...i, quantity: qty } : i))
+  }, [removeFromCart])
+
+  const addToCart = useCallback((book: Book, qty = 1, opts: AddToCartOptions = {}) => {
     if (totalItems >= CART_LIMIT) {
       showToast(
         `Limite de démonstration atteinte (${CART_LIMIT} articles max). Veuillez vider votre panier pour continuer.`,
@@ -208,18 +233,14 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         enReliquat: enReliquat ?? false,
       }]
     })
-  }
-
-  const updateQty = (itemKey: string, qty: number) => {
-    if (qty < 1) { removeFromCart(itemKey); return }
-    setItems(prev => prev.map(i => getItemKey(i) === itemKey ? { ...i, quantity: qty } : i))
-  }
-
-  const removeFromCart = (itemKey: string) =>
-    setItems(prev => prev.filter(i => getItemKey(i) !== itemKey))
+  }, [totalItems, showToast])
 
   /* ── OPs ── */
-  const addOPToCart = (group: Omit<OPCartGroup, 'id'>) => {
+  const removeOP = useCallback((opId: string) =>
+    setOpGroups(prev => prev.filter(op => op.id !== opId))
+  , [])
+
+  const addOPToCart = useCallback((group: Omit<OPCartGroup, 'id'>) => {
     const opCount = group.books.reduce((s, { quantity }) => s + quantity, 0)
     if (totalItems + opCount > CART_LIMIT) {
       showToast(
@@ -230,48 +251,37 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
     const id = `op-${group.serieId}-${Date.now()}`
     setOpGroups(prev => [...prev, { ...group, id }])
-  }
+  }, [totalItems, showToast])
 
-  const removeOP = (opId: string) =>
-    setOpGroups(prev => prev.filter(op => op.id !== opId))
+  const clearCart = useCallback(() => setCart({ items: [], opGroups: [] }), [])
 
-  const clearCart = () => setCart({ items: [], opGroups: [] })
-
-  const setTransmissionMode = (mode: TransmissionMode) => {
+  const setTransmissionMode = useCallback((mode: TransmissionMode) => {
     setTransmissionModeState(mode)
     if (user?.codeClient) {
       localStorage.setItem(transmissionKey(user.codeClient), mode)
     }
-  }
+  }, [user?.codeClient])
 
-  /* Taux effectifs : remisesParUnivers du libraire connecté (÷100) ou taux par défaut */
-  const effectiveRates: Record<string, number> = user?.remisesParUnivers
-    ? Object.fromEntries(Object.entries(user.remisesParUnivers).map(([k, v]) => [k, v / 100]))
-    : REMISE_RATES
-
-  const itemsTotal    = items.reduce((sum, i) => sum + i.quantity, 0)
-  const opBooksTotal  = opGroups.reduce((sum, op) =>
-    sum + op.books.reduce((s, { quantity }) => s + quantity, 0), 0)
-  const totalItems    = itemsTotal + opBooksTotal
-
-  const hasReliquatItems = items.some(i => i.enReliquat)
+  const value = useMemo(() => ({
+    items,
+    opGroups,
+    totalItems,
+    addToCart,
+    updateQty,
+    removeFromCart,
+    addOPToCart,
+    removeOP,
+    clearCart,
+    hasReliquatItems,
+    ...computeTotals(items, opGroups, effectiveRates),
+    transmissionMode,
+    setTransmissionMode,
+  }), [items, opGroups, totalItems, addToCart, updateQty, removeFromCart,
+      addOPToCart, removeOP, clearCart, hasReliquatItems, effectiveRates,
+      transmissionMode, setTransmissionMode])
 
   return (
-    <CartContext.Provider value={{
-      items,
-      opGroups,
-      totalItems,
-      addToCart,
-      updateQty,
-      removeFromCart,
-      addOPToCart,
-      removeOP,
-      clearCart,
-      hasReliquatItems,
-      ...computeTotals(items, opGroups, effectiveRates),
-      transmissionMode,
-      setTransmissionMode,
-    }}>
+    <CartContext.Provider value={value}>
       {children}
     </CartContext.Provider>
   )
