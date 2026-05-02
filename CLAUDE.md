@@ -2,15 +2,7 @@
 
 ## ⚠️ RÈGLES ABSOLUES — LIRE EN PREMIER
 
-### Démarrage de session
-- Lire CONTEXT.md immédiatement
-- Confirmer : "✅ CONTEXT.md lu — je reprends à [Task X]"
-- Ne pas attendre d'autres instructions pour continuer
 
-### Quand l'utilisateur dit "continue"
-- Lire CONTEXT.md
-- Reprendre exactement là où on s'est arrêtés
-- Confirmer ce qu'on va faire avant de coder
 
 ---
 
@@ -206,7 +198,7 @@ En permanence : **Panier** (droite, avec badge quantité) +  à gauche du panier
 - Mock JWT avec expiration 8h — token en localStorage (acceptable pour projet test)
 - Toute donnée entrante validée avec **Zod** avant traitement
 - **Un compte par librairie** — le panier et l'historique sont partagés entre tous les utilisateurs d'un même `codeClient` et persistent après déconnexion
-- Les données sont isolées par `codeClient` (clés localStorage suffixées) — deux librairies différentes ne se voient pas
+- Les données sont isolées par `codeClient` (clés localStorage suffixées, y compris `NAME_KEY` wishlist username depuis Phase 4) — deux librairies différentes ne se voient pas
 - Variables d'environnement dans `.env` — jamais dans le code, `.env` dans `.gitignore`
 - **Prisma** exclusivement si BDD branchée — jamais de SQL brut avec interpolations
 
