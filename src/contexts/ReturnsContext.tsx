@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react'
+import { createContext, useCallback, useContext, useMemo, useState, useEffect } from 'react'
 import { useAuthContext } from '@/contexts/AuthContext'
 import {
   getReturns,
@@ -41,7 +41,7 @@ export function ReturnsProvider({ children }: { children: React.ReactNode }) {
     })
   }, [codeClient])
 
-  async function addReturn(payload: CreateReturnPayload): Promise<ReturnRequest> {
+  const addReturn = useCallback(async (payload: CreateReturnPayload): Promise<ReturnRequest> => {
     const optimistic: ReturnRequest = {
       id: `RET-OPT-${Date.now()}`,
       codeClient: payload.codeClient,
@@ -72,10 +72,15 @@ export function ReturnsProvider({ children }: { children: React.ReactNode }) {
       setStats(prev => prev ? { ...prev, activeCount: Math.max(0, prev.activeCount - 1) } : null)
       throw err
     }
-  }
+  }, [])
+
+  const value = useMemo(
+    () => ({ returns, loading, stats, addReturn }),
+    [returns, loading, stats, addReturn]
+  )
 
   return (
-    <ReturnsContext.Provider value={{ returns, loading, stats, addReturn }}>
+    <ReturnsContext.Provider value={value}>
       {children}
     </ReturnsContext.Provider>
   )

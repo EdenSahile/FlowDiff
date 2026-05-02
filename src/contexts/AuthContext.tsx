@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useRef, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import bcrypt from 'bcryptjs'
 import { MOCK_USERS, VALID_CLIENT_CODES, type MockUser } from '@/lib/mockUsers'
 import {
@@ -102,7 +102,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(false)
   }, [])
 
-  const login = async (data: LoginInput): Promise<AuthResult> => {
+  const login = useCallback(async (data: LoginInput): Promise<AuthResult> => {
     const result = loginSchema.safeParse(data)
     if (!result.success) {
       return { success: false, fieldErrors: getZodErrors(result) }
@@ -122,9 +122,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem(TOKEN_KEY, token)
     setUser(toAuthUser(found))
     return { success: true }
-  }
+  }, [])
 
-  const register = async (data: RegisterInput): Promise<AuthResult> => {
+  const register = useCallback(async (data: RegisterInput): Promise<AuthResult> => {
     const result = registerSchema.safeParse(data)
     if (!result.success) {
       return { success: false, fieldErrors: getZodErrors(result) }
@@ -167,19 +167,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return { success: false, error: 'Erreur lors de la création du compte.' }
     }
     return { success: true }
-  }
+  }, [])
 
-  const logout = () => {
+  const logout = useCallback(() => {
     if (user?.codeClient) {
       localStorage.removeItem(`bookflow_wishlist_username_${user.codeClient}`)
     }
     localStorage.removeItem(TOKEN_KEY)
     setUser(null)
     /* Panier et historique conservés — partagés entre tous les utilisateurs de la librairie */
-  }
+  }, [user?.codeClient])
+
+  const value = useMemo(
+    () => ({ user, isLoading, login, register, logout }),
+    [user, isLoading, login, register, logout]
+  )
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, register, logout }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   )

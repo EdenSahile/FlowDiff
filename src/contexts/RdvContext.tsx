@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react'
+import { createContext, useCallback, useContext, useMemo, useState, useEffect } from 'react'
 import type { Book } from '@/data/mockBooks'
 import { useAuthContext } from '@/contexts/AuthContext'
 import { storedRdvSchema } from '@/lib/storageSchemas'
@@ -56,7 +56,7 @@ export function RdvProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem(key, JSON.stringify(items))
   }, [items, key, user?.codeClient])
 
-  const addToRdv = (book: Book, qty: number) => {
+  const addToRdv = useCallback((book: Book, qty: number) => {
     setItems(prev => {
       const existing = prev.find(i => i.book.id === book.id)
       if (existing) {
@@ -66,37 +66,44 @@ export function RdvProvider({ children }: { children: React.ReactNode }) {
       }
       return [...prev, { book, quantity: qty }]
     })
-  }
+  }, [])
 
-  const removeFromRdv = (bookId: string) =>
+  const removeFromRdv = useCallback((bookId: string) =>
     setItems(prev => prev.filter(i => i.book.id !== bookId))
+  , [])
 
-  const updateQty = (bookId: string, qty: number) => {
+  const updateQty = useCallback((bookId: string, qty: number) => {
     if (qty < 1) { removeFromRdv(bookId); return }
     setItems(prev => prev.map(i => i.book.id === bookId ? { ...i, quantity: qty } : i))
-  }
+  }, [removeFromRdv])
 
-  const clearRdv = () => setItems([])
+  const clearRdv = useCallback(() => setItems([]), [])
 
-  const isInRdv = (bookId: string) => items.some(i => i.book.id === bookId)
+  const isInRdv = useCallback((bookId: string) =>
+    items.some(i => i.book.id === bookId)
+  , [items])
 
-  const getQty = (bookId: string) => items.find(i => i.book.id === bookId)?.quantity ?? 0
+  const getQty = useCallback((bookId: string) =>
+    items.find(i => i.book.id === bookId)?.quantity ?? 0
+  , [items])
 
   const rdvCount = items.length
   const totalExemplaires = items.reduce((sum, i) => sum + i.quantity, 0)
 
+  const value = useMemo(() => ({
+    items,
+    rdvCount,
+    totalExemplaires,
+    addToRdv,
+    removeFromRdv,
+    updateQty,
+    clearRdv,
+    isInRdv,
+    getQty,
+  }), [items, rdvCount, totalExemplaires, addToRdv, removeFromRdv, updateQty, clearRdv, isInRdv, getQty])
+
   return (
-    <RdvContext.Provider value={{
-      items,
-      rdvCount,
-      totalExemplaires,
-      addToRdv,
-      removeFromRdv,
-      updateQty,
-      clearRdv,
-      isInRdv,
-      getQty,
-    }}>
+    <RdvContext.Provider value={value}>
       {children}
     </RdvContext.Provider>
   )

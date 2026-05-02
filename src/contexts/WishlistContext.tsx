@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react'
+import { createContext, useCallback, useContext, useMemo, useState, useEffect } from 'react'
 import type { Book } from '@/data/mockBooks'
 import { useAuthContext } from '@/contexts/AuthContext'
 import { storedWishlistsSchema } from '@/lib/storageSchemas'
@@ -68,12 +68,12 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem(key, JSON.stringify(lists))
   }, [lists, key])
 
-  function setCurrentUserName(name: string) {
+  const setCurrentUserName = useCallback((name: string) => {
     setCurrentUserNameState(name)
     localStorage.setItem(nameKey(user?.codeClient), name)
-  }
+  }, [user?.codeClient])
 
-  const createList = (name: string): Wishlist => {
+  const createList = useCallback((name: string): Wishlist => {
     const newList: Wishlist = {
       id: `wl-${Date.now()}`,
       name: name.trim(),
@@ -82,46 +82,55 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
     }
     setLists(prev => [...prev, newList])
     return newList
-  }
+  }, [])
 
-  const deleteList = (listId: string) =>
+  const deleteList = useCallback((listId: string) =>
     setLists(prev => prev.filter(l => l.id !== listId))
+  , [])
 
-  const addToList = (listId: string, book: Book, addedBy?: string) =>
+  const addToList = useCallback((listId: string, book: Book, addedBy?: string) =>
     setLists(prev => prev.map(l =>
       l.id !== listId ? l :
       l.items.some(i => i.book.id === book.id) ? l :
       { ...l, items: [...l.items, { book, addedBy: addedBy?.trim() || undefined, addedAt: new Date().toISOString() }] }
     ))
+  , [])
 
-  const removeFromList = (listId: string, bookId: string) =>
+  const removeFromList = useCallback((listId: string, bookId: string) =>
     setLists(prev => prev.map(l =>
       l.id !== listId ? l :
       { ...l, items: l.items.filter(i => i.book.id !== bookId) }
     ))
+  , [])
 
-  const isInAnyList = (bookId: string) =>
+  const isInAnyList = useCallback((bookId: string) =>
     lists.some(l => l.items.some(i => i.book.id === bookId))
+  , [lists])
 
-  const isInList = (listId: string, bookId: string) =>
+  const isInList = useCallback((listId: string, bookId: string) =>
     lists.find(l => l.id === listId)?.items.some(i => i.book.id === bookId) ?? false
+  , [lists])
 
-  const getListsContaining = (bookId: string) =>
+  const getListsContaining = useCallback((bookId: string) =>
     lists.filter(l => l.items.some(i => i.book.id === bookId))
+  , [lists])
+
+  const value = useMemo(() => ({
+    lists,
+    currentUserName,
+    setCurrentUserName,
+    createList,
+    deleteList,
+    addToList,
+    removeFromList,
+    isInAnyList,
+    isInList,
+    getListsContaining,
+  }), [lists, currentUserName, setCurrentUserName, createList, deleteList,
+      addToList, removeFromList, isInAnyList, isInList, getListsContaining])
 
   return (
-    <WishlistContext.Provider value={{
-      lists,
-      currentUserName,
-      setCurrentUserName,
-      createList,
-      deleteList,
-      addToList,
-      removeFromList,
-      isInAnyList,
-      isInList,
-      getListsContaining,
-    }}>
+    <WishlistContext.Provider value={value}>
       {children}
     </WishlistContext.Provider>
   )
