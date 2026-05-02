@@ -63,7 +63,7 @@ const Tooltip = styled.div<{ $top: number; $left: number }>`
   transform: translateY(-100%) translateY(-6px);
   background: #1E3A5F;
   color: #ffffff;
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.45;
   padding: 6px 10px;
   border-radius: ${({ theme }) => theme.radii.md};

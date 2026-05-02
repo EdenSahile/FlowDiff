@@ -79,7 +79,7 @@ const SectionLabel = styled.div`
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: rgba(255,255,255,0.30);
+  color: rgba(255,255,255,0.65);
   padding: 16px 14px 6px;
 `
 
@@ -211,7 +211,7 @@ const UserName = styled.div`
 const UserCode = styled.div`
   font-family: ${({ theme }) => theme.typography.fontFamilyMono};
   font-size: 10px;
-  color: rgba(255,255,255,0.40);
+  color: rgba(255,255,255,0.65);
   margin-top: 1px;
 `
 

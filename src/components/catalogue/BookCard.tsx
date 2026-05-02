@@ -234,7 +234,7 @@ const QtyControl = styled.div`
 `
 
 const QtyBtn = styled.button`
-  width: 22px; height: 22px;
+  width: 36px; height: 36px;
   background: none;
   border: none;
   font-size: 14px;

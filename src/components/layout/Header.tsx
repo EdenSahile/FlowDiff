@@ -289,7 +289,7 @@ const FilterModalTitle = styled.span`
 `
 
 const FilterModalClose = styled.button`
-  width: 30px; height: 30px;
+  width: 36px; height: 36px;
   display: flex; align-items: center; justify-content: center;
   background: ${({ theme }) => theme.colors.gray[100]};
   border: none;
@@ -416,7 +416,7 @@ const ApplyBtn = styled.button`
 
 /* ── Notifications ── */
 const NotifBtn = styled.button`
-  width: 32px; height: 32px;
+  width: 36px; height: 36px;
   border-radius: 50%;
   background: rgba(255,255,255,0.08);
   border: none;
@@ -429,10 +429,6 @@ const NotifBtn = styled.button`
   transition: background 0.15s;
 
   &:hover { background: rgba(255,255,255,0.14); }
-
-  @media (max-width: 479px) {
-    width: 28px; height: 28px;
-  }
 `
 
 const NotifDot = styled.span`
@@ -445,7 +441,7 @@ const NotifDot = styled.span`
 `
 
 const HelpBtn = styled.button`
-  width: 32px; height: 32px;
+  width: 36px; height: 36px;
   border-radius: 50%;
   background: rgba(255,255,255,0.08);
   border: none;
@@ -457,10 +453,6 @@ const HelpBtn = styled.button`
   transition: background 0.15s;
 
   &:hover { background: rgba(255,255,255,0.14); }
-
-  @media (max-width: 479px) {
-    width: 28px; height: 28px;
-  }
 `
 
 /* ── Panier ── */
@@ -604,7 +596,7 @@ const ListsPanelTitle = styled.span`
 `
 
 const ListsPanelClose = styled.button`
-  width: 28px; height: 28px;
+  width: 36px; height: 36px;
   display: flex; align-items: center; justify-content: center;
   background: ${({ theme }) => theme.colors.gray[100]};
   border: none; border-radius: 50%;
@@ -668,13 +660,13 @@ const ListRowName = styled.p`
 
 const ListRowCount = styled.p`
   font-family: ${({ theme }) => theme.typography.fontFamily};
-  font-size: 11px;
+  font-size: 12px;
   color: ${({ theme }) => theme.colors.gray[400]};
   margin-top: 1px;
 `
 
 const ListRowDelete = styled.button`
-  width: 26px; height: 26px;
+  width: 36px; height: 36px;
   display: flex; align-items: center; justify-content: center;
   background: none;
   border: none;
@@ -702,7 +694,7 @@ const DetailHead = styled.div`
 `
 
 const BackBtn = styled.button`
-  width: 28px; height: 28px;
+  width: 36px; height: 36px;
   display: flex; align-items: center; justify-content: center;
   background: ${({ theme }) => theme.colors.gray[100]};
   border: none; border-radius: 50%;
@@ -770,7 +762,7 @@ const BookRowTitle = styled.p`
 
 const BookRowAuthor = styled.p`
   font-family: ${({ theme }) => theme.typography.fontFamily};
-  font-size: 11px;
+  font-size: 12px;
   color: ${({ theme }) => theme.colors.gray[400]};
   white-space: nowrap;
   overflow: hidden;
@@ -779,7 +771,7 @@ const BookRowAuthor = styled.p`
 `
 
 const BookRowRemove = styled.button`
-  width: 24px; height: 24px;
+  width: 36px; height: 36px;
   display: flex; align-items: center; justify-content: center;
   background: none;
   border: none;
@@ -844,7 +836,7 @@ const PrenomChip = styled.button<{ $active: boolean }>`
 `
 
 const BookRowCartBtn = styled.button`
-  width: 28px; height: 28px;
+  width: 36px; height: 36px;
   display: flex; align-items: center; justify-content: center;
   background: ${({ theme }) => theme.colors.navy};
   border: none;
