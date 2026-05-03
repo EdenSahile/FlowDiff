@@ -144,7 +144,7 @@ const SearchIconWrap = styled.span`
   display: flex;
   align-items: center;
   pointer-events: none;
-  color: #555;
+  color: ${({ theme }) => theme.colors.gray[600]};
 
   @media (max-width: calc(${({ theme }) => theme.breakpoints.mobile} - 1px)) {
     color: rgba(255,255,255,0.7);
@@ -159,13 +159,13 @@ const SearchInput = styled.input`
   background: transparent;
   border: none;
   border-radius: 0;
-  color: #111;
+  color: ${({ theme }) => theme.colors.gray[800]};
   font-family: ${({ theme }) => theme.typography.fontFamily};
   font-size: 13px;
   outline: none;
   appearance: none;
 
-  &::placeholder { color: #555; font-size: 13px; }
+  &::placeholder { color: ${({ theme }) => theme.colors.gray[600]}; font-size: 13px; }
   &::-webkit-search-cancel-button { display: none; }
 
   @media (max-width: calc(${({ theme }) => theme.breakpoints.mobile} - 1px)) {
@@ -181,14 +181,14 @@ const SearchGroup = styled.div`
   position: relative;
   display: flex;
   align-items: center;
-  background: #dcdcdc;
+  background: ${({ theme }) => theme.colors.gray[200]};
   border-radius: ${({ theme }) => theme.radii.md};
   overflow: hidden;
   flex: 1;
   max-width: 520px;
   transition: background 0.15s;
 
-  &:focus-within { background: #e8e8e8; }
+  &:focus-within { background: ${({ theme }) => theme.colors.gray[100]}; }
 
   @media (max-width: calc(${({ theme }) => theme.breakpoints.mobile} - 1px)) {
     background: rgba(255,255,255,0.18);
@@ -219,7 +219,7 @@ const FilterIconBtn = styled.button<{ $active: boolean }>`
   background: ${({ $active }) => $active ? 'rgba(35,47,62,0.10)' : 'transparent'};
   border: none;
   cursor: pointer;
-  color: ${({ $active }) => $active ? '#232f3e' : '#555'};
+  color: ${({ $active, theme }) => $active ? theme.colors.navy : theme.colors.gray[600]};
   font-family: inherit;
   font-size: 12px;
   font-weight: 500;
@@ -410,7 +410,7 @@ const ApplyBtn = styled.button`
   font-weight: 600;
   cursor: pointer;
   transition: background .12s;
-  &:hover { background: #25477A; }
+  &:hover { background: ${({ theme }) => theme.colors.primaryHover}; }
 `
 
 
@@ -846,7 +846,7 @@ const BookRowCartBtn = styled.button`
   flex-shrink: 0;
   transition: background 0.12s;
 
-  &:hover { background: #25477A; }
+  &:hover { background: ${({ theme }) => theme.colors.primaryHover}; }
 `
 
 const DetailFooter = styled.div`
@@ -872,7 +872,7 @@ const AddAllBtn = styled.button`
   gap: 6px;
   transition: background 0.15s;
 
-  &:hover { background: #25477A; }
+  &:hover { background: ${({ theme }) => theme.colors.primaryHover}; }
 `
 
 const ExportCsvBtn = styled.button`

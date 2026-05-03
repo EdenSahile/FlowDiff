@@ -103,7 +103,7 @@ const StyledNavLink = styled(NavLink)`
   }
 
   &.active {
-    color: #C9A84C;
+    color: ${({ theme }) => theme.colors.accent};
     background-color: rgba(201, 168, 76, 0.10);
   }
 `
