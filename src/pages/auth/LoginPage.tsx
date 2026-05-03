@@ -10,8 +10,6 @@ import { DemoBanner } from '@/components/ui/DemoBanner'
 import { Wordmark } from '@/components/brand/Wordmark'
 import { theme } from '@/lib/theme'
 import {
-  AuthPage,
-  AuthCard,
   AuthLogo,
   AuthTitle,
   AuthSubtitle,
@@ -19,6 +17,17 @@ import {
   AuthError,
   AuthLink,
   PasswordWrapper,
+  SplitPage,
+  BrandPanel,
+  BrandPanelDotGrid,
+  BrandLine,
+  BrandName,
+  BrandTagline,
+  BrandFeatureList,
+  BrandFeatureItem,
+  BrandFooter,
+  FormPanel,
+  FormPanelInner,
 } from '@/components/auth/AuthLayout'
 
 /* ── Blocked modal ── */
@@ -58,7 +67,7 @@ const ModalIcon = styled.div`
 const ModalTitle = styled.p`
   font-size: 1rem;
   font-weight: 700;
-  color: \${({ theme }) => theme.colors.navy};
+  color: ${({ theme }) => theme.colors.navy};
   margin-bottom: 8px;
 `
 
@@ -81,7 +90,7 @@ const ModalClose = styled.button`
   font-family: inherit;
 
   &:hover {
-    background: #16304f;
+    background: ${({ theme }) => theme.colors.primaryHover};
   }
 `
 
@@ -141,100 +150,106 @@ export function LoginPage() {
   }
 
   return (
-    <AuthPage>
-      <AuthStack>
-      <AuthCard>
-        <AuthLogo>
-          <Wordmark size="lg" showBaseline />
-        </AuthLogo>
-
-        <AuthTitle>Connexion</AuthTitle>
-        <AuthSubtitle>Accès réservé aux libraires</AuthSubtitle>
-
-        <div style={{
-          background: '#FFF8E1',
-          border: '1px solid #FFD54F',
-          borderRadius: '6px',
-          padding: '10px 14px',
-          fontSize: '0.8125rem',
-          color: '#5D4037',
-          marginBottom: '4px',
-          lineHeight: 1.4,
-        }}>
-          Les identifiants sont pré-remplis. Cliquez directement sur le bouton de connexion.
+    <SplitPage>
+      <BrandPanel>
+        <BrandPanelDotGrid />
+        <div style={{ position: 'relative', zIndex: 1 }}>
+          <BrandLine />
+          <BrandName>Flow<span>Diff</span></BrandName>
+          <BrandTagline>La plateforme des libraires</BrandTagline>
+          <BrandFeatureList>
+            <BrandFeatureItem>Catalogue fonds, nouveautés &amp; à paraître</BrandFeatureItem>
+            <BrandFeatureItem>Commandes directes et suivi temps réel</BrandFeatureItem>
+            <BrandFeatureItem>Remises personnalisées par thématique</BrandFeatureItem>
+            <BrandFeatureItem>Historique, retours et EDI intégrés</BrandFeatureItem>
+          </BrandFeatureList>
         </div>
+        <BrandFooter>© 2026 FlowDiff — Accès réservé aux libraires</BrandFooter>
+      </BrandPanel>
 
-        {serverError && <AuthError role="alert">{serverError}</AuthError>}
+      <FormPanel>
+        <FormPanelInner>
+          <AuthLogo>
+            <Wordmark size="lg" showBaseline />
+          </AuthLogo>
 
-        <AuthForm onSubmit={handleSubmit} noValidate>
-          <Input
-            id="identifier"
-            label="Code client ou email"
-            type="password"
-            placeholder="LIB001 ou contact@malib.fr"
-            value={form.identifier}
-            onChange={handleChange('identifier')}
-            error={fieldErrors.identifier}
-            autoComplete="username"
-            autoFocus
-            disabled
-          />
+          <AuthTitle>Connexion</AuthTitle>
+          <AuthSubtitle>Accès réservé aux libraires</AuthSubtitle>
 
-          <div>
-            <PasswordWrapper>
-              <Input
-                id="password"
-                label="Mot de passe"
-                type="password"
-                placeholder="••••••••"
-                value={form.password}
-                onChange={handleChange('password')}
-                error={fieldErrors.password}
-                autoComplete="current-password"
-                disabled
-              />
-            </PasswordWrapper>
+          <div style={{
+            background: '#FFF8E1',
+            border: '1px solid #FFD54F',
+            borderRadius: '6px',
+            padding: '10px 14px',
+            fontSize: '0.8125rem',
+            color: '#5D4037',
+            marginBottom: '4px',
+            lineHeight: 1.4,
+          }}>
+            Les identifiants sont pré-remplis. Cliquez directement sur le bouton de connexion.
           </div>
 
-          <div style={{ textAlign: 'right', marginTop: '-4px' }}>
+          {serverError && <AuthError role="alert">{serverError}</AuthError>}
+
+          <AuthForm onSubmit={handleSubmit} noValidate>
+            <Input
+              id="identifier"
+              label="Code client ou email"
+              type="password"
+              placeholder="LIB001 ou contact@malib.fr"
+              value={form.identifier}
+              onChange={handleChange('identifier')}
+              error={fieldErrors.identifier}
+              autoComplete="username"
+              autoFocus
+              disabled
+            />
+
+            <div>
+              <PasswordWrapper>
+                <Input
+                  id="password"
+                  label="Mot de passe"
+                  type="password"
+                  placeholder="••••••••"
+                  value={form.password}
+                  onChange={handleChange('password')}
+                  error={fieldErrors.password}
+                  autoComplete="current-password"
+                  disabled
+                />
+              </PasswordWrapper>
+            </div>
+
+            <div style={{ textAlign: 'right', marginTop: '-4px' }}>
+              <a
+                href="#"
+                onClick={e => { e.preventDefault(); setBlockedMsg('La réinitialisation de mot de passe a été bloquée.') }}
+                style={{ fontSize: '0.875rem', color: theme.colors.navy, textDecoration: 'underline', cursor: 'pointer' }}
+              >
+                Mot de passe oublié ?
+              </a>
+            </div>
+
+            <Button type="submit" fullWidth disabled={isSubmitting}>
+              {isSubmitting ? 'Connexion…' : 'Se connecter'}
+            </Button>
+          </AuthForm>
+
+          <AuthLink>
             <a
               href="#"
-              onClick={e => { e.preventDefault(); setBlockedMsg('La réinitialisation de mot de passe a été bloquée.') }}
-              style={{ fontSize: '0.875rem', color: theme.colors.navy, textDecoration: 'underline', cursor: 'pointer' }}
+              onClick={e => { e.preventDefault(); setBlockedMsg('La création de compte a été bloquée.') }}
             >
-              Mot de passe oublié ?
+              Demander un accès
             </a>
-          </div>
+          </AuthLink>
 
-          <Button type="submit" fullWidth disabled={isSubmitting}>
-            {isSubmitting ? 'Connexion…' : 'Se connecter'}
-          </Button>
-        </AuthForm>
-
-        <AuthLink>
-         
-          <a
-            href="#"
-            onClick={e => { e.preventDefault(); setBlockedMsg('La création de compte a été bloquée.') }}
-          >
-            Demander un accès
-          </a>
-        </AuthLink>
-      </AuthCard>
-
-      <DemoBanner position="bottom" />
-      </AuthStack>
+          <DemoBanner position="bottom" />
+        </FormPanelInner>
+      </FormPanel>
 
       {blockedMsg && <BlockedModal message={blockedMsg} onClose={() => setBlockedMsg(null)} />}
-    </AuthPage>
+    </SplitPage>
   )
 }
-
-const AuthStack = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  width: 100%;
-  max-width: 420px;
-`
