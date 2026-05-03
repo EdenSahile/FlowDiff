@@ -881,6 +881,7 @@ function AddressFormFields({
 ══════════════════════════════════════════════════════ */
 export function CartPage() {
   const { items, opGroups, totalItems, updateQty, removeFromCart, removeOP, clearCart, hasReliquatItems,
+          subtotalTTC, remiseAmount, netHT, tva, totalTTC,
           transmissionMode, setTransmissionMode } = useCart()
   const { addOrder } = useOrders()
   const { showToast } = useToast()
@@ -916,26 +917,14 @@ export function CartPage() {
     return REMISE_RATES[universe as keyof typeof REMISE_RATES] ?? 0
   }
 
-  /* ── Totaux ── */
-  const subtotalTTC = items.reduce((s, { book, quantity }) => s + book.priceTTC * quantity, 0)
-    + opGroups.reduce((s, op) =>
-        s + op.books.reduce((ss, { book, quantity }) => ss + book.priceTTC * quantity, 0)
-          + op.plv.pricePerUnit * op.plv.quantity, 0)
+  /* ── Récapitulatif HT (Option A — tout en HT, standard facture diffuseur) ── */
+  const montantHT = subtotalTTC / 1.055          // brut HT avant remise
+  const remiseHT  = remiseAmount / 1.055          // remise en HT (= montantHT − netHT)
 
-  const remiseTotal = items.reduce((s, { book, quantity }) =>
-      s + book.priceTTC * quantity * getUserRate(book.universe), 0)
-    + opGroups.reduce((s, op) =>
-        s + op.books.reduce((ss, { book, quantity }) =>
-            ss + book.priceTTC * quantity * getUserRate(book.universe), 0), 0)
-
-  const netTTC    = subtotalTTC - remiseTotal
-  const netHT     = netTTC / 1.055
-  const tvaCalc   = netTTC - netHT
-  const totalCalc = netTTC
-
+  /* ── Badge remise % (base livres uniquement, hors PLV) ── */
   const booksTTCOnly = items.reduce((s, { book, quantity }) => s + book.priceTTC * quantity, 0)
     + opGroups.reduce((s, op) => s + op.books.reduce((ss, { book, quantity }) => ss + book.priceTTC * quantity, 0), 0)
-  const remisePct = booksTTCOnly > 0 ? (remiseTotal / booksTTCOnly) * 100 : 0
+  const remisePct = booksTTCOnly > 0 ? (remiseAmount / booksTTCOnly) * 100 : 0
 
   const allUniverses = [
     ...items.map(i => i.book.universe),
@@ -983,10 +972,10 @@ export function CartPage() {
       adresseLivraison: fmtAddress(deliveryAddress),
       items,
       subtotalHT: subtotalTTC / 1.055,
-      remiseAmount: remiseTotal,
+      remiseAmount: remiseAmount / 1.055,
       netHT,
-      tva: tvaCalc,
-      totalTTC: totalCalc,
+      tva,
+      totalTTC,
       deliveryMode: delivery,
       deliveryDate: delivery === 'specific' ? specificDate : undefined,
       transmissionMode: localTransmission,
@@ -1096,12 +1085,12 @@ export function CartPage() {
 
         <div style={{ borderTop: '1px solid #eee', marginTop: '12px', paddingTop: '12px' }}>
           <RecapRow><span>Livraison</span><span>{deliveryLabel}</span></RecapRow>
-          <RecapRow><span>Sous-total TTC</span><span>{fmt(subtotalTTC)}</span></RecapRow>
-          <RecapRow><span>Remise</span><span>− {fmt(remiseTotal)}</span></RecapRow>
+          <RecapRow><span>Montant HT</span><span>{fmt(montantHT)}</span></RecapRow>
+          <RecapRow><span>Remise</span><span>− {fmt(remiseHT)}</span></RecapRow>
           <RecapRow><span>Net HT</span><span>{fmt(netHT)}</span></RecapRow>
-          <RecapRow><span>TVA 5,5%</span><span>{fmt(tvaCalc)}</span></RecapRow>
+          <RecapRow><span>TVA 5,5%</span><span>{fmt(tva)}</span></RecapRow>
           <RecapRow style={{ fontWeight: 700, fontSize: '1rem', color: theme.colors.success, paddingTop: '8px' }}>
-            <span>Total TTC</span><span>{fmt(totalCalc)}</span>
+            <span>Total TTC</span><span>{fmt(totalTTC)}</span>
           </RecapRow>
         </div>
       </RecapCard>
@@ -1247,12 +1236,12 @@ export function CartPage() {
               <span>Transmission</span>
               <span>{localTransmission === 'EDI' ? '📡 EDI Dilicom' : '🌐 FlowDiff'}</span>
             </RecapRow>
-            <RecapRow><span>Sous-total TTC</span><span>{fmt(subtotalTTC)}</span></RecapRow>
-            <RecapRow><span>Remise</span><span>− {fmt(remiseTotal)}</span></RecapRow>
+            <RecapRow><span>Montant HT</span><span>{fmt(montantHT)}</span></RecapRow>
+            <RecapRow><span>Remise</span><span>− {fmt(remiseHT)}</span></RecapRow>
             <RecapRow><span>Net HT</span><span>{fmt(netHT)}</span></RecapRow>
-            <RecapRow><span>TVA 5,5%</span><span>{fmt(tvaCalc)}</span></RecapRow>
+            <RecapRow><span>TVA 5,5%</span><span>{fmt(tva)}</span></RecapRow>
             <RecapRow style={{ fontWeight: 700, fontSize: '1rem', color: theme.colors.success, paddingTop: '8px' }}>
-              <span>Total TTC</span><span>{fmt(totalCalc)}</span>
+              <span>Total TTC</span><span>{fmt(totalTTC)}</span>
             </RecapRow>
           </div>
         </RecapCard>
@@ -1321,8 +1310,8 @@ export function CartPage() {
       <SummaryCard>
         <SummaryTitle>Récapitulatif</SummaryTitle>
         <SummaryRow>
-          <SummaryLabel>Sous-total TTC</SummaryLabel>
-          <SummaryValue>{fmt(subtotalTTC)}</SummaryValue>
+          <SummaryLabel>Montant HT</SummaryLabel>
+          <SummaryValue>{fmt(montantHT)}</SummaryValue>
         </SummaryRow>
         <SummaryRow>
           <SummaryLabel>
@@ -1332,7 +1321,7 @@ export function CartPage() {
               : <RemiseBadge>−{remisePct.toFixed(1)}%</RemiseBadge>
             }
           </SummaryLabel>
-          <SummaryValue>− {fmt(remiseTotal)}</SummaryValue>
+          <SummaryValue>− {fmt(remiseHT)}</SummaryValue>
         </SummaryRow>
         <SummaryRow>
           <SummaryLabel>Net HT</SummaryLabel>
@@ -1340,11 +1329,11 @@ export function CartPage() {
         </SummaryRow>
         <SummaryRow>
           <SummaryLabel>TVA 5,5%</SummaryLabel>
-          <SummaryValue>{fmt(tvaCalc)}</SummaryValue>
+          <SummaryValue>{fmt(tva)}</SummaryValue>
         </SummaryRow>
         <SummaryRow $total>
           <SummaryLabel>Total TTC</SummaryLabel>
-          <SummaryValue>{fmt(totalCalc)}</SummaryValue>
+          <SummaryValue>{fmt(totalTTC)}</SummaryValue>
         </SummaryRow>
       </SummaryCard>
 
@@ -1361,7 +1350,6 @@ export function CartPage() {
             const isEbook   = !!ebookOption
             const unitPrice = isEbook ? ebookOption!.price : book.priceTTC
             const remise    = getUserRate(book.universe)
-            const ligneHT   = unitPrice * quantity
 
             const platformColor =
               ebookOption?.hebergeur === 'OpenEdition' ? '#D4500A' :
@@ -1403,16 +1391,16 @@ export function CartPage() {
                     <div>
                       <PriceStrip>
                         <PriceCell>
-                          <PriceCellLabel>Prix TTC</PriceCellLabel>
-                          <PriceCellValue>{fmt(ligneHT)}</PriceCellValue>
+                          <PriceCellLabel>Prix public TTC</PriceCellLabel>
+                          <PriceCellValue>{fmt(unitPrice)}</PriceCellValue>
                         </PriceCell>
                         <PriceCell>
                           <PriceCellLabel>Remise</PriceCellLabel>
                           <PriceCellValue $gold>−{(remise * 100).toFixed(0)} %</PriceCellValue>
                         </PriceCell>
                         <PriceCell>
-                          <PriceCellLabel>Prix TTC remisé</PriceCellLabel>
-                          <PriceCellValue $emphasis>{fmt(ligneHT * (1 - remise))}</PriceCellValue>
+                          <PriceCellLabel>Prix net TTC</PriceCellLabel>
+                          <PriceCellValue $emphasis>{fmt(unitPrice * (1 - remise))}</PriceCellValue>
                         </PriceCell>
                       </PriceStrip>
                     </div>

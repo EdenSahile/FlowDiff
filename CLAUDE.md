@@ -2,10 +2,6 @@
 
 ## ⚠️ RÈGLES ABSOLUES — LIRE EN PREMIER
 
-
-
----
-
 ## Règles de travail en session
 
 ### Avant tout code

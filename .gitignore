@@ -50,3 +50,4 @@ src/**/*.md
 
 # Claude Code — mémoire locale, non versionnée
 .claude/
+.claude/skills/

@@ -7,25 +7,56 @@
 ---
 
 ## État du build
-TS clean · 153 tests passants · dernière session 2026-04-29  
-Feature dashboard complète : sélecteur de période, comparaison N-1, 7 KPI cards dynamiques, graphique, donut, top éditeurs.  
-Feature personnalisation drawer complète : toggle visibilité, réordonnancement drag & drop (desktop) + flèches (mobile), reset, persistance localStorage.  
-Fixes UX drawer : touch targets 44px, icônes SVG (IconGrip, IconLayout), section labels visuels, scroll page background pendant drawer ouvert.  
-Feature réordonnancement sections HomePage complète : flèches ↑↓ au survol de chaque section (Actions · Tableau de bord · Panneaux principaux · Panneaux du bas), persistance localStorage.  
-Feature Feedback Widget complète : FAB bottom-right, panel slide-up, détection de page, envoi via Vercel serverless + Gmail SMTP (nodemailer), 16 tests unitaires.  
-Fixes UX Feedback Widget : icône FAB → croix ✕ droite quand panel ouvert (suppression rotate parasite), bouton ✕ dans le header du panel, bouton Envoyer toujours actif (min. caractères supprimé), spacing sections HomePage 2rem → 2.5rem.  
-Feature Capture d'écran Feedback Widget : html2canvas (dynamic import), capture au clic FAB + spinner, miniature 80×60px cliquable → lightbox plein écran, screenshot JPEG 0.65 joint en pièce jointe dans le mail (api/feedback.ts).  
-Fixes calculs dashboard : badge "Actions en attente" dynamique, nbEnvoyees/nbAnnulees depuis comptes bruts (PeriodKPI +nbActive/nbCancelled), donut garanti à 100% (largest remainder), label "Panier moyen (hors annulées)".  
-Feature Export CSV dashboard : bouton "Exporter CSV" dans le tableau de bord, fichier CSV deux sections (résumé KPIs + détail commandes), séparateur FR, BOM UTF-8, 7 tests unitaires (src/lib/exportCSV.ts).
+TS clean · 161 tests passants · dernière session 2026-05-03 (session 4)  
+**Audit comptable panier complet** — calculs et affichage conformes secteur diffusion livre.
 
 ---
 
-## Session en cours
+## Refonte UI — état des mockups (2026-05-03)
 
-_(aucune session en cours)_
+Choix arrêtés :
+- Direction : **Éditorial Luxe**
+- Typographie : **Open Sans** (toute l'app)
+- Palette : **Ardoise & Champagne** — `#2D3A4A` / `#D4A843` / `#F8F5EE`
+- Approche : **C — Hybride** (design system → 5 pages clés → touches légères sur les 17 autres)
+
+Fichiers mockup : `.superpowers/brainstorm/63208-1777743595/content/`
+
+Pages validées :
+- [x] **HomePage** ✅
+- [x] **Login** ✅
+- [x] **Fonds** ✅
+- [x] **Fiche livre** ✅
+- [ ] **Panier** — mockup à faire
+
+---
+
+## Corrections panier — session 4 (2026-05-03)
+
+Audit comptable réalisé via skills `comptable` + `expert-comptable-flowdiff` :
+
+**Bloc ouvrage (PriceStrip)** :
+- "Prix public TTC" = PP TTC unitaire (référence éditeur)
+- "Remise" = −X%
+- "Prix net TTC" = PP TTC × (1 − remise%) — prix unitaire remisé
+
+**Récapitulatif financier — Option A tout HT** (standard facture diffuseur) :
+- Montant HT = Σ(PP TTC / 1,055 × qté) — brut HT avant remise
+- Remise HT = montantHT × remise%
+- Net HT / TVA 5,5% / Total TTC
+
+**Autres corrections** :
+- `remiseAmount` dans `handleConfirmOrder` corrigé en HT (÷ 1,055), cohérent avec le modèle `Order`
+- Calculs de totaux consolidés vers `useCart()` — suppression de la duplication locale
+- Appliqué sur les 3 vues : panier, étape récap, étape confirmation finale
 
 ---
 
 ## Prochaines étapes
 
-_(aucune étape définie)_
+1. Mockup **Panier** (dernière page manquante)
+2. Écrire le spec dans `docs/superpowers/specs/2026-05-03-refonte-ui-design.md`
+3. Lancer `/writing-plans` pour le plan d'implémentation
+4. Implémentation phase 1 : `theme.ts` + composants UI
+5. Implémentation phase 2 : LoginPage · HomePage · FondsPage · FicheProduitPage · CartPage
+6. Implémentation phase 3 : touches légères sur les 17 autres pages
