@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import styled from 'styled-components'
 import type { Universe } from '@/data/mockBooks'
 import { CURRENT_OFFICE } from '@/data/mockOffices'
+import { theme } from '@/lib/theme'
 import type { OfficeBook } from '@/data/mockOffices'
 import { BookCover } from '@/components/catalogue/BookCover'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
@@ -922,7 +923,7 @@ export function OfficesPage() {
           <FilterSectionLabel>Thématiques :</FilterSectionLabel>
           <FilterTag
             $active={activeFilter === 'Tous'}
-            $color={activeFilter === 'Tous' ? '#232f3e' : '#555550'}
+            $color={activeFilter === 'Tous' ? theme.colors.navy : theme.colors.gray[600]}
             onClick={() => setActiveFilter('Tous')}
           >
             Tous ({office.books.length})
@@ -1143,7 +1144,7 @@ export function OfficesPage() {
                         {b.isbn}
                       </ExportTd>
                       <ExportTd style={{ fontWeight: 500, maxWidth: 220 }}>{b.title}</ExportTd>
-                      <ExportTd style={{ color: '#555550' }}>{b.authors.join(', ')}</ExportTd>
+                      <ExportTd style={{ color: theme.colors.gray[600] }}>{b.authors.join(', ')}</ExportTd>
                       <ExportTd>{b.universe}</ExportTd>
                       <ExportTd>{fmtDate(b.publicationDate)}</ExportTd>
                       <ExportTd style={{ fontFamily: "'DM Mono', monospace", textAlign: 'right' }}>

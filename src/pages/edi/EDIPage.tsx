@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import styled from 'styled-components'
 import { useAuthContext } from '@/contexts/AuthContext'
 import { useEDI } from '@/contexts/EDIContext'
+import { theme } from '@/lib/theme'
 import { useToast } from '@/contexts/ToastContext'
 import { EDIMessageModal } from '@/components/edi/EDIMessageModal'
 import { DesadvGroupedList } from '@/components/edi/DesadvGroupedList'
@@ -1090,7 +1091,7 @@ export function EDIPage() {
       {/* ── Footer EDI ── */}
       <EDIFooter>
         Les échanges EDI sont sécurisés et transitent via Dilicom.{' '}
-        <strong style={{ color: '#232f3e' }}>🏢 DILICOM</strong>
+        <strong style={{ color: theme.colors.navy }}>🏢 DILICOM</strong>
       </EDIFooter>
 
       <EDIMessageModal message={selectedMessage} onClose={() => setSelectedMessage(null)} />

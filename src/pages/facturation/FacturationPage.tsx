@@ -210,7 +210,7 @@ const HeaderCheckbox = styled.input.attrs({ type: 'checkbox' })`
       top: -1px;
       width: 5px;
       height: 9px;
-      border: 2px solid #232f3e;
+      border: 2px solid ${({ theme }) => theme.colors.navy};
       border-top: none;
       border-left: none;
       transform: rotate(45deg);
@@ -227,7 +227,7 @@ const HeaderCheckbox = styled.input.attrs({ type: 'checkbox' })`
       top: 5px;
       width: 7px;
       height: 2px;
-      background: #232f3e;
+      background: ${({ theme }) => theme.colors.navy};
     }
   }
 
