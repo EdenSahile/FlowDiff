@@ -10,9 +10,12 @@ import {
 ───────────────────────────────────────── */
 
 export type PeriodPreset =
+  | 'last-7'
+  | 'last-30'
   | 'this-month'
   | 'last-month'
   | '3-months'
+  | 'last-12'
   | '6-months'
   | 'this-year'
   | 'custom'
@@ -83,6 +86,21 @@ function resolvePreset(preset: PeriodPreset): DateRange {
   const month = today.getMonth()
 
   switch (preset) {
+    case 'last-7':
+      return {
+        start: startOfDay(addDays(today, -6)),
+        end:   endOfDay(today),
+      }
+    case 'last-30':
+      return {
+        start: startOfDay(addDays(today, -29)),
+        end:   endOfDay(today),
+      }
+    case 'last-12':
+      return {
+        start: startOfDay(addDays(today, -364)),
+        end:   endOfDay(today),
+      }
     case 'this-month':
       return {
         start: new Date(year, month, 1),
@@ -200,7 +218,7 @@ export function usePeriodFilter(extraOrders?: DashboardOrder[]): UsePeriodFilter
   const today = new Date().toISOString().slice(0, 10)
   const monthAgo = addDays(new Date(), -30).toISOString().slice(0, 10)
 
-  const [preset, _setPreset]               = useState<PeriodPreset>(stored.preset ?? 'this-month')
+  const [preset, _setPreset]               = useState<PeriodPreset>(stored.preset ?? 'last-30')
   const [compareMode, _setCompareMode]     = useState<CompareMode>(stored.compareMode ?? 'none')
   const [customStart, _setCustomStart]     = useState(stored.customStart ?? monthAgo)
   const [customEnd, _setCustomEnd]         = useState(stored.customEnd ?? today)

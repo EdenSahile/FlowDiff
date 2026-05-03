@@ -29,6 +29,8 @@ export interface Book {
   fictif?: boolean
   statut?: StockStatut  // défaut : 'disponible' ; absent pour les a-paraitre
   delaiReimp?: string  // ex: "2 semaines" | "15 mai 2026" — uniquement pour en_reimp
+  topVente?: boolean
+  selection?: boolean
 }
 
 /* ── Genres par univers ── */
@@ -302,6 +304,7 @@ const _RAW_MOCK_BOOKS: Book[] = [
     price: 4.90, priceTTC: 7.30, format: 'Poche', pages: 192,
     publicationDate: '1942-01-01',
     description: "Roman fondateur de l'absurde, chef-d'œuvre de la littérature française du XXe siècle.",
+    topVente: true,
   },
   {
     id: 'f-lit-02',
@@ -326,6 +329,7 @@ const _RAW_MOCK_BOOKS: Book[] = [
     price: 5.90, priceTTC: 8.80, format: 'Poche', pages: 736,
     publicationDate: '1831-01-01',
     description: "Le roman historique le plus célèbre de Victor Hugo, autour de la cathédrale de Paris.",
+    selection: true,
   },
   {
     id: 'f-lit-miserable',
@@ -441,6 +445,7 @@ const _RAW_MOCK_BOOKS: Book[] = [
     price: 8.70, priceTTC: 12.99, format: 'Album', pages: 64,
     publicationDate: '1960-01-01',
     description: "L'album le plus personnel d'Hergé, une ode à l'amitié dans les sommets himalayens.",
+    topVente: true,
   },
   {
     id: 'f-bd-02',
@@ -453,6 +458,7 @@ const _RAW_MOCK_BOOKS: Book[] = [
     price: 7.30, priceTTC: 10.95, format: 'Album', pages: 48,
     publicationDate: '1966-01-01',
     description: "Astérix traverse la Manche pour prêter main-forte à ses cousins les Bretons.",
+    topVente: true,
   },
   {
     id: 'f-bd-xiii',
@@ -465,6 +471,7 @@ const _RAW_MOCK_BOOKS: Book[] = [
     price: 10.50, priceTTC: 15.99, format: 'Album', pages: 48,
     publicationDate: '1984-01-01',
     description: "Un homme amnésique survit à une tentative de meurtre. Tatoué du chiffre XIII, il cherche à reconstituer son identité.",
+    selection: true,
   },
   {
     id: 'f-bd-spirou',

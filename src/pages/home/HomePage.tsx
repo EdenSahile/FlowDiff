@@ -197,10 +197,10 @@ const Page = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: ${({ theme }) => theme.spacing.xl} ${({ theme }) => theme.spacing.lg};
+  padding: 24px 16px 48px;
 
   @media (min-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    padding: ${({ theme }) => theme.spacing['2xl']} ${({ theme }) => theme.spacing['3xl']};
+    padding: 24px 28px 48px;
   }
 `
 
@@ -209,7 +209,7 @@ const Content = styled.div`
   max-width: 1100px;
   display: flex;
   flex-direction: column;
-  gap: 2.5rem;
+  gap: 24px;
 `
 
 /* ── Greeting row ── */
@@ -220,8 +220,8 @@ const GreetingRow = styled.div`
 `
 
 const GreetingTitle = styled.h1`
-  font-size: 22px;
-  font-weight: 600;
+  font-size: 20px;
+  font-weight: 700;
   color: ${({ theme }) => theme.colors.gray[800]};
   margin: 0;
 `
@@ -233,9 +233,6 @@ const GreetingSub = styled.p`
 `
 
 const DateBlock = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
   text-align: right;
 `
 
@@ -246,14 +243,16 @@ const DateText = styled.div`
 `
 
 const DateLabel = styled.span`
-  font-size: 11px;
+  font-size: 10px;
   color: ${({ theme }) => theme.colors.gray[400]};
+  text-transform: uppercase;
+  letter-spacing: .5px;
   line-height: 1.2;
 `
 
 const DateValue = styled.span`
-  font-size: 15px;
-  font-weight: 500;
+  font-size: 14px;
+  font-weight: 600;
   color: ${({ theme }) => theme.colors.gray[800]};
   line-height: 1.3;
 `
@@ -295,10 +294,10 @@ const CardDragHandle = styled.div`
 
 /* ── Actions en attente ── */
 const ActionsBox = styled.section`
-  background: #FEF2F2;
+  background: #FDECEA;
   border: 1px solid #FECACA;
   border-radius: ${({ theme }) => theme.radii.md};
-  padding: 16px 20px;
+  padding: 16px 18px;
 `
 
 const ActionsHeader = styled.div`
@@ -322,8 +321,8 @@ const ActionsTitleRow = styled.div`
 `
 
 const ActionsTitle = styled.h2`
-  font-size: 15px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 700;
   color: ${({ theme }) => theme.colors.gray[800]};
   margin: 0;
 `
@@ -339,18 +338,19 @@ const ActionsBadge = styled.span`
 `
 
 const ActionsSubtitle = styled.p`
-  font-size: 12px;
-  color: ${({ theme }) => theme.colors.gray[600]};
+  font-size: 11px;
+  color: ${({ theme }) => theme.colors.gray[400]};
   margin: 0;
 `
 
 const SeeAllBtn = styled.button`
   background: white;
   border: 1px solid ${({ theme }) => theme.colors.gray[200]};
-  padding: 7px 14px;
-  font-size: 13px;
+  border-radius: ${({ theme }) => theme.radii.md};
+  padding: 6px 12px;
+  font-size: 12px;
   font-weight: 500;
-  color: ${({ theme }) => theme.colors.gray[800]};
+  color: ${({ theme }) => theme.colors.gray[600]};
   cursor: pointer;
   white-space: nowrap;
   flex-shrink: 0;
@@ -371,7 +371,7 @@ const ActionCard = styled.button<{ $empty?: boolean; $dragging?: boolean; $dropT
   background: white;
   border: 1px solid ${({ $empty, $dropTarget, theme }) =>
     $dropTarget ? theme.colors.navy : $empty ? '#E5E7EB' : '#FEE2E2'};
-  padding: 14px 16px;
+  padding: 12px 14px;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -391,8 +391,8 @@ const ActionCardWrap = styled.div`
 `
 
 const ActionIconWrap = styled.div<{ $bg: string; $color: string }>`
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   border-radius: 8px;
   background: ${({ $bg }) => $bg};
   color: ${({ $color }) => $color};
@@ -400,6 +400,8 @@ const ActionIconWrap = styled.div<{ $bg: string; $color: string }>`
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  font-size: 18px;
+  line-height: 1;
 `
 
 const ActionBody = styled.div`
@@ -407,7 +409,7 @@ const ActionBody = styled.div`
 `
 
 const ActionCount = styled.div`
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 700;
   color: ${({ theme }) => theme.colors.gray[800]};
   line-height: 1.1;
@@ -415,15 +417,15 @@ const ActionCount = styled.div`
 `
 
 const ActionLabel = styled.div`
-  font-size: 12px;
-  color: ${({ theme }) => theme.colors.gray[600]};
+  font-size: 11px;
+  color: ${({ theme }) => theme.colors.gray[400]};
   line-height: 1.3;
 `
 
 const ActionDeadline = styled.div`
-  font-size: 11px;
+  font-size: 10px;
   color: ${({ theme }) => theme.colors.error};
-  font-weight: 500;
+  font-weight: 600;
   margin-top: 2px;
   line-height: 1.2;
 `
@@ -448,7 +450,7 @@ const BilanHeader = styled.div`
 
 const BilanTitle = styled.h2`
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 700;
   color: ${({ theme }) => theme.colors.gray[800]};
   margin: 0;
   white-space: nowrap;
@@ -465,22 +467,24 @@ const DashboardControls = styled.div`
   }
 `
 
-const CustomizeBtn = styled.button`
+const CustomizeBtn = styled.button<{ $primary?: boolean }>`
   display: flex;
   align-items: center;
-  gap: 6px;
-  background: none;
-  border: 1px solid ${({ theme }) => theme.colors.gray[200]};
-  padding: 7px 12px;
-  font-size: 13px;
-  font-weight: 500;
-  color: ${({ theme }) => theme.colors.gray[600]};
+  gap: 5px;
+  background: ${({ $primary, theme }) => $primary ? theme.colors.navy : 'white'};
+  border: 1px solid ${({ $primary, theme }) => $primary ? theme.colors.navy : theme.colors.gray[200]};
+  border-radius: ${({ theme }) => theme.radii.md};
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: ${({ $primary }) => $primary ? 600 : 500};
+  color: ${({ $primary, theme }) => $primary ? '#fff' : theme.colors.gray[600]};
   cursor: pointer;
   white-space: nowrap;
   flex-shrink: 0;
   &:hover {
-    border-color: ${({ theme }) => theme.colors.gray[400]};
-    color: ${({ theme }) => theme.colors.gray[800]};
+    background: ${({ $primary, theme }) => $primary ? theme.colors.primaryHover : 'white'};
+    border-color: ${({ $primary, theme }) => $primary ? theme.colors.primaryHover : theme.colors.navy};
+    color: ${({ $primary, theme }) => $primary ? '#fff' : theme.colors.navy};
   }
 `
 
@@ -498,19 +502,17 @@ const KPICard = styled.div<{ $dragging?: boolean; $dropTarget?: boolean }>`
   background: white;
   border: 1px solid ${({ $dropTarget, theme }) =>
     $dropTarget ? theme.colors.navy : theme.colors.gray[200]};
-  border-radius: ${({ theme }) => theme.radii.lg};
-  padding: 18px 16px 14px;
+  border-radius: ${({ theme }) => theme.radii.md};
+  padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 8px;
   position: relative;
   opacity: ${({ $dragging }) => $dragging ? 0.4 : 1};
-  box-shadow: 0 1px 4px rgba(0,0,0,.07), 0 4px 12px rgba(0,0,0,.05);
-  transition: opacity 0.1s, border-color 0.1s, transform 0.15s, box-shadow 0.15s;
+  transition: opacity 0.1s, border-color 0.1s, box-shadow 0.15s;
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 2px 8px rgba(0,0,0,.09), 0 6px 20px rgba(0,0,0,.07);
+    box-shadow: 0 1px 4px rgba(0,0,0,.07), 0 4px 12px rgba(0,0,0,.05);
   }
   &:hover ${CardDragHandle} { opacity: 1; }
 `
@@ -522,8 +524,8 @@ const KPITop = styled.div`
 `
 
 const KPIIconWrap = styled.div<{ $bg: string; $color: string }>`
-  width: 38px;
-  height: 38px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   background: ${({ $bg }) => $bg};
   color: ${({ $color }) => $color};
@@ -531,18 +533,20 @@ const KPIIconWrap = styled.div<{ $bg: string; $color: string }>`
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  font-size: 16px;
+  line-height: 1;
 `
 
 const KPILabel = styled.div`
-  font-size: 12px;
+  font-size: 11px;
   color: ${({ theme }) => theme.colors.gray[600]};
   line-height: 1.3;
 `
 
 const KPIValue = styled.div`
-  font-size: 26px;
+  font-size: 24px;
   font-weight: 700;
-  color: ${({ theme }) => theme.colors.gray[800]};
+  color: ${({ theme }) => theme.colors.navy};
   line-height: 1.1;
 `
 
@@ -551,20 +555,16 @@ const KPITrend = styled.div<{ $up: boolean }>`
   align-items: center;
   gap: 3px;
   font-size: 11px;
-  font-weight: 600;
   color: ${({ $up }) => $up ? '#16a34a' : '#DC2626'};
-  background: ${({ $up }) => $up ? '#E6F2EC' : '#FDECEA'};
-  padding: 2px 7px;
-  border-radius: ${({ theme }) => theme.radii.full};
-  align-self: flex-start;
 `
 
 const KPILink = styled.button`
   background: none;
   border: none;
   padding: 0;
-  font-size: 12px;
-  color: ${({ theme }) => theme.colors.success};
+  font-size: 11px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.accent};
   cursor: pointer;
   text-align: left;
   margin-top: 2px;
@@ -633,8 +633,8 @@ const SectionLabel = styled.p`
 
 const FAB = styled.button`
   position: fixed;
-  bottom: calc(${({ theme }) => theme.layout.bottomNavHeight} + 16px);
-  right: 20px;
+  bottom: 24px;
+  right: 24px;
   width: 52px;
   height: 52px;
   border-radius: 50%;
@@ -642,22 +642,17 @@ const FAB = styled.button`
   color: #fff;
   border: none;
   cursor: pointer;
-  font-size: 24px;
-  line-height: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 16px rgba(45,58,74,0.35);
-  transition: transform 0.15s, box-shadow 0.15s;
-  z-index: 100;
-
-  @media (min-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    display: none;
-  }
+  box-shadow: 0 4px 16px rgba(45,58,74,0.35), 0 2px 8px rgba(0,0,0,0.12);
+  transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+  z-index: 1000;
 
   &:hover {
     transform: scale(1.08);
-    box-shadow: 0 6px 24px rgba(45,58,74,0.45);
+    background: ${({ theme }) => theme.colors.primaryHover};
+    box-shadow: 0 6px 24px rgba(45,58,74,0.45), 0 3px 12px rgba(0,0,0,0.15);
   }
 `
 
@@ -669,8 +664,8 @@ const PanelHeader = styled.div`
 `
 
 const PanelTitle = styled.h3`
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 700;
   color: ${({ theme }) => theme.colors.gray[800]};
   margin: 0;
   display: flex;
@@ -682,12 +677,12 @@ const PanelSeeAll = styled.button`
   background: none;
   border: none;
   padding: 0;
-  font-size: 12px;
-  font-weight: 500;
-  color: ${({ theme }) => theme.colors.gray[600]};
+  font-size: 11px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.accent};
   cursor: pointer;
   white-space: nowrap;
-  &:hover { color: ${({ theme }) => theme.colors.navy}; }
+  &:hover { opacity: .75; }
 `
 
 /* ── Évolution des commandes (dynamique) ── */
@@ -825,6 +820,8 @@ const ChartStatIcon = styled.div<{ $bg: string; $color: string }>`
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  font-size: 13px;
+  line-height: 1;
 `
 
 const ChartStatNum = styled.span`
@@ -1129,6 +1126,8 @@ const EdiStatIcon = styled.div<{ $bg: string; $color: string }>`
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  font-size: 16px;
+  line-height: 1;
 `
 
 const EdiStatNum = styled.div`
@@ -1254,6 +1253,8 @@ const ShortcutIconWrap = styled.div`
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  font-size: 18px;
+  line-height: 1;
 `
 
 const ShortcutRowLabel = styled.span`
@@ -1279,6 +1280,12 @@ const SectionControls = styled.div`
   right: 0;
   display: flex;
   gap: 2px;
+  opacity: 0;
+  transition: opacity .2s;
+
+  ${SectionWrap}:hover & {
+    opacity: 1;
+  }
 `
 
 const SectionArrowBtn = styled.button<{ $disabled?: boolean }>`
@@ -1298,6 +1305,140 @@ const SectionArrowBtn = styled.button<{ $disabled?: boolean }>`
     border-color: ${({ theme }) => theme.colors.gray[400]};
     color: ${({ theme }) => theme.colors.gray[800]};
   }
+`
+
+/* ── Ghost cards (emplacements libres) ── */
+const GhostRow = styled.div`
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+`
+
+const GhostCard = styled.div`
+  flex: 1;
+  background: rgba(255,255,255,.5);
+  border: 1.5px dashed ${({ theme }) => theme.colors.gray[200]};
+  border-radius: ${({ theme }) => theme.radii.md};
+  padding: 14px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  opacity: .5;
+  transition: opacity .2s, border-color .2s, background .2s;
+  min-height: 68px;
+  &:hover {
+    opacity: .8;
+    border-color: ${({ theme }) => theme.colors.accent};
+    background: rgba(212,168,67,.05);
+  }
+`
+
+const GhostCardIcon = styled.div`
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  background: ${({ theme }) => theme.colors.gray[100]};
+  color: ${({ theme }) => theme.colors.gray[200]};
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 300; flex-shrink: 0;
+  transition: background .2s, color .2s;
+  ${GhostCard}:hover & {
+    background: rgba(212,168,67,.15);
+    color: ${({ theme }) => theme.colors.accent};
+  }
+`
+
+const GhostCardLabel = styled.span`
+  font-size: 11px;
+  color: ${({ theme }) => theme.colors.gray[400]};
+`
+
+const GhostKpiCard = styled.div`
+  flex: 1;
+  background: rgba(255,255,255,.5);
+  border: 1.5px dashed ${({ theme }) => theme.colors.gray[200]};
+  border-radius: ${({ theme }) => theme.radii.md};
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  opacity: .45;
+  transition: opacity .2s, border-color .2s, background .2s;
+  min-height: 100px;
+  &:hover {
+    opacity: .75;
+    border-color: ${({ theme }) => theme.colors.accent};
+    background: rgba(212,168,67,.04);
+  }
+`
+
+const GhostKpiIcon = styled.div`
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: ${({ theme }) => theme.colors.gray[100]};
+  color: ${({ theme }) => theme.colors.gray[200]};
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 300;
+  transition: background .2s, color .2s;
+  ${GhostKpiCard}:hover & {
+    background: rgba(212,168,67,.15);
+    color: ${({ theme }) => theme.colors.accent};
+  }
+`
+
+const GhostKpiLabel = styled.span`
+  font-size: 11px;
+  color: ${({ theme }) => theme.colors.gray[400]};
+`
+
+const GhostPanel = styled.div`
+  background: rgba(255,255,255,.45);
+  border: 1.5px dashed ${({ theme }) => theme.colors.gray[200]};
+  border-radius: ${({ theme }) => theme.radii.md};
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  opacity: .45;
+  min-height: 120px;
+  transition: opacity .2s, border-color .2s, background .2s;
+  &:hover {
+    opacity: .75;
+    border-color: ${({ theme }) => theme.colors.accent};
+    background: rgba(212,168,67,.04);
+  }
+`
+
+const GhostPanelIcon = styled.div`
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: ${({ theme }) => theme.colors.gray[100]};
+  color: ${({ theme }) => theme.colors.gray[200]};
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; font-weight: 300;
+  transition: background .2s, color .2s;
+  ${GhostPanel}:hover & {
+    background: rgba(212,168,67,.15);
+    color: ${({ theme }) => theme.colors.accent};
+  }
+`
+
+const GhostPanelLabel = styled.span`
+  font-size: 12px;
+  color: ${({ theme }) => theme.colors.gray[400]};
+`
+
+const MiniPrice = styled.div`
+  font-size: 11px;
+  font-weight: 700;
+  color: ${({ theme }) => theme.colors.accent};
+  margin-top: 3px;
 `
 
 /* ── KPI trend helper ── */
@@ -1371,7 +1512,7 @@ export function HomePage() {
   const greeting = hour < 12 ? 'Bonjour' : hour < 18 ? 'Bon après-midi' : 'Bonsoir'
 
   const dateLabel = 'Aujourd\'hui'
-  const dateValue = now.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+  const dateValue = now.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
 
   const extraDashboardOrders = useMemo(
     () => userOrders.flatMap(orderToDashboardOrders),
@@ -1480,14 +1621,14 @@ export function HomePage() {
 
   const actionCardDefs: Record<string, ActionCardDef> = {
     'action-offices': {
-      icon: <IconPackage />,
-      iconBg: '#F0FDF4', iconColor: '#16A34A',
+      icon: '📦',
+      iconBg: '#E6F2EC', iconColor: '#226241',
       count: 1, label: 'office à valider',
-      deadline: 'Limite : 13 mai 2026',
+      deadline: 'Limite : 13 mai',
       route: '/offices',
     },
     'action-panier': {
-      icon: <IconOrders />,
+      icon: '🛒',
       iconBg: cartCount === 0 ? '#F3F4F6' : '#FFF7ED',
       iconColor: cartCount === 0 ? '#9CA3AF' : '#EA580C',
       count: cartCount,
@@ -1496,19 +1637,19 @@ export function HomePage() {
       empty: cartCount === 0,
     },
     'action-commandes': {
-      icon: <IconReceipt />,
+      icon: '📋',
       iconBg: '#FFFBEB', iconColor: '#D97706',
       count: 2, label: 'commandes à vérifier',
       route: '/edi?filter=ORDRSP',
     },
     'action-edi-error': {
-      icon: <IconAlertClock />,
-      iconBg: '#FEF2F2', iconColor: '#DC2626',
+      icon: '⚠️',
+      iconBg: '#FDECEA', iconColor: '#C0392B',
       count: 1, label: 'erreur EDI à corriger',
       route: '/edi',
     },
     'action-expeditions': {
-      icon: <IconTruck />,
+      icon: '🚚',
       iconBg: '#EFF6FF', iconColor: '#2563EB',
       count: 3, label: 'expéditions en retard',
       route: '/edi?filter=DESADV',
@@ -1525,8 +1666,8 @@ export function HomePage() {
 
   const kpiCardDefs: Record<string, KpiCardDef> = {
     'kpi-commandes': {
-      icon: <IconCart />,
-      iconBg: '#DCFCE7', iconColor: '#16a34a',
+      icon: '🛒',
+      iconBg: '#E6F2EC', iconColor: '#226241',
       label: 'Commandes passées',
       value: kpi.nbCommandes,
       trend: compareKpi
@@ -1535,8 +1676,8 @@ export function HomePage() {
       link: <KPILink onClick={() => navigate('/historique')}>Voir le détail →</KPILink>,
     },
     'kpi-montant': {
-      icon: <IconEuro />,
-      iconBg: '#DCFCE7', iconColor: '#16a34a',
+      icon: '€',
+      iconBg: '#E6F2EC', iconColor: '#226241',
       label: 'Montant total commandé (TTC)',
       value: fmtEur(kpi.montantTotal),
       trend: compareKpi
@@ -1545,8 +1686,8 @@ export function HomePage() {
       link: <KPILink onClick={() => navigate('/historique')}>Voir le détail →</KPILink>,
     },
     'kpi-exemplaires': {
-      icon: <IconBox />,
-      iconBg: '#DCFCE7', iconColor: '#16a34a',
+      icon: '📦',
+      iconBg: '#E6F2EC', iconColor: '#226241',
       label: 'Exemplaires commandés',
       value: kpi.nbExemplaires.toLocaleString('fr-FR'),
       trend: compareKpi
@@ -1555,7 +1696,7 @@ export function HomePage() {
       link: <KPILink onClick={() => navigate('/historique')}>Voir le détail →</KPILink>,
     },
     'kpi-panier-moyen': {
-      icon: <IconBarChart />,
+      icon: '📊',
       iconBg: '#EDE9FE', iconColor: '#7C3AED',
       label: 'Panier moyen (hors annulées)',
       value: fmtEur(kpi.panierMoyen),
@@ -1565,7 +1706,7 @@ export function HomePage() {
       link: <KPILink onClick={() => navigate('/historique')}>Voir le détail →</KPILink>,
     },
     'kpi-delai': {
-      icon: <IconAlertClock />,
+      icon: '⏱',
       iconBg: '#FFF7ED', iconColor: '#EA580C',
       label: 'Délai moyen de livraison',
       value: `${kpi.delaiMoyen.toFixed(1).replace('.', ',')} j`,
@@ -1574,8 +1715,8 @@ export function HomePage() {
         : undefined,
     },
     'kpi-rupture': {
-      icon: <IconXCircle />,
-      iconBg: '#FEE2E2', iconColor: '#DC2626',
+      icon: '✕',
+      iconBg: '#FDECEA', iconColor: '#C0392B',
       label: 'Taux de rupture',
       value: `${(kpi.tauxRupture * 100).toFixed(1).replace('.', ',')} %`,
       trend: compareKpi
@@ -1583,7 +1724,7 @@ export function HomePage() {
         : undefined,
     },
     'kpi-references': {
-      icon: <IconBooks />,
+      icon: '📚',
       iconBg: '#EFF6FF', iconColor: '#2563EB',
       label: 'Références distinctes',
       value: kpi.nbReferences.toLocaleString('fr-FR'),
@@ -1613,7 +1754,6 @@ export function HomePage() {
               <DateLabel>{dateLabel}</DateLabel>
               <DateValue>{dateValue}</DateValue>
             </DateText>
-            <IconCalendar />
           </DateBlock>
         </GreetingRow>
 
@@ -1663,9 +1803,9 @@ export function HomePage() {
                 <ActionsTitle>Actions en attente</ActionsTitle>
                 <ActionsBadge>{totalActionCount}</ActionsBadge>
               </ActionsTitleRow>
-              <ActionsSubtitle>Ce sont des éléments qui nécessitent votre attention.</ActionsSubtitle>
+              <ActionsSubtitle>Éléments nécessitant votre attention</ActionsSubtitle>
             </ActionsLeft>
-            <SeeAllBtn onClick={() => navigate('/historique')}>Voir toutes les actions →</SeeAllBtn>
+            <SeeAllBtn onClick={() => navigate('/historique')}>Voir tout →</SeeAllBtn>
           </ActionsHeader>
           <ActionsGrid>
             {dashConfig.config.actionCards
@@ -1706,6 +1846,11 @@ export function HomePage() {
               })
             }
           </ActionsGrid>
+          <GhostRow>
+            <GhostCard><GhostCardIcon>+</GhostCardIcon><GhostCardLabel>Emplacement libre</GhostCardLabel></GhostCard>
+            <GhostCard><GhostCardIcon>+</GhostCardIcon><GhostCardLabel>Emplacement libre</GhostCardLabel></GhostCard>
+            <GhostCard><GhostCardIcon>+</GhostCardIcon><GhostCardLabel>Emplacement libre</GhostCardLabel></GhostCard>
+          </GhostRow>
         </ActionsBox>
         </SectionWrap>
           )
@@ -1740,7 +1885,7 @@ export function HomePage() {
               }>
                 <IconDownload /> Exporter CSV
               </CustomizeBtn>
-              <CustomizeBtn type="button" onClick={() => setCustomizerOpen(true)}>
+              <CustomizeBtn $primary type="button" onClick={() => setCustomizerOpen(true)}>
                 <IconLayout /> Personnaliser
               </CustomizeBtn>
             </DashboardControls>
@@ -1778,7 +1923,15 @@ export function HomePage() {
                 )
               })
             }
+            <GhostKpiCard>
+              <GhostKpiIcon>+</GhostKpiIcon>
+              <GhostKpiLabel>Emplacement libre</GhostKpiLabel>
+            </GhostKpiCard>
           </KPIGrid>
+          <GhostRow style={{ marginTop: '12px' }}>
+            <GhostKpiCard><GhostKpiIcon>+</GhostKpiIcon><GhostKpiLabel>Emplacement libre</GhostKpiLabel></GhostKpiCard>
+            <GhostKpiCard><GhostKpiIcon>+</GhostKpiIcon><GhostKpiLabel>Emplacement libre</GhostKpiLabel></GhostKpiCard>
+          </GhostRow>
         </BilanSection>
         </SectionWrap>
           )
@@ -1806,13 +1959,7 @@ export function HomePage() {
                     <IconGrip />
                   </CardDragHandle>
                   <PanelHeader>
-                    <div>
-                      <PanelEyebrow>Statistiques</PanelEyebrow>
-                      <PanelTitle>
-                        Évolution des commandes
-                        <IconCalendar />
-                      </PanelTitle>
-                    </div>
+                    <PanelTitle>📈 Évolution des commandes</PanelTitle>
                   </PanelHeader>
                   {compareChartData && (
                     <ChartLegend>
@@ -1834,7 +1981,7 @@ export function HomePage() {
                       <ChartStatRow>
                         <ChartStatLabel>Commandes envoyées</ChartStatLabel>
                         <ChartStatValueRow>
-                          <ChartStatIcon $bg="#DCFCE7" $color="#16a34a"><IconSend /></ChartStatIcon>
+                          <ChartStatIcon $bg="#E6F2EC" $color="#226241">↑</ChartStatIcon>
                           <ChartStatNum>{nbEnvoyees}</ChartStatNum>
                           {cmpEnvoyees !== null && (
                             <ChartStatDelta $up={nbEnvoyees >= cmpEnvoyees}>
@@ -1849,7 +1996,7 @@ export function HomePage() {
                       <ChartStatRow>
                         <ChartStatLabel>Commandes annulées</ChartStatLabel>
                         <ChartStatValueRow>
-                          <ChartStatIcon $bg="#FEE2E2" $color="#DC2626"><IconXCircle /></ChartStatIcon>
+                          <ChartStatIcon $bg="#FDECEA" $color="#C0392B">✕</ChartStatIcon>
                           <ChartStatNum>{nbAnnulees}</ChartStatNum>
                           {cmpAnnulees !== null && (
                             <ChartStatDelta $up={nbAnnulees <= cmpAnnulees}>
@@ -1864,7 +2011,7 @@ export function HomePage() {
                       <ChartStatRow>
                         <ChartStatLabel>Taux d'annulation</ChartStatLabel>
                         <ChartStatValueRow>
-                          <ChartStatIcon $bg="#FEE2E2" $color="#DC2626"><IconXCircle /></ChartStatIcon>
+                          <ChartStatIcon $bg="#FDECEA" $color="#C0392B">%</ChartStatIcon>
                           <ChartStatNum>{(kpi.tauxRupture * 100).toFixed(1).replace('.', ',')} %</ChartStatNum>
                           {compareKpi && (
                             <ChartStatDelta $up={kpi.tauxRupture <= compareKpi.tauxRupture}>
@@ -1893,7 +2040,7 @@ export function HomePage() {
                     <IconGrip />
                   </CardDragHandle>
                   <PanelHeader>
-                    <PanelTitle>Répartition de vos achats</PanelTitle>
+                    <PanelTitle>🍩 Répartition achats</PanelTitle>
                   </PanelHeader>
                   <DonutInner>
                     <ChartDonut main={donutData} compare={compareDonutData} />
@@ -1930,7 +2077,7 @@ export function HomePage() {
                     <IconGrip />
                   </CardDragHandle>
                   <PanelHeader>
-                    <PanelTitle>Top éditeurs</PanelTitle>
+                    <PanelTitle>🏅 Top éditeurs</PanelTitle>
                     <PanelSeeAll onClick={() => navigate('/fonds')}>Voir tout →</PanelSeeAll>
                   </PanelHeader>
                   <TopEdList>
@@ -1953,6 +2100,11 @@ export function HomePage() {
             })
           }
         </ThreeColRow>
+          <div style={{ display: 'grid', gridTemplateColumns: '45fr 30fr 25fr', gap: '14px', marginTop: '12px' }}>
+            <GhostPanel><GhostPanelIcon>+</GhostPanelIcon><GhostPanelLabel>Emplacement libre</GhostPanelLabel></GhostPanel>
+            <GhostPanel><GhostPanelIcon>+</GhostPanelIcon><GhostPanelLabel>Emplacement libre</GhostPanelLabel></GhostPanel>
+            <GhostPanel><GhostPanelIcon>+</GhostPanelIcon><GhostPanelLabel>Emplacement libre</GhostPanelLabel></GhostPanel>
+          </div>
         </SectionWrap>
           )
 
@@ -1979,35 +2131,36 @@ export function HomePage() {
                     <IconGrip />
                   </CardDragHandle>
                   <PanelHeader>
-                    <PanelTitle>Suivi des flux EDI</PanelTitle>
+                    <PanelTitle>🔗 Suivi des flux EDI</PanelTitle>
+                    <PanelSeeAll onClick={() => navigate('/edi')}>Accéder →</PanelSeeAll>
                   </PanelHeader>
                   <EdiStatsGrid>
                     <EdiStatItem>
-                      <EdiStatIcon $bg="#DCFCE7" $color="#16a34a"><IconSend /></EdiStatIcon>
+                      <EdiStatIcon $bg="#E6F2EC" $color="#226241">↑</EdiStatIcon>
                       <div>
                         <EdiStatNum>12</EdiStatNum>
                         <EdiStatLabel>Commandes envoyées</EdiStatLabel>
                       </div>
                     </EdiStatItem>
                     <EdiStatItem>
-                      <EdiStatIcon $bg="#EFF6FF" $color="#2563EB"><IconTruck /></EdiStatIcon>
+                      <EdiStatIcon $bg="#EFF6FF" $color="#2563EB">🚚</EdiStatIcon>
                       <div>
                         <EdiStatNum>5</EdiStatNum>
                         <EdiStatLabel>Expéditions en cours</EdiStatLabel>
                       </div>
                     </EdiStatItem>
                     <EdiStatItem>
-                      <EdiStatIcon $bg="#FFF7ED" $color="#EA580C"><IconReceipt /></EdiStatIcon>
+                      <EdiStatIcon $bg="#FFF7ED" $color="#EA580C">📄</EdiStatIcon>
                       <div>
                         <EdiStatNum>3</EdiStatNum>
                         <EdiStatLabel>Factures reçues</EdiStatLabel>
                       </div>
                     </EdiStatItem>
                     <EdiStatItem>
-                      <EdiStatIcon $bg="#FEF2F2" $color="#DC2626"><IconXCircle /></EdiStatIcon>
+                      <EdiStatIcon $bg="#FDECEA" $color="#C0392B">⚠️</EdiStatIcon>
                       <div>
                         <EdiStatNum>1</EdiStatNum>
-                        <EdiStatLabel>Erreur EDI</EdiStatLabel>
+                        <EdiStatLabel>Erreur à traiter</EdiStatLabel>
                       </div>
                     </EdiStatItem>
                   </EdiStatsGrid>
@@ -2039,10 +2192,7 @@ export function HomePage() {
                     <IconGrip />
                   </CardDragHandle>
                   <PanelHeader>
-                    <div>
-                      <PanelEyebrow>Catalogue</PanelEyebrow>
-                      <PanelTitle>Nouveautés du mois</PanelTitle>
-                    </div>
+                    <PanelTitle>✨ Nouveautés du mois</PanelTitle>
                     <PanelSeeAll onClick={() => navigate('/nouveautes')}>Voir tout →</PanelSeeAll>
                   </PanelHeader>
                   <NovelPanelWrap>
@@ -2071,6 +2221,7 @@ export function HomePage() {
                             </UniverseBadge>
                             <MiniTitle>{book.title}</MiniTitle>
                             <MiniAuthor>{book.authors[0]}</MiniAuthor>
+                            <MiniPrice>{book.priceTTC.toFixed(2).replace('.', ',')} €</MiniPrice>
                           </MiniCard>
                         )
                       })}
@@ -2093,17 +2244,14 @@ export function HomePage() {
                     <IconGrip />
                   </CardDragHandle>
                   <PanelHeader>
-                    <div>
-                      <PanelEyebrow>Navigation rapide</PanelEyebrow>
-                      <PanelTitle>Raccourcis</PanelTitle>
-                    </div>
+                    <PanelTitle>⚡ Raccourcis</PanelTitle>
                   </PanelHeader>
                   <ShortcutList>
                     {([
-                      { icon: <IconPackage />, label: 'Passer une commande',    to: '/fonds'      },
-                      { icon: <IconCart />,    label: 'Accéder au panier',       to: '/panier'     },
-                      { icon: <IconClipboard />, label: 'Gérer mes listes',      to: '/compte'     },
-                      { icon: <IconOrders />, label: 'Consulter mon historique', to: '/historique' },
+                      { icon: '📦', label: 'Passer une commande',    to: '/fonds'      },
+                      { icon: '🛒', label: 'Accéder au panier',       to: '/panier'     },
+                      { icon: '📋', label: 'Gérer mes listes',        to: '/compte'     },
+                      { icon: '📊', label: 'Consulter mon historique', to: '/historique' },
                     ] as { icon: React.ReactNode; label: string; to: string }[]).map(({ icon, label, to }) => (
                       <ShortcutRow key={to} to={to}>
                         <ShortcutIconWrap>{icon}</ShortcutIconWrap>
@@ -2118,6 +2266,11 @@ export function HomePage() {
             })
           }
         </ThreeColRow>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '14px', marginTop: '12px' }}>
+            <GhostPanel><GhostPanelIcon>+</GhostPanelIcon><GhostPanelLabel>Emplacement libre</GhostPanelLabel></GhostPanel>
+            <GhostPanel><GhostPanelIcon>+</GhostPanelIcon><GhostPanelLabel>Emplacement libre</GhostPanelLabel></GhostPanel>
+            <GhostPanel><GhostPanelIcon>+</GhostPanelIcon><GhostPanelLabel>Emplacement libre</GhostPanelLabel></GhostPanel>
+          </div>
         </SectionWrap>
           )
 
@@ -2128,8 +2281,8 @@ export function HomePage() {
         <ReminderCard>
           <ReminderIcon>📅</ReminderIcon>
           <ReminderText>
-            <strong>Catalogue À paraître disponible</strong>
-            <p>Consultez les nouveaux titres prévus. Commandes auprès de votre représentant.</p>
+            <strong>Catalogue À paraître — Été 2026 disponible</strong>
+            <p>Consultez les 127 nouveaux titres prévus pour juin–août 2026. Commandes auprès de votre représentant.</p>
           </ReminderText>
           <ReminderBtn onClick={() => navigate('/a-paraitre')}>
             Voir le catalogue
@@ -2147,7 +2300,11 @@ export function HomePage() {
 
       </Content>
 
-      <FAB aria-label="Nouvelle commande rapide" onClick={() => navigate('/fonds')}>＋</FAB>
+      <FAB title="Donner un feedback" aria-label="Ouvrir le formulaire de feedback" onClick={() => navigate('/contact')}>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+      </FAB>
 
     </Page>
   )

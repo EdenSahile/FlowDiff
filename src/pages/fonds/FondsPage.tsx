@@ -1,6 +1,7 @@
 import { useState, useDeferredValue, useMemo } from 'react'
 import styled from 'styled-components'
 import { BookCard } from '@/components/catalogue/BookCard'
+import { BookCardRow } from '@/components/catalogue/BookCardRow'
 import { UniverseFilter } from '@/components/catalogue/UniverseFilter'
 import { getBooksByType, searchBooks } from '@/data/mockBooks'
 import type { Universe, StockStatut } from '@/data/mockBooks'
@@ -21,9 +22,14 @@ const Page = styled.div`
   margin: 0 auto;
 `
 
-const PageHeader = styled.div`
+const PageHeaderRow = styled.div`
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
   margin-bottom: ${({ theme }) => theme.spacing.lg};
 `
+
+const PageHeaderText = styled.div``
 
 const PageTitle = styled.h1`
   font-family: ${({ theme }) => theme.typography.fontFamily};
@@ -38,6 +44,32 @@ const PageSubtitle = styled.p`
   font-size: ${({ theme }) => theme.typography.sizes.sm};
   color: ${({ theme }) => theme.colors.gray[600]};
   margin: 0;
+`
+
+const ViewToggle = styled.div`
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  margin-top: 6px;
+`
+
+const ViewBtn = styled.button<{ $active: boolean }>`
+  width: 36px;
+  height: 36px;
+  border-radius: ${({ theme }) => theme.radii.md};
+  border: 1px solid ${({ $active, theme }) => $active ? theme.colors.navy : theme.colors.gray[200]};
+  background: ${({ $active, theme }) => $active ? theme.colors.navy : theme.colors.white};
+  color: ${({ $active, theme }) => $active ? '#fff' : theme.colors.gray[400]};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+
+  &:hover {
+    border-color: ${({ theme }) => theme.colors.navy};
+    color: ${({ $active, theme }) => $active ? '#fff' : theme.colors.navy};
+  }
 `
 
 const Controls = styled.div`
@@ -106,6 +138,19 @@ const ResultsCount = styled.p`
     font-weight: 700;
     color: ${({ theme }) => theme.colors.gray[800]};
   }
+
+  span {
+    color: ${({ theme }) => theme.colors.gray[400]};
+  }
+`
+
+const SortWrap = styled.label`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 12.5px;
+  color: ${({ theme }) => theme.colors.gray[600]};
 `
 
 const SortSelect = styled.select`
@@ -166,12 +211,18 @@ const Grid = styled.div`
   }
 
   @media (min-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   }
 
   @media (min-width: 1024px) {
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
   }
+`
+
+const ListStack = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 `
 
 const EmptyState = styled.div`
@@ -180,40 +231,66 @@ const EmptyState = styled.div`
   color: ${({ theme }) => theme.colors.gray[400]};
   font-family: ${({ theme }) => theme.typography.fontFamily};
   font-size: ${({ theme }) => theme.typography.sizes.sm};
-
-  &::before {
-    content: '🔍';
-    display: block;
-    font-size: 2.5rem;
-    margin-bottom: 12px;
-  }
 `
 
 const SearchWrapper = styled.div`
   position: relative;
 
   input {
-    padding-left: 42px;
+    padding-left: 40px;
   }
 `
 
 const SearchIcon = styled.span`
   position: absolute;
-  left: 14px;
+  left: 13px;
   top: 50%;
   transform: translateY(-50%);
   color: ${({ theme }) => theme.colors.gray[400]};
-  font-size: 1rem;
+  display: flex;
+  align-items: center;
   pointer-events: none;
 `
 
+function IconSearch() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="11" cy="11" r="8"/>
+      <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+    </svg>
+  )
+}
+
+function IconGrid() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+      <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+    </svg>
+  )
+}
+
+function IconList() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/>
+      <line x1="8" y1="18" x2="21" y2="18"/>
+      <line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/>
+      <line x1="3" y1="18" x2="3.01" y2="18"/>
+    </svg>
+  )
+}
+
 type SortKey = 'pertinence' | 'titre' | 'prix_asc' | 'prix_desc'
+type ViewMode = 'grid' | 'list'
 
 export function FondsPage() {
   const [query, setQuery]       = useState('')
   const [universe, setUniverse] = useState<Universe | null>(null)
   const [statut, setStatut]     = useState<StockStatut | null>(null)
   const [sort, setSort]         = useState<SortKey>('pertinence')
+  const [view, setView]         = useState<ViewMode>('grid')
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const deferred = useDeferredValue(query)
 
   const sorted = useMemo(() => {
@@ -230,17 +307,39 @@ export function FondsPage() {
     return books
   }, [deferred, universe, statut, sort])
 
+  const contextLabel = universe ? ` · ${universe}` : ' · toutes thématiques'
+
   return (
     <Page>
-      <PageHeader>
-        <PageEyebrow>Catalogue</PageEyebrow>
-        <PageTitle>Fonds</PageTitle>
-        <PageSubtitle>Titres déjà parus, disponibles à la commande immédiate</PageSubtitle>
-      </PageHeader>
+      <PageHeaderRow>
+        <PageHeaderText>
+          <PageEyebrow>Catalogue</PageEyebrow>
+          <PageTitle>Fonds</PageTitle>
+          <PageSubtitle>Titres déjà parus, disponibles à la commande immédiate</PageSubtitle>
+        </PageHeaderText>
+        <ViewToggle>
+          <ViewBtn
+            $active={view === 'grid'}
+            onClick={() => setView('grid')}
+            aria-label="Vue grille"
+            title="Vue grille"
+          >
+            <IconGrid />
+          </ViewBtn>
+          <ViewBtn
+            $active={view === 'list'}
+            onClick={() => setView('list')}
+            aria-label="Vue liste"
+            title="Vue liste"
+          >
+            <IconList />
+          </ViewBtn>
+        </ViewToggle>
+      </PageHeaderRow>
 
       <Controls>
         <SearchWrapper>
-          <SearchIcon>🔍</SearchIcon>
+          <SearchIcon><IconSearch /></SearchIcon>
           <Input
             id="fonds-search"
             type="search"
@@ -269,7 +368,7 @@ export function FondsPage() {
                 $active={statut === opt.value}
                 onClick={() => setStatut(statut === opt.value ? null : opt.value)}
               >
-                {opt.color ? <DotFilter $color={opt.color} /> : '❌ '}
+                {opt.color && <DotFilter $color={opt.color} />}
                 {opt.label}
               </DispoPill>
             ))}
@@ -280,19 +379,46 @@ export function FondsPage() {
       <ResultsBar>
         <ResultsCount>
           <strong>{sorted.length}</strong> titre{sorted.length > 1 ? 's' : ''}
+          <span>{contextLabel}</span>
         </ResultsCount>
-        <SortSelect value={sort} onChange={e => setSort(e.target.value as SortKey)}>
-          <option value="pertinence">Pertinence</option>
-          <option value="titre">Titre A→Z</option>
-          <option value="prix_asc">Prix ↑</option>
-          <option value="prix_desc">Prix ↓</option>
-        </SortSelect>
+        <SortWrap htmlFor="fonds-sort">
+          Trier par :
+          <SortSelect
+            id="fonds-sort"
+            value={sort}
+            onChange={e => setSort(e.target.value as SortKey)}
+          >
+            <option value="pertinence">Pertinence</option>
+            <option value="titre">Titre A→Z</option>
+            <option value="prix_asc">Prix ↑</option>
+            <option value="prix_desc">Prix ↓</option>
+          </SortSelect>
+        </SortWrap>
       </ResultsBar>
 
       {sorted.length > 0 ? (
-        <Grid>
-          {sorted.map(book => <BookCard key={book.id} book={book} showType />)}
-        </Grid>
+        view === 'grid' ? (
+          <Grid>
+            {sorted.map(book => (
+              <BookCard key={book.id} book={book} showType coverFirst />
+            ))}
+          </Grid>
+        ) : (
+          <ListStack>
+            {sorted.map(book => (
+              <BookCardRow
+                key={book.id}
+                book={book}
+                selected={selectedIds.has(book.id)}
+                onToggle={() => setSelectedIds(prev => {
+                  const next = new Set(prev)
+                  next.has(book.id) ? next.delete(book.id) : next.add(book.id)
+                  return next
+                })}
+              />
+            ))}
+          </ListStack>
+        )
       ) : (
         <EmptyState>
           {deferred.trim()

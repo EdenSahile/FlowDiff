@@ -351,6 +351,151 @@ const RdvBtn = styled.button`
   &:active { transform: scale(0.97); }
 `
 
+/* ══════════════════════════════════════
+   COVER-FIRST LAYOUT
+══════════════════════════════════════ */
+const CoverWrap = styled.div`
+  position: relative;
+  width: 100%;
+  height: 260px;
+  overflow: hidden;
+  background: ${({ theme }) => theme.colors.gray[100]};
+  flex-shrink: 0;
+`
+
+const OverlayBadge = styled.span<{ $pos: 'left' | 'right'; $variant: 'topVente' | 'selection' }>`
+  position: absolute;
+  top: 12px;
+  ${({ $pos }) => $pos === 'left' ? 'left: 12px;' : 'right: 12px;'}
+  padding: 4px 10px;
+  border-radius: ${({ theme }) => theme.radii.md};
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  z-index: 2;
+  backdrop-filter: blur(4px);
+
+  ${({ $variant, theme }) => $variant === 'topVente' ? `
+    background: rgba(35, 47, 62, 0.92);
+    color: #fff;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.22);
+  ` : `
+    background: rgba(247, 240, 220, 0.95);
+    color: #7a5c00;
+    border: 1px solid ${theme.colors.accent};
+    box-shadow: 0 1px 6px rgba(0,0,0,0.10);
+  `}
+`
+
+const CFBody = styled.div`
+  padding: 12px 14px 14px;
+  display: flex;
+  flex-direction: column;
+`
+
+const CFBadgeRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0;
+`
+
+const CFTitle = styled.h3`
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 14px;
+  font-weight: 700;
+  color: ${({ theme }) => theme.colors.gray[800]};
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin: 8px 0 0;
+  min-height: calc(14px * 1.3 * 2);
+`
+
+const CFAuthors = styled.p`
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 12.5px;
+  font-weight: 500;
+  color: ${({ theme }) => theme.colors.gray[600]};
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 3px 0 0;
+`
+
+const CFPublisher = styled.p`
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 11px;
+  color: ${({ theme }) => theme.colors.gray[400]};
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 2px 0 0;
+`
+
+const CFDivider = styled.div`
+  width: 100%;
+  height: 1px;
+  background: ${({ theme }) => theme.colors.gray[200]};
+  margin: 12px 0 0;
+`
+
+const CFPrice = styled.span`
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 18px;
+  font-weight: 800;
+  color: ${({ theme }) => theme.colors.navy};
+  letter-spacing: -0.03em;
+  line-height: 1;
+
+  sup {
+    font-size: 11px;
+    font-weight: 600;
+    vertical-align: super;
+    letter-spacing: 0;
+    opacity: 0.75;
+  }
+`
+
+const CFQtyInput = styled.input`
+  width: 32px;
+  text-align: center;
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 13px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.navy};
+  background: none;
+  border: none;
+  outline: none;
+  padding: 0;
+  -moz-appearance: textfield;
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button { -webkit-appearance: none; }
+`
+
+const CFPriceRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 12px;
+  min-height: 40px;
+`
+
+const CFStockRow = styled.div`
+  display: flex;
+  align-items: center;
+  margin-top: 8px;
+`
+
+const CFActionRow = styled.div`
+  margin-top: 12px;
+`
+
 /* ── Icônes ── */
 function IconCart() {
   return (
@@ -392,9 +537,10 @@ function IconCheck() {
 interface Props {
   book: Book
   showType?: boolean
+  coverFirst?: boolean
 }
 
-export function BookCard({ book, showType = false }: Props) {
+export function BookCard({ book, showType = false, coverFirst = false }: Props) {
   const navigate      = useNavigate()
   const { addToCart } = useCart()
   const { showToast } = useToast()
@@ -454,6 +600,146 @@ export function BookCard({ book, showType = false }: Props) {
   const handleCardClick = () => {
     if (window.getSelection()?.toString()) return
     navigate(`/livre/${book.id}`)
+  }
+
+  const pubYear = book.publicationDate ? new Date(book.publicationDate).getFullYear() : null
+  const isEnReimp = book.statut === 'en_reimp'
+
+  if (coverFirst) {
+    const isIndispo = isEpuise || isEnReimp
+    return (
+      <>
+        <Card
+          onClick={handleCardClick}
+          role="button"
+          tabIndex={0}
+          onKeyDown={e => e.key === 'Enter' && navigate(`/livre/${book.id}`)}
+        >
+          {/* ── Couverture pleine largeur ── */}
+          <CoverWrap>
+            <BookCover
+              isbn={book.isbn}
+              alt={book.title}
+              universe={book.universe}
+              authors={book.authors}
+              publisher={book.publisher}
+              collection={book.collection}
+              fill
+            />
+            {book.topVente && (
+              <OverlayBadge $pos="left" $variant="topVente">Top vente</OverlayBadge>
+            )}
+            {book.selection && (
+              <OverlayBadge $pos="right" $variant="selection">Sélection</OverlayBadge>
+            )}
+          </CoverWrap>
+
+          {/* ── Infos ── */}
+          <CFBody>
+            {/* Badge univers + étoile — même ligne */}
+            <CFBadgeRow>
+              <UniverseBadge $bg={catColors.bg} $color={catColors.text}>
+                {book.universe}
+              </UniverseBadge>
+              <div ref={starRef}>
+                <StarBtn
+                  $active={inList}
+                  onClick={handleStarClick}
+                  aria-label="Ajouter à une liste"
+                  title="Ajouter à une liste"
+                >
+                  <IconStar filled={inList} />
+                </StarBtn>
+              </div>
+            </CFBadgeRow>
+
+            {/* Groupe identité — serrés = liés */}
+            <CFTitle>{book.title}</CFTitle>
+            <CFAuthors>{book.authors.join(', ')}</CFAuthors>
+            {(book.publisher || pubYear) && (
+              <CFPublisher>
+                {book.publisher}{pubYear ? ` · ${pubYear}` : ''}
+              </CFPublisher>
+            )}
+
+            {/* Séparateur — marque la rupture avec la section prix */}
+            <CFDivider />
+
+            {/* Groupe prix + quantité */}
+            <CFPriceRow>
+              <CFPrice>
+                {book.priceTTC.toFixed(2).replace('.', ',')} €<sup>TTC</sup>
+              </CFPrice>
+              {!isIndispo && (
+                <QtyControl onClick={e => e.stopPropagation()}>
+                  <QtyBtn
+                    onClick={e => handleQty(e, -1)}
+                    disabled={qty <= 1}
+                    aria-label="Diminuer la quantité"
+                  >−</QtyBtn>
+                  <CFQtyInput
+                    type="number"
+                    min={1}
+                    value={qty}
+                    onClick={e => e.stopPropagation()}
+                    onChange={e => {
+                      const v = parseInt(e.target.value, 10)
+                      if (!isNaN(v) && v >= 1) setQty(v)
+                    }}
+                    onBlur={e => {
+                      const v = parseInt(e.target.value, 10)
+                      setQty(isNaN(v) || v < 1 ? 1 : v)
+                    }}
+                    aria-label="Quantité"
+                  />
+                  <QtyBtn
+                    onClick={e => handleQty(e, +1)}
+                    aria-label="Augmenter la quantité"
+                  >+</QtyBtn>
+                </QtyControl>
+              )}
+            </CFPriceRow>
+
+            {/* Stock */}
+            {book.statut && (
+              <CFStockRow>
+                <StockStatus statut={book.statut} delaiReimp={book.delaiReimp} />
+              </CFStockRow>
+            )}
+
+            {/* CTA */}
+            <CFActionRow>
+              {isIndispo ? (
+                <AjouterBtn $epuise disabled aria-disabled="true" onClick={e => e.stopPropagation()}>
+                  Indisponible
+                </AjouterBtn>
+              ) : (
+                <AjouterBtn onClick={handleAdd} $added={added} aria-label="Ajouter au panier">
+                  {added ? <><IconCheck /> Ajouté au panier</> : <><IconCart /> Ajouter au panier</>}
+                </AjouterBtn>
+              )}
+            </CFActionRow>
+          </CFBody>
+        </Card>
+
+        {popoverAnchor && (
+          <ListPickerPopover
+            book={book}
+            anchorRect={popoverAnchor}
+            onClose={() => setPopoverAnchor(null)}
+          />
+        )}
+
+        {needsConfirm && book.statut && (
+          <StockAlertModal
+            open={alertOpen}
+            statut={book.statut}
+            onConfirm={() => { setAlertOpen(false); confirmAdd(book.statut === 'en_reimp') }}
+            onCancel={() => setAlertOpen(false)}
+          />
+        )}
+      </>
+    )
   }
 
   return (

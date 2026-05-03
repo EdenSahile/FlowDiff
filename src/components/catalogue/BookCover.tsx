@@ -97,12 +97,12 @@ function Deco({ universe, accent, w, h }: { universe: Universe; accent: string; 
 }
 
 /* ── Styled wrappers ── */
-const Wrapper = styled.div<{ $w: number; $h: number }>`
-  width: ${({ $w }) => $w}px;
-  height: ${({ $h }) => $h}px;
-  border-radius: ${({ theme }) => theme.radii.sm};
+const Wrapper = styled.div<{ $w: number; $h: number; $fill?: boolean }>`
+  width: ${({ $w, $fill }) => $fill ? '100%' : `${$w}px`};
+  height: ${({ $h, $fill }) => $fill ? '100%' : `${$h}px`};
+  border-radius: ${({ $fill, theme }) => $fill ? '0' : theme.radii.sm};
   overflow: hidden;
-  box-shadow: 3px 4px 14px rgba(0,0,0,0.28);
+  box-shadow: ${({ $fill }) => $fill ? 'none' : '3px 4px 14px rgba(0,0,0,0.28)'};
   flex-shrink: 0;
   position: relative;
   font-family: 'Inter', -apple-system, sans-serif;
@@ -180,6 +180,7 @@ interface Props {
   authors?: string[]
   publisher?: string
   collection?: string
+  fill?: boolean
 }
 
 function BookCoverBase({
@@ -191,6 +192,7 @@ function BookCoverBase({
   authors = [],
   publisher = '',
   collection,
+  fill = false,
 }: Props) {
   const palette = PALETTES[universe]
   const idx = hash(isbn) % palette.length
@@ -204,12 +206,12 @@ function BookCoverBase({
   const pubLabel = [publisher || null, collection || null].filter(Boolean).join(' · ')
 
   return (
-    <Wrapper $w={width} $h={height}>
+    <Wrapper $w={width} $h={height} $fill={fill}>
       <Bg $bg={bg} />
       <Spine $accent={accent} />
 
-      {/* Publisher + collection badge */}
-      {pubLabel && <PubBadge>{pubLabel}</PubBadge>}
+      {/* Publisher + collection badge — hidden in fill mode (overlaps with overlay badges) */}
+      {pubLabel && !fill && <PubBadge>{pubLabel}</PubBadge>}
 
       {/* Decorative graphic */}
       <Deco universe={universe} accent={accent} w={width} h={height} />
