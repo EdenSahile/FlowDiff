@@ -486,14 +486,14 @@ const CartBtn = styled.button<{ $hasItems: boolean }>`
     background: ${GOLD};
     border: 1.5px solid ${GOLD};
     color: ${theme.colors.navy};
-    box-shadow: 0 2px 8px rgba(201,168,76,0.35);
-    &:hover { background: #d4b05a; border-color: #d4b05a; box-shadow: 0 4px 14px rgba(201,168,76,0.45); }
-    &:active { background: #b8962e; border-color: #b8962e; }
+    box-shadow: 0 2px 8px rgba(212,168,67,0.35);
+    &:hover { background: #E0B84A; border-color: #E0B84A; box-shadow: 0 4px 14px rgba(212,168,67,0.45); }
+    &:active { background: #B8922E; border-color: #B8922E; }
   ` : `
     background: transparent;
-    border: 1.5px solid rgba(201,168,76,0.5);
+    border: 1.5px solid rgba(212,168,67,0.5);
     color: ${GOLD};
-    &:hover { background: rgba(201,168,76,0.12); border-color: ${GOLD}; }
+    &:hover { background: rgba(212,168,67,0.12); border-color: ${GOLD}; }
   `}
 
   &:focus-visible { outline: 2px solid ${GOLD}; outline-offset: 2px; }
@@ -535,7 +535,7 @@ const ListsBtn = styled.button<{ $hasLists: boolean }>`
   }
 
   ${({ $hasLists }) => $hasLists && `
-    border-color: rgba(201,168,76,0.5);
+    border-color: rgba(212,168,67,0.5);
     color: ${GOLD};
     &:hover { border-color: ${GOLD}; }
   `}
@@ -637,8 +637,8 @@ const ListRow = styled.div`
 const ListRowIcon = styled.div`
   width: 34px; height: 34px;
   border-radius: ${({ theme }) => theme.radii.md};
-  background: rgba(201,168,76,0.12);
-  border: 1px solid rgba(201,168,76,0.3);
+  background: rgba(212,168,67,0.12);
+  border: 1px solid rgba(212,168,67,0.3);
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
 `
@@ -800,7 +800,7 @@ const BookRowAddedBy = styled.span`
   font-family: ${({ theme }) => theme.typography.fontFamily};
   font-size: 10px;
   color: #3d2f00;
-  background: rgba(201,168,76,0.20);
+  background: rgba(212,168,67,0.20);
   border-radius: ${({ theme }) => theme.radii.lg};
   padding: 1px 7px;
   margin-top: 2px;
