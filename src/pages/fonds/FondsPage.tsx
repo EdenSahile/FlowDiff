@@ -216,23 +216,19 @@ export function FondsPage() {
   const [sort, setSort]         = useState<SortKey>('pertinence')
   const deferred = useDeferredValue(query)
 
-  const allFonds = getBooksByType('fonds')
-
-  let books = deferred.trim()
-    ? searchBooks(deferred).filter(b => b.type === 'fonds')
-    : allFonds
-
-  if (universe) books = books.filter(b => b.universe === universe)
-  if (statut)   books = books.filter(b => b.statut === statut)
-
-  const filtered = books
-
   const sorted = useMemo(() => {
-    if (sort === 'titre') return [...filtered].sort((a, b) => a.title.localeCompare(b.title))
-    if (sort === 'prix_asc') return [...filtered].sort((a, b) => a.priceTTC - b.priceTTC)
-    if (sort === 'prix_desc') return [...filtered].sort((a, b) => b.priceTTC - a.priceTTC)
-    return filtered
-  }, [filtered, sort])
+    let books = deferred.trim()
+      ? searchBooks(deferred).filter(b => b.type === 'fonds')
+      : getBooksByType('fonds')
+
+    if (universe) books = books.filter(b => b.universe === universe)
+    if (statut)   books = books.filter(b => b.statut === statut)
+
+    if (sort === 'titre')     return [...books].sort((a, b) => a.title.localeCompare(b.title))
+    if (sort === 'prix_asc')  return [...books].sort((a, b) => a.priceTTC - b.priceTTC)
+    if (sort === 'prix_desc') return [...books].sort((a, b) => b.priceTTC - a.priceTTC)
+    return books
+  }, [deferred, universe, statut, sort])
 
   return (
     <Page>
