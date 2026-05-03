@@ -1,4 +1,4 @@
-import { useState, useDeferredValue } from 'react'
+import { useState, useDeferredValue, useMemo } from 'react'
 import styled from 'styled-components'
 import { BookCard } from '@/components/catalogue/BookCard'
 import { UniverseFilter } from '@/components/catalogue/UniverseFilter'
@@ -71,16 +71,55 @@ const FilterLabel = styled.span`
   width: 80px;
 `
 
-const ResultsBar = styled.div`
-  margin-bottom: ${({ theme }) => theme.spacing.md};
+const PageEyebrow = styled.p`
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: ${({ theme }) => theme.colors.accent};
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  &::before {
+    content: '';
+    width: 18px;
+    height: 1.5px;
+    background: ${({ theme }) => theme.colors.accent};
+    display: inline-block;
+  }
 `
 
-const CountLabel = styled.span`
+const ResultsBar = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+`
+
+const ResultsCount = styled.p`
+  font-size: 13px;
+  color: ${({ theme }) => theme.colors.gray[600]};
+
+  strong {
+    font-weight: 700;
+    color: ${({ theme }) => theme.colors.gray[800]};
+  }
+`
+
+const SortSelect = styled.select`
   font-family: ${({ theme }) => theme.typography.fontFamily};
-  font-size: 19px;
-  font-weight: 700;
-  color: ${({ theme }) => theme.colors.navy};
-  white-space: nowrap;
+  font-size: 12.5px;
+  color: ${({ theme }) => theme.colors.gray[800]};
+  background: ${({ theme }) => theme.colors.white};
+  border: 1px solid ${({ theme }) => theme.colors.gray[200]};
+  border-radius: ${({ theme }) => theme.radii.md};
+  padding: 5px 10px;
+  cursor: pointer;
+  outline: none;
+
+  &:focus { border-color: ${({ theme }) => theme.colors.navy}; }
 `
 
 const DotFilter = styled.span<{ $color: string }>`
@@ -168,10 +207,13 @@ const SearchIcon = styled.span`
   pointer-events: none;
 `
 
+type SortKey = 'pertinence' | 'titre' | 'prix_asc' | 'prix_desc'
+
 export function FondsPage() {
   const [query, setQuery]       = useState('')
   const [universe, setUniverse] = useState<Universe | null>(null)
   const [statut, setStatut]     = useState<StockStatut | null>(null)
+  const [sort, setSort]         = useState<SortKey>('pertinence')
   const deferred = useDeferredValue(query)
 
   const allFonds = getBooksByType('fonds')
@@ -183,9 +225,19 @@ export function FondsPage() {
   if (universe) books = books.filter(b => b.universe === universe)
   if (statut)   books = books.filter(b => b.statut === statut)
 
+  const filtered = books
+
+  const sorted = useMemo(() => {
+    if (sort === 'titre') return [...filtered].sort((a, b) => a.title.localeCompare(b.title))
+    if (sort === 'prix_asc') return [...filtered].sort((a, b) => a.priceTTC - b.priceTTC)
+    if (sort === 'prix_desc') return [...filtered].sort((a, b) => b.priceTTC - a.priceTTC)
+    return filtered
+  }, [filtered, sort])
+
   return (
     <Page>
       <PageHeader>
+        <PageEyebrow>Catalogue</PageEyebrow>
         <PageTitle>Fonds</PageTitle>
         <PageSubtitle>Titres déjà parus, disponibles à la commande immédiate</PageSubtitle>
       </PageHeader>
@@ -230,12 +282,20 @@ export function FondsPage() {
       </Controls>
 
       <ResultsBar>
-        <CountLabel>{books.length} titre{books.length > 1 ? 's' : ''}</CountLabel>
+        <ResultsCount>
+          <strong>{sorted.length}</strong> titre{sorted.length > 1 ? 's' : ''}
+        </ResultsCount>
+        <SortSelect value={sort} onChange={e => setSort(e.target.value as SortKey)}>
+          <option value="pertinence">Pertinence</option>
+          <option value="titre">Titre A→Z</option>
+          <option value="prix_asc">Prix ↑</option>
+          <option value="prix_desc">Prix ↓</option>
+        </SortSelect>
       </ResultsBar>
 
-      {books.length > 0 ? (
+      {sorted.length > 0 ? (
         <Grid>
-          {books.map(book => <BookCard key={book.id} book={book} showType />)}
+          {sorted.map(book => <BookCard key={book.id} book={book} showType />)}
         </Grid>
       ) : (
         <EmptyState>

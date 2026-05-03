@@ -259,12 +259,15 @@ const QtyValue = styled.span`
   color: ${({ theme }) => theme.colors.navy};
 `
 
-const AjouterBtn = styled.button<{ $epuise?: boolean }>`
+const AjouterBtn = styled.button<{ $epuise?: boolean; $added?: boolean }>`
   width: 100%;
   padding: 8px;
   border: none;
   border-radius: ${({ theme }) => theme.radii.md};
-  background: ${({ $epuise, theme }) => $epuise ? theme.colors.gray[200] : theme.colors.navy};
+  background: ${({ $epuise, $added, theme }) =>
+    $epuise ? theme.colors.gray[200]
+    : $added  ? theme.colors.success
+    : theme.colors.navy};
   color: ${({ $epuise, theme }) => $epuise ? theme.colors.gray[400] : '#fdfdfd'};
   font-family: ${({ theme }) => theme.typography.fontFamily};
   font-size: 12.5px;
@@ -279,7 +282,10 @@ const AjouterBtn = styled.button<{ $epuise?: boolean }>`
   gap: 6px;
 
   &:hover {
-    background: ${({ $epuise, theme }) => $epuise ? theme.colors.gray[200] : theme.colors.primaryHover};
+    background: ${({ $epuise, $added, theme }) =>
+      $epuise ? theme.colors.gray[200]
+      : $added  ? theme.colors.success
+      : theme.colors.primaryHover};
   }
   &:active { transform: ${({ $epuise }) => $epuise ? 'none' : 'scale(0.97)'}; }
 `
@@ -401,6 +407,7 @@ export function BookCard({ book, showType = false }: Props) {
     : (REMISE_RATES[book.universe as keyof typeof REMISE_RATES] ?? 0)
   const priceNet = userRate > 0 ? (book.priceTTC * (1 - userRate)).toFixed(2) : null
   const [qty, setQty] = useState(1)
+  const [added, setAdded] = useState(false)
   const [popoverAnchor, setPopoverAnchor] = useState<DOMRect | null>(null)
   const [alertOpen, setAlertOpen] = useState(false)
   const [rdvAnchor, setRdvAnchor] = useState<DOMRect | null>(null)
@@ -428,6 +435,8 @@ export function BookCard({ book, showType = false }: Props) {
     const action: ToastAction = { label: 'Voir le panier →', onClick: () => navigate('/panier') }
     showToast(`"${book.title}" ajouté au panier`, 'success', action)
     setQty(1)
+    setAdded(true)
+    setTimeout(() => setAdded(false), 2000)
   }
 
   const handleAdd = (e: React.MouseEvent) => {
@@ -532,8 +541,8 @@ export function BookCard({ book, showType = false }: Props) {
                   >+</QtyBtn>
                 </QtyControl>
               </PriceRow>
-              <AjouterBtn onClick={handleAdd} aria-label="Ajouter au panier">
-                <IconCart /> Ajouter au panier
+              <AjouterBtn onClick={handleAdd} $added={added} aria-label="Ajouter au panier">
+                {added ? <><IconCheck /> Ajouté</> : <><IconCart /> Ajouter au panier</>}
               </AjouterBtn>
               <NotesNote>Le titre sera enregistré en notés</NotesNote>
             </AParaitreFooter>
@@ -571,8 +580,8 @@ export function BookCard({ book, showType = false }: Props) {
                   <EpuiseNote>Cet ouvrage n'est plus disponible</EpuiseNote>
                 </>
               ) : (
-                <AjouterBtn onClick={handleAdd} aria-label="Ajouter au panier">
-                  <IconCart /> Ajouter au panier
+                <AjouterBtn onClick={handleAdd} $added={added} aria-label="Ajouter au panier">
+                  {added ? <><IconCheck /> Ajouté</> : <><IconCart /> Ajouter au panier</>}
                 </AjouterBtn>
               )}
             </>
