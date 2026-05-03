@@ -23,11 +23,18 @@ import {
   BrandLine,
   BrandName,
   BrandTagline,
-  BrandFeatureList,
-  BrandFeatureItem,
+  BrandHeadline,
+  BrandSub,
+  BrandStatsRow,
+  BrandStatItem,
+  BrandStatNum,
+  BrandStatLabel,
+  BrandStatSep,
+  BrandQuote,
   BrandFooter,
   FormPanel,
   FormPanelInner,
+  FormEyebrow,
 } from '@/components/auth/AuthLayout'
 
 /* ── Blocked modal ── */
@@ -157,13 +164,39 @@ export function LoginPage() {
           <BrandLine />
           <BrandName>Flow<span>Diff</span></BrandName>
           <BrandTagline>La plateforme des libraires</BrandTagline>
-          <BrandFeatureList>
-            <BrandFeatureItem>Catalogue fonds, nouveautés &amp; à paraître</BrandFeatureItem>
-            <BrandFeatureItem>Commandes directes et suivi temps réel</BrandFeatureItem>
-            <BrandFeatureItem>Remises personnalisées par thématique</BrandFeatureItem>
-            <BrandFeatureItem>Historique, retours et EDI intégrés</BrandFeatureItem>
-          </BrandFeatureList>
+
+          <BrandHeadline>
+            La relation<br />diffuseur-libraire,<br />
+            <em>simplifiée.</em>
+          </BrandHeadline>
+
+          <BrandSub>
+            Commandez en ligne ou par EDI, consultez vos statistiques et gérez vos retours. La plateforme B2B pensée pour les libraires.
+          </BrandSub>
+
+          <BrandStatsRow>
+            <BrandStatItem>
+              <BrandStatNum>18 000+</BrandStatNum>
+              <BrandStatLabel>Références</BrandStatLabel>
+            </BrandStatItem>
+            <BrandStatSep />
+            <BrandStatItem>
+              <BrandStatNum>400+</BrandStatNum>
+              <BrandStatLabel>Points de vente</BrandStatLabel>
+            </BrandStatItem>
+            <BrandStatSep />
+            <BrandStatItem>
+              <BrandStatNum>J+5</BrandStatNum>
+              <BrandStatLabel>Livraison</BrandStatLabel>
+            </BrandStatItem>
+          </BrandStatsRow>
         </div>
+
+        <BrandQuote>
+          <p>"On gagne un temps fou sur les commandes. Enfin un outil pensé pour nous."</p>
+          <cite>— Librairie fictive, Paris 10e</cite>
+        </BrandQuote>
+
         <BrandFooter>© 2026 FlowDiff — Accès réservé aux libraires</BrandFooter>
       </BrandPanel>
 
@@ -173,8 +206,9 @@ export function LoginPage() {
             <Wordmark size="lg" showBaseline />
           </AuthLogo>
 
+          <FormEyebrow>Espace libraire</FormEyebrow>
           <AuthTitle>Connexion</AuthTitle>
-          <AuthSubtitle>Accès réservé aux libraires</AuthSubtitle>
+          <AuthSubtitle>Accès réservé aux libraires professionnels.</AuthSubtitle>
 
           <div style={{
             background: '#FFF8E1',

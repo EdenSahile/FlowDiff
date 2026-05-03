@@ -209,6 +209,95 @@ export const BrandTagline = styled.div`
   margin-bottom: 36px;
 `
 
+export const BrandHeadline = styled.h1`
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 34px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.22;
+  letter-spacing: -0.02em;
+  margin-bottom: 16px;
+  position: relative;
+  z-index: 1;
+
+  em {
+    font-style: normal;
+    color: ${({ theme }) => theme.colors.accent};
+  }
+`
+
+export const BrandSub = styled.p`
+  font-size: 14px;
+  font-weight: 400;
+  color: rgba(255,255,255,0.58);
+  line-height: 1.65;
+  max-width: 340px;
+  position: relative;
+  z-index: 1;
+`
+
+export const BrandStatsRow = styled.div`
+  display: flex;
+  gap: 40px;
+  position: relative;
+  z-index: 1;
+  margin-top: 52px;
+`
+
+export const BrandStatItem = styled.div``
+
+export const BrandStatNum = styled.div`
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 28px;
+  font-weight: 700;
+  color: ${({ theme }) => theme.colors.accent};
+  letter-spacing: -0.03em;
+  line-height: 1;
+`
+
+export const BrandStatLabel = styled.div`
+  font-size: 11px;
+  font-weight: 400;
+  color: rgba(255,255,255,0.45);
+  margin-top: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+`
+
+export const BrandStatSep = styled.div`
+  width: 1px;
+  align-self: stretch;
+  background: rgba(255,255,255,0.08);
+`
+
+export const BrandQuote = styled.blockquote`
+  position: relative;
+  z-index: 1;
+  margin-top: 40px;
+  padding: 20px 24px;
+  border-left: 2px solid ${({ theme }) => theme.colors.accent};
+  background: rgba(255,255,255,0.04);
+  border-radius: 0 6px 6px 0;
+
+  p {
+    font-size: 13px;
+    font-style: italic;
+    font-weight: 300;
+    color: rgba(255,255,255,0.72);
+    line-height: 1.6;
+    margin-bottom: 8px;
+  }
+
+  cite {
+    font-size: 11px;
+    font-style: normal;
+    font-weight: 500;
+    color: ${({ theme }) => theme.colors.accent};
+    opacity: 0.8;
+    letter-spacing: 0.05em;
+  }
+`
+
 export const BrandFeatureList = styled.ul`
   list-style: none;
   padding: 0;
@@ -240,6 +329,28 @@ export const BrandFooter = styled.div`
   font-size: 11px;
   color: rgba(255,255,255,0.30);
   letter-spacing: 0.05em;
+`
+
+export const FormEyebrow = styled.div`
+  font-size: 11px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.accent};
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  &::before {
+    content: '';
+    display: block;
+    width: 24px;
+    height: 1.5px;
+    background: ${({ theme }) => theme.colors.accent};
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
 `
 
 export const FormPanel = styled.div`
