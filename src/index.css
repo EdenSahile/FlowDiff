@@ -8,10 +8,10 @@
 html,
 body {
   height: 100%;
-  font-family: 'Roboto', Arial, sans-serif;
+  font-family: 'Open Sans', Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #F4F4F0;
+  background-color: #F8F5EE;
   color: #111111;
 }
 

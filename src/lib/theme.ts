@@ -1,33 +1,33 @@
 export const theme = {
   colors: {
-    /* ── Palette Forêt & Lin ── */
-    primary:      '#232f3e',    // Bleu — CTA, boutons, sidebar
-    primaryHover: '#42556c',   // Bleu légèrement plus clair au hover
-    primaryLight: '#E6EFE9',   // Fond très clair (badges, highlights)
-    accent:       '#C9A84C',   // Or — signal nouveauté, badges, accents
-    accentLight:  '#F7F0DC',   // Fond or très clair
+    /* ── Palette Ardoise & Champagne ── */
+    primary:      '#2D3A4A',
+    primaryHover: '#3D4E60',
+    primaryLight: '#EDE8DF',
+    accent:       '#D4A843',
+    accentLight:  '#FBF6E8',
 
     /* Sidebar / header dark */
-    navy:         '#232f3e',    // Bleu forêt — fond sidebar/header
-    navyHover:    '#2D5C44',   // Légèrement plus clair
-    navyLight:    '#E6EFE9',   // Vert pâle pour surfaces alternées
+    navy:         '#2D3A4A',
+    navyHover:    '#3D4E60',
+    navyLight:    '#EDE8DF',
 
     /* Surfaces & texte */
-    white:        '#FFFFFF',    // Blanc pur — surfaces cards
+    white:        '#FFFFFF',
     error:        '#C0392B',
-    success:      '#226241',   // Vert forêt — états positifs, disponibilité, "expédié"
+    success:      '#226241',
 
     gray: {
-      50:  '#F4F4F0',   // Fond page (lin neutre)
-      100: '#EAEAE6',   // Surface légèrement teintée
-      200: '#D8D8D4',   // Bordures, séparateurs
-      400: '#6B6B68',   // Texte tertiaire, placeholders — 5.3:1 sur blanc (WCAG AA)
-      600: '#555550',   // Texte secondaire
-      800: '#111111',   // Texte principal
+      50:  '#F8F5EE',
+      100: '#EDE8DF',
+      200: '#DAD4C8',
+      400: '#6A6A66',
+      600: '#555550',
+      800: '#111111',
     },
   },
   typography: {
-    fontFamily:      "'Roboto', Arial, sans-serif",
+    fontFamily:      "'Open Sans', Arial, sans-serif",
     fontFamilySerif: "'Playfair Display', Georgia, serif",
     fontFamilyMono:  "'DM Mono', 'Courier New', monospace",
     sizes: {
