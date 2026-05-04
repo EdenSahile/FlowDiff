@@ -4,6 +4,7 @@ import { useAuthContext } from '@/contexts/AuthContext'
 import { useToast } from '@/contexts/ToastContext'
 import { newsletterSchema } from '@/lib/formSchemas'
 import { useOnboarding } from '@/contexts/OnboardingContext'
+import { mq } from '@/lib/responsive'
 
 /* ── Types ── */
 type Universe = 'BD/Mangas' | 'Jeunesse' | 'Littérature' | 'Adulte-pratique'
@@ -41,11 +42,12 @@ const fadeIn = keyframes`from{opacity:0;transform:translateY(8px)}to{opacity:1;t
 
 /* ── Styled ── */
 const Page = styled.div`
-  padding: ${({ theme }) => theme.spacing.lg};
+  padding: ${({ theme }) => theme.spacing.md};
   max-width: 540px;
   margin: 0 auto;
   animation: ${fadeIn} .25s ease;
   @media (prefers-reduced-motion: reduce) { animation: none; }
+  ${mq.sm} { padding: ${({ theme }) => theme.spacing.lg}; }
 `
 
 const PageHeader = styled.div`
@@ -94,18 +96,22 @@ const SectionTitle = styled.div`
   color: ${({ theme }) => theme.colors.gray[600]};
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  padding: ${({ theme }) => theme.spacing.md} ${({ theme }) => theme.spacing.lg};
+  padding: ${({ theme }) => theme.spacing.md};
   background-color: ${({ theme }) => theme.colors.navyLight};
   border-bottom: 1px solid ${({ theme }) => theme.colors.gray[100]};
+  ${mq.sm} { padding: ${({ theme }) => theme.spacing.md} ${({ theme }) => theme.spacing.lg}; }
 `
 
 const Row = styled.label`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px ${({ theme }) => theme.spacing.lg};
+  gap: ${({ theme }) => theme.spacing.md};
+  padding: 10px ${({ theme }) => theme.spacing.md};
+  min-height: 44px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.gray[100]};
   cursor: pointer;
+  ${mq.sm} { padding: 14px ${({ theme }) => theme.spacing.lg}; }
 
   &:last-child { border-bottom: none; }
 `
@@ -113,6 +119,8 @@ const Row = styled.label`
 const RowLabel = styled.span`
   font-size: ${({ theme }) => theme.typography.sizes.md};
   color: ${({ theme }) => theme.colors.navy};
+  flex: 1;
+  min-width: 0;
 `
 
 /* Toggle */
@@ -151,9 +159,11 @@ const CheckRow = styled.label`
   display: flex;
   align-items: center;
   gap: ${({ theme }) => theme.spacing.md};
-  padding: 12px ${({ theme }) => theme.spacing.lg};
+  padding: 10px ${({ theme }) => theme.spacing.md};
+  min-height: 44px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.gray[100]};
   cursor: pointer;
+  ${mq.sm} { padding: 12px ${({ theme }) => theme.spacing.lg}; }
 
   &:last-of-type { border-bottom: none; }
 `

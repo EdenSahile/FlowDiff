@@ -5,6 +5,7 @@ import { useAuthContext } from '@/contexts/AuthContext'
 import { useEDI } from '@/contexts/EDIContext'
 import { theme } from '@/lib/theme'
 import { useToast } from '@/contexts/ToastContext'
+import { mq } from '@/lib/responsive'
 import { EDIMessageModal } from '@/components/edi/EDIMessageModal'
 import { DesadvGroupedList } from '@/components/edi/DesadvGroupedList'
 import { exportToCSV } from '@/lib/csv'
@@ -51,11 +52,12 @@ const DIFFUSEURS = [
 const fadeIn = keyframes`from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}`
 
 const Page = styled.div`
-  padding: ${({ theme }) => theme.spacing.lg};
+  padding: ${({ theme }) => theme.spacing.md};
   max-width: 1200px;
   margin: 0 auto;
   animation: ${fadeIn} .25s ease;
   @media (prefers-reduced-motion: reduce) { animation: none; }
+  ${mq.sm} { padding: ${({ theme }) => theme.spacing.lg}; }
 `
 
 const PageHeader = styled.div`
@@ -123,13 +125,11 @@ const DocBtn = styled.a`
 /* ── Grille 3 statcards ── */
 const StatsRow = styled.div`
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: 1fr;
   gap: 16px;
   margin-bottom: 24px;
-
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    grid-template-columns: 1fr;
-  }
+  ${mq.sm} { grid-template-columns: repeat(2, 1fr); }
+  ${mq.md} { grid-template-columns: repeat(3, 1fr); }
 `
 
 const Card = styled.div`
@@ -285,13 +285,10 @@ const FluxSub = styled.div`
 ════════════════════════════════════════════════════ */
 const MainLayout = styled.div`
   display: grid;
-  grid-template-columns: 1fr 300px;
+  grid-template-columns: 1fr;
   gap: 20px;
   margin-bottom: 24px;
-
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    grid-template-columns: 1fr;
-  }
+  ${mq.md} { grid-template-columns: 1fr 300px; }
 `
 
 /* ── Section Historique ── */
@@ -412,8 +409,14 @@ const Tab = styled.button<{ $active: boolean }>`
 `
 
 /* Tableau */
+const TableScrollWrapper = styled.div`
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+`
+
 const Table = styled.table`
   width: 100%;
+  min-width: 560px;
   border-collapse: collapse;
   font-size: 0.8125rem;
 `
@@ -599,13 +602,10 @@ const ParamsCard = styled.div`
 
 const ParamsGrid = styled.div`
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 24px;
   align-items: start;
-
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    grid-template-columns: 1fr;
-  }
+  ${mq.md} { grid-template-columns: 1fr 1fr; }
 `
 
 const ToggleRow = styled.div`
@@ -958,6 +958,7 @@ export function EDIPage() {
               />
             ) : (
               <>
+                <TableScrollWrapper>
                 <Table>
                   <thead>
                     <tr>
@@ -1013,6 +1014,7 @@ export function EDIPage() {
                     )}
                   </tbody>
                 </Table>
+                </TableScrollWrapper>
 
                 <VoirTout>
                   <VoirToutLink onClick={() => setActiveFilter('ALL')}>

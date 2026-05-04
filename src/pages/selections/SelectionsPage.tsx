@@ -5,6 +5,7 @@ import { useCart } from '@/contexts/CartContext'
 import { MOCK_BOOKS, UNIVERSES, type Universe } from '@/data/mockBooks'
 import { MOCK_SERIES, type Serie, type OffreCommerciale } from '@/data/mockSeries'
 import { BookCover } from '@/components/catalogue/BookCover'
+import { mq } from '@/lib/responsive'
 
 /* ══════════════════════════════════════════════
    COUVERTURE SÉRIE — dégradé générique par univers
@@ -108,11 +109,12 @@ type FilterType = Universe | 'Tous' | 'Prix littéraire'
 const fadeIn = keyframes`from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}`
 
 const Page = styled.div`
-  padding: ${({ theme }) => theme.spacing.lg};
+  padding: ${({ theme }) => theme.spacing.md};
   max-width: 900px;
   margin: 0 auto;
   animation: ${fadeIn} .25s ease;
   @media (prefers-reduced-motion: reduce) { animation: none; }
+  ${mq.sm} { padding: ${({ theme }) => theme.spacing.lg}; }
 `
 
 const PageHeader = styled.div`
@@ -312,46 +314,35 @@ const SectionCount = styled.span`
   border-radius: ${({ theme }) => theme.radii.lg};
 `
 
-/* ── Scroll horizontal — 5 max visibles ── */
-const HScroll = styled.div`
-  display: flex;
-  gap: 14px;
-  overflow-x: auto;
-  padding-bottom: 8px;
-  -webkit-overflow-scrolling: touch;
-  scroll-snap-type: x mandatory;
-  &::-webkit-scrollbar { height: 3px; }
-  &::-webkit-scrollbar-track { background: transparent; }
-  &::-webkit-scrollbar-thumb {
-    background: ${({ theme }) => theme.colors.gray[200]};
-    border-radius: ${({ theme }) => theme.radii.sm};
-  }
+/* ── Grille responsive : 2→3→4→5 colonnes ── */
+const TileGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  ${mq.sm} { grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  ${mq.md} { grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  ${mq.lg} { grid-template-columns: repeat(5, 1fr); gap: 14px; }
 `
 
-/* ── Tuile : largeur fixe pour afficher ~5 par ligne ── */
+/* ── Tuile : ratio couverture 2:3 ── */
 const Tile = styled.button`
   position: relative;
   border: none;
   border-radius: ${({ theme }) => theme.radii.lg};
   overflow: hidden;
-  /* ~5 tiles visibles dans 900px : (900 - 32*2 - 14*4) / 5 ≈ 150px */
-  width: 148px;
-  height: 222px;
-  flex-shrink: 0;
+  width: 100%;
+  aspect-ratio: 2 / 3;
   cursor: pointer;
   padding: 0;
   background: ${({ theme }) => theme.colors.navyLight};
   transition: transform 0.22s ease, box-shadow 0.22s ease;
-  scroll-snap-align: start;
   box-shadow: 0 2px 8px rgba(30, 58, 95, 0.12);
 
   &:hover {
-    transform: translateY(-6px) scale(1.03);
-    box-shadow: 0 16px 40px rgba(30, 58, 95, 0.28);
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 12px 32px rgba(30, 58, 95, 0.28);
   }
-  &:active { transform: translateY(-2px) scale(1.01); }
-
-  @media (max-width: 480px) { width: 112px; height: 168px; }
+  &:active { transform: translateY(-1px) scale(1.01); }
 `
 
 const TileGradient = styled.div`
@@ -1122,7 +1113,7 @@ function PLVSection({ offre, nom }: { offre: OffreCommerciale; nom: string }) {
 function HeroTile({ serie, onClick }: { serie: Serie; onClick: () => void }) {
   return (
     <Tile onClick={onClick} aria-label={`Voir la série ${serie.nom}`}>
-      <SerieCover serie={serie} width={148} height={222} />
+      <SerieCover serie={serie} />
       <TileGradient />
       {serie.isOffreSpeciale && <OffreBadge />}
       {serie.isPrixLitteraire && <PrixBadge><IconTrophy size={8} /> Prix</PrixBadge>}
@@ -1602,7 +1593,7 @@ export function SelectionsPage() {
               <SectionTitle>{categorie}</SectionTitle>
               <SectionCount>{series.length} série{series.length > 1 ? 's' : ''}</SectionCount>
             </SectionHeader>
-            <HScroll>
+            <TileGrid>
               {series.map(serie => (
                 <HeroTile
                   key={serie.id}
@@ -1610,7 +1601,7 @@ export function SelectionsPage() {
                   onClick={() => setSelectedSerie(serie)}
                 />
               ))}
-            </HScroll>
+            </TileGrid>
           </Section>
         ))
       )}
