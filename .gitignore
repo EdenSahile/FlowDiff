@@ -52,3 +52,7 @@ src/**/*.md
 .claude/
 .claude/skills/
 .worktrees/
+
+# Superpowers — fichiers générés localement, non versionnés
+.superpowers/
+*.skill
