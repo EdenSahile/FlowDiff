@@ -1,5 +1,6 @@
 import { useState, useDeferredValue, useMemo } from 'react'
 import styled from 'styled-components'
+import { mq } from '@/lib/responsive'
 import { BookCard } from '@/components/catalogue/BookCard'
 import { UniverseFilter } from '@/components/catalogue/UniverseFilter'
 import { getBooksByType, searchBooks } from '@/data/mockBooks'
@@ -172,19 +173,19 @@ const DispoPill = styled.button<{ $active: boolean }>`
 
 const Grid = styled.div`
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: 1fr;
   gap: ${({ theme }) => theme.spacing.md};
 
-  @media (min-width: 480px) {
+  ${mq.sm} {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  ${mq.md} {
     grid-template-columns: repeat(3, 1fr);
   }
 
-  @media (min-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    grid-template-columns: repeat(auto-fill, minmax(274px, 1fr));
-  }
-
-  @media (min-width: 1024px) {
-    grid-template-columns: repeat(auto-fill, minmax(274px, 1fr));
+  ${mq.lg} {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   }
 `
 
