@@ -9,10 +9,10 @@ export const CART_LIMIT = 30
 
 /* ── Remises mock par univers (en attendant AS400/CRM) ── */
 export const REMISE_RATES: Record<Universe, number> = {
-  'BD/Mangas':       0.10,
-  'Jeunesse':        0.08,
-  'Littérature':     0.09,
-  'Adulte-pratique': 0.09,
+  'BD/Mangas':       0.30,
+  'Jeunesse':        0.30,
+  'Littérature':     0.35,
+  'Adulte-pratique': 0.35,
 }
 
 /* ── Types ── */
