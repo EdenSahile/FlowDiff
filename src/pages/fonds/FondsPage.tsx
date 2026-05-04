@@ -309,8 +309,8 @@ export function FondsPage() {
           >
             <option value="pertinence">Pertinence</option>
             <option value="titre">Titre A→Z</option>
-            <option value="prix_asc">Prix ↑</option>
-            <option value="prix_desc">Prix ↓</option>
+            <option value="prix_asc">Prix croissant</option>
+            <option value="prix_desc">Prix décroissant</option>
           </SortSelect>
         </SortWrap>
       </ResultsBar>
