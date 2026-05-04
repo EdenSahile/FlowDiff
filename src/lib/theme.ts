@@ -69,6 +69,11 @@ export const theme = {
   },
   breakpoints: {
     mobile: '768px',
+    xs: '360px',
+    sm: '480px',
+    md: '768px',
+    lg: '1024px',
+    xl: '1400px',
   },
   layout: {
     sidebarWidth:        '220px',
