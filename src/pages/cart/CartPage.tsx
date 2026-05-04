@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/Button'
 import { DatePicker } from '@/components/ui/DatePicker'
 import { useToast } from '@/contexts/ToastContext'
 import { theme } from '@/lib/theme'
+import { mq } from '@/lib/responsive'
 import { CHECKOUT_STEPS, type CheckoutStep, getNextStep, getPrevStep, getStepIndex, getStepLabel } from './checkoutSteps'
 import { addressSchema, parseAddressString, type AddressData, type TransmissionMode } from './checkoutSchemas'
 import { OrderTransmissionStep } from './OrderTransmissionStep'
@@ -419,7 +420,7 @@ const OPTable = styled.div`
 
 const OPRow = styled.div<{ $variant?: 'book' | 'cadeau' | 'plv' | 'total' }>`
   display: grid;
-  grid-template-columns: 44px 1fr auto auto auto;
+  grid-template-columns: 36px 1fr auto auto;
   align-items: center;
   gap: 0;
   padding: 0 14px;
@@ -436,6 +437,10 @@ const OPRow = styled.div<{ $variant?: 'book' | 'cadeau' | 'plv' | 'total' }>`
     $variant === 'cadeau' ? `1px dashed ${theme.colors.gray[200]}` :
     $variant === 'plv'    ? `1px dashed ${theme.colors.accent}` :
     `1px solid ${theme.colors.gray[50]}`};
+
+  ${mq.md} {
+    grid-template-columns: 44px 1fr auto auto auto;
+  }
 `
 
 const OPCover = styled.div`
@@ -780,12 +785,12 @@ const NavActions = styled.div`
 ══════════════════════════════════════════════════════ */
 const TwoColLayout = styled.div`
   display: grid;
-  grid-template-columns: 1fr 320px;
+  grid-template-columns: 1fr;
   gap: 24px;
   align-items: start;
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    grid-template-columns: 1fr;
+  ${mq.md} {
+    grid-template-columns: 1fr 320px;
   }
 `
 
