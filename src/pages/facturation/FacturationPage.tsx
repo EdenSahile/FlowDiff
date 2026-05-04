@@ -4,6 +4,7 @@ import { useAuthContext } from '@/contexts/AuthContext'
 import { MOCK_FACTURES, type Facture } from '@/data/mockFactures'
 import { openInvoicePDF } from '@/lib/invoicePdf'
 import { DatePicker } from '@/components/ui/DatePicker'
+import { mq } from '@/lib/responsive'
 
 /* ── Helpers ── */
 const fmtDate = (iso: string) =>
@@ -14,11 +15,15 @@ const fadeIn = keyframes`from{opacity:0;transform:translateY(8px)}to{opacity:1;t
 
 /* ── Styled ── */
 const Page = styled.div`
-  padding: ${({ theme }) => theme.spacing.lg};
+  padding: ${({ theme }) => theme.spacing.md};
   max-width: 860px;
   margin: 0 auto;
   animation: ${fadeIn} .25s ease;
   @media (prefers-reduced-motion: reduce) { animation: none; }
+
+  ${mq.md} {
+    padding: ${({ theme }) => theme.spacing.lg};
+  }
 `
 
 const PageHeader = styled.div`
@@ -112,6 +117,7 @@ const ExportBtn = styled.button`
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  min-height: 44px;
   height: 38px;
   padding: 0 14px;
   border: 1.5px solid ${({ theme }) => theme.colors.navy};
@@ -280,6 +286,7 @@ const PdfBtn = styled.button`
   display: inline-flex;
   align-items: center;
   gap: 5px;
+  min-height: 44px;
   padding: 5px 10px;
   background: none;
   border: 1px solid ${({ theme }) => theme.colors.gray[200]};
@@ -321,6 +328,7 @@ type PageBtnProps = { $active?: boolean; $disabled?: boolean }
 
 const PageBtn = styled.button<PageBtnProps>`
   min-width: 32px;
+  min-height: 44px;
   height: 30px;
   padding: 0 8px;
   border: 1px solid ${({ $active, theme }) =>
