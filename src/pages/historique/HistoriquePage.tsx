@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import { exportToCSV } from '@/lib/csv'
 import { theme } from '@/lib/theme'
+import { mq } from '@/lib/responsive'
 import styled, { keyframes } from 'styled-components'
 import { useAuthContext } from '@/contexts/AuthContext'
 import { useCart, REMISE_RATES } from '@/contexts/CartContext'
@@ -504,9 +505,18 @@ const TabBadge = styled.span`
 `
 
 const StatsGrid = styled.div`
-  display: grid; grid-template-columns: repeat(3, 1fr);
+  display: grid;
+  grid-template-columns: 1fr;
   gap: ${({ theme }) => theme.spacing.md};
   margin-bottom: ${({ theme }) => theme.spacing.xl};
+
+  ${mq.sm} {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  ${mq.md} {
+    grid-template-columns: repeat(3, 1fr);
+  }
 `
 
 const StatCard = styled.div`
