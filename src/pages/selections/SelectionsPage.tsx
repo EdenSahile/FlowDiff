@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef, useEffect } from 'react'
-import styled from 'styled-components'
+import styled, { keyframes } from 'styled-components'
 import { useNavigate } from 'react-router-dom'
 import { useCart } from '@/contexts/CartContext'
 import { MOCK_BOOKS, UNIVERSES, type Universe } from '@/data/mockBooks'
@@ -105,14 +105,38 @@ type FilterType = Universe | 'Tous' | 'Prix littéraire'
 /* ══════════════════════════════════════════════
    STYLES — page principale
 ══════════════════════════════════════════════ */
+const fadeIn = keyframes`from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}`
+
 const Page = styled.div`
   padding: ${({ theme }) => theme.spacing.lg};
   max-width: 900px;
   margin: 0 auto;
+  animation: ${fadeIn} .25s ease;
+  @media (prefers-reduced-motion: reduce) { animation: none; }
 `
 
 const PageHeader = styled.div`
   margin-bottom: ${({ theme }) => theme.spacing.lg};
+`
+
+const PageEyebrow = styled.p`
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: ${({ theme }) => theme.colors.accent};
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  &::before {
+    content: '';
+    width: 18px;
+    height: 1.5px;
+    background: ${({ theme }) => theme.colors.accent};
+    display: inline-block;
+  }
 `
 
 const PageTitle = styled.h1`
@@ -186,12 +210,29 @@ const ClearBtn = styled.button`
   &:hover { background: ${({ theme }) => theme.colors.gray[400]}; color: white; }
 `
 
-/* ── Ligne filtres ── */
+/* ── Filtres ── */
+const FilterGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 30px;
+`
+
 const FiltersRow = styled.div`
   display: flex;
   align-items: center;
   gap: ${({ theme }) => theme.spacing.sm};
-  margin-bottom: ${({ theme }) => theme.spacing.lg};
+`
+
+const FilterLabel = styled.span`
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 11px;
+  font-weight: 500;
+  color: ${({ theme }) => theme.colors.gray[400]};
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  flex-shrink: 0;
+  width: 80px;
 `
 
 const FilterBar = styled.div`
@@ -199,8 +240,8 @@ const FilterBar = styled.div`
   gap: ${({ theme }) => theme.spacing.xs};
   overflow-x: auto;
   padding-bottom: 2px;
-  flex: 1;
   -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
   &::-webkit-scrollbar { display: none; }
 `
 
@@ -252,7 +293,7 @@ const SectionHeader = styled.div`
   justify-content: space-between;
   margin-bottom: ${({ theme }) => theme.spacing.md};
   padding-bottom: 10px;
-  border-bottom: 2px solid ${({ theme }) => theme.colors.primary};
+  border-bottom: 1.5px solid ${({ theme }) => theme.colors.gray[200]};
 `
 
 const SectionTitle = styled.h2`
@@ -1488,6 +1529,7 @@ export function SelectionsPage() {
   return (
     <Page>
       <PageHeader>
+        <PageEyebrow>Catalogue</PageEyebrow>
         <PageTitle>Sélections</PageTitle>
         <PageSubtitle>Sélections éditoriales thématiques et opérations commerciales</PageSubtitle>
       </PageHeader>
@@ -1508,31 +1550,36 @@ export function SelectionsPage() {
       </SearchBar>
 
       {/* Filtres */}
-      <FiltersRow>
-        <FilterBar>
-          {FILTERS.map(f => (
-            <FilterPill
-              key={f.value}
-              $active={filter === f.value}
-              $variant={f.variant}
-              onClick={() => setFilter(f.value)}
-            >
-              {f.variant === 'prix' && <IconTrophy size={11} />}
-              {f.label}
-            </FilterPill>
-          ))}
-        </FilterBar>
+      <FilterGroup role="group" aria-label="Filtres">
+        <FiltersRow>
+          <FilterLabel>Thématique</FilterLabel>
+          <FilterBar>
+            {FILTERS.map(f => (
+              <FilterPill
+                key={f.value}
+                $active={filter === f.value}
+                $variant={f.variant}
+                onClick={() => setFilter(f.value)}
+              >
+                {f.variant === 'prix' && <IconTrophy size={11} />}
+                {f.label}
+              </FilterPill>
+            ))}
+          </FilterBar>
+        </FiltersRow>
 
-        <FilterPill
-          $active={offreOnly}
-          $variant="offre"
-          onClick={() => setOffreOnly(v => !v)}
-          style={{ flexShrink: 0 }}
-        >
-          <GreenDot />
-          OP commerciale
-        </FilterPill>
-      </FiltersRow>
+        <FiltersRow>
+          <FilterLabel>Offre</FilterLabel>
+          <FilterPill
+            $active={offreOnly}
+            $variant="offre"
+            onClick={() => setOffreOnly(v => !v)}
+          >
+            <GreenDot />
+            OP commerciale
+          </FilterPill>
+        </FiltersRow>
+      </FilterGroup>
 
       {/* Sections */}
       {groupedSections.length === 0 ? (

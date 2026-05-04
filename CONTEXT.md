@@ -23,7 +23,7 @@ Language design : Playfair Display pour les titres de section, Open Sans corps, 
 - [x] NouveautesPage
 - [x] AParaitrePage
 - [x] TopVentesPage
-- [ ] SelectionsPage
+- [x] SelectionsPage
 - [ ] FlashInfosPage
 - [ ] HistoriquePage
 - [ ] MonComptePage
