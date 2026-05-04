@@ -1,56 +1,87 @@
 import { useState } from 'react'
-import styled from 'styled-components'
+import styled, { keyframes } from 'styled-components'
 import { useLocation } from 'react-router-dom'
 import { useAuthContext } from '@/contexts/AuthContext'
 import { useToast } from '@/contexts/ToastContext'
 import { contactSchema } from '@/lib/formSchemas'
 
+/* ── Animations ── */
+const fadeIn = keyframes`from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}`
+
 /* ── Styled ── */
 const Page = styled.div`
   padding: ${({ theme }) => theme.spacing.lg};
-  max-width: 600px;
+  max-width: 640px;
   margin: 0 auto;
+  animation: ${fadeIn} .25s ease;
+  @media (prefers-reduced-motion: reduce) { animation: none; }
 `
 
-const Title = styled.h1`
+const PageHeader = styled.div`
+  margin-bottom: ${({ theme }) => theme.spacing.xl};
+`
+
+const PageEyebrow = styled.p`
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: ${({ theme }) => theme.colors.accent};
+  margin: 0 0 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  &::before {
+    content: '';
+    width: 18px;
+    height: 1.5px;
+    background: ${({ theme }) => theme.colors.accent};
+    display: inline-block;
+  }
+`
+
+const PageTitle = styled.h1`
+  font-family: ${({ theme }) => theme.typography.fontFamily};
   font-size: ${({ theme }) => theme.typography.sizes['2xl']};
   font-weight: ${({ theme }) => theme.typography.weights.bold};
   color: ${({ theme }) => theme.colors.navy};
-  margin-bottom: 6px;
+  margin: 0 0 4px;
 `
 
-const Subtitle = styled.p`
+const PageSubtitle = styled.p`
+  font-family: ${({ theme }) => theme.typography.fontFamily};
   font-size: ${({ theme }) => theme.typography.sizes.sm};
   color: ${({ theme }) => theme.colors.gray[600]};
-  margin-bottom: ${({ theme }) => theme.spacing.xl};
+  margin: 0;
 `
 
 const TabRow = styled.div`
   display: flex;
-  gap: ${({ theme }) => theme.spacing.sm};
+  gap: 6px;
   margin-bottom: ${({ theme }) => theme.spacing.xl};
 `
 
 const Tab = styled.button<{ $active: boolean }>`
-  flex: 1;
-  padding: 10px;
-  border-radius: ${({ theme }) => theme.radii.md};
-  border: 2px solid ${({ $active, theme }) => $active ? theme.colors.navy : theme.colors.gray[200]};
-  background-color: ${({ $active, theme }) => $active ? theme.colors.navy : theme.colors.white};
-  color: ${({ $active, theme }) => $active ? '#fdfdfd' : theme.colors.navy};
+  padding: 8px 20px;
+  border-radius: ${({ theme }) => theme.radii.full};
+  border: 1.5px solid ${({ $active, theme }) => $active ? theme.colors.navy : theme.colors.gray[200]};
+  background: ${({ $active, theme }) => $active ? theme.colors.navy : 'transparent'};
+  color: ${({ $active, theme }) => $active ? '#fdfdfd' : theme.colors.gray[600]};
+  font-family: ${({ theme }) => theme.typography.fontFamily};
   font-size: ${({ theme }) => theme.typography.sizes.sm};
   font-weight: ${({ theme }) => theme.typography.weights.semibold};
   cursor: pointer;
   transition: all 0.15s ease;
-
   &:hover:not([disabled]) {
     border-color: ${({ theme }) => theme.colors.navy};
+    color: ${({ $active, theme }) => $active ? '#fdfdfd' : theme.colors.navy};
   }
 `
 
 const Card = styled.div`
   background-color: ${({ theme }) => theme.colors.white};
-  border: 1px solid ${({ theme }) => theme.colors.gray[200]};
+  border: 1px solid ${({ theme }) => theme.colors.gray[100]};
+  border-radius: ${({ theme }) => theme.radii.xl};
   padding: ${({ theme }) => theme.spacing.xl};
 `
 
@@ -134,14 +165,15 @@ const ErrorText = styled.p`
 `
 
 const InfoCard = styled.div`
-  background-color: ${({ theme }) => theme.colors.primaryLight};
-  border: 1px solid ${({ theme }) => theme.colors.gray[200]};
-  border-left: 3px solid ${({ theme }) => theme.colors.primary};
+  background-color: ${({ theme }) => theme.colors.navyLight};
+  border-left: 3px solid ${({ theme }) => theme.colors.accent};
+  border-radius: ${({ theme }) => theme.radii.md};
   padding: ${({ theme }) => theme.spacing.lg};
   margin-top: ${({ theme }) => theme.spacing.lg};
 `
 
 const InfoTitle = styled.div`
+  font-family: ${({ theme }) => theme.typography.fontFamily};
   font-size: ${({ theme }) => theme.typography.sizes.sm};
   font-weight: ${({ theme }) => theme.typography.weights.bold};
   color: ${({ theme }) => theme.colors.navy};
@@ -149,8 +181,9 @@ const InfoTitle = styled.div`
 `
 
 const InfoLine = styled.div`
+  font-family: ${({ theme }) => theme.typography.fontFamily};
   font-size: ${({ theme }) => theme.typography.sizes.sm};
-  color: ${({ theme }) => theme.colors.navy};
+  color: ${({ theme }) => theme.colors.gray[600]};
   padding: 4px 0;
 
   a {
@@ -212,8 +245,11 @@ export function ContactPage() {
 
   return (
     <Page>
-      <Title>Contact</Title>
-      <Subtitle>Envoyez un message à votre représentant ou au service clients.</Subtitle>
+      <PageHeader>
+        <PageEyebrow>Mon espace</PageEyebrow>
+        <PageTitle>Contact</PageTitle>
+        <PageSubtitle>Envoyez un message à votre représentant ou au service clients.</PageSubtitle>
+      </PageHeader>
 
       <TabRow>
         <Tab $active={recipient === 'representant'} onClick={() => setRecipient('representant')}>
