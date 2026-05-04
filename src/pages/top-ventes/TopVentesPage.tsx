@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useNotifications } from '@/contexts/NotificationsContext'
 import { useNavigate } from 'react-router-dom'
 import { theme } from '@/lib/theme'
 import styled, { keyframes } from 'styled-components'
@@ -575,6 +576,9 @@ function TopSection({
 ══════════════════════════════════════════════════════ */
 
 export function TopVentesPage() {
+  const { markAsRead } = useNotifications()
+  useEffect(() => { markAsRead('topventes') }, [markAsRead])
+
   const [period,    setPeriod] = useState<Period>('30j')  // eslint-disable-line @typescript-eslint/no-unused-vars
   const [activeTab, setTab]    = useState<TabView>('tous')
   const { addToCart }          = useCart()

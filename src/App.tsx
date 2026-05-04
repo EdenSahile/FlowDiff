@@ -11,6 +11,7 @@ import { WishlistProvider } from '@/contexts/WishlistContext'
 import { RdvProvider } from '@/contexts/RdvContext'
 import { ToastProvider } from '@/contexts/ToastContext'
 import { OnboardingProvider } from '@/contexts/OnboardingContext'
+import { NotificationsProvider } from '@/contexts/NotificationsContext'
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
 import { AppLayout } from '@/components/layout/AppLayout'
 
@@ -91,6 +92,7 @@ export default function App() {
           <ToastProvider>
           <AuthProvider>
             <CartProvider>
+              <NotificationsProvider>
               <WishlistProvider>
               <RdvProvider>
               <OrdersProvider>
@@ -139,6 +141,7 @@ export default function App() {
               </OrdersProvider>
               </RdvProvider>
               </WishlistProvider>
+              </NotificationsProvider>
             </CartProvider>
           </AuthProvider>
           </ToastProvider>

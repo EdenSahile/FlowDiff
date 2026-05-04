@@ -7,26 +7,26 @@
 ---
 
 ## État du build
-TS clean · 161 tests passants · session 2026-05-04  
+TS clean · 162 tests passants · session 2026-05-04  
 **Refonte design pages** : NouveautesPage, AParaitrePage, TopVentesPage, SelectionsPage, FlashInfosPage, HistoriquePage, MonComptePage, RecherchePage, AuteurPage, ContactPage, FacturationPage, ParametresPage, EDIPage, OfficesPage ✅  
-**Onboarding** : Tour guidé Driver.js 7 étapes + TooltipInfo métier + "Revoir le tour" ✅
+**Onboarding** : Tour guidé Driver.js 7 étapes + TooltipInfo métier + "Revoir le tour" ✅  
+**Panier** : Récapitulatif HT corrigé — remise appliquée sur base HT (Prix TTC / 1,055) ✅
 
 ---
 
 ## Session en cours
 
-### Système d'onboarding — Tour guidé Driver.js + Tooltips contextuels
+### Panneau de notifications — Feed chronologique
 
-- [x] 1. Installer driver.js (npm)
-- [x] 2. Créer `OnboardingContext` (flag `onboarding_done` localStorage, `startTour()`, `resetTour()`)
-- [x] 3. Ajouter `data-tour` IDs sur les éléments cibles (SearchGroup, bloc actions, dashboard, sidebar Catalogue, CartBtn, sidebar EDI, bloc Nouveautés)
-- [x] 4. Créer composant `OnboardingTour` — définit les 7 étapes Driver.js, styles cohérents navy/or
-- [x] 5. Intégrer le tour dans `AppLayout` — déclenche automatiquement à la première connexion
-- [x] 6. Créer composant `TooltipInfo` (icône `?` + popover) + l'utiliser sur Taux de rupture, Panier moyen, EDI, Office, PP TTC
-- [x] 7. Ajouter bouton "Revoir le tour guidé" dans ParametresPage et BurgerMenu
-- [x] 8. Vérification TS + 161 tests passants
+Spec : `docs/superpowers/specs/2026-05-04-notifications-design.md`
+
+- [x] 1. Créer `NotificationsContext` (calcul des 3 notifs, état lu/non-lu éphémère)
+- [x] 2. Créer composant `NotificationBell` (cloche + badge + dropdown panel)
+- [x] 3. Intégrer dans `Header.tsx` (remplace IconBell + prop `hasNotif`)
+- [x] 4. Ajouter `markAsRead` dans NouveautesPage, CartPage, TopVentesPage
+- [x] 5. Envelopper l'app avec `NotificationsProvider` dans App.tsx
+- [x] 6. Vérification TS + 162 tests passants
 
 ---
 
 ## Prochaines étapes
-

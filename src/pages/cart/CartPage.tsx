@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useNotifications } from '@/contexts/NotificationsContext'
 import { useNavigate } from 'react-router-dom'
 import styled, { keyframes } from 'styled-components'
 import { useCart, REMISE_RATES, getItemKey } from '@/contexts/CartContext'
@@ -1053,6 +1054,9 @@ function AddressFormFields({
    COMPOSANT PRINCIPAL
 ══════════════════════════════════════════════════════ */
 export function CartPage() {
+  const { markAsRead } = useNotifications()
+  useEffect(() => { markAsRead('panier') }, [markAsRead])
+
   const { items, opGroups, totalItems, updateQty, removeFromCart, removeOP, clearCart, hasReliquatItems,
           subtotalTTC, remiseAmount, netHT, tva, totalTTC,
           transmissionMode, setTransmissionMode } = useCart()

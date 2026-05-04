@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
+import { NotificationBell } from '@/components/layout/NotificationBell'
 import { createPortal } from 'react-dom'
 import styled from 'styled-components'
 import { useNavigate, Link } from 'react-router-dom'
@@ -427,38 +428,6 @@ const ApplyBtn = styled.button`
 
 
 /* ── Notifications ── */
-const NotifBtn = styled.button`
-  width: 34px; height: 34px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.08);
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  flex-shrink: 0;
-  transition: background 0.15s;
-  color: rgba(255,255,255,0.55);
-
-  &:hover { background: rgba(255,255,255,0.14); }
-
-  @media (min-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    background: transparent;
-    border: 1.5px solid ${({ theme }) => theme.colors.gray[200]};
-    color: ${({ theme }) => theme.colors.gray[400]};
-    &:hover { background: ${({ theme }) => theme.colors.gray[50]}; border-color: #b0a898; }
-  }
-`
-
-const NotifDot = styled.span`
-  position: absolute;
-  top: 4px; right: 4px;
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  background: #e24b4a;
-  pointer-events: none;
-`
 
 const HelpBtn = styled.button`
   width: 34px; height: 34px;
@@ -1012,10 +981,9 @@ interface HeaderProps {
   cartCount?: number
   onBurgerClick?: () => void
   onCartClick?: () => void
-  hasNotif?: boolean
 }
 
-export function Header({ cartCount = 0, onBurgerClick, onCartClick, hasNotif = true }: HeaderProps) {
+export function Header({ cartCount = 0, onBurgerClick, onCartClick }: HeaderProps) {
   const navigate = useNavigate()
   const { lists, deleteList, removeFromList } = useWishlist()
   const { addToCart } = useCart()
@@ -1265,10 +1233,7 @@ export function Header({ cartCount = 0, onBurgerClick, onCartClick, hasNotif = t
         </SearchContainer>
 
         <RightSection>
-          <NotifBtn aria-label="Notifications">
-            <IconBell />
-            {hasNotif && <NotifDot />}
-          </NotifBtn>
+          <NotificationBell />
 
           <HelpBtn
             onClick={() => navigate('/aide')}

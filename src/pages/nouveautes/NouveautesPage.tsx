@@ -1,4 +1,5 @@
-import { useState, useDeferredValue, useMemo } from 'react'
+import { useState, useDeferredValue, useMemo, useEffect } from 'react'
+import { useNotifications } from '@/contexts/NotificationsContext'
 import styled, { keyframes } from 'styled-components'
 import { BookCard } from '@/components/catalogue/BookCard'
 import { UniverseFilter } from '@/components/catalogue/UniverseFilter'
@@ -196,6 +197,9 @@ function IconEmpty() {
 }
 
 export function NouveautesPage() {
+  const { markAsRead } = useNotifications()
+  useEffect(() => { markAsRead('nouveautes') }, [markAsRead])
+
   const [universe, setUniverse] = useState<Universe | null>(null)
   const [query, setQuery]       = useState('')
   const [sort, setSort]         = useState<SortKey>('pertinence')
