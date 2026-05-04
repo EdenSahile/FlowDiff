@@ -1,16 +1,21 @@
 import styled, { keyframes } from 'styled-components'
 import { useAuthContext } from '@/contexts/AuthContext'
+import { mq } from '@/lib/responsive'
 
 /* ── Animations ── */
 const fadeIn = keyframes`from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}`
 
 /* ── Styled ── */
 const Page = styled.div`
-  padding: ${({ theme }) => theme.spacing.lg};
+  padding: ${({ theme }) => theme.spacing.md};
   max-width: 700px;
   margin: 0 auto;
   animation: ${fadeIn} .25s ease;
   @media (prefers-reduced-motion: reduce) { animation: none; }
+
+  ${mq.md} {
+    padding: ${({ theme }) => theme.spacing.lg};
+  }
 `
 
 const PageHeader = styled.div`
@@ -57,6 +62,7 @@ const CardHeader = styled.div`
   display: flex;
   align-items: center;
   gap: ${({ theme }) => theme.spacing.md};
+  flex-wrap: wrap;
 `
 
 const Avatar = styled.div`
