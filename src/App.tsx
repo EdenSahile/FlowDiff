@@ -67,7 +67,7 @@ function usePrefetchPages() {
       import('@/pages/cgv/CGVPage')
       import('@/pages/newsletter/NewsletterPage')
       import('@/pages/rdv/RdvPage')
-    }, 1000)
+    }, 100)
     return () => clearTimeout(t)
   }, [])
 }
@@ -75,7 +75,7 @@ function usePrefetchPages() {
 function ProtectedLayout() {
   return (
     <AppLayout>
-      <Suspense fallback={<PageSkeleton />}>
+      <Suspense fallback={null}>
         <Outlet />
       </Suspense>
     </AppLayout>
