@@ -1,6 +1,6 @@
 import { useState, type JSX } from 'react'
 import { theme } from '@/lib/theme'
-import styled from 'styled-components'
+import styled, { keyframes } from 'styled-components'
 import { MOCK_FLASH_INFOS, FLASH_CATEGORIES } from '@/data/mockFlashInfos'
 import type { FlashCategory } from '@/data/mockFlashInfos'
 import { getBookById, UNIVERSES } from '@/data/mockBooks'
@@ -9,10 +9,38 @@ import { useCart } from '@/contexts/CartContext'
 import { useToast } from '@/contexts/ToastContext'
 
 /* ── Layout ── */
+const fadeIn = keyframes`from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}`
+
 const Page = styled.div`
   padding: ${({ theme }) => theme.spacing.lg};
   max-width: 1200px;
   margin: 0 auto;
+  animation: ${fadeIn} .25s ease;
+  @media (prefers-reduced-motion: reduce) { animation: none; }
+`
+
+const PageHeader = styled.div`
+  margin-bottom: ${({ theme }) => theme.spacing.lg};
+`
+
+const PageEyebrow = styled.p`
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: ${({ theme }) => theme.colors.accent};
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  &::before {
+    content: '';
+    width: 18px;
+    height: 1.5px;
+    background: ${({ theme }) => theme.colors.accent};
+    display: inline-block;
+  }
 `
 
 const PageTitle = styled.h1`
@@ -20,7 +48,14 @@ const PageTitle = styled.h1`
   font-size: ${({ theme }) => theme.typography.sizes['2xl']};
   font-weight: ${({ theme }) => theme.typography.weights.bold};
   color: ${({ theme }) => theme.colors.navy};
-  margin-bottom: ${({ theme }) => theme.spacing.lg};
+  margin: 0 0 4px;
+`
+
+const PageSubtitle = styled.p`
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: ${({ theme }) => theme.typography.sizes.sm};
+  color: ${({ theme }) => theme.colors.gray[600]};
+  margin: 0;
 `
 
 /* ── Filtres ── */
@@ -105,12 +140,15 @@ const EmptyState = styled.div`
 const Card = styled.article<{ $clickable: boolean }>`
   background: ${({ theme }) => theme.colors.white};
   border-radius: ${({ theme }) => theme.radii.lg};
+  border: 1px solid ${({ theme }) => theme.colors.gray[200]};
+  box-shadow: 0 1px 4px rgba(35, 47, 62, 0.06);
   overflow: hidden;
-  transition: transform 0.18s ease;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
   cursor: ${({ $clickable }) => ($clickable ? 'pointer' : 'default')};
 
   &:hover {
     transform: ${({ $clickable }) => ($clickable ? 'translateY(-2px)' : 'none')};
+    box-shadow: ${({ $clickable }) => $clickable ? '0 4px 14px rgba(35,47,62,0.12)' : '0 1px 4px rgba(35,47,62,0.06)'};
   }
 `
 
@@ -166,7 +204,7 @@ const VideoIframe = styled.iframe`
 `
 
 const CardBody = styled.div`
-  padding: ${({ theme }) => theme.spacing.md};
+  padding: ${({ theme }) => theme.spacing.lg};
   display: flex;
   flex-direction: column;
   gap: ${({ theme }) => theme.spacing.sm};
@@ -458,7 +496,11 @@ export function FlashInfosPage() {
 
   return (
     <Page>
-      <PageTitle>Flash Infos</PageTitle>
+      <PageHeader>
+        <PageEyebrow>Actualités</PageEyebrow>
+        <PageTitle>Flash Infos</PageTitle>
+        <PageSubtitle>Auteurs, fonds, nouveautés — toute l'actualité FlowDiff en temps réel</PageSubtitle>
+      </PageHeader>
 
       <FiltersGroup>
         <FilterRow>
