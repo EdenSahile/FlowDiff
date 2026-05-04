@@ -211,11 +211,11 @@ const Grid = styled.div`
   }
 
   @media (min-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(274px, 1fr));
   }
 
   @media (min-width: 1024px) {
-    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(274px, 1fr));
   }
 `
 

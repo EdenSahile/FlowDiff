@@ -83,7 +83,7 @@ const Grid = styled.div`
   }
 
   @media (min-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   }
 
   @media (min-width: 1024px) {
@@ -178,7 +178,7 @@ export function AParaitrePage() {
               <ProgrammeCount>{books.length} titre{books.length > 1 ? 's' : ''}</ProgrammeCount>
             </ProgrammeTitle>
             <Grid>
-              {books.map(book => <BookCard key={book.id} book={book} />)}
+              {books.map(book => <BookCard key={book.id} book={book} coverFirst />)}
             </Grid>
           </ProgrammeSection>
         )

@@ -261,7 +261,7 @@ const QtyValue = styled.span`
 
 const AjouterBtn = styled.button<{ $epuise?: boolean; $added?: boolean }>`
   width: 100%;
-  padding: 8px;
+  padding: 12px 8px;
   border: none;
   border-radius: ${({ theme }) => theme.radii.md};
   background: ${({ $epuise, $added, theme }) =>
@@ -354,55 +354,83 @@ const RdvBtn = styled.button`
 /* ══════════════════════════════════════
    COVER-FIRST LAYOUT
 ══════════════════════════════════════ */
-const CoverWrap = styled.div`
+const CoverZone = styled.div`
   position: relative;
   width: 100%;
-  height: 260px;
-  overflow: hidden;
-  background: ${({ theme }) => theme.colors.gray[100]};
+  height: 200px;
+  background: ${({ theme }) => theme.colors.white};
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.gray[200]};
   flex-shrink: 0;
 `
 
-const OverlayBadge = styled.span<{ $pos: 'left' | 'right'; $variant: 'topVente' | 'selection' }>`
+const Book3D = styled.div`
+  display: inline-block;
+  transform: perspective(1200px) rotateY(-10deg) rotateX(2deg);
+  filter: drop-shadow(8px 12px 20px rgba(0, 0, 0, 0.22));
+  transition: transform 0.22s ease, filter 0.22s ease;
+  border-radius: 2px;
+
+  ${Card}:hover & {
+    transform: perspective(1200px) rotateY(-6deg) rotateX(1deg) translateY(-3px);
+    filter: drop-shadow(10px 16px 26px rgba(0, 0, 0, 0.28));
+  }
+`
+
+const StarCorner = styled.div`
   position: absolute;
-  top: 12px;
-  ${({ $pos }) => $pos === 'left' ? 'left: 12px;' : 'right: 12px;'}
-  padding: 4px 10px;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+`
+
+const TopVenteBadge = styled.span`
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 3px 9px;
   border-radius: ${({ theme }) => theme.radii.md};
+  background: ${({ theme }) => theme.colors.navy};
+  color: #fff;
   font-family: ${({ theme }) => theme.typography.fontFamily};
-  font-size: 9.5px;
+  font-size: 9px;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   z-index: 2;
-  backdrop-filter: blur(4px);
-
-  ${({ $variant, theme }) => $variant === 'topVente' ? `
-    background: rgba(35, 47, 62, 0.92);
-    color: #fff;
-    box-shadow: 0 1px 6px rgba(0,0,0,0.22);
-  ` : `
-    background: rgba(247, 240, 220, 0.95);
-    color: #7a5c00;
-    border: 1px solid ${theme.colors.accent};
-    box-shadow: 0 1px 6px rgba(0,0,0,0.10);
-  `}
+  box-shadow: 0 1px 6px rgba(0,0,0,0.18);
 `
 
-const CFBody = styled.div`
+const CFInfoSection = styled.div`
   padding: 12px 14px 14px;
   display: flex;
   flex-direction: column;
 `
 
-const CFBadgeRow = styled.div`
+const CFBadgeGroup = styled.div`
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: 0;
+  gap: 4px;
+  margin-bottom: 7px;
 `
 
-const CFTitle = styled.h3`
+const SelectionChip = styled.span`
+  padding: 2px 7px;
+  border-radius: ${({ theme }) => theme.radii.xl};
+  background: ${({ theme }) => theme.colors.accentLight};
+  color: #7a5c00;
+  border: 1px solid ${({ theme }) => theme.colors.accent};
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  flex-shrink: 0;
+`
+
+const CF2Title = styled.h3`
   font-family: ${({ theme }) => theme.typography.fontFamily};
   font-size: 14px;
   font-weight: 700;
@@ -412,37 +440,29 @@ const CFTitle = styled.h3`
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  margin: 8px 0 0;
-  min-height: calc(14px * 1.3 * 2);
+  margin: 0 0 3px;
 `
 
-const CFAuthors = styled.p`
+const CF2Authors = styled.p`
   font-family: ${({ theme }) => theme.typography.fontFamily};
-  font-size: 12.5px;
-  font-weight: 500;
+  font-size: 12px;
   color: ${({ theme }) => theme.colors.gray[600]};
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  margin: 3px 0 0;
+  margin: 0 0 1px;
 `
 
-const CFPublisher = styled.p`
+const CF2Publisher = styled.p`
   font-family: ${({ theme }) => theme.typography.fontFamily};
   font-size: 11px;
   color: ${({ theme }) => theme.colors.gray[400]};
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  margin: 2px 0 0;
+  margin: 0;
 `
 
-const CFDivider = styled.div`
-  width: 100%;
-  height: 1px;
-  background: ${({ theme }) => theme.colors.gray[200]};
-  margin: 12px 0 0;
-`
 
 const CFPrice = styled.span`
   font-family: ${({ theme }) => theme.typography.fontFamily};
@@ -483,17 +503,16 @@ const CFPriceRow = styled.div`
   justify-content: space-between;
   gap: 8px;
   margin-top: 12px;
-  min-height: 40px;
 `
 
 const CFStockRow = styled.div`
   display: flex;
   align-items: center;
-  margin-top: 8px;
+  margin-top: 6px;
 `
 
 const CFActionRow = styled.div`
-  margin-top: 12px;
+  margin-top: 10px;
 `
 
 /* ── Icônes ── */
@@ -615,57 +634,49 @@ export function BookCard({ book, showType = false, coverFirst = false }: Props) 
           tabIndex={0}
           onKeyDown={e => e.key === 'Enter' && navigate(`/livre/${book.id}`)}
         >
-          {/* ── Couverture pleine largeur ── */}
-          <CoverWrap>
-            <BookCover
-              isbn={book.isbn}
-              alt={book.title}
-              universe={book.universe}
-              authors={book.authors}
-              publisher={book.publisher}
-              collection={book.collection}
-              fill
-            />
-            {book.topVente && (
-              <OverlayBadge $pos="left" $variant="topVente">Top vente</OverlayBadge>
-            )}
-            {book.selection && (
-              <OverlayBadge $pos="right" $variant="selection">Sélection</OverlayBadge>
-            )}
-          </CoverWrap>
+          {/* ── Couverture centrée sur fond neutre ── */}
+          <CoverZone>
+            <Book3D>
+              <BookCover
+                isbn={book.isbn}
+                alt={book.title}
+                universe={book.universe}
+                authors={book.authors}
+                publisher={book.publisher}
+                collection={book.collection}
+                width={108}
+                height={158}
+              />
+            </Book3D>
+            {book.topVente && <TopVenteBadge>Top vente</TopVenteBadge>}
+            <StarCorner ref={starRef}>
+              <StarBtn
+                $active={inList}
+                onClick={handleStarClick}
+                aria-label="Ajouter à une liste"
+                title="Ajouter à une liste"
+              >
+                <IconStar filled={inList} />
+              </StarBtn>
+            </StarCorner>
+          </CoverZone>
 
-          {/* ── Infos ── */}
-          <CFBody>
-            {/* Badge univers + étoile — même ligne */}
-            <CFBadgeRow>
+          {/* ── Infos + zone commerciale ── */}
+          <CFInfoSection>
+            <CFBadgeGroup>
               <UniverseBadge $bg={catColors.bg} $color={catColors.text}>
                 {book.universe}
               </UniverseBadge>
-              <div ref={starRef}>
-                <StarBtn
-                  $active={inList}
-                  onClick={handleStarClick}
-                  aria-label="Ajouter à une liste"
-                  title="Ajouter à une liste"
-                >
-                  <IconStar filled={inList} />
-                </StarBtn>
-              </div>
-            </CFBadgeRow>
-
-            {/* Groupe identité — serrés = liés */}
-            <CFTitle>{book.title}</CFTitle>
-            <CFAuthors>{book.authors.join(', ')}</CFAuthors>
+              {book.selection && <SelectionChip>Sélection</SelectionChip>}
+            </CFBadgeGroup>
+            <CF2Title>{book.title}</CF2Title>
+            <CF2Authors>{book.authors.join(', ')}</CF2Authors>
             {(book.publisher || pubYear) && (
-              <CFPublisher>
+              <CF2Publisher>
                 {book.publisher}{pubYear ? ` · ${pubYear}` : ''}
-              </CFPublisher>
+              </CF2Publisher>
             )}
 
-            {/* Séparateur — marque la rupture avec la section prix */}
-            <CFDivider />
-
-            {/* Groupe prix + quantité */}
             <CFPriceRow>
               <CFPrice>
                 {book.priceTTC.toFixed(2).replace('.', ',')} €<sup>TTC</sup>
@@ -700,14 +711,12 @@ export function BookCard({ book, showType = false, coverFirst = false }: Props) 
               )}
             </CFPriceRow>
 
-            {/* Stock */}
             {book.statut && (
               <CFStockRow>
                 <StockStatus statut={book.statut} delaiReimp={book.delaiReimp} />
               </CFStockRow>
             )}
 
-            {/* CTA */}
             <CFActionRow>
               {isIndispo ? (
                 <AjouterBtn $epuise disabled aria-disabled="true" onClick={e => e.stopPropagation()}>
@@ -719,7 +728,7 @@ export function BookCard({ book, showType = false, coverFirst = false }: Props) 
                 </AjouterBtn>
               )}
             </CFActionRow>
-          </CFBody>
+          </CFInfoSection>
         </Card>
 
         {popoverAnchor && (

@@ -631,30 +631,7 @@ const SectionLabel = styled.p`
   }
 `
 
-const FAB = styled.button`
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  background: ${({ theme }) => theme.colors.navy};
-  color: #fff;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 16px rgba(45,58,74,0.35), 0 2px 8px rgba(0,0,0,0.12);
-  transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
-  z-index: 1000;
 
-  &:hover {
-    transform: scale(1.08);
-    background: ${({ theme }) => theme.colors.primaryHover};
-    box-shadow: 0 6px 24px rgba(45,58,74,0.45), 0 3px 12px rgba(0,0,0,0.15);
-  }
-`
 
 const PanelHeader = styled.div`
   display: flex;
@@ -2299,12 +2276,6 @@ export function HomePage() {
         />
 
       </Content>
-
-      <FAB title="Donner un feedback" aria-label="Ouvrir le formulaire de feedback" onClick={() => navigate('/contact')}>
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-        </svg>
-      </FAB>
 
     </Page>
   )

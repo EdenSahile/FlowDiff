@@ -129,7 +129,7 @@ const MonthLine = styled.div`
 
 const Grid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: ${({ theme }) => theme.spacing.md};
 `
 
@@ -233,7 +233,7 @@ export function AuteurPage() {
               </MonthHeader>
               <Grid>
                 {monthBooks.map(book => (
-                  <BookCard key={book.id} book={book} showType />
+                  <BookCard key={book.id} book={book} showType coverFirst />
                 ))}
               </Grid>
             </MonthSection>

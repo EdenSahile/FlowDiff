@@ -214,7 +214,7 @@ const PodiumGrid = styled.div`
   padding: ${({ theme }) => theme.spacing.lg} ${({ theme }) => theme.spacing.md};
 
   & > * {
-    width: 200px;
+    width: 260px;
     flex-shrink: 0;
   }
 
@@ -503,7 +503,7 @@ function TopSection({
                 <BadgeTop>TOP</BadgeTop>
                 <BadgeNum>{rank}</BadgeNum>
               </TopBadge>
-              <BookCard book={book} showType />
+              <BookCard book={book} showType coverFirst />
             </CardWrapper>
           )
         })}

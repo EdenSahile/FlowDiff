@@ -91,7 +91,7 @@ const Grid = styled.div`
   }
 
   @media (min-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   }
 
   @media (min-width: 1024px) {
@@ -150,7 +150,7 @@ export function NouveautesPage() {
 
       {nouveautes.length > 0 ? (
         <Grid>
-          {nouveautes.map(book => <BookCard key={book.id} book={book} showType />)}
+          {nouveautes.map(book => <BookCard key={book.id} book={book} showType coverFirst />)}
         </Grid>
       ) : (
         <EmptyState>

@@ -1,45 +1,7 @@
-import { memo } from 'react'
+import { memo, useState, useEffect } from 'react'
 import styled from 'styled-components'
 import type { Universe } from '@/data/mockBooks'
 
-/* ── deterministic hash ── */
-function hash(str: string): number {
-  let h = 0
-  for (let i = 0; i < str.length; i++) { h = Math.imul(31, h) + str.charCodeAt(i) | 0 }
-  return Math.abs(h)
-}
-
-/* ── palette: [bg, accent, text] par univers ── */
-const PALETTES: Record<Universe, Array<[string, string, string]>> = {
-  'Littérature': [
-    ['#1a2744', '#c9a96e', '#f0e6d3'],
-    ['#2c1810', '#d4956a', '#f5e8dc'],
-    ['#1a3a2a', '#9ab87a', '#e8f0e0'],
-    ['#2d1b3d', '#c89fc4', '#f0e0f0'],
-    ['#3a2010', '#e8a84a', '#fff3d8'],
-  ],
-  'BD/Mangas': [
-    ['#1e0a3c', '#e89b2e', '#fff3d8'],
-    ['#0a0a2e', '#ff6b8a', '#ffe8ee'],
-    ['#0a2040', '#5bc4f5', '#e0f4ff'],
-    ['#2a0a1e', '#f07de8', '#fce0f8'],
-    ['#1a2a00', '#a8e060', '#e8f8d0'],
-  ],
-  'Jeunesse': [
-    ['#7a2800', '#ffd166', '#fff8e0'],
-    ['#005a30', '#7ee8a2', '#e0f8eb'],
-    ['#004a6a', '#7ed8f8', '#e0f5ff'],
-    ['#5a1030', '#ffaac0', '#ffe8ee'],
-    ['#4a3a00', '#f0c040', '#fff8d0'],
-  ],
-  'Adulte-pratique': [
-    ['#062030', '#3ecfcf', '#d0f8f8'],
-    ['#102808', '#78c840', '#e8f8d8'],
-    ['#282808', '#e8c040', '#fff8d8'],
-    ['#200840', '#9878f8', '#ece0ff'],
-    ['#101828', '#60a8e8', '#d8eeff'],
-  ],
-}
 
 /* ── decorative SVG by universe ── */
 function Deco({ universe, accent, w, h }: { universe: Universe; accent: string; w: number; h: number }) {
@@ -183,6 +145,14 @@ interface Props {
   fill?: boolean
 }
 
+const CoverImg = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+`
+
 function BookCoverBase({
   isbn,
   alt,
@@ -194,35 +164,49 @@ function BookCoverBase({
   collection,
   fill = false,
 }: Props) {
-  const palette = PALETTES[universe]
-  const idx = hash(isbn) % palette.length
-  const [bg, accent] = palette[idx]
+  const [imgFailed, setImgFailed] = useState(false)
 
-  /* échelles relatives à la hauteur */
+  useEffect(() => { setImgFailed(false) }, [isbn])
+
   const titleFs  = Math.max(8,  Math.round(height * 0.10))
   const authorFs = Math.max(7,  Math.round(height * 0.08))
   const pad      = Math.max(4,  Math.round(width  * 0.07))
-
   const pubLabel = [publisher || null, collection || null].filter(Boolean).join(' · ')
+
+  const openLibraryUrl = `https://covers.openlibrary.org/b/isbn/${isbn}-M.jpg`
+
+  if (!imgFailed) {
+    return (
+      <Wrapper $w={width} $h={height} $fill={fill}>
+        <CoverImg
+          src={openLibraryUrl}
+          alt={alt}
+          loading="lazy"
+          onError={() => setImgFailed(true)}
+          onLoad={(e) => {
+            const img = e.currentTarget
+            if (img.naturalWidth < 10 || img.naturalHeight < 10) setImgFailed(true)
+          }}
+        />
+      </Wrapper>
+    )
+  }
+
+  const fallbackBg     = '#232f3e'
+  const fallbackAccent = '#C9A84C'
 
   return (
     <Wrapper $w={width} $h={height} $fill={fill}>
-      <Bg $bg={bg} />
-      <Spine $accent={accent} />
-
-      {/* Publisher + collection badge — hidden in fill mode (overlaps with overlay badges) */}
+      <Bg $bg={fallbackBg} />
+      <Spine $accent={fallbackAccent} />
       {pubLabel && !fill && <PubBadge>{pubLabel}</PubBadge>}
-
-      {/* Decorative graphic */}
-      <Deco universe={universe} accent={accent} w={width} h={height} />
-
-      {/* Title + Author */}
-      <TitleArea $pad={pad}>
-        <TitleText $fs={titleFs}>{alt}</TitleText>
-        {authors[0] && (
-          <AuthorText $fs={authorFs}>{authors[0]}</AuthorText>
-        )}
-      </TitleArea>
+      <Deco universe="Littérature" accent={fallbackAccent} w={width} h={height} />
+      {!fill && (
+        <TitleArea $pad={pad}>
+          <TitleText $fs={titleFs}>{alt}</TitleText>
+          {authors[0] && <AuthorText $fs={authorFs}>{authors[0]}</AuthorText>}
+        </TitleArea>
+      )}
     </Wrapper>
   )
 }

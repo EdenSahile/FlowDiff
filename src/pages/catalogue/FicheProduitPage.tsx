@@ -474,7 +474,6 @@ const AddBtnMain = styled.button<{ $added: boolean }>`
   justify-content: center;
   gap: 6px;
   white-space: nowrap;
-  flex: 1;
   &:hover:not(:disabled) { background: ${({ theme }) => theme.colors.primaryHover}; }
   &:disabled { opacity: .5; cursor: not-allowed; }
 `
