@@ -137,11 +137,11 @@ export function computeTotals(items: CartItem[], opGroups: OPCartGroup[], rates:
 
   const subtotalTTC  = booksTTC + opBooksTTC + opPLVTTC
   const remiseAmount = booksRemise + opBooksRemise
-  /* Net TTC après remise → extraction TVA (5,5% inclus dans le TTC) */
+  /* Remise appliquée sur HT : netHT = (subtotalTTC − remiseTTC) / 1,055 */
   const netTTC       = subtotalTTC - remiseAmount
   const netHT        = netTTC / 1.055
-  const tva          = netTTC - netHT
-  const totalTTC     = netTTC
+  const tva          = netHT * 0.055
+  const totalTTC     = netHT + tva
   return { subtotalTTC, remiseAmount, netHT, tva, totalTTC }
 }
 

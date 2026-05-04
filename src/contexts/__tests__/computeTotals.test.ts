@@ -83,14 +83,11 @@ describe('computeTotals', () => {
     ]
     const totals = computeTotals(items, [], cartRates)
 
-    // remiseAmount = somme des remises TTC ligne par ligne (pas divisée par 1,055)
+    // remiseAmount = somme des remises TTC ligne par ligne
     const attendu = 12.99 * 0.30 + 7.99 * 0.30 + 21.00 * 0.35 + 7.30 * 0.35
     expect(totals.remiseAmount).toBeCloseTo(attendu, 2)
 
-    // la version HT (actuellement affichée à tort) serait différente
-    expect(totals.remiseAmount).not.toBeCloseTo(attendu / 1.055, 2)
-
-    // Net HT = (subtotalTTC - remiseAmount) / 1,055
+    // Net HT = (subtotalTTC − remiseTTC) / 1,055 (remise appliquée sur HT)
     const netTTC = totals.subtotalTTC - totals.remiseAmount
     expect(totals.netHT).toBeCloseTo(netTTC / 1.055, 2)
   })
