@@ -72,4 +72,26 @@ describe('computeTotals', () => {
     const totals = computeTotals(items, [], rates)
     expect(totals.totalTTC).toBeCloseTo(totals.netHT + totals.tva, 5)
   })
+
+  it('récap 4 articles réels — remiseAmount est la somme TTC des remises ligne par ligne', () => {
+    const cartRates = { 'BD/Mangas': 0.30, 'Littérature': 0.35, 'Jeunesse': 0.30, 'Adulte-pratique': 0.35 }
+    const items = [
+      makeItem(12.99, 'BD/Mangas'),   // Le Lotus Bleu
+      makeItem(7.99,  'BD/Mangas'),   // Kaguya-sama
+      makeItem(21.00, 'Littérature'), // L'Anomalie
+      makeItem(7.30,  'Littérature'), // L'Étranger
+    ]
+    const totals = computeTotals(items, [], cartRates)
+
+    // remiseAmount = somme des remises TTC ligne par ligne (pas divisée par 1,055)
+    const attendu = 12.99 * 0.30 + 7.99 * 0.30 + 21.00 * 0.35 + 7.30 * 0.35
+    expect(totals.remiseAmount).toBeCloseTo(attendu, 2)
+
+    // la version HT (actuellement affichée à tort) serait différente
+    expect(totals.remiseAmount).not.toBeCloseTo(attendu / 1.055, 2)
+
+    // Net HT = (subtotalTTC - remiseAmount) / 1,055
+    const netTTC = totals.subtotalTTC - totals.remiseAmount
+    expect(totals.netHT).toBeCloseTo(netTTC / 1.055, 2)
+  })
 })

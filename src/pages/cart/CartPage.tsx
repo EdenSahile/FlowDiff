@@ -1091,8 +1091,7 @@ export function CartPage() {
   }
 
   /* ── Récapitulatif HT (Option A — tout en HT, standard facture diffuseur) ── */
-  const montantHT = subtotalTTC / 1.055          // brut HT avant remise
-  const remiseHT  = remiseAmount / 1.055          // remise en HT (= montantHT − netHT)
+  const montantTTC = subtotalTTC
 
   /* ── Badge remise % (base livres uniquement, hors PLV) ── */
   const booksTTCOnly = items.reduce((s, { book, quantity }) => s + book.priceTTC * quantity, 0)
@@ -1258,8 +1257,8 @@ export function CartPage() {
 
         <div style={{ borderTop: '1px solid #eee', marginTop: '12px', paddingTop: '12px' }}>
           <RecapRow><span>Livraison</span><span>{deliveryLabel}</span></RecapRow>
-          <RecapRow><span>Montant HT</span><span>{fmt(montantHT)}</span></RecapRow>
-          <RecapRow><span>Remise</span><span>− {fmt(remiseHT)}</span></RecapRow>
+          <RecapRow><span>Montant TTC</span><span>{fmt(montantTTC)}</span></RecapRow>
+          <RecapRow><span>Remise</span><span>− {fmt(remiseAmount)}</span></RecapRow>
           <RecapRow><span>Net HT</span><span>{fmt(netHT)}</span></RecapRow>
           <RecapRow><span>TVA 5,5%</span><span>{fmt(tva)}</span></RecapRow>
           <RecapRow style={{ fontWeight: 700, fontSize: '1rem', color: theme.colors.success, paddingTop: '8px' }}>
@@ -1409,8 +1408,8 @@ export function CartPage() {
               <span>Transmission</span>
               <span>{localTransmission === 'EDI' ? '📡 EDI Dilicom' : '🌐 FlowDiff'}</span>
             </RecapRow>
-            <RecapRow><span>Montant HT</span><span>{fmt(montantHT)}</span></RecapRow>
-            <RecapRow><span>Remise</span><span>− {fmt(remiseHT)}</span></RecapRow>
+            <RecapRow><span>Montant TTC</span><span>{fmt(montantTTC)}</span></RecapRow>
+            <RecapRow><span>Remise</span><span>− {fmt(remiseAmount)}</span></RecapRow>
             <RecapRow><span>Net HT</span><span>{fmt(netHT)}</span></RecapRow>
             <RecapRow><span>TVA 5,5%</span><span>{fmt(tva)}</span></RecapRow>
             <RecapRow style={{ fontWeight: 700, fontSize: '1rem', color: theme.colors.success, paddingTop: '8px' }}>
@@ -1745,7 +1744,7 @@ export function CartPage() {
             <RecapSideBody>
               <RecapSideRow>
                 <span>Montant HT</span>
-                <span>{fmt(montantHT)}</span>
+                <span>{fmt(montantTTC)}</span>
               </RecapSideRow>
               {remisePct > 0 && (
                 <RecapSideDiscount>
@@ -1756,7 +1755,7 @@ export function CartPage() {
                       : <span>−{remisePct.toFixed(1)}%</span>
                     }
                   </span>
-                  <span>− {fmt(remiseHT)}</span>
+                  <span>− {fmt(remiseAmount)}</span>
                 </RecapSideDiscount>
               )}
               <RecapSideRow>
