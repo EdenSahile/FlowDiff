@@ -63,7 +63,7 @@ const Page = styled.div`
   animation: ${fadeIn} 0.22s ease;
 
   ${mq.belowMd} {
-    padding: 14px 16px 48px;
+    padding: 24px 16px 96px;
   }
 `
 
@@ -122,6 +122,10 @@ const BreadcrumbNav = styled.nav`
   color: ${({ theme }) => theme.colors.gray[400]};
   margin-bottom: 14px;
   flex-wrap: wrap;
+
+  ${mq.belowMd} {
+    margin-bottom: 20px;
+  }
 `
 
 const BreadcrumbLink = styled.button`
@@ -153,8 +157,8 @@ const BookLayout = styled.div`
   align-items: start;
 
   ${mq.belowMd} {
-    grid-template-columns: 1fr;
-    gap: 20px;
+    grid-template-columns: 110px 1fr;
+    gap: 14px;
   }
 `
 
@@ -167,7 +171,7 @@ const CoverColNew = styled.div`
     position: static;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
   }
 `
 
@@ -180,7 +184,7 @@ const CoverFrame = styled.div`
   position: relative;
 
   ${mq.belowMd} {
-    width: 140px;
+    width: 110px;
   }
 `
 
@@ -205,7 +209,7 @@ const CoverActionsRow = styled.div`
   margin-top: 8px;
 
   ${mq.belowMd} {
-    width: 140px;
+    width: 110px;
   }
 `
 
@@ -236,7 +240,7 @@ const MetaBox = styled.div`
   overflow: hidden;
 
   ${mq.belowMd} {
-    width: 140px;
+    width: 110px;
   }
 `
 
@@ -623,6 +627,10 @@ const OrderInfoIconEl = styled.span`
 /* ── Similar books ── */
 const SimilarSectionNew = styled.section`
   margin-top: 28px;
+
+  ${mq.belowMd} {
+    margin-top: 40px;
+  }
 `
 
 const SimilarHeaderRow = styled.div`
