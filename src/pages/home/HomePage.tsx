@@ -200,6 +200,7 @@ const Page = styled.div`
   flex-direction: column;
   align-items: center;
   padding: 24px 16px 48px;
+  overflow-x: hidden;
 
   ${mq.md} {
     padding: 24px 28px 48px;
@@ -1286,136 +1287,6 @@ const SectionArrowBtn = styled.button<{ $disabled?: boolean }>`
   }
 `
 
-/* ── Ghost cards (emplacements libres) ── */
-const GhostRow = styled.div`
-  display: flex;
-  gap: 10px;
-  margin-top: 10px;
-
-  ${mq.belowMd} {
-    display: none;
-  }
-`
-
-const GhostCard = styled.div`
-  flex: 1;
-  background: rgba(255,255,255,.5);
-  border: 1.5px dashed ${({ theme }) => theme.colors.gray[200]};
-  border-radius: ${({ theme }) => theme.radii.md};
-  padding: 14px 12px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
-  opacity: .5;
-  transition: opacity .2s, border-color .2s, background .2s;
-  min-height: 68px;
-  &:hover {
-    opacity: .8;
-    border-color: ${({ theme }) => theme.colors.accent};
-    background: rgba(212,168,67,.05);
-  }
-`
-
-const GhostCardIcon = styled.div`
-  width: 32px; height: 32px;
-  border-radius: 8px;
-  background: ${({ theme }) => theme.colors.gray[100]};
-  color: ${({ theme }) => theme.colors.gray[200]};
-  display: flex; align-items: center; justify-content: center;
-  font-size: 16px; font-weight: 300; flex-shrink: 0;
-  transition: background .2s, color .2s;
-  ${GhostCard}:hover & {
-    background: rgba(212,168,67,.15);
-    color: ${({ theme }) => theme.colors.accent};
-  }
-`
-
-const GhostCardLabel = styled.span`
-  font-size: 11px;
-  color: ${({ theme }) => theme.colors.gray[400]};
-`
-
-const GhostKpiCard = styled.div`
-  flex: 1;
-  background: rgba(255,255,255,.5);
-  border: 1.5px dashed ${({ theme }) => theme.colors.gray[200]};
-  border-radius: ${({ theme }) => theme.radii.md};
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  cursor: pointer;
-  opacity: .45;
-  transition: opacity .2s, border-color .2s, background .2s;
-  min-height: 100px;
-  &:hover {
-    opacity: .75;
-    border-color: ${({ theme }) => theme.colors.accent};
-    background: rgba(212,168,67,.04);
-  }
-`
-
-const GhostKpiIcon = styled.div`
-  width: 32px; height: 32px;
-  border-radius: 50%;
-  background: ${({ theme }) => theme.colors.gray[100]};
-  color: ${({ theme }) => theme.colors.gray[200]};
-  display: flex; align-items: center; justify-content: center;
-  font-size: 16px; font-weight: 300;
-  transition: background .2s, color .2s;
-  ${GhostKpiCard}:hover & {
-    background: rgba(212,168,67,.15);
-    color: ${({ theme }) => theme.colors.accent};
-  }
-`
-
-const GhostKpiLabel = styled.span`
-  font-size: 11px;
-  color: ${({ theme }) => theme.colors.gray[400]};
-`
-
-const GhostPanel = styled.div`
-  background: rgba(255,255,255,.45);
-  border: 1.5px dashed ${({ theme }) => theme.colors.gray[200]};
-  border-radius: ${({ theme }) => theme.radii.md};
-  padding: 24px 16px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  cursor: pointer;
-  opacity: .45;
-  min-height: 120px;
-  transition: opacity .2s, border-color .2s, background .2s;
-  &:hover {
-    opacity: .75;
-    border-color: ${({ theme }) => theme.colors.accent};
-    background: rgba(212,168,67,.04);
-  }
-`
-
-const GhostPanelIcon = styled.div`
-  width: 36px; height: 36px;
-  border-radius: 50%;
-  background: ${({ theme }) => theme.colors.gray[100]};
-  color: ${({ theme }) => theme.colors.gray[200]};
-  display: flex; align-items: center; justify-content: center;
-  font-size: 18px; font-weight: 300;
-  transition: background .2s, color .2s;
-  ${GhostPanel}:hover & {
-    background: rgba(212,168,67,.15);
-    color: ${({ theme }) => theme.colors.accent};
-  }
-`
-
-const GhostPanelLabel = styled.span`
-  font-size: 12px;
-  color: ${({ theme }) => theme.colors.gray[400]};
-`
 
 const MiniPrice = styled.div`
   font-size: 11px;
@@ -1832,11 +1703,6 @@ export function HomePage() {
               })
             }
           </ActionsGrid>
-          <GhostRow>
-            <GhostCard><GhostCardIcon>+</GhostCardIcon><GhostCardLabel>Emplacement libre</GhostCardLabel></GhostCard>
-            <GhostCard><GhostCardIcon>+</GhostCardIcon><GhostCardLabel>Emplacement libre</GhostCardLabel></GhostCard>
-            <GhostCard><GhostCardIcon>+</GhostCardIcon><GhostCardLabel>Emplacement libre</GhostCardLabel></GhostCard>
-          </GhostRow>
         </ActionsBox>
         </SectionWrap>
           )
@@ -1912,15 +1778,7 @@ export function HomePage() {
                 )
               })
             }
-            <GhostKpiCard>
-              <GhostKpiIcon>+</GhostKpiIcon>
-              <GhostKpiLabel>Emplacement libre</GhostKpiLabel>
-            </GhostKpiCard>
           </KPIGrid>
-          <GhostRow style={{ marginTop: '12px' }}>
-            <GhostKpiCard><GhostKpiIcon>+</GhostKpiIcon><GhostKpiLabel>Emplacement libre</GhostKpiLabel></GhostKpiCard>
-            <GhostKpiCard><GhostKpiIcon>+</GhostKpiIcon><GhostKpiLabel>Emplacement libre</GhostKpiLabel></GhostKpiCard>
-          </GhostRow>
         </BilanSection>
         </SectionWrap>
           )
@@ -2089,11 +1947,6 @@ export function HomePage() {
             })
           }
         </ThreeColRow>
-          <div style={{ display: 'grid', gridTemplateColumns: '45fr 30fr 25fr', gap: '14px', marginTop: '12px' }}>
-            <GhostPanel><GhostPanelIcon>+</GhostPanelIcon><GhostPanelLabel>Emplacement libre</GhostPanelLabel></GhostPanel>
-            <GhostPanel><GhostPanelIcon>+</GhostPanelIcon><GhostPanelLabel>Emplacement libre</GhostPanelLabel></GhostPanel>
-            <GhostPanel><GhostPanelIcon>+</GhostPanelIcon><GhostPanelLabel>Emplacement libre</GhostPanelLabel></GhostPanel>
-          </div>
         </SectionWrap>
           )
 
@@ -2256,11 +2109,6 @@ export function HomePage() {
             })
           }
         </ThreeColRow>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '14px', marginTop: '12px' }}>
-            <GhostPanel><GhostPanelIcon>+</GhostPanelIcon><GhostPanelLabel>Emplacement libre</GhostPanelLabel></GhostPanel>
-            <GhostPanel><GhostPanelIcon>+</GhostPanelIcon><GhostPanelLabel>Emplacement libre</GhostPanelLabel></GhostPanel>
-            <GhostPanel><GhostPanelIcon>+</GhostPanelIcon><GhostPanelLabel>Emplacement libre</GhostPanelLabel></GhostPanel>
-          </div>
         </SectionWrap>
           )
 
