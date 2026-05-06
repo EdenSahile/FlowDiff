@@ -11,6 +11,7 @@ import { ListPickerPopover } from '@/components/catalogue/ListPickerPopover'
 import { StockAlertModal } from '@/components/ui/StockAlertModal'
 import { slugifyAuthor } from '@/lib/slugify'
 import { theme } from '@/lib/theme'
+import { mq } from '@/lib/responsive'
 
 /* ── Formats physiques ── */
 type FormatId = 'broche' | 'poche'
@@ -60,6 +61,10 @@ const Page = styled.div`
   max-width: 1000px;
   margin: 0 auto;
   animation: ${fadeIn} 0.22s ease;
+
+  ${mq.belowMd} {
+    padding: 14px 16px 48px;
+  }
 `
 
 const BackButton = styled.button`
@@ -147,8 +152,9 @@ const BookLayout = styled.div`
   gap: 28px;
   align-items: start;
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
+  ${mq.belowMd} {
     grid-template-columns: 1fr;
+    gap: 20px;
   }
 `
 
@@ -156,6 +162,13 @@ const BookLayout = styled.div`
 const CoverColNew = styled.div`
   position: sticky;
   top: 94px;
+
+  ${mq.belowMd} {
+    position: static;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
 `
 
 const CoverFrame = styled.div`
@@ -165,6 +178,10 @@ const CoverFrame = styled.div`
   overflow: hidden;
   box-shadow: 0 8px 32px rgba(42,42,40,.15), 0 2px 8px rgba(42,42,40,.08);
   position: relative;
+
+  ${mq.belowMd} {
+    width: 140px;
+  }
 `
 
 const CoverBadgeDetail = styled.span`
@@ -186,6 +203,10 @@ const CoverActionsRow = styled.div`
   display: flex;
   gap: 8px;
   margin-top: 8px;
+
+  ${mq.belowMd} {
+    width: 140px;
+  }
 `
 
 const CoverActionBtn = styled.button`
@@ -213,6 +234,10 @@ const MetaBox = styled.div`
   border: 1.5px solid rgba(42,42,40,.07);
   border-radius: 8px;
   overflow: hidden;
+
+  ${mq.belowMd} {
+    width: 140px;
+  }
 `
 
 const MetaRowItem = styled.div`
@@ -269,6 +294,10 @@ const BookTitleMain = styled.h1`
   letter-spacing: -.01em;
   line-height: 1.2;
   margin-bottom: 4px;
+
+  ${mq.belowMd} {
+    font-size: 18px;
+  }
 `
 
 const BookAuthorMain = styled.p`
