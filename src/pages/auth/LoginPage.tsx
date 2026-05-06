@@ -34,7 +34,6 @@ import {
   BrandFooter,
   FormPanel,
   FormPanelInner,
-  FormEyebrow,
 } from '@/components/auth/AuthLayout'
 
 /* ── Blocked modal ── */
@@ -159,6 +158,7 @@ export function LoginPage() {
   }
 
   return (
+    <>
     <SplitPage>
       <BrandPanel>
         <BrandPanelDotGrid />
@@ -205,7 +205,7 @@ export function LoginPage() {
       <FormPanel>
         <FormPanelInner>
           <AuthLogo>
-            <Wordmark size="lg" showBaseline />
+            <Wordmark size="lg" showBaseline responsiveOnDark />
           </AuthLogo>
 
           <AuthTitle>Connexion</AuthTitle>
@@ -283,11 +283,9 @@ export function LoginPage() {
         </FormPanelInner>
       </FormPanel>
 
-      <div style={{ gridColumn: '1 / -1' }}>
-        <DemoBanner />
-      </div>
-
       {blockedMsg && <BlockedModal message={blockedMsg} onClose={() => setBlockedMsg(null)} />}
     </SplitPage>
+    <DemoBanner />
+    </>
   )
 }

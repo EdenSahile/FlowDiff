@@ -1,4 +1,5 @@
 import styled from 'styled-components'
+import { mq } from '@/lib/responsive'
 
 export const AuthPage = styled.main`
   min-height: 100vh;
@@ -16,7 +17,7 @@ export const AuthCard = styled.div`
   width: 100%;
   max-width: 420px;
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
+  ${mq.belowMd} {
     padding: ${({ theme }) => theme.spacing.xl};
     border-radius: ${({ theme }) => theme.radii.lg};
   }
@@ -55,17 +56,25 @@ export const AuthTitle = styled.h1`
   font-family: ${({ theme }) => theme.typography.fontFamily};
   font-size: ${({ theme }) => theme.typography.sizes.xl};
   font-weight: ${({ theme }) => theme.typography.weights.bold};
-  color: ${({ theme }) => theme.colors.navy};
+  color: ${({ theme }) => theme.colors.white};
   text-align: center;
   margin-bottom: ${({ theme }) => theme.spacing.xs};
+
+  ${mq.md} {
+    color: ${({ theme }) => theme.colors.navy};
+  }
 `
 
 export const AuthSubtitle = styled.p`
   font-family: ${({ theme }) => theme.typography.fontFamily};
   font-size: ${({ theme }) => theme.typography.sizes.sm};
-  color: ${({ theme }) => theme.colors.gray[600]};
+  color: rgba(255, 255, 255, 0.65);
   text-align: center;
   margin-bottom: ${({ theme }) => theme.spacing.xl};
+
+  ${mq.md} {
+    color: ${({ theme }) => theme.colors.gray[600]};
+  }
 `
 
 export const AuthForm = styled.form`
@@ -88,17 +97,30 @@ export const AuthLink = styled.div`
   text-align: center;
   font-family: ${({ theme }) => theme.typography.fontFamily};
   font-size: ${({ theme }) => theme.typography.sizes.sm};
-  color: ${({ theme }) => theme.colors.gray[600]};
+  color: rgba(255, 255, 255, 0.55);
   margin-top: ${({ theme }) => theme.spacing.md};
 
   a {
-    color: ${({ theme }) => theme.colors.navy};
+    color: ${({ theme }) => theme.colors.accent};
     font-weight: ${({ theme }) => theme.typography.weights.semibold};
     text-decoration: underline;
     cursor: pointer;
 
     &:hover {
-      color: ${({ theme }) => theme.colors.navyHover};
+      opacity: 0.8;
+    }
+  }
+
+  ${mq.md} {
+    color: ${({ theme }) => theme.colors.gray[600]};
+
+    a {
+      color: ${({ theme }) => theme.colors.navy};
+
+      &:hover {
+        color: ${({ theme }) => theme.colors.navyHover};
+        opacity: 1;
+      }
     }
   }
 `
@@ -136,23 +158,23 @@ export const PasswordToggle = styled.button`
 
 export const SplitPage = styled.main`
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   min-height: 100vh;
-  padding-top: ${({ theme }) => theme.layout.demoBannerHeight};
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    grid-template-columns: 1fr;
+  ${mq.md} {
+    grid-template-columns: 1fr 1fr;
   }
 `
 
 export const BrandPanel = styled.div`
   background-color: ${({ theme }) => theme.colors.navy};
   position: relative;
-  display: flex;
+  display: none;
   flex-direction: column;
   justify-content: space-between;
   padding: 52px 56px 44px;
   overflow: hidden;
+  min-width: 0;
 
   &::before {
     content: '';
@@ -164,8 +186,8 @@ export const BrandPanel = styled.div`
     pointer-events: none;
   }
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    display: none;
+  ${mq.md} {
+    display: flex;
   }
 `
 
@@ -354,19 +376,22 @@ export const FormEyebrow = styled.div`
 `
 
 export const FormPanel = styled.div`
-  background-color: ${({ theme }) => theme.colors.gray[50]};
+  background-color: ${({ theme }) => theme.colors.navy};
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  padding: ${({ theme }) => theme.spacing.xl} ${({ theme }) => theme.spacing.lg};
+  padding: 32px ${({ theme }) => theme.spacing.md};
+  min-width: 0;
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    background-color: ${({ theme }) => theme.colors.navy};
-    padding: ${({ theme }) => theme.spacing.lg};
+  ${mq.md} {
+    background-color: ${({ theme }) => theme.colors.gray[50]};
+    align-items: center;
+    padding: ${({ theme }) => theme.spacing.xl} ${({ theme }) => theme.spacing.lg};
   }
 `
 
 export const FormPanelInner = styled.div`
   width: 100%;
   max-width: 380px;
+  min-width: 0;
 `

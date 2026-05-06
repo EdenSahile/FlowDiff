@@ -1,9 +1,11 @@
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
+import { mq } from '@/lib/responsive'
 
 type WordmarkSize = 'sm' | 'md' | 'lg'
 
 interface WordmarkProps {
   onDark?: boolean
+  responsiveOnDark?: boolean
   size?: WordmarkSize
   showBaseline?: boolean
 }
@@ -30,12 +32,16 @@ const Row = styled.div`
   gap: 8px;
 `
 
-const Text = styled.span<{ $size: WordmarkSize; $onDark: boolean }>`
+const Text = styled.span<{ $size: WordmarkSize; $onDark: boolean; $responsiveOnDark?: boolean }>`
   font-size: ${({ $size }) => sizes[$size].font};
   font-weight: 800;
   letter-spacing: ${({ $size }) => sizes[$size].letterSpacing};
   line-height: 1;
   color: ${({ $onDark, theme }) => ($onDark ? '#FAFAF7' : theme.colors.navy)};
+  ${({ $responsiveOnDark, theme }) => $responsiveOnDark && css`
+    color: #FAFAF7;
+    ${mq.md} { color: ${theme.colors.navy}; }
+  `}
 `
 
 const Diff = styled.span`
@@ -55,24 +61,28 @@ const ProTag = styled.span<{ $size: WordmarkSize }>`
   flex-shrink: 0;
 `
 
-const Baseline = styled.span<{ $size: WordmarkSize; $onDark: boolean }>`
+const Baseline = styled.span<{ $size: WordmarkSize; $onDark: boolean; $responsiveOnDark?: boolean }>`
   font-size: ${({ $size }) => sizes[$size].baselineFont};
   font-weight: 500;
   letter-spacing: 0.3px;
   color: ${({ $onDark }) => ($onDark ? 'rgba(250,250,247,0.7)' : 'rgba(30,58,95,0.7)')};
+  ${({ $responsiveOnDark }) => $responsiveOnDark && css`
+    color: rgba(250,250,247,0.7);
+    ${mq.md} { color: rgba(30,58,95,0.7); }
+  `}
 `
 
-export function Wordmark({ onDark = false, size = 'md', showBaseline = false }: WordmarkProps) {
+export function Wordmark({ onDark = false, responsiveOnDark = false, size = 'md', showBaseline = false }: WordmarkProps) {
   return (
     <Wrap>
       <Row>
-        <Text $size={size} $onDark={onDark}>
+        <Text $size={size} $onDark={onDark} $responsiveOnDark={responsiveOnDark}>
           Flow<Diff>Diff</Diff>
         </Text>
         <ProTag $size={size}>PRO</ProTag>
       </Row>
       {showBaseline && (
-        <Baseline $size={size} $onDark={onDark}>
+        <Baseline $size={size} $onDark={onDark} $responsiveOnDark={responsiveOnDark}>
           La diffusion au service des libraires.
         </Baseline>
       )}

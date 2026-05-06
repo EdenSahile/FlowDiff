@@ -15,6 +15,7 @@ import { useDashboardConfig, type DashboardZone } from '@/hooks/useDashboardConf
 import { CustomizerDrawer } from '@/components/dashboard/CustomizerDrawer'
 import { computeKPIs, computeChartData, computeDonutData, computeTopPublishers, orderToDashboardOrders, fmtEur, type ChartPoint, type DonutSegment } from '@/data/mockDashboard'
 import { exportDashboardCSV } from '@/lib/exportCSV'
+import { mq } from '@/lib/responsive'
 
 const nouveautes = MOCK_BOOKS
   .filter(b => b.type === 'nouveaute')
@@ -200,7 +201,7 @@ const Page = styled.div`
   align-items: center;
   padding: 24px 16px 48px;
 
-  @media (min-width: ${({ theme }) => theme.breakpoints.mobile}) {
+  ${mq.md} {
     padding: 24px 28px 48px;
   }
 `
@@ -363,7 +364,7 @@ const ActionsGrid = styled.div`
   grid-template-columns: repeat(5, 1fr);
   gap: 10px;
 
-  @media (max-width: 700px) {
+  ${mq.belowMd} {
     grid-template-columns: repeat(2, 1fr);
   }
 `
@@ -463,7 +464,7 @@ const DashboardControls = styled.div`
   gap: 8px;
   flex-wrap: wrap;
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
+  ${mq.belowMd} {
     width: 100%;
   }
 `
@@ -494,7 +495,7 @@ const KPIGrid = styled.div`
   grid-template-columns: repeat(4, 1fr);
   gap: 12px;
 
-  @media (max-width: 700px) {
+  ${mq.belowMd} {
     grid-template-columns: repeat(2, 1fr);
   }
 `
@@ -583,7 +584,7 @@ const ThreeColRow = styled.div<{ $count: number }>`
   gap: 16px;
   align-items: start;
 
-  @media (max-width: 900px) {
+  ${mq.belowLg} {
     grid-template-columns: 1fr;
   }
 `

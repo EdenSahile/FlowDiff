@@ -7,6 +7,7 @@ import { theme } from '@/lib/theme'
 import type { OfficeBook } from '@/data/mockOffices'
 import { BookCover } from '@/components/catalogue/BookCover'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
+import { mq } from '@/lib/responsive'
 
 // ── Types ──────────────────────────────────────────────────────────
 type BookStatus = 'inclus' | 'retire'
@@ -159,7 +160,7 @@ const Page = styled.div`
   background: ${({ theme }) => theme.colors.gray[50]};
   padding: 28px 32px;
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
+  ${mq.belowMd} {
     padding: 16px;
   }
 `
@@ -234,7 +235,7 @@ const HeaderRight = styled.div`
   gap: 8px;
   flex-shrink: 0;
 
-  @media (max-width: 600px) {
+  ${mq.belowMd} {
     flex-wrap: wrap;
   }
 `
@@ -264,10 +265,10 @@ const SummaryGrid = styled.div`
   grid-template-columns: repeat(4, 1fr);
   gap: 12px;
 
-  @media (max-width: 900px) {
+  ${mq.belowLg} {
     grid-template-columns: repeat(2, 1fr);
   }
-  @media (max-width: 480px) {
+  ${mq.belowSm} {
     grid-template-columns: 1fr;
   }
 `
@@ -395,7 +396,7 @@ const TableHead = styled.div`
   border-bottom: 1px solid ${({ theme }) => theme.colors.gray[200]};
   padding: 0 16px;
 
-  @media (max-width: 900px) {
+  ${mq.belowLg} {
     display: none;
   }
 `
@@ -453,7 +454,7 @@ const BookRow = styled.div<{ $retired: boolean }>`
     border-bottom: none;
   }
 
-  @media (max-width: 900px) {
+  ${mq.belowLg} {
     grid-template-columns: 1fr;
     gap: 12px;
   }
@@ -526,7 +527,7 @@ const BookPriceLine = styled.div`
 const DataCell = styled.div`
   padding: 0 8px;
 
-  @media (max-width: 900px) {
+  ${mq.belowLg} {
     padding: 0;
     display: flex;
     align-items: center;
@@ -537,7 +538,7 @@ const DataCell = styled.div`
 const MobileLabel = styled.span`
   display: none;
 
-  @media (max-width: 900px) {
+  ${mq.belowLg} {
     display: inline-block;
     font-size: 11px;
     font-weight: 500;
@@ -602,7 +603,7 @@ const QtyBtn = styled.button`
     pointer-events: none;
   }
 
-  @media (max-width: 900px) {
+  ${mq.belowLg} {
     width: 36px;
     height: 36px;
   }
@@ -721,7 +722,7 @@ const ActionsRow = styled.div`
   justify-content: flex-end;
   gap: 12px;
 
-  @media (max-width: 600px) {
+  ${mq.belowMd} {
     flex-direction: column;
     align-items: stretch;
   }

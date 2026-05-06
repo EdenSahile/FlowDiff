@@ -1,6 +1,7 @@
 import { useState, type JSX } from 'react'
 import { theme } from '@/lib/theme'
 import styled, { keyframes } from 'styled-components'
+import { mq } from '@/lib/responsive'
 import { MOCK_FLASH_INFOS, FLASH_CATEGORIES } from '@/data/mockFlashInfos'
 import type { FlashCategory } from '@/data/mockFlashInfos'
 import { getBookById, UNIVERSES } from '@/data/mockBooks'
@@ -156,7 +157,7 @@ const CardInner = styled.div`
   display: flex;
   flex-direction: column;
 
-  @media (min-width: ${({ theme }) => theme.breakpoints.mobile}) {
+  ${mq.md} {
     flex-direction: row;
   }
 `
@@ -165,7 +166,7 @@ const MediaArea = styled.div`
   flex-shrink: 0;
   width: 100%;
 
-  @media (min-width: ${({ theme }) => theme.breakpoints.mobile}) {
+  ${mq.md} {
     width: 280px;
   }
 `
@@ -176,7 +177,7 @@ const CardImage = styled.img`
   object-fit: cover;
   display: block;
 
-  @media (min-width: ${({ theme }) => theme.breakpoints.mobile}) {
+  ${mq.md} {
     height: 100%;
     min-height: 200px;
   }
@@ -188,7 +189,7 @@ const VideoWrapper = styled.div`
   height: 200px;
   overflow: hidden;
 
-  @media (min-width: ${({ theme }) => theme.breakpoints.mobile}) {
+  ${mq.md} {
     height: 100%;
     min-height: 200px;
   }
@@ -338,7 +339,7 @@ const MediaPlaceholder = styled.div<{ $bg: string }>`
   align-items: center;
   justify-content: center;
 
-  @media (min-width: ${({ theme }) => theme.breakpoints.mobile}) {
+  ${mq.md} {
     width: 280px;
     height: 100%;
     min-height: 200px;
