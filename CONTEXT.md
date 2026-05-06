@@ -14,7 +14,8 @@ TS clean · 162 tests passants · session 2026-05-06
 **Notifications** : Feed chronologique 3 types, NotificationBell, NotificationsContext, markAsRead ✅  
 **Audit Mobile Responsive** : 360px→1400px · `src/lib/responsive.ts` (bp/mq) · 16 pages alignées · 0 scroll horizontal · touch ≥44px ✅  
 **LoginPage responsive** : overflow grid corrigé (DemoBanner sorti de SplitPage) · Wordmark prop `responsiveOnDark` (white mobile / navy desktop) ✅  
-**Scroll restoration FicheProduitPage** : `useEffect([id])` → `window.scrollTo(0,0)` — remonte en haut à chaque navigation "Vous aimerez aussi" ✅
+**Scroll restoration FicheProduitPage** : `useEffect([id])` → `window.scrollTo(0,0)` — remonte en haut à chaque navigation "Vous aimerez aussi" ✅  
+**FicheProduitPage mobile** : scroll horizontal supprimé · `OrderZoneEl` empilé vertical · `AddBtnMain` 48px full-width · `SecBtnHoriz` 2 par ligne (50%) · `StockZoneEl` flex-wrap · touch targets ≥44px · "Vous aimerez aussi" en carrousel horizontal snap ✅
 
 ---
 

@@ -64,6 +64,7 @@ const Page = styled.div`
 
   ${mq.belowMd} {
     padding: 24px 16px 96px;
+    overflow-x: hidden;
   }
 `
 
@@ -274,6 +275,7 @@ const DetailCol = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0;
+  min-width: 0;
 `
 
 const BookUniverseBadge = styled.span<{ $bg: string; $color: string }>`
@@ -428,6 +430,8 @@ const StockZoneEl = styled.div`
   align-items: center;
   gap: 8px;
   margin-bottom: 10px;
+  flex-wrap: wrap;
+  row-gap: 4px;
 `
 
 const StockIndicatorEl = styled.span<{ $statut?: string }>`
@@ -466,6 +470,12 @@ const OrderZoneEl = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
+
+  ${mq.belowMd} {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
 `
 
 const QtyStepperLg = styled.div`
@@ -475,6 +485,10 @@ const QtyStepperLg = styled.div`
   border-radius: 7px;
   overflow: hidden;
   flex-shrink: 0;
+
+  ${mq.belowMd} {
+    width: 100%;
+  }
 `
 
 const QtyBtnLg = styled.button`
@@ -492,6 +506,12 @@ const QtyBtnLg = styled.button`
   transition: background .1s;
   &:hover { background: rgba(42,42,40,.08); }
   &:disabled { opacity: .35; cursor: not-allowed; }
+
+  ${mq.belowMd} {
+    width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
+  }
 `
 
 const QtyInputLg = styled.input`
@@ -509,6 +529,12 @@ const QtyInputLg = styled.input`
   outline: none;
   -moz-appearance: textfield;
   &::-webkit-inner-spin-button, &::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+  ${mq.belowMd} {
+    flex: 1;
+    height: 44px;
+    font-size: 15px;
+  }
 `
 
 const AddBtnMain = styled.button<{ $added: boolean }>`
@@ -530,6 +556,13 @@ const AddBtnMain = styled.button<{ $added: boolean }>`
   white-space: nowrap;
   &:hover:not(:disabled) { background: ${({ theme }) => theme.colors.primaryHover}; }
   &:disabled { opacity: .5; cursor: not-allowed; }
+
+  ${mq.belowMd} {
+    height: 48px;
+    width: 100%;
+    font-size: 14px;
+    border-radius: 8px;
+  }
 `
 
 const EpuiseNoticeEl = styled.p`
@@ -581,6 +614,13 @@ const SecBtnHoriz = styled.button`
   gap: 5px;
   transition: border-color .15s, color .15s;
   &:hover { border-color: ${({ theme }) => theme.colors.navy}; color: ${({ theme }) => theme.colors.navy}; }
+
+  ${mq.belowMd} {
+    min-width: 0;
+    height: 40px;
+    font-size: 11px;
+    flex-basis: calc(50% - 3px);
+  }
 `
 
 /* ── Synopsis ── */
@@ -665,8 +705,16 @@ const SimilarGridNew = styled.div`
   grid-template-columns: repeat(7, 1fr);
   gap: 10px;
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    grid-template-columns: repeat(3, 1fr);
+  ${mq.belowMd} {
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    gap: 10px;
+    padding-bottom: 8px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    &::-webkit-scrollbar { display: none; }
   }
 `
 
@@ -683,6 +731,11 @@ const SimilarCardNew = styled.article`
     transform: translateY(-2px);
     border-color: rgba(42,42,40,.18);
     box-shadow: 0 4px 14px rgba(42,42,40,.09);
+  }
+
+  ${mq.belowMd} {
+    flex: 0 0 130px;
+    scroll-snap-align: start;
   }
 `
 
