@@ -463,6 +463,15 @@ const CF2Publisher = styled.p`
   margin: 0;
 `
 
+const IsbnText = styled.p`
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 13px;
+  font-weight: 700;
+  color: ${({ theme }) => theme.colors.navy};
+  margin: 3px 0 0;
+  letter-spacing: 0.01em;
+`
+
 
 const CFPrice = styled.span`
   font-family: ${({ theme }) => theme.typography.fontFamily};
@@ -676,6 +685,7 @@ export function BookCard({ book, showType = false, coverFirst = false }: Props) 
                 {book.publisher}{pubYear ? ` · ${pubYear}` : ''}
               </CF2Publisher>
             )}
+            {book.isbn && <IsbnText>{book.isbn}</IsbnText>}
 
             <CFPriceRow>
               <CFPrice>
@@ -779,6 +789,7 @@ export function BookCard({ book, showType = false, coverFirst = false }: Props) 
               {book.publisher}{book.collection ? ` · ${book.collection}` : ''}
             </Publisher>
           )}
+          {book.isbn && <IsbnText>{book.isbn}</IsbnText>}
         </CardHeader>
 
         {/* ── Body : visuel ── */}
