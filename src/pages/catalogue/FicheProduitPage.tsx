@@ -327,6 +327,7 @@ const AuthorLinkBtn = styled.button`
   background: none;
   border: none;
   padding: 0;
+  margin-top: 5px;
   margin-bottom: 12px;
   font-family: ${({ theme }) => theme.typography.fontFamily};
   font-size: 12px;
@@ -668,9 +669,11 @@ const OrderInfoIconEl = styled.span`
 /* ── Similar books ── */
 const SimilarSectionNew = styled.section`
   margin-top: 28px;
+  padding-top: 24px;
 
   ${mq.belowMd} {
     margin-top: 40px;
+    padding-top: 20px;
   }
 `
 
@@ -1707,7 +1710,7 @@ export function FicheProduitPage() {
       {similar.length > 0 && (
         <SimilarSectionNew>
           <SimilarHeaderRow>
-            <SimilarTitleEl>Vous aimerez aussi</SimilarTitleEl>
+            <SimilarTitleEl>Dans la même thématique</SimilarTitleEl>
             <SimilarLinkEl onClick={() => navigate(`${sectionPath}?universe=${encodeURIComponent(book.universe)}`)}>
               Voir tout en {book.universe} →
             </SimilarLinkEl>
