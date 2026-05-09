@@ -21,6 +21,7 @@ interface PhysicalFormat {
   label: string
   description: string
   priceTTC: number
+  dimensions: string
 }
 
 const LOREM_SHORT =
@@ -1300,8 +1301,8 @@ export function FicheProduitPage() {
   }
 
   const formats: PhysicalFormat[] = [
-    { id: 'broche', label: 'Broché', description: 'Format standard', priceTTC: book.priceTTC },
-    { id: 'poche',  label: 'Poche',  description: 'Format poche',    priceTTC: Math.round(book.priceTTC * 0.62 * 100) / 100 },
+    { id: 'broche', label: 'Broché', description: 'Format standard', priceTTC: book.priceTTC,                                      dimensions: book.format },
+    { id: 'poche',  label: 'Poche',  description: 'Format poche',    priceTTC: Math.round(book.priceTTC * 0.62 * 100) / 100, dimensions: '108 x 177 mm' },
   ]
 
   const selectedFormat = formats.find(f => f.id === formatId)!
@@ -1387,7 +1388,7 @@ export function FicheProduitPage() {
               </ArgMetaItem>
               <ArgMetaItem>
                 <ArgMetaLabel>Format</ArgMetaLabel>
-                <ArgMetaValue>{book.format}</ArgMetaValue>
+                <ArgMetaValue>{selectedFormat.dimensions}</ArgMetaValue>
               </ArgMetaItem>
               {book.pages && (
                 <ArgMetaItem>
@@ -1509,7 +1510,7 @@ export function FicheProduitPage() {
             )}
             <MetaRowItem>
               <MetaLabelEl>Format</MetaLabelEl>
-              <MetaValueEl>{book.format}</MetaValueEl>
+              <MetaValueEl>{selectedFormat.dimensions}</MetaValueEl>
             </MetaRowItem>
             {book.collection && (
               <MetaRowItem>
