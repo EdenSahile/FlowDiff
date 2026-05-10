@@ -58,10 +58,15 @@ const fadeIn = keyframes`from{opacity:0;transform:translateY(8px)}to{opacity:1;t
    LAYOUT GÉNÉRAL
 ══════════════════════════════════════════════════════ */
 const Page = styled.div`
-  padding: ${({ theme }) => theme.spacing.lg};
+  padding: ${({ theme }) => theme.spacing.md};
   max-width: 720px;
   margin: 0 auto;
+  overflow-x: hidden;
   animation: ${fadeIn} .25s ease;
+
+  ${mq.sm} {
+    padding: ${({ theme }) => theme.spacing.lg};
+  }
   @media (prefers-reduced-motion: reduce) { animation: none; }
 `
 
@@ -258,7 +263,8 @@ const ItemFooter = styled.div`
 `
 
 const PriceStrip = styled.div`
-  display: inline-flex;
+  display: flex;
+  width: 100%;
   align-items: stretch;
   background: rgba(28, 58, 95, 0.03);
   border: 1px solid rgba(28, 58, 95, 0.10);
@@ -268,10 +274,15 @@ const PriceStrip = styled.div`
 `
 
 const PriceCell = styled.div`
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 5px 12px;
+  padding: 5px 6px;
+
+  ${mq.sm} {
+    padding: 5px 12px;
+  }
 
   & + & {
     border-left: 1px solid rgba(28, 58, 95, 0.08);
@@ -283,9 +294,12 @@ const PriceCellLabel = styled.span`
   font-size: 8.5px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.07em;
+  letter-spacing: 0.04em;
   color: ${({ theme }) => theme.colors.gray[400]};
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
   line-height: 1;
 `
 
@@ -797,8 +811,10 @@ const TwoColLayout = styled.div`
 const ItemsCol = styled.div``
 
 const RecapCol = styled.div`
-  position: sticky;
-  top: calc(${({ theme }) => theme.layout.headerHeight} + 16px);
+  ${mq.md} {
+    position: sticky;
+    top: calc(${({ theme }) => theme.layout.headerHeight} + 16px);
+  }
 `
 
 const UniverseGroupLabel = styled.div`
@@ -902,6 +918,8 @@ const RecapSideTotalValue = styled.p`
 
 const ValidateBtn = styled.button`
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   height: 52px;
   background: ${({ theme }) => theme.colors.navy};
   color: #fff;

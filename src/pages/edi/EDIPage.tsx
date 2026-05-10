@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom'
 import styled, { keyframes } from 'styled-components'
 import { useAuthContext } from '@/contexts/AuthContext'
 import { useEDI } from '@/contexts/EDIContext'
@@ -7,6 +7,7 @@ import { theme } from '@/lib/theme'
 import { useToast } from '@/contexts/ToastContext'
 import { mq } from '@/lib/responsive'
 import { EDIMessageModal } from '@/components/edi/EDIMessageModal'
+import { useDemoState } from '@/contexts/DemoStateContext'
 import { DesadvGroupedList } from '@/components/edi/DesadvGroupedList'
 import { exportToCSV } from '@/lib/csv'
 import {
@@ -16,6 +17,7 @@ import {
   formatEDITypeLabel,
   formatEDIStatusLabel,
   getBusinessStatus,
+  isDesadvPartial,
   type EDIMessage,
   type EDIFilter,
 } from '@/lib/ediUtils'
@@ -742,12 +744,24 @@ const EDIFooter = styled.footer`
 export function EDIPage() {
   const { user } = useAuthContext()
   const { messages, lastSync, params, updateParams } = useEDI()
+  const { markDesadvSeen } = useDemoState()
   const { showToast } = useToast()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
+  const location = useLocation()
 
   const initialFilter = (searchParams.get('filter') as EDIFilter | null) ?? 'ALL'
   const [activeFilter, setActiveFilter] = useState<EDIFilter>(initialFilter)
+
+  useEffect(() => {
+    const id = location.hash === '#historique' ? 'historique'
+             : location.hash === '#flux-en-cours' ? 'flux-en-cours'
+             : null
+    if (id) {
+      const el = document.getElementById(id)
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }, [location.hash])
   const [selectedMessage, setSelectedMessage] = useState<EDIMessage | null>(null)
   const [refInput, setRefInput] = useState('')
   const [isbnSearch, setIsbnSearch] = useState('')
@@ -805,7 +819,7 @@ export function EDIPage() {
         {/* ── Header ── */}
         <PageHeader>
           <TitleBlock>
-            <PageEyebrow>Mon espace</PageEyebrow>
+            <PageEyebrow>Outils</PageEyebrow>
             <Title>EDI — Échanges de données informatisés</Title>
             <Subtitle>
               Suivez vos flux EDI avec Dilicom et consultez l'historique des échanges avec vos diffuseurs.
@@ -872,7 +886,7 @@ export function EDIPage() {
           </Card>
 
           {/* Flux en cours */}
-          <Card>
+          <Card id="flux-en-cours">
             <CardTitle>Flux en cours</CardTitle>
             <FluxGrid>
               <FluxItem>
@@ -914,7 +928,7 @@ export function EDIPage() {
         {/* ── Corps (table + panel droit) ── */}
         <MainLayout>
           {/* Table historique */}
-          <HistoriqueSection>
+          <HistoriqueSection id="historique">
             <SectionHeader>
               <SectionTitle>Historique des échanges</SectionTitle>
               <SectionActions>
@@ -1131,7 +1145,14 @@ export function EDIPage() {
         <strong style={{ color: theme.colors.navy }}>🏢 DILICOM</strong>
       </EDIFooter>
 
-      <EDIMessageModal message={selectedMessage} onClose={() => setSelectedMessage(null)} />
+      <EDIMessageModal
+        message={selectedMessage}
+        onClose={() => setSelectedMessage(null)}
+        isPartial={selectedMessage ? isDesadvPartial(selectedMessage, messages) : false}
+        onMarkSeen={() => {
+          if (selectedMessage) markDesadvSeen(selectedMessage.id)
+        }}
+      />
     </>
   )
 }

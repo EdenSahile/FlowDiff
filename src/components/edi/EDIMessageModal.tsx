@@ -5,6 +5,8 @@ import { EDIViewer } from '@/components/edi/EDIViewer'
 interface Props {
   message: EDIMessage | null
   onClose: () => void
+  isPartial?: boolean
+  onMarkSeen?: () => void
 }
 
 const Overlay = styled.div`
@@ -18,11 +20,11 @@ const Overlay = styled.div`
   padding: 16px;
 `
 
-export function EDIMessageModal({ message, onClose }: Props) {
+export function EDIMessageModal({ message, onClose, isPartial, onMarkSeen }: Props) {
   if (!message) return null
   return (
     <Overlay onClick={onClose}>
-      <EDIViewer message={message} onClose={onClose} />
+      <EDIViewer message={message} onClose={onClose} isPartial={isPartial} onMarkSeen={onMarkSeen} />
     </Overlay>
   )
 }

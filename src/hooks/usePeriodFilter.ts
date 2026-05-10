@@ -49,6 +49,10 @@ export interface UsePeriodFilterReturn {
   // Données filtrées
   orders: DashboardOrder[]
   compareOrders: DashboardOrder[]
+
+  // Réinitialisation
+  resetToDefault: () => void
+  isDefault: boolean
 }
 
 /* ─────────────────────────────────────────
@@ -330,5 +334,18 @@ export function usePeriodFilter(extraOrders?: DashboardOrder[]): UsePeriodFilter
 
     orders,
     compareOrders,
+
+    isDefault: preset === 'last-30' && compareMode === 'none',
+    resetToDefault: useCallback(() => {
+      const defaultStart = addDays(new Date(), -30).toISOString().slice(0, 10)
+      const defaultEnd   = new Date().toISOString().slice(0, 10)
+      _setPreset('last-30')
+      _setCompareMode('none')
+      _setCustomStart(defaultStart)
+      _setCustomEnd(defaultEnd)
+      _setCustomCompareStart(defaultStart)
+      _setCustomCompareEnd(defaultEnd)
+      localStorage.removeItem(LS_KEY)
+    }, []),
   }
 }

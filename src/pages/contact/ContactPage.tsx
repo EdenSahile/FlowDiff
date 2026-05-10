@@ -246,7 +246,7 @@ export function ContactPage() {
   return (
     <Page>
       <PageHeader>
-        <PageEyebrow>Mon espace</PageEyebrow>
+        <PageEyebrow>Informations</PageEyebrow>
         <PageTitle>Contact</PageTitle>
         <PageSubtitle>Envoyez un message à votre représentant ou au service clients.</PageSubtitle>
       </PageHeader>

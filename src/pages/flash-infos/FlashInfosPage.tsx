@@ -498,7 +498,7 @@ export function FlashInfosPage() {
   return (
     <Page>
       <PageHeader>
-        <PageEyebrow>Actualités</PageEyebrow>
+        <PageEyebrow>Informations</PageEyebrow>
         <PageTitle>Flash Infos</PageTitle>
         <PageSubtitle>Auteurs, fonds, nouveautés — toute l'actualité FlowDiff en temps réel</PageSubtitle>
       </PageHeader>

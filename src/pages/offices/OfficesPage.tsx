@@ -8,6 +8,7 @@ import type { OfficeBook } from '@/data/mockOffices'
 import { BookCover } from '@/components/catalogue/BookCover'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { mq } from '@/lib/responsive'
+import { useDemoState } from '@/contexts/DemoStateContext'
 
 // ── Types ──────────────────────────────────────────────────────────
 type BookStatus = 'inclus' | 'retire'
@@ -830,6 +831,8 @@ const ExportActions = styled.div`
 // ── Component ───────────────────────────────────────────────────────
 export function OfficesPage() {
   const office = CURRENT_OFFICE
+  const { validatedOfficeIds, validateOffice } = useDemoState()
+  const validated = validatedOfficeIds.has(office.id)
 
   const initialStatuses = useMemo(
     () => Object.fromEntries(office.books.map(b => [b.isbn, 'inclus' as BookStatus])),
@@ -917,7 +920,7 @@ export function OfficesPage() {
         <PageHeader>
           <HeaderLeft>
             <div>
-              <PageEyebrow>Mon espace</PageEyebrow>
+              <PageEyebrow>Outils</PageEyebrow>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
                 <PageTitle>Mon office — {office.label}</PageTitle>
                 <PeriodBadge>Période concernée</PeriodBadge>
@@ -1155,8 +1158,13 @@ export function OfficesPage() {
 
         {/* ── Action buttons ── */}
         <ActionsRow>
-          <CancelBtn onClick={handleCancel}>Annuler mes modifications</CancelBtn>
-          <ValidateBtn onClick={() => alert('Office validé !')}>Valider mon office</ValidateBtn>
+          <CancelBtn onClick={handleCancel} disabled={validated}>Annuler mes modifications</CancelBtn>
+          <ValidateBtn
+            onClick={() => validateOffice(office.id)}
+            disabled={validated}
+          >
+            {validated ? '✓ Office validé' : 'Valider mon office'}
+          </ValidateBtn>
         </ActionsRow>
 
       </Content>

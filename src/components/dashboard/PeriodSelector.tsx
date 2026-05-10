@@ -1,16 +1,35 @@
 import styled from 'styled-components'
-import { DatePicker } from '../ui/DatePicker'
-import type { PeriodPreset, UsePeriodFilterReturn } from '../../hooks/usePeriodFilter'
+import type { PeriodPreset, UsePeriodFilterReturn, DateRange } from '../../hooks/usePeriodFilter'
 
 const TABS: { value: PeriodPreset; label: string }[] = [
-  { value: 'last-7',   label: '7j'          },
-  { value: 'last-30',  label: '30j'         },
-  { value: '3-months', label: '3m'          },
-  { value: 'last-12',  label: '12m'         },
+  { value: 'last-7',   label: '7 jours'   },
+  { value: 'last-30',  label: '30 jours'  },
+  { value: '3-months', label: '3 mois'    },
+  { value: 'last-12',  label: '12 mois'   },
   { value: 'custom',   label: 'Personnalisé' },
 ]
 
-const today = new Date().toISOString().slice(0, 10)
+function fmtDate(d: Date): string {
+  return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
+}
+
+function fmtDateFull(d: Date): string {
+  return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })
+}
+
+export function rangeLabel(period: DateRange): string {
+  const sameYear = period.start.getFullYear() === period.end.getFullYear()
+  const start = sameYear ? fmtDate(period.start) : fmtDateFull(period.start)
+  const end = fmtDateFull(period.end)
+  return `${start} — ${end}`
+}
+
+const Wrap = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+`
 
 const TabGroup = styled.div`
   display: flex;
@@ -41,15 +60,25 @@ const TabBtn = styled.button<{ $active: boolean }>`
   }
 `
 
-const CustomRow = styled.div`
+const RangeLabelRow = styled.div`
   display: flex;
   align-items: center;
   gap: 6px;
-  flex-wrap: wrap;
+  padding-left: 2px;
 `
 
-const RangeSep = styled.span`
-  font-size: 0.8125rem;
+const RangeText = styled.span`
+  font-size: 11px;
+  color: ${({ theme }) => theme.colors.gray[400]};
+`
+
+const CompareSep = styled.span`
+  font-size: 11px;
+  color: ${({ theme }) => theme.colors.gray[200]};
+`
+
+const CompareText = styled.span`
+  font-size: 11px;
   color: ${({ theme }) => theme.colors.gray[400]};
 `
 
@@ -58,24 +87,23 @@ export type PeriodSelectorProps = Pick<
   | 'preset'
   | 'setPreset'
   | 'period'
-  | 'customStart'
-  | 'setCustomStart'
-  | 'customEnd'
-  | 'setCustomEnd'
->
+> & {
+  compareMode?: UsePeriodFilterReturn['compareMode']
+  comparePeriod?: UsePeriodFilterReturn['comparePeriod']
+}
 
 export function PeriodSelector({
   preset,
   setPreset,
-  customStart,
-  setCustomStart,
-  customEnd,
-  setCustomEnd,
+  period,
+  compareMode,
+  comparePeriod,
 }: PeriodSelectorProps) {
   const isCustom = preset === 'custom'
+  const isComparing = compareMode !== 'none' && compareMode !== undefined
 
   return (
-    <>
+    <Wrap>
       <TabGroup>
         {TABS.map(tab => (
           <TabBtn
@@ -89,24 +117,17 @@ export function PeriodSelector({
           </TabBtn>
         ))}
       </TabGroup>
-      {isCustom && (
-        <CustomRow>
-          <DatePicker
-            value={customStart}
-            onChange={setCustomStart}
-            max={customEnd || today}
-            placeholder="Début"
-          />
-          <RangeSep>→</RangeSep>
-          <DatePicker
-            value={customEnd}
-            onChange={setCustomEnd}
-            min={customStart}
-            max={today}
-            placeholder="Fin"
-          />
-        </CustomRow>
+      {!isCustom && (
+        <RangeLabelRow>
+          <RangeText>{rangeLabel(period)}</RangeText>
+          {isComparing && comparePeriod && (
+            <>
+              <CompareSep>·</CompareSep>
+              <CompareText>vs {rangeLabel(comparePeriod)}</CompareText>
+            </>
+          )}
+        </RangeLabelRow>
       )}
-    </>
+    </Wrap>
   )
 }

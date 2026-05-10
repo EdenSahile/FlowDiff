@@ -438,4 +438,62 @@ export const MOCK_EDI_MESSAGES: EDIMessage[] = [
     createdAt: '2026-04-27T09:16:00.000Z',
     payload: { invoiceRef: 'INV-2026-0427-001', amountTTC: 1234.50, currency: 'EUR' },
   },
+  {
+    id: 'edi-err-1',
+    type: 'ORDRSP',
+    status: 'ERROR',
+    documentRef: 'ERR-2026-0508-001',
+    diffuseur: 'Diffuseur 2',
+    detail: 'Erreur de format — champ GLN manquant',
+    createdAt: '2026-05-08T14:22:00.000Z',
+    payload: { errorCode: 'MISSING_GLN', orderId: 'CMD-2026-0508-001' },
+  },
+  {
+    id: 'edi-desadv-partial-1',
+    type: 'DESADV',
+    status: 'RECEIVED',
+    documentRef: 'DESADV-2026-0506-001',
+    diffuseur: 'Diffuseur 1',
+    detail: '2 ex. expédiés / 5 confirmés',
+    createdAt: '2026-05-06T09:00:00.000Z',
+    payload: {
+      desadvRef: 'DESADV-2026-0506-001',
+      orderId: 'CMD-2026-0503-001',
+      lines: [
+        { isbn: '9782070360024', qtyShipped: 2 },
+      ],
+    },
+  },
+  {
+    id: 'edi-desadv-partial-2',
+    type: 'DESADV',
+    status: 'RECEIVED',
+    documentRef: 'DESADV-2026-0507-001',
+    diffuseur: 'Diffuseur 3',
+    detail: '1 ex. expédié / 4 confirmés',
+    createdAt: '2026-05-07T11:30:00.000Z',
+    payload: {
+      desadvRef: 'DESADV-2026-0507-001',
+      orderId: 'CMD-2026-0504-001',
+      lines: [
+        { isbn: '9782075017346', qtyShipped: 1 },
+      ],
+    },
+  },
+  {
+    id: 'edi-desadv-partial-3',
+    type: 'DESADV',
+    status: 'RECEIVED',
+    documentRef: 'DESADV-2026-0508-002',
+    diffuseur: 'Diffuseur 2',
+    detail: '3 ex. expédiés / 6 confirmés',
+    createdAt: '2026-05-08T08:15:00.000Z',
+    payload: {
+      desadvRef: 'DESADV-2026-0508-002',
+      orderId: 'CMD-2026-0505-001',
+      lines: [
+        { isbn: '9782344044285', qtyShipped: 3 },
+      ],
+    },
+  },
 ]

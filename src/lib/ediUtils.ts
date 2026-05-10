@@ -195,6 +195,24 @@ export function getFluxCounts(messages: EDIMessage[]): {
   }
 }
 
+export function isDesadvPartial(msg: EDIMessage, messages: EDIMessage[]): boolean {
+  if (msg.type !== 'DESADV') return false
+  const orderId = (msg.payload as DESADVPayload).orderId
+  if (!orderId) return false
+  const { grouped } = groupDESADVByOrder(messages)
+  const group = grouped.find(g => g.orderId === orderId)
+  return group ? group.globalStatus === 'EN_COURS' : false
+}
+
+export function countPendingPartialExpeditions(messages: EDIMessage[], seenIds: Set<string>): number {
+  const { grouped } = groupDESADVByOrder(messages)
+  return grouped
+    .filter(g => g.globalStatus === 'EN_COURS')
+    .flatMap(g => g.desadvs)
+    .filter(d => !seenIds.has(d.id))
+    .length
+}
+
 const TYPE_LABELS: Record<EDIMessageType, string> = {
   ORDERS: 'Commande (ORDERS)',
   ORDRSP: 'Accusé réception (ORDRSP)',

@@ -1,6 +1,5 @@
 import styled from 'styled-components'
 import { NavLink } from 'react-router-dom'
-import { useCart } from '@/contexts/CartContext'
 
 /* ── Icons SVG inline ── */
 function HomeIcon() {
@@ -58,12 +57,13 @@ function GridIcon() {
   )
 }
 
-function CartIcon() {
+function CalendarIcon() {
   return (
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <circle cx="9" cy="21" r="1"/>
-      <circle cx="20" cy="21" r="1"/>
-      <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+      <rect x="3" y="4" width="18" height="18" rx="2"/>
+      <line x1="16" y1="2" x2="16" y2="6"/>
+      <line x1="8" y1="2" x2="8" y2="6"/>
+      <line x1="3" y1="10" x2="21" y2="10"/>
     </svg>
   )
 }
@@ -115,40 +115,17 @@ const TabLabel = styled.span`
   letter-spacing: 0.02em;
 `
 
-const CartTabWrap = styled.span`
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-`
-
-const CartBadge = styled.span`
-  position: absolute;
-  top: -4px;
-  right: -8px;
-  background: ${({ theme }) => theme.colors.accent};
-  color: ${({ theme }) => theme.colors.primary};
-  font-size: 9px;
-  font-weight: 700;
-  min-width: 16px;
-  height: 16px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 3px;
-`
-
 /* ── Component ── */
 export function BottomNav() {
-  const { totalItems } = useCart()
-
   return (
     <Nav aria-label="Navigation principale">
       <StyledNavLink to="/" end>
         <HomeIcon />
         <TabLabel>Accueil</TabLabel>
+      </StyledNavLink>
+      <StyledNavLink to="/a-paraitre">
+        <CalendarIcon />
+        <TabLabel>À paraître</TabLabel>
       </StyledNavLink>
       <StyledNavLink to="/nouveautes">
         <StarIcon />
@@ -157,15 +134,6 @@ export function BottomNav() {
       <StyledNavLink to="/fonds">
         <BookIcon />
         <TabLabel>Fonds</TabLabel>
-      </StyledNavLink>
-      <StyledNavLink to="/panier">
-        <CartTabWrap>
-          <CartIcon />
-          {totalItems > 0 && (
-            <CartBadge>{totalItems > 99 ? '99+' : totalItems}</CartBadge>
-          )}
-        </CartTabWrap>
-        <TabLabel>Panier</TabLabel>
       </StyledNavLink>
       <StyledNavLink to="/selections">
         <GridIcon />

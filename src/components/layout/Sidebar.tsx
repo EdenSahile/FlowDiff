@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import styled from 'styled-components'
-import { NavLink, Link, useNavigate } from 'react-router-dom'
+import { NavLink, Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuthContext } from '@/contexts/AuthContext'
 import { theme } from '@/lib/theme'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
@@ -71,13 +71,14 @@ const ScrollArea = styled.div`
   &::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); }
 `
 
-const SectionLabel = styled.div`
+const SectionLabel = styled.div<{ $active?: boolean }>`
   font-size: 9px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: .12em;
-  color: rgba(255,255,255,.35);
+  color: ${({ $active }) => $active ? GOLD : 'rgba(255,255,255,.35)'};
   padding: 14px 20px 5px;
+  transition: color .15s;
 `
 
 const Divider = styled.div`
@@ -195,7 +196,6 @@ const accountItems = [
 ]
 
 const toolItems = [
-  { to: '/panier',  label: 'Panier',  tooltip: undefined },
   { to: '/edi',     label: 'EDI',     tooltip: undefined },
   { to: '/offices', label: 'Offices', tooltip: undefined },
 ]
@@ -208,7 +208,13 @@ const infoItems = [
 export function Sidebar() {
   const { user, logout } = useAuthContext()
   const navigate = useNavigate()
+  const { pathname } = useLocation()
   const [confirmLogout, setConfirmLogout] = useState(false)
+
+  const catalogueActive = catalogueItems.some(i => pathname.startsWith(i.to))
+  const accountActive   = accountItems.some(i => pathname.startsWith(i.to))
+  const toolsActive     = toolItems.some(i => pathname.startsWith(i.to))
+  const infoActive      = infoItems.some(i => pathname.startsWith(i.to))
 
   const initiale = user?.nomLibrairie?.[0]?.toUpperCase() ?? 'L'
 
@@ -235,7 +241,7 @@ export function Sidebar() {
           </nav>
 
           <Divider />
-          <SectionLabel>Catalogue</SectionLabel>
+          <SectionLabel $active={catalogueActive}>Catalogue</SectionLabel>
           <nav id="tour-catalogue" aria-label="Catalogue">
             {catalogueItems.map(({ to, label }) => (
               <StyledNavLink key={to} to={to}>{label}</StyledNavLink>
@@ -243,7 +249,7 @@ export function Sidebar() {
           </nav>
 
           <Divider />
-          <SectionLabel>Mon espace</SectionLabel>
+          <SectionLabel $active={accountActive}>Mon espace</SectionLabel>
           <nav aria-label="Mon espace">
             {accountItems.map(({ to, label }) => (
               <StyledNavLink key={to} to={to}>{label}</StyledNavLink>
@@ -251,7 +257,7 @@ export function Sidebar() {
           </nav>
 
           <Divider />
-          <SectionLabel>Outils</SectionLabel>
+          <SectionLabel $active={toolsActive}>Outils</SectionLabel>
           <nav aria-label="Outils">
             {toolItems.map(({ to, label, tooltip }) => (
               <StyledNavLink key={to} to={to} id={to === '/edi' ? 'tour-edi' : undefined}>
@@ -262,7 +268,7 @@ export function Sidebar() {
           </nav>
 
           <Divider />
-          <SectionLabel>Informations</SectionLabel>
+          <SectionLabel $active={infoActive}>Informations</SectionLabel>
           <nav aria-label="Informations">
             {infoItems.map(({ to, label }) => (
               <StyledNavLink key={to} to={to}>{label}</StyledNavLink>

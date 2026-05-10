@@ -15,6 +15,7 @@ const LayoutRoot = styled.div`
   display: flex;
   min-height: 100vh;
   background-color: ${({ theme }) => theme.colors.gray[50]};
+  overflow-x: hidden;
 `
 
 const MainColumn = styled.div`

@@ -1,3 +1,4 @@
+import React from 'react'
 import styled from 'styled-components'
 import type { EDIMessage } from '@/lib/ediUtils'
 import {
@@ -9,6 +10,8 @@ import {
 interface Props {
   message: EDIMessage
   onClose: () => void
+  isPartial?: boolean
+  onMarkSeen?: () => void
 }
 
 /* ── Container ── */
@@ -178,7 +181,27 @@ const BtnClose = styled.button`
   &:hover { background: ${({ theme }) => theme.colors.gray[50]}; }
 `
 
-export function EDIViewer({ message, onClose }: Props) {
+const BtnMarkSeen = styled.button`
+  padding: 8px 20px;
+  border: 1.5px solid ${({ theme }) => theme.colors.navy};
+  background: ${({ theme }) => theme.colors.navy};
+  font-size: 0.875rem;
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-weight: ${({ theme }) => theme.typography.weights.medium};
+  color: white;
+  cursor: pointer;
+  &:hover { background: ${({ theme }) => theme.colors.primaryHover}; border-color: ${({ theme }) => theme.colors.primaryHover}; }
+  &:disabled { opacity: 0.55; cursor: default; }
+`
+
+export function EDIViewer({ message, onClose, isPartial, onMarkSeen }: Props) {
+  const [marked, setMarked] = React.useState(false)
+
+  function handleMarkSeen() {
+    onMarkSeen?.()
+    setMarked(true)
+  }
+
   return (
     <Container onClick={e => e.stopPropagation()}>
       <Header>
@@ -207,6 +230,11 @@ export function EDIViewer({ message, onClose }: Props) {
       </Body>
 
       <Footer>
+        {isPartial && (
+          <BtnMarkSeen onClick={handleMarkSeen} disabled={marked} style={{ marginRight: 'auto' }}>
+            {marked ? '✓ Marqué comme vu' : 'Marquer comme vu'}
+          </BtnMarkSeen>
+        )}
         <BtnClose onClick={onClose}>Fermer</BtnClose>
       </Footer>
     </Container>

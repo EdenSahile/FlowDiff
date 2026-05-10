@@ -1,4 +1,5 @@
 import { useState, useMemo, useRef, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import styled, { keyframes } from 'styled-components'
 import { useAuthContext } from '@/contexts/AuthContext'
 import { MOCK_FACTURES, type Facture } from '@/data/mockFactures'
@@ -73,6 +74,11 @@ const FiltersRow = styled.div`
   align-items: center;
 `
 
+const FilterBreak = styled.div`
+  width: 100%;
+  height: 0;
+`
+
 /* ── Filtre date ── */
 const DateGroup = styled.div`
   display: flex;
@@ -132,6 +138,28 @@ const ExportBtn = styled.button`
   transition: background .15s, color .15s;
 
   &:hover { background: ${({ theme }) => theme.colors.navy}; color: #fff; }
+  &:active { opacity: 0.85; }
+`
+
+const ResetBtn = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  height: 38px;
+  padding: 0 14px;
+  border: 1.5px solid ${({ theme }) => theme.colors.gray[200]};
+  border-radius: ${({ theme }) => theme.radii.md};
+  background: none;
+  color: ${({ theme }) => theme.colors.gray[400]};
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 0.8125rem;
+  font-weight: ${({ theme }) => theme.typography.weights.semibold};
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color .15s, color .15s;
+
+  &:hover { border-color: ${({ theme }) => theme.colors.error}; color: ${({ theme }) => theme.colors.error}; }
   &:active { opacity: 0.85; }
 `
 
@@ -350,6 +378,298 @@ const PageBtn = styled.button<PageBtnProps>`
   }
 `
 
+/* ── Bouton Payer ── */
+const PayBtn = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 44px;
+  padding: 5px 12px;
+  background: ${({ theme }) => theme.colors.navy};
+  border: none;
+  border-radius: ${({ theme }) => theme.radii.md};
+  color: #fff;
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 0.75rem;
+  font-weight: ${({ theme }) => theme.typography.weights.semibold};
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background .15s, transform .1s;
+
+  &:hover  { background: ${({ theme }) => theme.colors.primaryHover}; }
+  &:active { transform: scale(0.96); }
+`
+
+const PaidBadge = styled.span`
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: #E6F4EC;
+  color: #1E7045;
+  border-radius: ${({ theme }) => theme.radii.xl};
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+`
+
+/* ── Modal paiement ── */
+const Overlay = styled.div`
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+`
+
+const ModalBox = styled.div`
+  background: ${({ theme }) => theme.colors.white};
+  border-radius: ${({ theme }) => theme.radii.xl};
+  width: 100%;
+  max-width: 420px;
+  padding: 24px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+`
+
+const ModalHeader = styled.div`
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+`
+
+const ModalTitle = styled.h2`
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 1rem;
+  font-weight: 700;
+  color: ${({ theme }) => theme.colors.navy};
+  margin: 0;
+`
+
+const ModalSubtitle = styled.p`
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 0.8125rem;
+  color: ${({ theme }) => theme.colors.gray[400]};
+  margin: 2px 0 0;
+`
+
+const CloseBtn = styled.button`
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  color: ${({ theme }) => theme.colors.gray[400]};
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+  flex-shrink: 0;
+  &:hover { color: ${({ theme }) => theme.colors.gray[800]}; }
+`
+
+const TabRow = styled.div`
+  display: flex;
+  gap: 0;
+  border: 1.5px solid ${({ theme }) => theme.colors.gray[200]};
+  border-radius: ${({ theme }) => theme.radii.md};
+  overflow: hidden;
+`
+
+const TabBtn = styled.button<{ $active: boolean }>`
+  flex: 1;
+  padding: 9px;
+  border: none;
+  background: ${({ $active, theme }) => $active ? theme.colors.navy : 'transparent'};
+  color: ${({ $active, theme }) => $active ? '#fff' : theme.colors.gray[600]};
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+  &:hover { background: ${({ $active, theme }) => $active ? theme.colors.navy : theme.colors.gray[50]}; }
+`
+
+const FormGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+`
+
+const FormLabel = styled.label`
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.gray[600]};
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+`
+
+const FormInput = styled.input`
+  width: 100%;
+  box-sizing: border-box;
+  height: 42px;
+  padding: 0 12px;
+  border: 1.5px solid ${({ theme }) => theme.colors.gray[200]};
+  border-radius: ${({ theme }) => theme.radii.md};
+  font-family: ${({ theme }) => theme.typography.fontFamilyMono};
+  font-size: 0.9375rem;
+  color: ${({ theme }) => theme.colors.gray[800]};
+  background: ${({ theme }) => theme.colors.white};
+  outline: none;
+  transition: border-color .15s;
+  &:focus { border-color: ${({ theme }) => theme.colors.navy}; }
+  &::placeholder { color: ${({ theme }) => theme.colors.gray[200]}; font-family: ${({ theme }) => theme.typography.fontFamily}; }
+`
+
+const FormRow = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+
+  & > * { min-width: 0; }
+`
+
+const PayNowBtn = styled.button<{ $loading?: boolean; $success?: boolean }>`
+  width: 100%;
+  padding: 13px;
+  border: none;
+  border-radius: ${({ theme }) => theme.radii.md};
+  background: ${({ $success, theme }) => $success ? '#1E7045' : theme.colors.navy};
+  color: #fff;
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 0.9375rem;
+  font-weight: 700;
+  cursor: ${({ $loading }) => $loading ? 'wait' : 'pointer'};
+  transition: background .2s, transform .1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  &:hover:not(:disabled) { background: ${({ $success, theme }) => $success ? '#1E7045' : theme.colors.primaryHover}; }
+  &:active:not(:disabled) { transform: scale(0.98); }
+`
+
+const IbanBlock = styled.div`
+  background: ${({ theme }) => theme.colors.gray[50]};
+  border: 1px solid ${({ theme }) => theme.colors.gray[200]};
+  border-radius: ${({ theme }) => theme.radii.md};
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+`
+
+const IbanRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+`
+
+const IbanLabel = styled.span`
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: ${({ theme }) => theme.colors.gray[400]};
+`
+
+const IbanValue = styled.span`
+  font-family: ${({ theme }) => theme.typography.fontFamilyMono};
+  font-size: 0.8125rem;
+  color: ${({ theme }) => theme.colors.gray[800]};
+  font-weight: 600;
+  letter-spacing: 0.04em;
+`
+
+const CopyBtn = styled.button`
+  background: none;
+  border: 1px solid ${({ theme }) => theme.colors.gray[200]};
+  border-radius: ${({ theme }) => theme.radii.sm};
+  padding: 2px 8px;
+  font-size: 0.6875rem;
+  color: ${({ theme }) => theme.colors.gray[600]};
+  cursor: pointer;
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  white-space: nowrap;
+  transition: background .12s;
+  &:hover { background: ${({ theme }) => theme.colors.gray[100]}; }
+`
+
+const VirBtn = styled.button`
+  width: 100%;
+  padding: 13px;
+  border: none;
+  border-radius: ${({ theme }) => theme.radii.md};
+  background: ${({ theme }) => theme.colors.navy};
+  color: #fff;
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 0.9375rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .15s, transform .1s;
+  &:hover { background: ${({ theme }) => theme.colors.primaryHover}; }
+  &:active { transform: scale(0.98); }
+`
+
+const SimulationBanner = styled.div`
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px;
+  background: ${({ theme }) => theme.colors.accentLight};
+  border: 1px solid ${({ theme }) => theme.colors.accent};
+  border-radius: ${({ theme }) => theme.radii.md};
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 0.8125rem;
+  color: ${({ theme }) => theme.colors.gray[800]};
+  line-height: 1.45;
+
+  svg { flex-shrink: 0; margin-top: 1px; color: ${({ theme }) => theme.colors.accent}; }
+`
+
+const SuccessBox = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 0 8px;
+`
+
+const SuccessIcon = styled.div`
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #E6F4EC;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`
+
+const SuccessTitle = styled.p`
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1E7045;
+  margin: 0;
+  text-align: center;
+`
+
+const SuccessText = styled.p`
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 0.8125rem;
+  color: ${({ theme }) => theme.colors.gray[400]};
+  margin: 0;
+  text-align: center;
+`
+
 /* ── Icônes ── */
 function IconPDF() {
   return (
@@ -363,6 +683,54 @@ function IconPDF() {
   )
 }
 
+
+function IconCheck() {
+  return (
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1E7045" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="20 6 9 17 4 12"/>
+    </svg>
+  )
+}
+
+function IconInfo() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10"/>
+      <line x1="12" y1="8" x2="12" y2="12"/>
+      <line x1="12" y1="16" x2="12.01" y2="16"/>
+    </svg>
+  )
+}
+
+function IconCard() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+      <line x1="1" y1="10" x2="23" y2="10"/>
+    </svg>
+  )
+}
+
+function IconTransfer() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="17 1 21 5 17 9"/>
+      <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+      <polyline points="7 23 3 19 7 15"/>
+      <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+    </svg>
+  )
+}
+
+/* ── localStorage ── */
+const PAID_KEY = 'flowdiff_paid_invoices'
+function loadPaid(): Set<string> {
+  try { return new Set(JSON.parse(localStorage.getItem(PAID_KEY) ?? '[]') as string[]) }
+  catch { return new Set() }
+}
+function savePaid(ids: Set<string>) {
+  localStorage.setItem(PAID_KEY, JSON.stringify([...ids]))
+}
 
 /* ── Constantes ── */
 const PAGE_SIZE = 10
@@ -380,6 +748,67 @@ export function FacturationPage() {
     () => MOCK_FACTURES[user?.codeClient ?? ''] ?? [],
     [user?.codeClient],
   )
+
+  /* ── Paiement ── */
+  const [paidIds,       setPaidIds]       = useState<Set<string>>(() => loadPaid())
+  const [paymentModal,  setPaymentModal]  = useState<Facture | null>(null)
+  const [payTab,        setPayTab]        = useState<'cb' | 'virement'>('cb')
+  const [cardNumber,    setCardNumber]    = useState('')
+  const [cardExpiry,    setCardExpiry]    = useState('')
+  const [cardCvv,       setCardCvv]       = useState('')
+  const [payLoading,    setPayLoading]    = useState(false)
+  const [paySuccess,    setPaySuccess]    = useState(false)
+
+  function openPayment(f: Facture) {
+    setPaymentModal(f)
+    setPayTab('cb')
+    setCardNumber('')
+    setCardExpiry('')
+    setCardCvv('')
+    setPayLoading(false)
+    setPaySuccess(false)
+  }
+
+  function closePayment() { setPaymentModal(null) }
+
+  function handleResetPaid() {
+    const next = new Set<string>()
+    setPaidIds(next)
+    savePaid(next)
+  }
+
+  function handlePay() {
+    setPayLoading(true)
+    setTimeout(() => {
+      setPayLoading(false)
+      setPaySuccess(true)
+      if (paymentModal) {
+        const next = new Set(paidIds)
+        next.add(paymentModal.id)
+        setPaidIds(next)
+        savePaid(next)
+      }
+    }, 1600)
+  }
+
+  function handleVirement() {
+    setPaySuccess(true)
+    if (paymentModal) {
+      const next = new Set(paidIds)
+      next.add(paymentModal.id)
+      setPaidIds(next)
+      savePaid(next)
+    }
+  }
+
+  function formatCardNumber(v: string) {
+    return v.replace(/\D/g, '').slice(0, 16).replace(/(.{4})/g, '$1 ').trim()
+  }
+
+  function formatExpiry(v: string) {
+    const digits = v.replace(/\D/g, '').slice(0, 4)
+    return digits.length > 2 ? `${digits.slice(0,2)}/${digits.slice(2)}` : digits
+  }
 
   /* ── Ref pour le checkbox "tout sélectionner" ── */
   const refSelectAll = useRef<HTMLInputElement>(null)
@@ -584,6 +1013,8 @@ export function FacturationPage() {
           {filtered.length} facture{filtered.length !== 1 ? 's' : ''}
         </ResultCount>
 
+        <FilterBreak />
+
         <ExportBtn type="button" onClick={exportCSV} aria-label="Exporter les factures en CSV">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
@@ -592,6 +1023,21 @@ export function FacturationPage() {
           </svg>
           {exportLabel}
         </ExportBtn>
+
+        {paidIds.size > 0 && (
+          <ResetBtn
+            type="button"
+            onClick={handleResetPaid}
+            aria-label="Réinitialiser les paiements de démonstration"
+            style={{ marginLeft: 'auto' }}
+          >
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+              <path d="M3 3v5h5"/>
+            </svg>
+            Réinitialiser les paiements
+          </ResetBtn>
+        )}
       </FiltersRow>
 
       {/* Tableau */}
@@ -625,12 +1071,13 @@ export function FacturationPage() {
               </Th>
               <Th>Montant T.T.C.</Th>
               <Th aria-label="PDF">PDF</Th>
+              <Th aria-label="Payer">Payer</Th>
             </tr>
           </Thead>
           <Tbody>
             {pageItems.length === 0 ? (
               <EmptyRow>
-                <EmptyTd colSpan={5}>
+                <EmptyTd colSpan={6}>
                   Aucune facture ne correspond à votre recherche.
                 </EmptyTd>
               </EmptyRow>
@@ -664,6 +1111,23 @@ export function FacturationPage() {
                         <IconPDF />
                         PDF
                       </PdfBtn>
+                    </Td>
+                    <Td>
+                      {paidIds.has(f.id) ? (
+                        <PaidBadge aria-label="Facture payée">
+                          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                          Payé
+                        </PaidBadge>
+                      ) : (
+                        <PayBtn
+                          type="button"
+                          onClick={() => openPayment(f)}
+                          aria-label={`Payer la facture ${f.numero}`}
+                        >
+                          <IconCard />
+                          Payer
+                        </PayBtn>
+                      )}
                     </Td>
                   </Tr>
                 )
@@ -733,6 +1197,130 @@ export function FacturationPage() {
           </PaginationBar>
         )}
       </TableWrapper>
+
+
+      {/* ── Modal paiement ── */}
+      {paymentModal && createPortal(
+        <Overlay onClick={e => { if (e.target === e.currentTarget) closePayment() }}>
+          <ModalBox role="dialog" aria-modal="true" aria-label="Paiement de la facture">
+            <ModalHeader>
+              <div>
+                <ModalTitle>Règlement de la facture</ModalTitle>
+                <ModalSubtitle>{paymentModal.numero} · {paymentModal.totalTTC.toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €</ModalSubtitle>
+              </div>
+              <CloseBtn onClick={closePayment} aria-label="Fermer">×</CloseBtn>
+            </ModalHeader>
+
+            {!paySuccess && (
+              <SimulationBanner role="note">
+                <IconInfo />
+                <span><strong>Application de démonstration&nbsp;— aucun paiement réel ne sera effectué.</strong> Cliquez sur&nbsp;«&nbsp;Payer&nbsp;» pour simuler le règlement de cette facture.</span>
+              </SimulationBanner>
+            )}
+
+            {paySuccess ? (
+              <SuccessBox>
+                <SuccessIcon><IconCheck /></SuccessIcon>
+                <SuccessTitle>Paiement confirmé</SuccessTitle>
+                <SuccessText>La facture {paymentModal.numero} a bien été réglée.</SuccessText>
+                <PayNowBtn $success onClick={closePayment}>Fermer</PayNowBtn>
+              </SuccessBox>
+            ) : (
+              <>
+                <TabRow>
+                  <TabBtn $active={payTab === 'cb'} onClick={() => setPayTab('cb')}>
+                    <IconCard /> Carte bancaire
+                  </TabBtn>
+                  <TabBtn $active={payTab === 'virement'} onClick={() => setPayTab('virement')}>
+                    <IconTransfer /> Virement
+                  </TabBtn>
+                </TabRow>
+
+                {payTab === 'cb' ? (
+                  <>
+                    <FormGroup>
+                      <FormLabel>Numéro de carte</FormLabel>
+                      <FormInput
+                        type="text"
+                        inputMode="numeric"
+                        placeholder="1234 5678 9012 3456"
+                        value={cardNumber}
+                        onChange={e => setCardNumber(formatCardNumber(e.target.value))}
+                        maxLength={19}
+                        autoComplete="cc-number"
+                      />
+                    </FormGroup>
+                    <FormRow>
+                      <FormGroup>
+                        <FormLabel>Expiration</FormLabel>
+                        <FormInput
+                          type="text"
+                          inputMode="numeric"
+                          placeholder="MM/AA"
+                          value={cardExpiry}
+                          onChange={e => setCardExpiry(formatExpiry(e.target.value))}
+                          maxLength={5}
+                          autoComplete="cc-exp"
+                        />
+                      </FormGroup>
+                      <FormGroup>
+                        <FormLabel>CVV</FormLabel>
+                        <FormInput
+                          type="text"
+                          inputMode="numeric"
+                          placeholder="123"
+                          value={cardCvv}
+                          onChange={e => setCardCvv(e.target.value.replace(/\D/g, '').slice(0, 3))}
+                          maxLength={3}
+                          autoComplete="cc-csc"
+                        />
+                      </FormGroup>
+                    </FormRow>
+                    <PayNowBtn
+                      onClick={handlePay}
+                      disabled={payLoading}
+                      $loading={payLoading}
+                      aria-label="Confirmer le paiement"
+                    >
+                      {payLoading ? 'Traitement en cours…' : `Payer ${paymentModal.totalTTC.toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €`}
+                    </PayNowBtn>
+                  </>
+                ) : (
+                  <>
+                    <IbanBlock>
+                      <IbanRow>
+                        <div>
+                          <IbanLabel>IBAN</IbanLabel>
+                          <div><IbanValue>FR76 9999 9000 0012 3456 7890 077</IbanValue></div>
+                        </div>
+                        <CopyBtn onClick={() => navigator.clipboard.writeText('FR7699999000001234567890077')}>Copier</CopyBtn>
+                      </IbanRow>
+                      <IbanRow>
+                        <div>
+                          <IbanLabel>BIC</IbanLabel>
+                          <div><IbanValue>FICTFR99XXX</IbanValue></div>
+                        </div>
+                        <CopyBtn onClick={() => navigator.clipboard.writeText('FICTFR99XXX')}>Copier</CopyBtn>
+                      </IbanRow>
+                      <IbanRow>
+                        <div>
+                          <IbanLabel>Référence</IbanLabel>
+                          <div><IbanValue>{paymentModal.numero}</IbanValue></div>
+                        </div>
+                        <CopyBtn onClick={() => navigator.clipboard.writeText(paymentModal.numero)}>Copier</CopyBtn>
+                      </IbanRow>
+                    </IbanBlock>
+                    <VirBtn onClick={handleVirement} aria-label="Confirmer le virement">
+                      J'ai effectué le virement
+                    </VirBtn>
+                  </>
+                )}
+              </>
+            )}
+          </ModalBox>
+        </Overlay>,
+        document.body,
+      )}
     </Page>
   )
 }

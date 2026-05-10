@@ -21,7 +21,7 @@ interface EDIContextValue {
 
 const EDIContext = createContext<EDIContextValue | null>(null)
 
-const MOCK_EDI_VERSION = 'v3' // incrémenter à chaque modification de MOCK_EDI_MESSAGES
+const MOCK_EDI_VERSION = 'v5' // incrémenter à chaque modification de MOCK_EDI_MESSAGES
 
 function messagesKey(cc: string)  { return `bookflow_edi_${cc}` }
 function paramsKey(cc: string)    { return `bookflow_edi_params_${cc}` }

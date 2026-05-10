@@ -5,16 +5,28 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
 import { useCart } from '@/contexts/CartContext'
 import { useOrders } from '@/contexts/OrdersContext'
+import { useEDI } from '@/contexts/EDIContext'
+import { getFluxCounts } from '@/lib/ediUtils'
 import { MOCK_BOOKS } from '@/data/mockBooks'
 import { BookCover } from '@/components/catalogue/BookCover'
 import { usePeriodFilter, type CompareMode } from '@/hooks/usePeriodFilter'
-import { PeriodSelector } from '@/components/dashboard/PeriodSelector'
+import { PeriodSelector, rangeLabel } from '@/components/dashboard/PeriodSelector'
+import { DatePicker } from '@/components/ui/DatePicker'
 import { theme } from '@/lib/theme'
 import { ComparaisonToggle } from '@/components/dashboard/ComparaisonToggle'
 import { useDashboardConfig, type DashboardZone } from '@/hooks/useDashboardConfig'
 import { CustomizerDrawer } from '@/components/dashboard/CustomizerDrawer'
 import { computeKPIs, computeChartData, computeDonutData, computeTopPublishers, orderToDashboardOrders, fmtEur, type ChartPoint, type DonutSegment } from '@/data/mockDashboard'
-import { exportDashboardCSV } from '@/lib/exportCSV'
+import {
+  exportDashboardCSV,
+  exportKPIOnlyCSV,
+  exportEvolutionCSV,
+  exportRepartitionCSV,
+  exportTopEditeursCSV,
+  exportEDICSV,
+  exportNouveautesCSV,
+  exportActionsCSV,
+} from '@/lib/exportCSV'
 import { mq } from '@/lib/responsive'
 
 const nouveautes = MOCK_BOOKS
@@ -178,6 +190,16 @@ function IconDownload() {
   )
 }
 
+function IconReset() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <polyline points="1 4 1 10 7 10" />
+      <path d="M3.51 15a9 9 0 1 0 .49-4.95" />
+    </svg>
+  )
+}
+
 function IconGrip() {
   return (
     <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor" aria-hidden="true">
@@ -212,7 +234,7 @@ const Content = styled.div`
   max-width: 1100px;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 40px;
 `
 
 /* ── Greeting row ── */
@@ -301,6 +323,7 @@ const ActionsBox = styled.section`
   border: 1px solid #FECACA;
   border-radius: ${({ theme }) => theme.radii.md};
   padding: 16px 18px;
+  overflow: hidden;
 `
 
 const ActionsHeader = styled.div`
@@ -365,6 +388,10 @@ const ActionsGrid = styled.div`
   grid-template-columns: repeat(5, 1fr);
   gap: 10px;
 
+  ${mq.belowLg} {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
   ${mq.belowMd} {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -381,6 +408,7 @@ const ActionCard = styled.button<{ $empty?: boolean; $dragging?: boolean; $dropT
   cursor: ${({ $empty }) => $empty ? 'default' : 'pointer'};
   text-align: left;
   width: 100%;
+  height: 100%;
   opacity: ${({ $empty, $dragging }) => $dragging ? 0.4 : $empty ? 0.55 : 1};
   pointer-events: ${({ $empty }) => $empty ? 'none' : 'auto'};
   transition: opacity 0.1s, border-color 0.1s;
@@ -390,6 +418,7 @@ const ActionCard = styled.button<{ $empty?: boolean; $dragging?: boolean; $dropT
 
 const ActionCardWrap = styled.div`
   position: relative;
+  height: 100%;
   &:hover ${CardDragHandle} { opacity: 1; }
 `
 
@@ -431,6 +460,7 @@ const ActionDeadline = styled.div`
   font-weight: 600;
   margin-top: 2px;
   line-height: 1.2;
+  white-space: nowrap;
 `
 
 const ActionArrow = styled.span`
@@ -444,11 +474,17 @@ const BilanSection = styled.section``
 
 const BilanHeader = styled.div`
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
   margin-bottom: 14px;
-  gap: 12px;
-  flex-wrap: wrap;
+`
+
+const BilanTitleRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
 `
 
 const BilanTitle = styled.h2`
@@ -461,13 +497,65 @@ const BilanTitle = styled.h2`
 
 const DashboardControls = styled.div`
   display: flex;
-  align-items: center;
+  align-items: flex-start;
+  justify-content: space-between;
   gap: 8px;
-  flex-wrap: wrap;
+  width: 100%;
 
   ${mq.belowMd} {
-    width: 100%;
+    flex-direction: column;
   }
+`
+
+const ControlsLeft = styled.div`
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  flex-wrap: wrap;
+`
+
+const ResetLink = styled.button<{ $visible: boolean }>`
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  padding: 5px 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: ${({ theme }) => theme.colors.gray[400]};
+  cursor: pointer;
+  white-space: nowrap;
+  opacity: ${({ $visible }) => ($visible ? 1 : 0)};
+  pointer-events: ${({ $visible }) => ($visible ? 'auto' : 'none')};
+  transition: opacity 0.2s ease, color 0.15s ease;
+  align-self: top;
+
+  &:hover {
+    color: ${({ theme }) => theme.colors.primary};
+  }
+`
+
+const DashboardCustomRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+`
+
+const DashCustomSep = styled.span`
+  font-size: 0.8125rem;
+  color: ${({ theme }) => theme.colors.gray[400]};
+`
+
+const DashCompareSep = styled.span`
+  font-size: 11px;
+  color: ${({ theme }) => theme.colors.gray[200]};
+`
+
+const DashCompareText = styled.span`
+  font-size: 11px;
+  color: ${({ theme }) => theme.colors.gray[400]};
 `
 
 const CustomizeBtn = styled.button<{ $primary?: boolean }>`
@@ -488,6 +576,47 @@ const CustomizeBtn = styled.button<{ $primary?: boolean }>`
     background: ${({ $primary, theme }) => $primary ? theme.colors.primaryHover : 'white'};
     border-color: ${({ $primary, theme }) => $primary ? theme.colors.primaryHover : theme.colors.navy};
     color: ${({ $primary, theme }) => $primary ? '#fff' : theme.colors.navy};
+  }
+`
+
+const KPIExportBar = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+`
+
+const BtnTooltipWrap = styled.div`
+  position: relative;
+  display: inline-flex;
+`
+
+const BtnTooltip = styled.span`
+  position: absolute;
+  bottom: calc(100% + 7px);
+  right: 0;
+  background: ${({ theme }) => theme.colors.navy};
+  color: rgba(255,255,255,0.9);
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+  padding: 6px 10px;
+  border-radius: 6px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  z-index: 300;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    right: 8px;
+    border: 4px solid transparent;
+    border-top-color: ${({ theme }) => theme.colors.navy};
+  }
+
+  ${BtnTooltipWrap}:hover & {
+    opacity: 1;
   }
 `
 
@@ -641,6 +770,7 @@ const PanelHeader = styled.div`
   align-items: center;
   justify-content: space-between;
   margin-bottom: 14px;
+  padding-right: 30px;
 `
 
 const PanelTitle = styled.h3`
@@ -665,8 +795,77 @@ const PanelSeeAll = styled.button`
   &:hover { opacity: .75; }
 `
 
+const PanelHeaderRight = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`
+
+const PanelExportBtn = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 5px;
+  border: 1px solid ${({ theme }) => theme.colors.gray[200]};
+  background: ${({ theme }) => theme.colors.white};
+  color: ${({ theme }) => theme.colors.gray[600]};
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.15s, color 0.15s;
+  flex-shrink: 0;
+  &:hover {
+    background: ${({ theme }) => theme.colors.gray[100]};
+    color: ${({ theme }) => theme.colors.primary};
+  }
+`
+
+const ExportDropdownWrap = styled.div`
+  position: relative;
+`
+
+const ExportDropdownMenu = styled.div<{ $open: boolean }>`
+  display: ${({ $open }) => ($open ? 'block' : 'none')};
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  background: ${({ theme }) => theme.colors.white};
+  border: 1px solid ${({ theme }) => theme.colors.gray[200]};
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+  min-width: 180px;
+  z-index: 200;
+  padding: 4px 0;
+`
+
+const ExportDropdownItem = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 9px 14px;
+  background: none;
+  border: none;
+  font-size: 13px;
+  font-weight: 500;
+  color: ${({ theme }) => theme.colors.gray[800]};
+  cursor: pointer;
+  text-align: left;
+  white-space: nowrap;
+  &:hover {
+    background: ${({ theme }) => theme.colors.gray[50]};
+    color: ${({ theme }) => theme.colors.primary};
+  }
+`
+
 /* ── Évolution des commandes (dynamique) ── */
 const CW = 210, CH = 85, COX = 25, COY = 90
+
+function toCumulative(pts: ChartPoint[]): ChartPoint[] {
+  let acc = 0
+  return pts.map(p => { acc += p.count; return { date: p.date, count: acc } })
+}
 
 function toPolyline(pts: ChartPoint[], yMax: number): string {
   if (pts.length < 2) return ''
@@ -689,19 +888,60 @@ function ChartEvolution({
   main: ChartPoint[]
   compare: ChartPoint[] | null
 }) {
-  const mainMax    = Math.max(...main.map(p => p.count), 1)
-  const compareMax = compare ? Math.max(...compare.map(p => p.count), 1) : 0
-  const yMaxRaw    = Math.max(mainMax, compareMax, 5)
-  const yMax       = Math.ceil(yMaxRaw / 5) * 5
-  const yTicks     = Array.from({ length: 6 }, (_, i) => Math.round((i / 5) * yMax))
+  const svgRef = useRef<SVGSVGElement>(null)
+  const [hoverIdx, setHoverIdx] = useState<number | null>(null)
+
+  const mainCum    = toCumulative(main)
+  const compareCum = compare ? toCumulative(compare) : null
+
+  const mainTotal    = mainCum.at(-1)?.count ?? 0
+  const compareTotal = compareCum ? (compareCum.at(-1)?.count ?? 0) : 0
+  const yMaxRaw      = Math.max(mainTotal, compareTotal, 5)
+  const yMax         = Math.ceil(yMaxRaw / 5) * 5
+  const yTicks       = Array.from({ length: 6 }, (_, i) => Math.round((i / 5) * yMax))
 
   const xIdxs = [0, 0.25, 0.5, 0.75, 1].map(t => Math.round(t * Math.max(main.length - 1, 0)))
 
-  const mainPoly    = toPolyline(main, yMax)
-  const comparePoly = compare ? toPolyline(compare, yMax) : null
+  const mainPoly    = toPolyline(mainCum, yMax)
+  const comparePoly = compareCum ? toPolyline(compareCum, yMax) : null
+
+  function handleMouseMove(e: React.MouseEvent<SVGSVGElement>) {
+    const svg = svgRef.current
+    if (!svg || main.length < 2) return
+    const rect = svg.getBoundingClientRect()
+    const svgW = rect.width
+    const scaleX = 260 / svgW
+    const mouseX = (e.clientX - rect.left) * scaleX
+    const t = Math.max(0, Math.min(1, (mouseX - COX) / CW))
+    const idx = Math.round(t * (main.length - 1))
+    setHoverIdx(idx)
+  }
+
+  const hoverPt = hoverIdx !== null ? mainCum[hoverIdx] : null
+  const hoverCmpPt = (hoverIdx !== null && compareCum) ? compareCum[Math.min(hoverIdx, compareCum.length - 1)] : null
+  const hoverX = hoverIdx !== null && main.length > 1
+    ? COX + (hoverIdx / (main.length - 1)) * CW
+    : null
+  const hoverY = hoverPt ? COY - (hoverPt.count / yMax) * CH : null
+  const hoverCmpY = hoverCmpPt ? COY - (hoverCmpPt.count / yMax) * CH : null
+
+  // tooltip bubble: keep it inside the viewBox
+  const tipW = 90, tipH = compareCum ? 44 : 32, tipR = 4
+  const tipX = hoverX !== null
+    ? Math.min(Math.max(hoverX - tipW / 2, COX), COX + CW - tipW)
+    : 0
+  const tipY = 8
 
   return (
-    <svg viewBox="0 0 260 105" width="100%" aria-label="Évolution des commandes">
+    <svg
+      ref={svgRef}
+      viewBox="0 0 260 105"
+      width="100%"
+      aria-label="Évolution des commandes"
+      style={{ cursor: 'crosshair' }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={() => setHoverIdx(null)}
+    >
       {yTicks.map(v => {
         const y = COY - (v / yMax) * CH
         return (
@@ -719,6 +959,13 @@ function ChartEvolution({
         <polyline points={mainPoly} fill="none" stroke="#16a34a" strokeWidth="1.5"
           strokeLinejoin="round" strokeLinecap="round" />
       )}
+      {mainTotal > 0 && (
+        <text
+          x={COX + CW + 3}
+          y={COY - (mainTotal / yMax) * CH + 3.5}
+          fontSize="7" fontWeight="600" fill="#16a34a"
+        >{mainTotal}</text>
+      )}
       <line x1={COX} y1={COY} x2={COX + CW} y2={COY} stroke="#D1D5DB" strokeWidth="0.8" />
       {xIdxs.map((idx, k) => {
         const x = COX + (idx / Math.max(main.length - 1, 1)) * CW
@@ -728,7 +975,41 @@ function ChartEvolution({
           </text>
         )
       })}
-      <text x={COX} y="6" fontSize="7" fill="#9CA3AF">Commandes / jour</text>
+      <text x={COX} y="6" fontSize="7" fill="#9CA3AF">Commandes cumulées</text>
+
+      {/* Hover overlay */}
+      {hoverX !== null && hoverPt && hoverY !== null && (
+        <g>
+          {/* vertical guide */}
+          <line x1={hoverX} y1={COY} x2={hoverX} y2={tipY + tipH + 2}
+            stroke="#D1D5DB" strokeWidth="0.6" strokeDasharray="2 2" />
+          {/* dot on compare curve */}
+          {hoverCmpY !== null && (
+            <circle cx={hoverX} cy={hoverCmpY} r="2.5"
+              fill={theme.colors.accent} stroke="#fff" strokeWidth="1" />
+          )}
+          {/* dot on main curve */}
+          <circle cx={hoverX} cy={hoverY} r="2.5"
+            fill="#16a34a" stroke="#fff" strokeWidth="1" />
+          {/* tooltip bubble */}
+          <rect x={tipX} y={tipY} width={tipW} height={tipH} rx={tipR} ry={tipR}
+            fill={theme.colors.navy} opacity="0.92" />
+          <text x={tipX + tipW / 2} y={tipY + 12} textAnchor="middle"
+            fontSize="8.5" fill="#9CA3AF">
+            {xLabel(hoverPt.date)}
+          </text>
+          <text x={tipX + tipW / 2} y={tipY + 25} textAnchor="middle" fontSize="9">
+            <tspan fontWeight="700" fill="#16a34a">{hoverPt.count}</tspan>
+            <tspan fill="#fff" fontSize="8"> cmd cumulées</tspan>
+          </text>
+          {hoverCmpPt && (
+            <text x={tipX + tipW / 2} y={tipY + 37} textAnchor="middle"
+              fontSize="8.5" fill={theme.colors.accent}>
+              N-1 : {hoverCmpPt.count}
+            </text>
+          )}
+        </g>
+      )}
     </svg>
   )
 }
@@ -834,57 +1115,41 @@ function IconXCircle() {
 }
 
 /* ── Donut chart (dynamique) ── */
-function buildDonutArcs(segments: DonutSegment[], r: number) {
-  const circ = 2 * Math.PI * r
-  let cumulative = 0
-  return segments.map(({ percent, color }) => {
-    const dash   = (percent / 100) * circ
-    const offset = circ * 0.25 - cumulative
-    cumulative  += dash
-    return { dash, offset, circ, color }
-  })
-}
-
 function ChartDonut({
   main,
-  compare,
 }: {
   main: DonutSegment[]
   compare: DonutSegment[] | null
 }) {
-  const outerR = compare ? 36 : 35
-  const outerW = compare ? 10 : 14
-  const innerR = 22
-  const innerW = 10
+  const outerR = 35
+  const outerW = 14
+  const circ   = 2 * Math.PI * outerR
+  // dashoffset constant : décale le départ du dash à 12 h (top)
+  const startOffset = circ * 0.25
 
-  const mainArcs    = buildDonutArcs(main, outerR)
-  const compareArcs = compare ? buildDonutArcs(compare, innerR) : null
+  const arcs = main.map(({ percent, color }, i) => {
+    const cumPct  = main.slice(0, i).reduce((s, seg) => s + seg.percent, 0)
+    const dash    = (percent / 100) * circ
+    const gap     = circ - dash
+    const rotation = (cumPct / 100) * 360
+    return { dash, gap, rotation, color }
+  })
 
   return (
     <svg viewBox="0 0 100 100" width="110" height="110" aria-label="Répartition des achats">
-      {/* Fond anneau principal */}
       <circle cx="50" cy="50" r={outerR} fill="none" stroke="#F3F4F6" strokeWidth={outerW} />
-      {/* Segments principaux */}
-      {mainArcs.map(({ dash, offset, circ, color }, i) => (
-        <circle key={i} cx="50" cy="50" r={outerR} fill="none"
-          stroke={color} strokeWidth={outerW}
-          strokeDasharray={`${dash.toFixed(2)} ${circ.toFixed(2)}`}
-          strokeDashoffset={offset.toFixed(2)}
+      {arcs.map(({ dash, gap, rotation, color }, i) => (
+        <circle
+          key={i}
+          cx="50" cy="50" r={outerR}
+          fill="none"
+          stroke={color}
+          strokeWidth={outerW}
+          strokeDasharray={`${dash.toFixed(3)} ${gap.toFixed(3)}`}
+          strokeDashoffset={startOffset.toFixed(3)}
+          transform={`rotate(${rotation.toFixed(3)}, 50, 50)`}
         />
       ))}
-      {/* Fond + segments anneau de comparaison */}
-      {compareArcs && (
-        <>
-          <circle cx="50" cy="50" r={innerR} fill="none" stroke="#F3F4F6" strokeWidth={innerW} />
-          {compareArcs.map(({ dash, offset, circ, color }, i) => (
-            <circle key={i} cx="50" cy="50" r={innerR} fill="none"
-              stroke={color} strokeWidth={innerW} opacity="0.5"
-              strokeDasharray={`${dash.toFixed(2)} ${circ.toFixed(2)}`}
-              strokeDashoffset={offset.toFixed(2)}
-            />
-          ))}
-        </>
-      )}
     </svg>
   )
 }
@@ -981,9 +1246,9 @@ const TopEdAmount = styled.span`
 `
 
 const TopEdFooter = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  gap: 24px;
+  display: grid;
+  grid-template-columns: 16px 1fr 34px 56px;
+  gap: 8px;
   margin-top: 8px;
   padding-top: 6px;
   border-top: 1px solid ${({ theme }) => theme.colors.gray[200]};
@@ -992,6 +1257,8 @@ const TopEdFooter = styled.div`
 const TopEdFooterLabel = styled.span`
   font-size: 10px;
   color: ${({ theme }) => theme.colors.gray[400]};
+  text-align: right;
+  line-height: 1.3;
 `
 
 /* ── Nouveautés du mois (panel) ── */
@@ -1352,11 +1619,14 @@ export function HomePage() {
   const { user } = useAuth()
   const { totalItems: cartCount } = useCart()
   const { userOrders } = useOrders()
+  const { messages: ediMessages } = useEDI()
+  const ediCounts = getFluxCounts(ediMessages)
   const navigate = useNavigate()
   const novelRef = useRef<HTMLDivElement>(null)
   const [canNovRight, setCanNovRight] = useState(true)
 
   const [customizerOpen, setCustomizerOpen] = useState(false)
+  const [exportDropdownOpen, setExportDropdownOpen] = useState(false)
   const dashConfig = useDashboardConfig()
   const cardDragRef = useRef<{ zone: DashboardZone; id: string } | null>(null)
   const [cardDrag, setCardDrag] = useState<{ zone: DashboardZone; id: string } | null>(null)
@@ -1439,6 +1709,13 @@ export function HomePage() {
     return () => el.removeEventListener('scroll', updateNovArrows)
   }, [])
 
+  useEffect(() => {
+    if (!exportDropdownOpen) return
+    const close = () => setExportDropdownOpen(false)
+    document.addEventListener('click', close)
+    return () => document.removeEventListener('click', close)
+  }, [exportDropdownOpen])
+
   function handleDragStart(zone: DashboardZone, id: string) {
     cardDragRef.current = { zone, id }
     setCardDrag({ zone, id })
@@ -1478,7 +1755,8 @@ export function HomePage() {
     'action-offices': {
       icon: '📦',
       iconBg: '#E6F2EC', iconColor: '#226241',
-      count: 1, label: 'office à valider',
+      count: 1,
+      label: 'office à valider',
       deadline: 'Limite : 13 mai',
       route: '/offices',
     },
@@ -1494,20 +1772,21 @@ export function HomePage() {
     'action-commandes': {
       icon: '📋',
       iconBg: '#FFFBEB', iconColor: '#D97706',
-      count: 2, label: 'commandes à vérifier',
-      route: '/edi?filter=ORDRSP',
+      count: ediCounts.orders, label: ediCounts.orders <= 1 ? 'commande à vérifier' : 'commandes à vérifier',
+      route: '/edi#flux-en-cours',
     },
     'action-edi-error': {
       icon: '⚠️',
       iconBg: '#FDECEA', iconColor: '#C0392B',
-      count: 1, label: 'erreur EDI à corriger',
-      route: '/edi',
+      count: ediCounts.errors, label: ediCounts.errors <= 1 ? 'erreur EDI à traiter' : 'erreurs EDI à traiter',
+      route: '/edi#flux-en-cours',
     },
     'action-expeditions': {
       icon: '🚚',
       iconBg: '#EFF6FF', iconColor: '#2563EB',
-      count: 3, label: 'expéditions en retard',
-      route: '/edi?filter=DESADV',
+      count: 3,
+      label: 'expéditions en retard',
+      route: '/edi?filter=DESADV#historique',
     },
   }
 
@@ -1524,9 +1803,9 @@ export function HomePage() {
       icon: '🛒',
       iconBg: '#E6F2EC', iconColor: '#226241',
       label: 'Commandes passées',
-      value: kpi.nbCommandes,
+      value: kpi.nbActive,
       trend: compareKpi
-        ? <KpiTrendLine current={kpi.nbCommandes} compare={compareKpi.nbCommandes} mode={periodFilter.compareMode} />
+        ? <KpiTrendLine current={kpi.nbActive} compare={compareKpi.nbActive} mode={periodFilter.compareMode} />
         : undefined,
       link: <KPILink onClick={() => navigate('/historique')}>Voir le détail →</KPILink>,
     },
@@ -1583,7 +1862,7 @@ export function HomePage() {
     'kpi-references': {
       icon: '📚',
       iconBg: '#EFF6FF', iconColor: '#2563EB',
-      label: 'Références distinctes',
+      label: 'Références distinctes commandées',
       value: kpi.nbReferences.toLocaleString('fr-FR'),
       trend: compareKpi
         ? <KpiTrendLine current={kpi.nbReferences} compare={compareKpi.nbReferences} mode={periodFilter.compareMode} />
@@ -1650,7 +1929,16 @@ export function HomePage() {
             </SectionControls>
           )
 
-          if (sectionId === 'actions') return (
+          if (sectionId === 'actions') {
+            const visibleActionCards = dashConfig.config.actionCards
+              .filter(c => c.visible)
+              .filter(c => {
+                const def = actionCardDefs[c.id]
+                if (!def) return false
+                return typeof def.count === 'number' ? def.count > 0 : true
+              })
+            if (visibleActionCards.length === 0) return null
+            return (
         <SectionWrap key="actions">
           {sectionControls}
         <ActionsBox id="tour-actions" aria-label="Actions en attente">
@@ -1662,11 +1950,20 @@ export function HomePage() {
               </ActionsTitleRow>
               <ActionsSubtitle>Éléments nécessitant votre attention</ActionsSubtitle>
             </ActionsLeft>
-            <SeeAllBtn onClick={() => navigate('/historique')}>Voir tout →</SeeAllBtn>
+            <PanelExportBtn
+              onClick={() => exportActionsCSV(
+                dashConfig.config.actionCards
+                  .filter(c => c.visible)
+                  .map(c => actionCardDefs[c.id])
+                  .filter((d): d is NonNullable<typeof d> => !!d && !d.empty)
+                  .map(d => ({ label: d.label, count: Number(d.count) || 0, deadline: d.deadline }))
+              )}
+            >
+              <IconDownload />
+            </PanelExportBtn>
           </ActionsHeader>
           <ActionsGrid>
-            {dashConfig.config.actionCards
-              .filter(c => c.visible)
+            {visibleActionCards
               .map(c => {
                 const def = actionCardDefs[c.id]
                 if (!def) return null
@@ -1705,43 +2002,87 @@ export function HomePage() {
           </ActionsGrid>
         </ActionsBox>
         </SectionWrap>
-          )
+            )
+          }
 
           if (sectionId === 'kpi') return (
         <SectionWrap key="kpi">
           {sectionControls}
         <BilanSection id="tour-dashboard" aria-label="Tableau de bord">
           <BilanHeader>
-            <BilanTitle>Tableau de bord</BilanTitle>
+            <BilanTitleRow>
+              <BilanTitle>Tableau de bord</BilanTitle>
+              <CustomizeBtn type="button" style={{ marginTop: '5px', color: '#2d3a4a', borderColor: '#2d3a4a' }} onClick={() => setCustomizerOpen(true)}>
+                <IconLayout /> Personnaliser
+              </CustomizeBtn>
+            </BilanTitleRow>
             <DashboardControls>
-              <PeriodSelector
-                preset={periodFilter.preset}
-                setPreset={periodFilter.setPreset}
-                period={periodFilter.period}
-                customStart={periodFilter.customStart}
-                setCustomStart={periodFilter.setCustomStart}
-                customEnd={periodFilter.customEnd}
-                setCustomEnd={periodFilter.setCustomEnd}
-              />
-              <ComparaisonToggle
-                compareMode={periodFilter.compareMode}
-                setCompareMode={periodFilter.setCompareMode}
-                comparePeriod={periodFilter.comparePeriod}
-                customCompareStart={periodFilter.customCompareStart}
-                setCustomCompareStart={periodFilter.setCustomCompareStart}
-                customCompareEnd={periodFilter.customCompareEnd}
-                setCustomCompareEnd={periodFilter.setCustomCompareEnd}
-              />
+              <ControlsLeft>
+                <PeriodSelector
+                  preset={periodFilter.preset}
+                  setPreset={periodFilter.setPreset}
+                  period={periodFilter.period}
+                  compareMode={periodFilter.compareMode}
+                  comparePeriod={periodFilter.comparePeriod}
+                />
+                <ComparaisonToggle
+                  compareMode={periodFilter.compareMode}
+                  setCompareMode={periodFilter.setCompareMode}
+                  comparePeriod={periodFilter.comparePeriod}
+                  customCompareStart={periodFilter.customCompareStart}
+                  setCustomCompareStart={periodFilter.setCustomCompareStart}
+                  customCompareEnd={periodFilter.customCompareEnd}
+                  setCustomCompareEnd={periodFilter.setCustomCompareEnd}
+                />
+                <ResetLink
+                  type="button"
+                  $visible={!periodFilter.isDefault}
+                  onClick={periodFilter.resetToDefault}
+                >
+                  <IconReset /> Réinitialiser
+                </ResetLink>
+              </ControlsLeft>
               <CustomizeBtn type="button" onClick={() =>
                 exportDashboardCSV(kpi, periodFilter.orders, periodFilter.period, periodFilter.preset)
               }>
                 <IconDownload /> Exporter CSV
               </CustomizeBtn>
-              <CustomizeBtn $primary type="button" onClick={() => setCustomizerOpen(true)}>
-                <IconLayout /> Personnaliser
-              </CustomizeBtn>
             </DashboardControls>
+            {periodFilter.preset === 'custom' && (
+              <DashboardCustomRow>
+                <DatePicker
+                  value={periodFilter.customStart}
+                  onChange={periodFilter.setCustomStart}
+                  max={periodFilter.customEnd || new Date().toISOString().slice(0, 10)}
+                  placeholder="Début"
+                />
+                <DashCustomSep>→</DashCustomSep>
+                <DatePicker
+                  value={periodFilter.customEnd}
+                  onChange={periodFilter.setCustomEnd}
+                  min={periodFilter.customStart}
+                  max={new Date().toISOString().slice(0, 10)}
+                  placeholder="Fin"
+                />
+                {periodFilter.compareMode !== 'none' && periodFilter.comparePeriod && (
+                  <>
+                    <DashCompareSep>·</DashCompareSep>
+                    <DashCompareText>vs {rangeLabel(periodFilter.comparePeriod)}</DashCompareText>
+                  </>
+                )}
+              </DashboardCustomRow>
+            )}
           </BilanHeader>
+          <KPIExportBar>
+            <BtnTooltipWrap>
+              <PanelExportBtn
+                onClick={() => exportKPIOnlyCSV(kpi, periodFilter.period, periodFilter.preset)}
+              >
+                <IconDownload />
+              </PanelExportBtn>
+              <BtnTooltip>Télécharger uniquement les KPIs</BtnTooltip>
+            </BtnTooltipWrap>
+          </KPIExportBar>
           <KPIGrid>
             {dashConfig.config.kpiCards
               .filter(c => c.visible)
@@ -1807,6 +2148,12 @@ export function HomePage() {
                   </CardDragHandle>
                   <PanelHeader>
                     <PanelTitle>📈 Évolution des commandes</PanelTitle>
+                    <PanelExportBtn
+
+                      onClick={() => exportEvolutionCSV(mainChartData, periodFilter.period)}
+                    >
+                      <IconDownload />
+                    </PanelExportBtn>
                   </PanelHeader>
                   {compareChartData && (
                     <ChartLegend>
@@ -1888,6 +2235,12 @@ export function HomePage() {
                   </CardDragHandle>
                   <PanelHeader>
                     <PanelTitle>🍩 Répartition achats</PanelTitle>
+                    <PanelExportBtn
+
+                      onClick={() => exportRepartitionCSV(donutData, periodFilter.period)}
+                    >
+                      <IconDownload />
+                    </PanelExportBtn>
                   </PanelHeader>
                   <DonutInner>
                     <ChartDonut main={donutData} compare={compareDonutData} />
@@ -1925,20 +2278,27 @@ export function HomePage() {
                   </CardDragHandle>
                   <PanelHeader>
                     <PanelTitle>🏅 Top éditeurs</PanelTitle>
-                    <PanelSeeAll onClick={() => navigate('/fonds')}>Voir tout →</PanelSeeAll>
+                    <PanelExportBtn
+
+                      onClick={() => exportTopEditeursCSV(topPublishers, periodFilter.period)}
+                    >
+                      <IconDownload />
+                    </PanelExportBtn>
                   </PanelHeader>
                   <TopEdList>
-                    {topPublishers.map(({ name, pct, montant }, i) => (
-                      <TopEdRow key={name}>
+                    {topPublishers.map(({ pct, montant }, i) => (
+                      <TopEdRow key={i}>
                         <TopEdRank>{i + 1}</TopEdRank>
-                        <TopEdName>{name}</TopEdName>
+                        <TopEdName>Éditeur {i + 1}</TopEdName>
                         <TopEdPct>{pct}%</TopEdPct>
                         <TopEdAmount>{fmtEur(montant)}</TopEdAmount>
                       </TopEdRow>
                     ))}
                   </TopEdList>
                   <TopEdFooter>
-                    <TopEdFooterLabel>Part du montant</TopEdFooterLabel>
+                    <span />
+                    <span />
+                    <TopEdFooterLabel>Part montant</TopEdFooterLabel>
                     <TopEdFooterLabel>Montant commandé</TopEdFooterLabel>
                   </TopEdFooter>
                 </PanelCard>
@@ -1974,7 +2334,12 @@ export function HomePage() {
                   </CardDragHandle>
                   <PanelHeader>
                     <PanelTitle>🔗 Suivi des flux EDI</PanelTitle>
-                    <PanelSeeAll onClick={() => navigate('/edi')}>Accéder →</PanelSeeAll>
+                    <PanelExportBtn
+
+                      onClick={() => exportEDICSV(ediCounts)}
+                    >
+                      <IconDownload />
+                    </PanelExportBtn>
                   </PanelHeader>
                   <EdiStatsGrid>
                     <EdiStatItem>
@@ -2036,7 +2401,15 @@ export function HomePage() {
                   </CardDragHandle>
                   <PanelHeader>
                     <PanelTitle>✨ Nouveautés du mois</PanelTitle>
-                    <PanelSeeAll onClick={() => navigate('/nouveautes')}>Voir tout →</PanelSeeAll>
+                    <PanelHeaderRight>
+                      <PanelExportBtn
+  
+                        onClick={() => exportNouveautesCSV(nouveautes)}
+                      >
+                        <IconDownload />
+                      </PanelExportBtn>
+                      <PanelSeeAll onClick={() => navigate('/nouveautes')}>Voir tout →</PanelSeeAll>
+                    </PanelHeaderRight>
                   </PanelHeader>
                   <NovelPanelWrap>
                     <NovelArrow $side="right" $visible={canNovRight}

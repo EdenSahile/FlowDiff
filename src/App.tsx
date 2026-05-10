@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect } from 'react'
 import { PageSkeleton } from '@/components/ui/PageSkeleton'
-import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Outlet, Navigate } from 'react-router-dom'
 import { ThemeProvider } from '@/providers/ThemeProvider'
 import { AuthProvider } from '@/contexts/AuthContext'
 import { CartProvider } from '@/contexts/CartContext'
@@ -12,6 +12,7 @@ import { RdvProvider } from '@/contexts/RdvContext'
 import { ToastProvider } from '@/contexts/ToastContext'
 import { OnboardingProvider } from '@/contexts/OnboardingContext'
 import { NotificationsProvider } from '@/contexts/NotificationsContext'
+import { DemoStateProvider } from '@/contexts/DemoStateContext'
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
 import { AppLayout } from '@/components/layout/AppLayout'
 
@@ -97,6 +98,7 @@ export default function App() {
               <RdvProvider>
               <OrdersProvider>
               <EDIProvider>
+              <DemoStateProvider>
               <ReturnsProvider>
               <OnboardingProvider>
               <Suspense fallback={<PageSkeleton />}>
@@ -131,12 +133,14 @@ export default function App() {
                     <Route path="/rdv-representant" element={<RdvPage />} />
                     <Route path="/edi" element={<EDIPage />} />
                     <Route path="/offices" element={<OfficesPage />} />
+                    <Route path="*" element={<Navigate to="/" replace />} />
                   </Route>
                 </Route>
               </Routes>
               </Suspense>
               </OnboardingProvider>
               </ReturnsProvider>
+              </DemoStateProvider>
               </EDIProvider>
               </OrdersProvider>
               </RdvProvider>

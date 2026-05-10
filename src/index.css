@@ -13,11 +13,13 @@ body {
   -moz-osx-font-smoothing: grayscale;
   background-color: #F8F5EE;
   color: #111111;
+  overflow-x: hidden;
 }
 
 #root {
   height: 100%;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 a {

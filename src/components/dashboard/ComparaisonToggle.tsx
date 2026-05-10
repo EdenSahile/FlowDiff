@@ -1,52 +1,36 @@
 import styled from 'styled-components'
 import type { UsePeriodFilterReturn } from '../../hooks/usePeriodFilter'
 
-const Wrap = styled.div`
+const ToggleBtn = styled.button<{ $on: boolean }>`
   display: flex;
   align-items: center;
-  gap: 6px;
-  border: 1px solid ${({ theme }) => theme.colors.gray[200]};
-  border-radius: ${({ theme }) => theme.radii.md};
-  background: white;
-  padding: 5px 10px;
-  height: 32px;
-`
-
-const Label = styled.span`
+  gap: 5px;
+  padding: 6px 12px;
   font-size: 11px;
-  color: ${({ theme }) => theme.colors.gray[400]};
+  font-weight: 500;
+  font-family: inherit;
   white-space: nowrap;
-`
-
-const Switch = styled.button<{ $on: boolean }>`
-  width: 28px;
-  height: 16px;
-  background: ${({ $on, theme }) => $on ? theme.colors.navy : theme.colors.gray[200]};
-  border-radius: 8px;
-  position: relative;
   cursor: pointer;
-  border: none;
-  padding: 0;
-  flex-shrink: 0;
-  transition: background 0.15s;
+  border-radius: ${({ theme }) => theme.radii.md};
+  border: 1px solid ${({ $on, theme }) => $on ? theme.colors.navy : theme.colors.gray[200]};
+  background: ${({ $on, theme }) => $on ? theme.colors.navy : 'white'};
+  color: ${({ $on, theme }) => $on ? '#fff' : theme.colors.gray[600]};
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
 
-  &::after {
-    content: '';
-    position: absolute;
-    left: ${({ $on }) => $on ? '14px' : '2px'};
-    top: 2px;
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: white;
-    transition: left 0.15s;
+  &:hover:not([aria-pressed="true"]) {
+    background: ${({ theme }) => theme.colors.gray[50]};
+    color: ${({ theme }) => theme.colors.gray[800]};
+    border-color: ${({ theme }) => theme.colors.gray[200]};
   }
 `
 
-const ModeLabel = styled.span`
-  font-size: 11px;
-  color: ${({ theme }) => theme.colors.gray[600]};
-  white-space: nowrap;
+const Dot = styled.span<{ $on: boolean }>`
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: ${({ $on }) => $on ? 'rgba(255,255,255,0.7)' : 'currentColor'};
+  opacity: ${({ $on }) => $on ? 1 : 0.4};
+  flex-shrink: 0;
 `
 
 export type ComparaisonToggleProps = Pick<
@@ -67,17 +51,17 @@ export function ComparaisonToggle({
   const isOn = compareMode !== 'none'
 
   return (
-    <Wrap>
-      <Label>Comparer à</Label>
-      <Switch
-        type="button"
-        $on={isOn}
-        role="switch"
-        aria-checked={isOn}
-        aria-label="Activer la comparaison avec le mois précédent"
-        onClick={() => setCompareMode(isOn ? 'none' : 'previous')}
-      />
-      <ModeLabel>Mois préc.</ModeLabel>
-    </Wrap>
+    <ToggleBtn
+      type="button"
+      $on={isOn}
+      role="switch"
+      aria-checked={isOn}
+      aria-pressed={isOn}
+      aria-label="Comparer à l'année N-1"
+      onClick={() => setCompareMode(isOn ? 'none' : 'year-ago')}
+    >
+      <Dot $on={isOn} />
+      vs N-1
+    </ToggleBtn>
   )
 }
