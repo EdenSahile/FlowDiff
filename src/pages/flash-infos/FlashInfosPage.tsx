@@ -8,6 +8,7 @@ import { getBookById, UNIVERSES } from '@/data/mockBooks'
 import type { Universe } from '@/data/mockBooks'
 import { useCart } from '@/contexts/CartContext'
 import { useToast } from '@/contexts/ToastContext'
+import { BackButton } from '@/components/ui/BackButton'
 
 /* ── Layout ── */
 const fadeIn = keyframes`from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}`
@@ -498,6 +499,7 @@ export function FlashInfosPage() {
   return (
     <Page>
       <PageHeader>
+        <BackButton />
         <PageEyebrow>Informations</PageEyebrow>
         <PageTitle>Flash Infos</PageTitle>
         <PageSubtitle>Auteurs, fonds, nouveautés — toute l'actualité FlowDiff en temps réel</PageSubtitle>

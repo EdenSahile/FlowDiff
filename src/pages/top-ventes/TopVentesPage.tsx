@@ -8,6 +8,7 @@ import { BookCard } from '@/components/catalogue/BookCard'
 import { BookCover } from '@/components/catalogue/BookCover'
 import { useCart } from '@/contexts/CartContext'
 import { useToast } from '@/contexts/ToastContext'
+import { BackButton } from '@/components/ui/BackButton'
 
 /* ══════════════════════════════════════════════════════
    DONNÉES MOCK — ventes rolling 30 jours
@@ -598,6 +599,7 @@ export function TopVentesPage() {
   return (
     <Page>
       <PageHeader>
+        <BackButton />
         <PageHeaderText>
           <PageEyebrow>Catalogue</PageEyebrow>
           <PageTitle>Top Ventes</PageTitle>

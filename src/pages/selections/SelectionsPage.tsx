@@ -6,6 +6,7 @@ import { MOCK_BOOKS, UNIVERSES, type Universe } from '@/data/mockBooks'
 import { MOCK_SERIES, type Serie, type OffreCommerciale } from '@/data/mockSeries'
 import { BookCover } from '@/components/catalogue/BookCover'
 import { mq } from '@/lib/responsive'
+import { BackButton as BackNavButton } from '@/components/ui/BackButton'
 
 /* ══════════════════════════════════════════════
    COUVERTURE SÉRIE — dégradé générique par univers
@@ -1528,6 +1529,7 @@ export function SelectionsPage() {
   return (
     <Page>
       <PageHeader>
+        <BackNavButton />
         <PageEyebrow>Catalogue</PageEyebrow>
         <PageTitle>Sélections</PageTitle>
         <PageSubtitle>Sélections éditoriales thématiques et opérations commerciales</PageSubtitle>
