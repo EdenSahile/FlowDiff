@@ -6,6 +6,7 @@ import { MOCK_FACTURES, type Facture } from '@/data/mockFactures'
 import { openInvoicePDF } from '@/lib/invoicePdf'
 import { DatePicker } from '@/components/ui/DatePicker'
 import { mq } from '@/lib/responsive'
+import { BackButton } from '@/components/ui/BackButton'
 
 /* ── Helpers ── */
 const fmtDate = (iso: string) =>
@@ -974,6 +975,7 @@ export function FacturationPage() {
   return (
     <Page>
       <PageHeader>
+        <BackButton />
         <PageEyebrow>Mon espace</PageEyebrow>
         <PageTitle>Facturation</PageTitle>
         <PageSubtitle>Retrouvez l'ensemble de vos factures et téléchargez-les en PDF.</PageSubtitle>

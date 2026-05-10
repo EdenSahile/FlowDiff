@@ -15,6 +15,7 @@ import { ReturnCard } from '@/components/historique/ReturnCard'
 import { NewReturnModal } from '@/components/historique/NewReturnModal'
 import { DatePicker } from '@/components/ui/DatePicker'
 import { IconSearch } from '@/components/ui/icons'
+import { BackButton } from '@/components/ui/BackButton'
 
 /* ── Animations ── */
 const fadeSlideIn = keyframes`
@@ -699,6 +700,7 @@ export function HistoriquePage() {
     <Page>
       <TitleRow>
         <PageHeader>
+          <BackButton />
           <PageEyebrow>Mon espace</PageEyebrow>
           <PageTitle>Mon historique</PageTitle>
         </PageHeader>

@@ -5,6 +5,7 @@ import { useToast } from '@/contexts/ToastContext'
 import { newsletterSchema } from '@/lib/formSchemas'
 import { useOnboarding } from '@/contexts/OnboardingContext'
 import { mq } from '@/lib/responsive'
+import { BackButton } from '@/components/ui/BackButton'
 
 /* ── Types ── */
 type Universe = 'BD/Mangas' | 'Jeunesse' | 'Littérature' | 'Adulte-pratique'
@@ -331,6 +332,7 @@ export function ParametresPage() {
   return (
     <Page>
       <PageHeader>
+        <BackButton />
         <PageEyebrow>Mon espace</PageEyebrow>
         <PageTitle>Paramètres</PageTitle>
       </PageHeader>

@@ -1,6 +1,7 @@
 import styled, { keyframes } from 'styled-components'
 import { useAuthContext } from '@/contexts/AuthContext'
 import { mq } from '@/lib/responsive'
+import { BackButton } from '@/components/ui/BackButton'
 
 /* ── Animations ── */
 const fadeIn = keyframes`from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}`
@@ -192,6 +193,7 @@ export function MonComptePage() {
   return (
     <Page>
       <PageHeader>
+        <BackButton />
         <PageEyebrow>Mon espace</PageEyebrow>
         <PageTitle>Mon compte</PageTitle>
       </PageHeader>
