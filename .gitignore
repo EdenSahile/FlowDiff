@@ -48,6 +48,9 @@ next-env.d.ts
 # docs internes — ne pas inclure dans src/
 src/**/*.md
 
+# Comptes de test — données fictives mais non versionnées
+docs/dev/COMPTES_TEST.md
+
 # Claude Code — mémoire locale, non versionnée
 .claude/
 .claude/skills/
