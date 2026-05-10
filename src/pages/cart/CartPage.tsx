@@ -16,6 +16,7 @@ import { addressSchema, parseAddressString, type AddressData, type TransmissionM
 import { OrderTransmissionStep } from './OrderTransmissionStep'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { IconTrash, IconCart, IconChevronLeft } from '@/components/ui/icons'
+import { BackButton } from '@/components/ui/BackButton'
 
 /* ── SVG Icons ── */
 function IconScreen() {
@@ -1495,6 +1496,7 @@ export function CartPage() {
         onConfirm={confirm.open ? confirm.onConfirm : () => {}}
         onCancel={() => setConfirm({ open: false })}
       />
+      <BackButton />
       <PageHeader>
         <PageTitle style={{ marginBottom: 0 }}>Panier</PageTitle>
         <ClearCartBtn
