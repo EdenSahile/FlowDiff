@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import { BackButton as BackNavButton } from '@/components/ui/BackButton'
 import { createPortal } from 'react-dom'
 import { useParams, useNavigate } from 'react-router-dom'
 import styled, { keyframes } from 'styled-components'
@@ -1445,6 +1446,7 @@ export function FicheProduitPage() {
 
   return (
     <Page>
+      <BackNavButton />
       <BreadcrumbNav aria-label="Fil d'Ariane">
         <BreadcrumbLink onClick={() => navigate('/')}>Accueil</BreadcrumbLink>
         <BreadcrumbSep>›</BreadcrumbSep>
