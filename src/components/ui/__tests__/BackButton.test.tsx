@@ -22,7 +22,7 @@ function wrap(ui: React.ReactElement) {
 }
 
 describe('BackButton', () => {
-  beforeEach(() => { mockNavigate.mockClear() })
+  beforeEach(() => { mockNavigate.mockClear(); mockUseLocation.mockClear() })
 
   it('renders when location key is not default', () => {
     mockUseLocation.mockReturnValue({ pathname: '/test', search: '', hash: '', state: null, key: 'abc123' })
