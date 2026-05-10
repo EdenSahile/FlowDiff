@@ -7,6 +7,7 @@ import { getBooksByType, searchBooks } from '@/data/mockBooks'
 import type { Universe } from '@/data/mockBooks'
 import { Input } from '@/components/ui/Input'
 import { mq } from '@/lib/responsive'
+import { BackButton } from '@/components/ui/BackButton'
 
 type SortKey = 'pertinence' | 'titre' | 'prix_asc' | 'prix_desc'
 
@@ -224,6 +225,7 @@ export function NouveautesPage() {
   return (
     <Page>
       <PageHeader>
+        <BackButton />
         <PageEyebrow>Catalogue</PageEyebrow>
         <PageTitle>Nouveautés</PageTitle>
         <PageSubtitle>Titres du mois disponibles à la commande immédiate</PageSubtitle>

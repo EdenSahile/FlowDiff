@@ -5,6 +5,7 @@ import { UniverseFilter } from '@/components/catalogue/UniverseFilter'
 import { getBooksByType, searchBooks } from '@/data/mockBooks'
 import type { Universe } from '@/data/mockBooks'
 import { Input } from '@/components/ui/Input'
+import { BackButton } from '@/components/ui/BackButton'
 
 const fadeIn = keyframes`from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}`
 
@@ -190,6 +191,7 @@ export function AParaitrePage() {
   return (
     <Page>
       <PageHeader>
+        <BackButton />
         <PageEyebrow>Catalogue</PageEyebrow>
         <PageTitle>À paraître</PageTitle>
         <PageSubtitle>Les titres seront enregistrés en notés</PageSubtitle>

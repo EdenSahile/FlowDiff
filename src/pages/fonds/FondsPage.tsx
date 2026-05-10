@@ -6,6 +6,7 @@ import { UniverseFilter } from '@/components/catalogue/UniverseFilter'
 import { getBooksByType, searchBooks } from '@/data/mockBooks'
 import type { Universe, StockStatut } from '@/data/mockBooks'
 import { Input } from '@/components/ui/Input'
+import { BackButton } from '@/components/ui/BackButton'
 
 // Colors must stay in sync with STATUT_CONFIG in src/components/ui/StockStatus.tsx
 const DISPO_OPTIONS: Array<{ value: StockStatut; label: string; color: string | null }> = [
@@ -253,6 +254,7 @@ export function FondsPage() {
   return (
     <Page>
       <PageHeader>
+        <BackButton />
         <PageEyebrow>Catalogue</PageEyebrow>
         <PageTitle>Fonds</PageTitle>
         <PageSubtitle>Titres déjà parus, disponibles à la commande immédiate</PageSubtitle>
