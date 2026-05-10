@@ -4,6 +4,7 @@ import { useLocation } from 'react-router-dom'
 import { useAuthContext } from '@/contexts/AuthContext'
 import { useToast } from '@/contexts/ToastContext'
 import { contactSchema } from '@/lib/formSchemas'
+import { BackButton } from '@/components/ui/BackButton'
 
 /* ── Animations ── */
 const fadeIn = keyframes`from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}`
@@ -246,6 +247,7 @@ export function ContactPage() {
   return (
     <Page>
       <PageHeader>
+        <BackButton />
         <PageEyebrow>Informations</PageEyebrow>
         <PageTitle>Contact</PageTitle>
         <PageSubtitle>Envoyez un message à votre représentant ou au service clients.</PageSubtitle>

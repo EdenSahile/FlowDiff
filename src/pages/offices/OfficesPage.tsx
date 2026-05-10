@@ -9,6 +9,7 @@ import { BookCover } from '@/components/catalogue/BookCover'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { mq } from '@/lib/responsive'
 import { useDemoState } from '@/contexts/DemoStateContext'
+import { BackButton } from '@/components/ui/BackButton'
 
 // ── Types ──────────────────────────────────────────────────────────
 type BookStatus = 'inclus' | 'retire'
@@ -918,6 +919,7 @@ export function OfficesPage() {
 
         {/* ── Header ── */}
         <PageHeader>
+          <BackButton />
           <HeaderLeft>
             <div>
               <PageEyebrow>Outils</PageEyebrow>

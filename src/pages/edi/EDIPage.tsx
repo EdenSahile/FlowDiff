@@ -21,6 +21,7 @@ import {
   type EDIMessage,
   type EDIFilter,
 } from '@/lib/ediUtils'
+import { BackButton } from '@/components/ui/BackButton'
 
 /* ════════════════════════════════════════════════════
    HELPERS
@@ -818,6 +819,7 @@ export function EDIPage() {
       <Page>
         {/* ── Header ── */}
         <PageHeader>
+          <BackButton />
           <TitleBlock>
             <PageEyebrow>Outils</PageEyebrow>
             <Title>EDI — Échanges de données informatisés</Title>
