@@ -1596,11 +1596,6 @@ export function FicheProduitPage() {
                     $added={added}
                     onClick={handleAdd}
                     aria-label="Ajouter au panier"
-                    style={
-                      book.statut === 'sur_commande' ? { background: '#506680' } :
-                      book.statut === 'en_reimp'     ? { background: '#B65A00' } :
-                      undefined
-                    }
                   >
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>

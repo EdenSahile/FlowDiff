@@ -1,14 +1,9 @@
 import { useMemo } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import styled, { keyframes } from 'styled-components'
 import { MOCK_BOOKS } from '@/data/mockBooks'
 import { BookCard } from '@/components/catalogue/BookCard'
 import { slugifyAuthor } from '@/lib/slugify'
-
-const MONTHS_FR = [
-  'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
-  'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre',
-]
 
 /* ── Styled ── */
 const fadeIn = keyframes`from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}`
@@ -109,34 +104,6 @@ const Content = styled.div`
   padding: ${({ theme }) => theme.spacing.xl} ${({ theme }) => theme.spacing.lg};
 `
 
-const MonthSection = styled.section`
-  margin-bottom: ${({ theme }) => theme.spacing['2xl']};
-`
-
-const MonthHeader = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: ${({ theme }) => theme.spacing.lg};
-`
-
-const MonthPill = styled.div`
-  background: ${({ theme }) => theme.colors.navy};
-  color: #fff;
-  font-family: ${({ theme }) => theme.typography.fontFamily};
-  font-size: 13px;
-  font-weight: 700;
-  padding: 5px 16px;
-  border-radius: ${({ theme }) => theme.radii.full};
-  white-space: nowrap;
-`
-
-const MonthLine = styled.div`
-  flex: 1;
-  height: 1px;
-  background: ${({ theme }) => theme.colors.gray[200]};
-`
-
 const Grid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -165,6 +132,8 @@ const EmptyText = styled.p`
 export function AuteurPage() {
   const { auteurSlug } = useParams<{ auteurSlug: string }>()
   const navigate = useNavigate()
+  const location = useLocation()
+  const canGoBack = location.key !== 'default'
 
   /* Trouver le nom réel depuis le slug */
   const authorName = useMemo(() => {
@@ -177,31 +146,13 @@ export function AuteurPage() {
     return null
   }, [auteurSlug])
 
-  /* Livres de cet auteur — 2 dernières années, triés date décroissante */
+  /* Livres de cet auteur — triés du plus récent au plus ancien */
   const books = useMemo(() => {
     if (!authorName) return []
-    const twoYearsAgo = new Date()
-    twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2)
-    const cutoff = twoYearsAgo.toISOString().slice(0, 10)
     return MOCK_BOOKS
-      .filter(b =>
-        b.authors.some(a => slugifyAuthor(a) === auteurSlug) &&
-        b.publicationDate >= cutoff
-      )
+      .filter(b => b.authors.some(a => slugifyAuthor(a) === auteurSlug))
       .sort((a, b) => b.publicationDate.localeCompare(a.publicationDate))
   }, [authorName, auteurSlug])
-
-  /* Grouper par "Mois AAAA" */
-  const groups = useMemo(() => {
-    const map = new Map<string, typeof books>()
-    for (const book of books) {
-      const [year, month] = book.publicationDate.split('-')
-      const key = `${MONTHS_FR[parseInt(month, 10) - 1]} ${year}`
-      if (!map.has(key)) map.set(key, [])
-      map.get(key)!.push(book)
-    }
-    return Array.from(map.entries())
-  }, [books])
 
   const initials = authorName
     ? authorName.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase()
@@ -211,7 +162,7 @@ export function AuteurPage() {
     <Page>
       <Hero>
         <HeroInner>
-          <BackBtn onClick={() => navigate(-1)}>← Retour</BackBtn>
+          {canGoBack && <BackBtn onClick={() => navigate(-1)}>← Retour</BackBtn>}
           <AuthorRow>
             <Avatar>{initials}</Avatar>
             <AuthorInfo>
@@ -235,19 +186,11 @@ export function AuteurPage() {
             <EmptyText>Cet auteur n'a pas de parution dans notre catalogue.</EmptyText>
           </EmptyBox>
         ) : (
-          groups.map(([month, monthBooks]) => (
-            <MonthSection key={month}>
-              <MonthHeader>
-                <MonthPill>{month}</MonthPill>
-                <MonthLine />
-              </MonthHeader>
-              <Grid>
-                {monthBooks.map(book => (
-                  <BookCard key={book.id} book={book} showType coverFirst />
-                ))}
-              </Grid>
-            </MonthSection>
-          ))
+          <Grid>
+            {books.map(book => (
+              <BookCard key={book.id} book={book} showType coverFirst />
+            ))}
+          </Grid>
         )}
       </Content>
     </Page>

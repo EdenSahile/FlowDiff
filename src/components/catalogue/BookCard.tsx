@@ -631,10 +631,8 @@ export function BookCard({ book, showType = false, coverFirst = false }: Props) 
   }
 
   const pubYear = book.publicationDate ? new Date(book.publicationDate).getFullYear() : null
-  const isEnReimp = book.statut === 'en_reimp'
-
   if (coverFirst) {
-    const isIndispo = isEpuise || isEnReimp
+    const isIndispo = isEpuise
     return (
       <>
         <Card

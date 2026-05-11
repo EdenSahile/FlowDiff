@@ -18,6 +18,7 @@ export interface MockUser {
   remise: number // % de remise personnalisée
   telephone: string
   remisesParUnivers: Record<string, number> // % de remise par thématique
+  reliquatAccepte: boolean // configuré dans l'outil de gestion commerciale (AS400/CRM)
 }
 
 function createMockUser(data: {
@@ -29,6 +30,7 @@ function createMockUser(data: {
   remise: number
   telephone: string
   remisesParUnivers: Record<string, number>
+  reliquatAccepte: boolean
 }): MockUser {
   return {
     id: `mock-${data.codeClient.toLowerCase()}`,
@@ -40,6 +42,7 @@ function createMockUser(data: {
     remise: data.remise,
     telephone: data.telephone,
     remisesParUnivers: data.remisesParUnivers,
+    reliquatAccepte: data.reliquatAccepte,
   }
 }
 
@@ -53,6 +56,7 @@ export const MOCK_USERS: MockUser[] = [
     remise: 15,
     telephone: '01 23 45 67 89',
     remisesParUnivers: { 'Littérature': 35, 'BD/Mangas': 30, 'Jeunesse': 30, 'Adulte-pratique': 35 },
+    reliquatAccepte: true,
   }),
   createMockUser({
     codeClient: 'LIB002',
@@ -63,6 +67,7 @@ export const MOCK_USERS: MockUser[] = [
     remise: 20,
     telephone: '04 56 78 90 12',
     remisesParUnivers: { 'Littérature': 35, 'BD/Mangas': 30, 'Jeunesse': 30, 'Adulte-pratique': 35 },
+    reliquatAccepte: false,
   }),
   createMockUser({
     codeClient: 'LIB003',
@@ -73,6 +78,7 @@ export const MOCK_USERS: MockUser[] = [
     remise: 12,
     telephone: '05 56 12 34 56',
     remisesParUnivers: { 'Littérature': 35, 'BD/Mangas': 30, 'Jeunesse': 30, 'Adulte-pratique': 35 },
+    reliquatAccepte: true,
   }),
 ]
 

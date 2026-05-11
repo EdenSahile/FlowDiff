@@ -172,6 +172,27 @@ const RemiseTileSub = styled.span`
   color: ${({ theme }) => theme.colors.gray[400]};
 `
 
+const ReliquatRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+`
+
+const ReliquatBadge = styled.span<{ $accepted: boolean }>`
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  border-radius: ${({ theme }) => theme.radii.full};
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 13px;
+  font-weight: 700;
+  background: ${({ $accepted }) => $accepted ? 'rgba(46,125,50,0.10)' : 'rgba(107,107,104,0.10)'};
+  color: ${({ $accepted }) => $accepted ? '#2E7D32' : '#6B6B68'};
+  border: 1px solid ${({ $accepted }) => $accepted ? 'rgba(46,125,50,0.25)' : 'rgba(107,107,104,0.20)'};
+`
+
 const InfoNote = styled.p`
   font-size: ${({ theme }) => theme.typography.sizes.sm};
   color: ${({ theme }) => theme.colors.gray[600]};
@@ -219,6 +240,28 @@ export function MonComptePage() {
           <Field>
             <FieldLabel>Adresse de livraison</FieldLabel>
             <FieldValue>{user.adresseLivraison}</FieldValue>
+          </Field>
+          <Field>
+            <FieldLabel>Reliquat accepté</FieldLabel>
+            <ReliquatRow>
+              <ReliquatBadge $accepted={user.reliquatAccepte}>
+                {user.reliquatAccepte ? (
+                  <>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    Oui
+                  </>
+                ) : (
+                  <>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                    Non
+                  </>
+                )}
+              </ReliquatBadge>
+            </ReliquatRow>
           </Field>
           <Field>
             <FieldLabel>Remises par thématique</FieldLabel>

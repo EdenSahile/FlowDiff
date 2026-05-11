@@ -24,6 +24,7 @@ export interface AuthUser {
   remise: number
   telephone: string
   remisesParUnivers: Record<string, number>
+  reliquatAccepte: boolean
 }
 
 interface AuthResult {
@@ -56,6 +57,7 @@ function toAuthUser(u: MockUser): AuthUser {
     remise: u.remise,
     telephone: u.telephone,
     remisesParUnivers: u.remisesParUnivers ?? {},
+    reliquatAccepte: u.reliquatAccepte ?? false,
   }
 }
 
