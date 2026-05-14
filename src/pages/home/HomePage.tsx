@@ -179,6 +179,56 @@ function IconBarChart() {
   )
 }
 
+function IconUpcoming() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="3" y="4" width="18" height="18" rx="2" />
+      <line x1="16" y1="2" x2="16" y2="6" />
+      <line x1="8" y1="2" x2="8" y2="6" />
+      <line x1="3" y1="10" x2="21" y2="10" />
+      <circle cx="8" cy="15" r="1" fill="currentColor" stroke="none" />
+      <circle cx="12" cy="15" r="1" fill="currentColor" stroke="none" />
+      <circle cx="16" cy="15" r="1" fill="currentColor" stroke="none" />
+    </svg>
+  )
+}
+
+function IconNewTag() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
+      <circle cx="7" cy="7" r="1.2" fill="currentColor" stroke="none" />
+    </svg>
+  )
+}
+
+function IconSync() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <polyline points="23 4 23 10 17 10" />
+      <polyline points="1 20 1 14 7 14" />
+      <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+    </svg>
+  )
+}
+
+function IconChecklist() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <line x1="10" y1="6" x2="21" y2="6" />
+      <line x1="10" y1="12" x2="21" y2="12" />
+      <line x1="10" y1="18" x2="21" y2="18" />
+      <polyline points="3 6 4 7 6 5" />
+      <polyline points="3 12 4 13 6 11" />
+      <polyline points="3 18 4 19 6 17" />
+    </svg>
+  )
+}
+
 function IconDownload() {
   return (
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -1105,6 +1155,56 @@ function IconSend() {
   )
 }
 
+function IconOffices() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 2 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+      <polyline points="3.29 7 12 12 20.71 7" />
+      <line x1="12" y1="22" x2="12" y2="12" />
+      <path d="M6 20l-2-2 2-2" />
+    </svg>
+  )
+}
+
+function IconMonitorList() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="2" y="3" width="20" height="13" rx="2" />
+      <path d="M8 21h8M12 16v5" />
+      <line x1="6" y1="8" x2="18" y2="8" />
+      <line x1="6" y1="12" x2="14" y2="12" />
+    </svg>
+  )
+}
+
+function IconEDI() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="3" y="3" width="18" height="18" rx="2" />
+      <line x1="3" y1="9" x2="21" y2="9" />
+      <line x1="3" y1="15" x2="21" y2="15" />
+      <line x1="9" y1="3" x2="9" y2="21" />
+      <line x1="15" y1="3" x2="15" y2="21" />
+    </svg>
+  )
+}
+
+function IconTrophy() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M6 9H4a2 2 0 0 1-2-2V5h4" />
+      <path d="M18 9h2a2 2 0 0 0 2-2V5h-4" />
+      <path d="M12 17v4" />
+      <path d="M8 21h8" />
+      <path d="M6 3h12v8a6 6 0 0 1-12 0V3z" />
+    </svg>
+  )
+}
+
 function IconXCircle() {
   return (
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -1516,6 +1616,81 @@ const ShortcutChevron = styled.span`
   line-height: 1;
 `
 
+/* ── Quick actions (top fixed bar) ── */
+const TopSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 33px;
+`
+
+const ShortcutsLabel = styled.h2`
+  font-size: 15px;
+  font-weight: 700;
+  color: ${({ theme }) => theme.colors.gray[800]};
+  margin: 0;
+`
+
+const QuickActionsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+
+  ${mq.belowMd} {
+    grid-template-columns: repeat(2, 1fr);
+  }
+`
+
+const QuickActionCard = styled(Link)`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: white;
+  border: 1.5px solid ${({ theme }) => theme.colors.gray[200]};
+  border-radius: 10px;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.12s;
+
+  &:hover {
+    border-color: ${({ theme }) => theme.colors.navy};
+    box-shadow: 0 2px 10px rgba(35, 47, 62, 0.1);
+    transform: translateY(-1px);
+  }
+
+  ${mq.belowMd} {
+    padding: 12px 14px;
+    gap: 10px;
+  }
+`
+
+const QuickActionIconWrap = styled.div`
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
+  background: ${({ theme }) => theme.colors.accentLight};
+  color: ${({ theme }) => theme.colors.navy};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+`
+
+const QuickActionLabel = styled.span`
+  flex: 1;
+  font-size: 13px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.navy};
+  line-height: 1.3;
+`
+
+const QuickActionChevron = styled.div`
+  color: ${({ theme }) => theme.colors.gray[400]};
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+`
+
 /* ── Section reorder controls ── */
 const SectionWrap = styled.div`
   position: relative;
@@ -1773,7 +1948,7 @@ export function HomePage() {
       icon: '📋',
       iconBg: '#FFFBEB', iconColor: '#D97706',
       count: ediCounts.orders, label: ediCounts.orders <= 1 ? 'commande à vérifier' : 'commandes à vérifier',
-      route: '/edi#flux-en-cours',
+      route: '/edi?filter=ORDRSP#historique',
     },
     'action-edi-error': {
       icon: '⚠️',
@@ -1874,24 +2049,46 @@ export function HomePage() {
     <Page>
       <Content>
 
-        {/* 1 — Greeting row */}
-        <GreetingRow>
-          <div>
-            <GreetingTitle>
-              {greeting} {user?.nomLibrairie ?? 'Librairie'} 👋
-            </GreetingTitle>
-            <GreetingSub>
-              Votre activité du mois de{' '}
-              {now.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}
-            </GreetingSub>
-          </div>
-          <DateBlock>
-            <DateText>
-              <DateLabel>{dateLabel}</DateLabel>
-              <DateValue>{dateValue}</DateValue>
-            </DateText>
-          </DateBlock>
-        </GreetingRow>
+        {/* 1 — Greeting + raccourcis groupés */}
+        <TopSection>
+          <GreetingRow>
+            <div>
+              <GreetingTitle>
+                {greeting} {user?.nomLibrairie ?? 'Librairie'} 👋
+              </GreetingTitle>
+              <GreetingSub>
+                Votre activité du mois de{' '}
+                {now.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}
+              </GreetingSub>
+            </div>
+            <DateBlock>
+              <DateText>
+                <DateLabel>{dateLabel}</DateLabel>
+                <DateValue>{dateValue}</DateValue>
+              </DateText>
+            </DateBlock>
+          </GreetingRow>
+
+          <ShortcutsLabel>Raccourcis</ShortcutsLabel>
+          <QuickActionsGrid>
+            {([
+              { icon: <IconUpcoming />,    label: 'À paraître',                    to: '/a-paraitre' },
+              { icon: <IconNewTag />,      label: 'Nouveautés du mois',             to: '/nouveautes' },
+              { icon: <IconTrophy />,      label: 'Top ventes',                     to: '/top-ventes' },
+              { icon: <IconChecklist />,   label: 'Sélections',                     to: '/selections' },
+              { icon: <IconSync />,        label: 'Offices',                        to: '/offices'    },
+              { icon: <IconCart />,        label: 'Panier',                         to: '/panier'     },
+              { icon: <IconMonitorList />, label: 'Historique commandes/retours',   to: '/historique' },
+              { icon: <IconBarChart />,    label: 'Facturation',                    to: '/facturation'},
+            ]).map(({ icon, label, to }) => (
+              <QuickActionCard key={to} to={to}>
+                <QuickActionIconWrap>{icon}</QuickActionIconWrap>
+                <QuickActionLabel>{label}</QuickActionLabel>
+                <QuickActionChevron><IconChevron dir="right" /></QuickActionChevron>
+              </QuickActionCard>
+            ))}
+          </QuickActionsGrid>
+        </TopSection>
 
         {/* 2-5 — Sections réordonnables */}
         {dashConfig.config.sectionOrder.map((sectionId, sectionIdx) => {
@@ -2445,39 +2642,7 @@ export function HomePage() {
                   </NovelPanelWrap>
                 </PanelCard>
               )
-              if (c.id === 'panel-raccourcis') return (
-                <PanelCard
-                  key={c.id}
-                  $dragging={cardDrag?.id === c.id}
-                  $dropTarget={cardDrop?.id === c.id}
-                  draggable
-                  onDragStart={() => handleDragStart('bottomPanels', c.id)}
-                  onDragOver={e => handleDragOver(e, 'bottomPanels', c.id)}
-                  onDrop={() => handleDrop('bottomPanels', c.id)}
-                  onDragEnd={handleDragEnd}
-                >
-                  <CardDragHandle title="Déplacer" aria-label="Déplacer ce panneau">
-                    <IconGrip />
-                  </CardDragHandle>
-                  <PanelHeader>
-                    <PanelTitle>⚡ Raccourcis</PanelTitle>
-                  </PanelHeader>
-                  <ShortcutList>
-                    {([
-                      { icon: '📦', label: 'Passer une commande',    to: '/fonds'      },
-                      { icon: '🛒', label: 'Accéder au panier',       to: '/panier'     },
-                      { icon: '📋', label: 'Gérer mes listes',        to: '/compte'     },
-                      { icon: '📊', label: 'Consulter mon historique', to: '/historique' },
-                    ] as { icon: React.ReactNode; label: string; to: string }[]).map(({ icon, label, to }) => (
-                      <ShortcutRow key={to} to={to}>
-                        <ShortcutIconWrap>{icon}</ShortcutIconWrap>
-                        <ShortcutRowLabel>{label}</ShortcutRowLabel>
-                        <ShortcutChevron>›</ShortcutChevron>
-                      </ShortcutRow>
-                    ))}
-                  </ShortcutList>
-                </PanelCard>
-              )
+              if (c.id === 'panel-raccourcis') return null
               return null
             })
           }

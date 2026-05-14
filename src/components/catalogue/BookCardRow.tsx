@@ -13,6 +13,7 @@ import { ListPickerPopover } from './ListPickerPopover'
 import { StockStatus } from '@/components/ui/StockStatus'
 import { cartQtySchema } from '@/lib/formSchemas'
 import { theme } from '@/lib/theme'
+import { formatPrice } from '@/lib/format'
 
 /* ══════════════════════════════════════════════════════
    TYPES & DONNÉES
@@ -789,7 +790,7 @@ export function BookCardRow({ book, selected, onToggle }: Props) {
     ? user.remisesParUnivers[book.universe] / 100
     : (REMISE_RATES[book.universe as keyof typeof REMISE_RATES] ?? 0)
   const priceNet = userRate > 0 && mode === 'print'
-    ? (book.priceTTC * (1 - userRate)).toFixed(2)
+    ? formatPrice(book.priceTTC * (1 - userRate))
     : null
 
   function handleStarRowClick(e: React.MouseEvent) {
@@ -945,9 +946,9 @@ export function BookCardRow({ book, selected, onToggle }: Props) {
             <DropOptionIcon>{mode === 'ebook' ? '💻' : '📖'}</DropOptionIcon>
             <TriggerLabel>
               {mode === 'print'
-                ? `Version papier (PRINT) — ${book.priceTTC.toFixed(2)} €`
+                ? `Version papier (PRINT) — ${formatPrice(book.priceTTC)} €`
                 : selectedEbook
-                  ? `${selectedEbook.hebergeur} · ${selectedEbook.format} — ${selectedEbook.price.toFixed(2)} €`
+                  ? `${selectedEbook.hebergeur} · ${selectedEbook.format} — ${formatPrice(selectedEbook.price)} €`
                   : 'Choisir un format'}
             </TriggerLabel>
           </DropdownTrigger>
@@ -965,7 +966,7 @@ export function BookCardRow({ book, selected, onToggle }: Props) {
               >
                 <DropOptionIcon>📖</DropOptionIcon>
                 <DropOptionText>Version papier (PRINT)</DropOptionText>
-                <DropOptionPrice>{book.priceTTC.toFixed(2)} €</DropOptionPrice>
+                <DropOptionPrice>{formatPrice(book.priceTTC)} €</DropOptionPrice>
                 <DropCheckmark>{mode === 'print' ? '✓' : ''}</DropCheckmark>
               </DropOption>
 
@@ -983,7 +984,7 @@ export function BookCardRow({ book, selected, onToggle }: Props) {
                       >
                         <DropOptionIcon>💻</DropOptionIcon>
                         <DropOptionText>{opt.hebergeur} · {opt.format}</DropOptionText>
-                        <DropOptionPrice>{opt.price.toFixed(2)} €</DropOptionPrice>
+                        <DropOptionPrice>{formatPrice(opt.price)} €</DropOptionPrice>
                         <DropCheckmark>{isActive ? '✓' : ''}</DropCheckmark>
                       </DropOption>
                     )

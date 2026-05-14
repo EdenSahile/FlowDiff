@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import styled, { keyframes } from 'styled-components'
 import { useRdv } from '@/contexts/RdvContext'
 import { exportToCSV } from '@/lib/csv'
+import { formatPrice } from '@/lib/format'
 import { BookCover } from '@/components/catalogue/BookCover'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 
@@ -439,7 +440,7 @@ export function RdvPage() {
       book.authors.join(', '),
       book.isbn,
       book.publisher,
-      book.priceTTC.toFixed(2),
+      formatPrice(book.priceTTC),
       quantity,
       '',
     ])
@@ -518,7 +519,7 @@ export function RdvPage() {
                       {book.publisher}{book.collection ? ` · ${book.collection}` : ''}
                       {' · '}ISBN {book.isbn}
                     </BookSecondary>
-                    <BookPrice>{book.priceTTC.toFixed(2)} € TTC</BookPrice>
+                    <BookPrice>{formatPrice(book.priceTTC)} € TTC</BookPrice>
 
                     <BookActions>
                       {/* Stepper quantité */}

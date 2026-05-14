@@ -12,6 +12,7 @@ import { ListPickerPopover } from '@/components/catalogue/ListPickerPopover'
 import { StockAlertModal } from '@/components/ui/StockAlertModal'
 import { slugifyAuthor } from '@/lib/slugify'
 import { theme } from '@/lib/theme'
+import { formatPrice } from '@/lib/format'
 import { mq } from '@/lib/responsive'
 
 /* ── Formats physiques ── */
@@ -101,7 +102,7 @@ const SectionEyebrow = styled.p`
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: ${({ theme }) => theme.colors.accent};
-  margin: 0 0 10px;
+  margin: 30px 0 10px;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -1402,7 +1403,7 @@ export function FicheProduitPage() {
               )}
               <ArgMetaItem>
                 <ArgMetaLabel>Prix TTC</ArgMetaLabel>
-                <ArgMetaValue>{book.priceTTC.toFixed(2)} €</ArgMetaValue>
+                <ArgMetaValue>{formatPrice(book.priceTTC)} €</ArgMetaValue>
               </ArgMetaItem>
             </ArgMeta>
           </ArgBody>
@@ -1559,7 +1560,7 @@ export function FicheProduitPage() {
                 {formats.map(f => (
                   <FormatBtnEl key={f.id} $active={formatId === f.id} onClick={() => setFormatId(f.id)}>
                     <FormatNameEl $active={formatId === f.id}>{f.label}</FormatNameEl>
-                    <FormatPriceEl $active={formatId === f.id}>{f.priceTTC.toFixed(2)} € TTC</FormatPriceEl>
+                    <FormatPriceEl $active={formatId === f.id}>{formatPrice(f.priceTTC)} € TTC</FormatPriceEl>
                   </FormatBtnEl>
                 ))}
               </FormatOptionsRow>
@@ -1568,7 +1569,7 @@ export function FicheProduitPage() {
 
           <PriceZone>
             <PriceRowEl>
-              <PricePublicEl>{selectedFormat.priceTTC.toFixed(2)} €</PricePublicEl>
+              <PricePublicEl>{formatPrice(selectedFormat.priceTTC)} €</PricePublicEl>
               <PricePublicLabelEl>TTC</PricePublicLabelEl>
             </PriceRowEl>
 
@@ -1724,7 +1725,7 @@ export function FicheProduitPage() {
                     <SimilarUniverseBadgeEl $bg={bStyle.bg} $color={bStyle.color}>{b.universe}</SimilarUniverseBadgeEl>
                     <SimilarTitleTextEl>{b.title}</SimilarTitleTextEl>
                     <SimilarAuthorTextEl>{b.authors[0]}</SimilarAuthorTextEl>
-                    <SimilarPriceEl>{b.priceTTC.toFixed(2)} €</SimilarPriceEl>
+                    <SimilarPriceEl>{formatPrice(b.priceTTC)} €</SimilarPriceEl>
                   </SimilarBodyNew>
                 </SimilarCardNew>
               )

@@ -133,8 +133,8 @@ export function LoginPage() {
     if (serverError) setServerError('')
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleSubmit = async (e?: React.FormEvent | React.MouseEvent | React.KeyboardEvent) => {
+    e?.preventDefault()
 
     const result = loginSchema.safeParse(form)
     if (!result.success) {
@@ -226,7 +226,7 @@ export function LoginPage() {
 
           {serverError && <AuthError role="alert">{serverError}</AuthError>}
 
-          <AuthForm onSubmit={handleSubmit} noValidate>
+          <AuthForm>
             <Input
               id="identifier"
               label="Code client ou email"
@@ -235,9 +235,10 @@ export function LoginPage() {
               value={form.identifier}
               onChange={handleChange('identifier')}
               error={fieldErrors.identifier}
-              autoComplete="username"
+              autoComplete="off"
               autoFocus
               disabled
+              onKeyDown={(e) => e.key === 'Enter' && handleSubmit(e)}
             />
 
             <div>
@@ -250,8 +251,9 @@ export function LoginPage() {
                   value={form.password}
                   onChange={handleChange('password')}
                   error={fieldErrors.password}
-                  autoComplete="current-password"
+                  autoComplete="off"
                   disabled
+                  onKeyDown={(e) => e.key === 'Enter' && handleSubmit(e)}
                 />
               </PasswordWrapper>
             </div>
@@ -266,7 +268,7 @@ export function LoginPage() {
               </a>
             </div>
 
-            <Button type="submit" fullWidth disabled={isSubmitting}>
+            <Button type="button" fullWidth disabled={isSubmitting} onClick={handleSubmit}>
               {isSubmitting ? 'Connexion…' : 'Se connecter'}
             </Button>
           </AuthForm>

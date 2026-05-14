@@ -4,6 +4,7 @@ import styled, { keyframes } from 'styled-components'
 import type { Universe } from '@/data/mockBooks'
 import { CURRENT_OFFICE } from '@/data/mockOffices'
 import { theme } from '@/lib/theme'
+import { formatPrice } from '@/lib/format'
 import type { OfficeBook } from '@/data/mockOffices'
 import { BookCover } from '@/components/catalogue/BookCover'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
@@ -54,7 +55,7 @@ function downloadCSV(
     `"${b.authors.join(', ')}"`,
     b.universe,
     fmtDate(b.publicationDate),
-    `${b.priceTTC.toFixed(2)} EUR`,
+    `${formatPrice(b.priceTTC)} EUR`,
     String(qties[b.isbn] ?? b.proposedQty),
   ])
   const csv = [header.join(sep), ...rows.map(r => r.join(sep))].join('\n')
@@ -1067,7 +1068,7 @@ export function OfficesPage() {
                           </UniverseBadge>
                           <BookTitle>{book.title}</BookTitle>
                           <BookAuthor>{book.authors.join(', ')} · {book.publisher}</BookAuthor>
-                          <BookPriceLine>{book.priceTTC.toFixed(2)} € TTC</BookPriceLine>
+                          <BookPriceLine>{formatPrice(book.priceTTC)} € TTC</BookPriceLine>
                         </BookMeta>
                       </TitleCell>
 
@@ -1221,7 +1222,7 @@ export function OfficesPage() {
                       <ExportTd>{b.universe}</ExportTd>
                       <ExportTd>{fmtDate(b.publicationDate)}</ExportTd>
                       <ExportTd style={{ textAlign: 'right' }}>
-                        {b.priceTTC.toFixed(2)} €
+                        {formatPrice(b.priceTTC)} €
                       </ExportTd>
                       <ExportTd style={{ textAlign: 'center', fontWeight: 700 }}>
                         {bookQties[b.isbn] ?? b.proposedQty}

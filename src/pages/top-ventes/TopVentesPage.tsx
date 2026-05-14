@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNotifications } from '@/contexts/NotificationsContext'
 import { useNavigate } from 'react-router-dom'
 import { theme } from '@/lib/theme'
+import { formatPrice } from '@/lib/format'
 import styled, { keyframes } from 'styled-components'
 import { MOCK_BOOKS, type Book, type Universe } from '@/data/mockBooks'
 import { BookCard } from '@/components/catalogue/BookCard'
@@ -490,7 +491,7 @@ function ListItem({
       </RowInfo>
       <RowRight onClick={e => e.stopPropagation()}>
         {sales && <RowSales><TrendIcon trend={sales.trend} /> {sales.units.toLocaleString('fr-FR')} ex.</RowSales>}
-        <RowPrice>{book.priceTTC.toFixed(2)} €</RowPrice>
+        <RowPrice>{formatPrice(book.priceTTC)} €</RowPrice>
         <RowAddBtn onClick={() => onAdd(book)} aria-label="Ajouter au panier">
           <IconCart />
         </RowAddBtn>

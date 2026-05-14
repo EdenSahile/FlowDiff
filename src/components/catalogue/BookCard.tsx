@@ -4,13 +4,14 @@ import styled from 'styled-components'
 import type { Book } from '@/data/mockBooks'
 import { BookCover } from './BookCover'
 import { useCart, REMISE_RATES } from '@/contexts/CartContext'
-import { useToast, type ToastAction } from '@/contexts/ToastContext'
+import { useToast } from '@/contexts/ToastContext'
 import { useAuth } from '@/hooks/useAuth'
 import { useWishlist } from '@/contexts/WishlistContext'
 import { ListPickerPopover } from './ListPickerPopover'
 import { StockStatus } from '@/components/ui/StockStatus'
 import { StockAlertModal } from '@/components/ui/StockAlertModal'
 import { theme } from '@/lib/theme'
+import { formatPrice } from '@/lib/format'
 import { useRdv } from '@/contexts/RdvContext'
 import { RdvPopup } from '@/components/catalogue/RdvPopup'
 
@@ -407,6 +408,7 @@ const CFInfoSection = styled.div`
   padding: 12px 14px 14px;
   display: flex;
   flex-direction: column;
+  flex: 1;
 `
 
 const CFBadgeGroup = styled.div`
@@ -511,7 +513,9 @@ const CFPriceRow = styled.div`
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  margin-top: 12px;
+  margin-top: auto;
+  padding-top: 12px;
+  min-height: 36px;
 `
 
 const CFStockRow = styled.div`
@@ -579,7 +583,7 @@ export function BookCard({ book, showType = false, coverFirst = false }: Props) 
   const userRate: number = user?.remisesParUnivers?.[book.universe] != null
     ? user.remisesParUnivers[book.universe] / 100
     : (REMISE_RATES[book.universe as keyof typeof REMISE_RATES] ?? 0)
-  const priceNet = userRate > 0 ? (book.priceTTC * (1 - userRate)).toFixed(2) : null
+  const priceNet = userRate > 0 ? formatPrice(book.priceTTC * (1 - userRate)) : null
   const [qty, setQty] = useState(1)
   const [added, setAdded] = useState(false)
   const [popoverAnchor, setPopoverAnchor] = useState<DOMRect | null>(null)
@@ -606,8 +610,7 @@ export function BookCard({ book, showType = false, coverFirst = false }: Props) 
 
   const confirmAdd = (enReliquat: boolean) => {
     addToCart(book, qty, { enReliquat })
-    const action: ToastAction = { label: 'Voir le panier →', onClick: () => navigate('/panier') }
-    showToast(`"${book.title}" ajouté au panier`, 'success', action)
+    showToast(`"${book.title}" ajouté au panier`)
     setQty(1)
     setAdded(true)
     setTimeout(() => setAdded(false), 2000)
@@ -826,7 +829,7 @@ export function BookCard({ book, showType = false, coverFirst = false }: Props) 
             <AParaitreFooter>
               <PriceRow>
                 <PriceInfo>
-                  <Price>{book.priceTTC.toFixed(2)} €</Price>
+                  <Price>{formatPrice(book.priceTTC)} €</Price>
                   <PriceLabel>Prix public TTC</PriceLabel>
                   {priceNet && (
                     <PriceNet>{priceNet} €<PriceNetLabel>Net remisé</PriceNetLabel></PriceNet>
@@ -854,7 +857,7 @@ export function BookCard({ book, showType = false, coverFirst = false }: Props) 
             <>
               <PriceRow>
                 <PriceInfo>
-                  <Price>{book.priceTTC.toFixed(2)} €</Price>
+                  <Price>{formatPrice(book.priceTTC)} €</Price>
                   <PriceLabel>Prix public TTC</PriceLabel>
                   {priceNet && (
                     <PriceNet>{priceNet} €<PriceNetLabel>Net remisé</PriceNetLabel></PriceNet>

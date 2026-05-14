@@ -77,7 +77,7 @@ export const AuthSubtitle = styled.p`
   }
 `
 
-export const AuthForm = styled.form`
+export const AuthForm = styled.div`
   display: flex;
   flex-direction: column;
   gap: ${({ theme }) => theme.spacing.md};

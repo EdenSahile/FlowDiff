@@ -57,8 +57,8 @@ export function RegisterPage() {
     if (serverError) setServerError('')
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleSubmit = async (e?: React.FormEvent | React.MouseEvent | React.KeyboardEvent) => {
+    e?.preventDefault()
 
     const result = registerSchema.safeParse(form)
     if (!result.success) {
@@ -93,7 +93,7 @@ export function RegisterPage() {
 
         {serverError && <AuthError role="alert">{serverError}</AuthError>}
 
-        <AuthForm onSubmit={handleSubmit} noValidate>
+        <AuthForm>
           <Input
             id="codeClient"
             label="Code client"
@@ -168,7 +168,7 @@ export function RegisterPage() {
             </PasswordToggle>
           </PasswordWrapper>
 
-          <Button type="submit" fullWidth disabled={isSubmitting}>
+          <Button type="button" fullWidth disabled={isSubmitting} onClick={handleSubmit}>
             {isSubmitting ? 'Création du compte…' : 'Créer mon accès'}
           </Button>
         </AuthForm>

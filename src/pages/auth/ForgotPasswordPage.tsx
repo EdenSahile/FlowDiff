@@ -33,8 +33,8 @@ export function ForgotPasswordPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleSubmit = async (e?: React.FormEvent | React.MouseEvent | React.KeyboardEvent) => {
+    e?.preventDefault()
 
     const result = forgotPasswordSchema.safeParse({ email })
     if (!result.success) {
@@ -78,7 +78,7 @@ export function ForgotPasswordPage() {
           </>
         ) : (
           <>
-            <AuthForm onSubmit={handleSubmit} noValidate>
+            <AuthForm>
               <Input
                 id="email"
                 label="Email professionnel"
@@ -94,7 +94,7 @@ export function ForgotPasswordPage() {
                 autoFocus
               />
 
-              <Button type="submit" fullWidth disabled={isSubmitting}>
+              <Button type="button" fullWidth disabled={isSubmitting} onClick={handleSubmit}>
                 {isSubmitting ? 'Envoi en cours…' : 'Envoyer le lien'}
               </Button>
             </AuthForm>

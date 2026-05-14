@@ -19,8 +19,8 @@ export const ToastBox = styled.div<{ $leaving: boolean; $type: ToastType; $hasAc
   transform: translateX(-50%);
   z-index: 9999;
 
-  background: ${({ $type, theme }) => $type === 'error' ? theme.colors.error : theme.colors.navy};
-  color: ${({ theme }) => theme.colors.white};
+  background: ${({ $type, theme }) => $type === 'error' ? theme.colors.error : theme.colors.accent};
+  color: ${({ $type }) => $type === 'error' ? '#fff' : '#3d2f00'};
   font-family: ${({ theme }) => theme.typography.fontFamily};
   font-size: ${({ theme }) => theme.typography.sizes.sm};
   font-weight: ${({ theme }) => theme.typography.weights.semibold};
