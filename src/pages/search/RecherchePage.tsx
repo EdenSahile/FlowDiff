@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom'
 import styled, { keyframes } from 'styled-components'
 import { MOCK_BOOKS, PRICE_RANGES, type Book, type Universe } from '@/data/mockBooks'
 import { BookCard } from '@/components/catalogue/BookCard'
+import { BackButton } from '@/components/ui/BackButton'
 import { mq } from '@/lib/responsive'
 
 /* ══════════════════════════════════════════════════════
@@ -123,24 +124,6 @@ const ResultSub = styled.p`
   font-family: ${({ theme }) => theme.typography.fontFamily};
   font-size: 13px;
   color: ${({ theme }) => theme.colors.gray[600]};
-`
-
-const BackBtn = styled.button`
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: none;
-  border: none;
-  color: ${({ theme }) => theme.colors.navy};
-  font-family: ${({ theme }) => theme.typography.fontFamily};
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  padding: 0;
-  margin-bottom: 20px;
-  opacity: 0.65;
-  transition: opacity .15s, transform .12s;
-  &:hover { opacity: 1; transform: translateX(-2px); }
 `
 
 /* ── Filtres univers ── */
@@ -508,7 +491,7 @@ export function RecherchePage() {
   if (!q && !hasAdvancedFilters) {
     return (
       <Page>
-        <BackBtn onClick={() => navigate(-1)}>← Retour</BackBtn>
+        <BackButton />
         <EmptyBox>
           <EmptyIcon>🔍</EmptyIcon>
           <EmptyTitle>Lancez une recherche</EmptyTitle>
@@ -521,7 +504,7 @@ export function RecherchePage() {
   if (isbnNotFound) {
     return (
       <Page>
-        <BackBtn onClick={() => navigate(-1)}>← Retour</BackBtn>
+        <BackButton />
         <PageHeader>
           <PageEyebrow>Recherche</PageEyebrow>
           <ResultTitle>ISBN {q}</ResultTitle>
@@ -534,7 +517,7 @@ export function RecherchePage() {
 
   return (
     <Page>
-      <BackBtn onClick={() => navigate(-1)}>← Retour</BackBtn>
+      <BackButton />
 
       <PageHeader>
         <PageEyebrow>Recherche</PageEyebrow>

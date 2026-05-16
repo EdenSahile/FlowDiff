@@ -64,7 +64,6 @@ export const DEFAULT_CONFIG: DashboardConfig = {
   bottomPanels: [
     { id: 'panel-edi',        visible: true },
     { id: 'panel-nouveautes', visible: true },
-    { id: 'panel-raccourcis', visible: true },
   ],
 }
 

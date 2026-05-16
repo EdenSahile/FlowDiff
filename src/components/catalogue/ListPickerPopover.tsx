@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import styled, { keyframes } from 'styled-components'
 import type { Book } from '@/data/mockBooks'
 import { useWishlist } from '@/contexts/WishlistContext'
+import { useToast } from '@/contexts/ToastContext'
 import { wishlistNameSchema } from '@/lib/formSchemas'
 
 const popIn = keyframes`
@@ -192,6 +193,7 @@ interface Props {
 
 export function ListPickerPopover({ book, anchorRect, onClose }: Props) {
   const { lists, createList, addToList, removeFromList, isInList, currentUserName, setCurrentUserName } = useWishlist()
+  const { showToast } = useToast()
   const [newName, setNewName] = useState('')
   const [nameError, setNameError] = useState('')
   const [userName, setUserName] = useState(currentUserName)
@@ -246,7 +248,9 @@ export function ListPickerPopover({ book, anchorRect, onClose }: Props) {
     if (isInList(listId, book.id)) {
       removeFromList(listId, book.id)
     } else {
+      const list = lists.find(l => l.id === listId)
       addToList(listId, book, userName.trim() || undefined)
+      if (list) showToast(`Titre ajouté à la liste « ${list.name} »`, 'success')
       onClose()
     }
   }
@@ -265,6 +269,7 @@ export function ListPickerPopover({ book, anchorRect, onClose }: Props) {
     setNameError('')
     const created = createList(validation.data)
     addToList(created.id, book, userName.trim() || undefined)
+    showToast(`Titre ajouté à la liste « ${created.name} »`, 'success')
     setNewName('')
     onClose()
   }

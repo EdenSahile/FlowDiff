@@ -59,6 +59,7 @@ const Bar = styled.div`
   display: flex;
   gap: ${({ theme }) => theme.spacing.sm};
   overflow-x: auto;
+  padding-top: 2px;
   padding-bottom: 4px;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;

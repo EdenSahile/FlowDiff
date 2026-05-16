@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 import type { Book } from '@/data/mockBooks'
@@ -313,6 +314,61 @@ const AParaitreFooter = styled.div`
   gap: 6px;
 `
 
+const NotesPopinOverlay = styled.div`
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 18, 35, 0.55);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+`
+
+const NotesPopinBox = styled.div`
+  background: #fff;
+  border-radius: 14px;
+  padding: 28px 24px;
+  max-width: 340px;
+  width: 100%;
+  box-shadow: 0 16px 48px rgba(10,18,35,0.22);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  text-align: center;
+`
+
+const NotesPopinTitle = styled.p`
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 15px;
+  font-weight: 700;
+  color: ${({ theme }) => theme.colors.navy};
+  margin: 0;
+`
+
+const NotesPopinText = styled.p`
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 13px;
+  color: ${({ theme }) => theme.colors.gray[600]};
+  line-height: 1.5;
+  margin: 0;
+`
+
+const NotesPopinBtn = styled.button`
+  padding: 10px 28px;
+  border: none;
+  border-radius: 8px;
+  background: ${({ theme }) => theme.colors.navy};
+  color: #fff;
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .15s;
+  &:hover { background: ${({ theme }) => theme.colors.primaryHover}; }
+`
+
 const RdvBadge = styled.div`
   display: flex;
   align-items: center;
@@ -443,6 +499,7 @@ const CF2Title = styled.h3`
   -webkit-box-orient: vertical;
   overflow: hidden;
   margin: 0 0 3px;
+  min-height: calc(14px * 1.3 * 2);
 `
 
 const CF2Authors = styled.p`
@@ -510,12 +567,12 @@ const CFQtyInput = styled.input`
 
 const CFPriceRow = styled.div`
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 8px;
   margin-top: auto;
   padding-top: 12px;
-  min-height: 36px;
+  min-height: 40px;
 `
 
 const CFStockRow = styled.div`
@@ -589,6 +646,7 @@ export function BookCard({ book, showType = false, coverFirst = false }: Props) 
   const [popoverAnchor, setPopoverAnchor] = useState<DOMRect | null>(null)
   const [alertOpen, setAlertOpen] = useState(false)
   const [rdvAnchor, setRdvAnchor] = useState<DOMRect | null>(null)
+  const [notesPopinOpen, setNotesPopinOpen] = useState(false)
   const starRef = useRef<HTMLDivElement>(null)
   const rdvBtnRef = useRef<HTMLButtonElement>(null)
 
@@ -619,6 +677,7 @@ export function BookCard({ book, showType = false, coverFirst = false }: Props) 
   const handleAdd = (e: React.MouseEvent) => {
     e.stopPropagation()
     if (isEpuise) return
+    if (isAParaitre) { setNotesPopinOpen(true); return }
     if (needsConfirm) { setAlertOpen(true); return }
     confirmAdd(false)
   }
@@ -758,6 +817,18 @@ export function BookCard({ book, showType = false, coverFirst = false }: Props) 
             onCancel={() => setAlertOpen(false)}
           />
         )}
+
+        {notesPopinOpen && createPortal(
+          <NotesPopinOverlay onClick={() => setNotesPopinOpen(false)}>
+            <NotesPopinBox onClick={e => e.stopPropagation()}>
+              <span style={{ fontSize: 28 }}>📅</span>
+              <NotesPopinTitle>Titre à paraître</NotesPopinTitle>
+              <NotesPopinText>Le titre sera enregistré en noté et conservé indéfiniment</NotesPopinText>
+              <NotesPopinBtn onClick={() => { setNotesPopinOpen(false); confirmAdd(false) }}>OK</NotesPopinBtn>
+            </NotesPopinBox>
+          </NotesPopinOverlay>,
+          document.body
+        )}
       </>
     )
   }
@@ -851,7 +922,6 @@ export function BookCard({ book, showType = false, coverFirst = false }: Props) 
               <AjouterBtn onClick={handleAdd} $added={added} aria-label="Ajouter au panier">
                 {added ? <><IconCheck /> Ajouté</> : <><IconCart /> Ajouter au panier</>}
               </AjouterBtn>
-              <NotesNote>Le titre sera enregistré en notés</NotesNote>
             </AParaitreFooter>
           ) : (
             <>
@@ -919,6 +989,18 @@ export function BookCard({ book, showType = false, coverFirst = false }: Props) 
           anchorRect={rdvAnchor}
           onClose={() => setRdvAnchor(null)}
         />
+      )}
+
+      {notesPopinOpen && createPortal(
+        <NotesPopinOverlay onClick={() => setNotesPopinOpen(false)}>
+          <NotesPopinBox onClick={e => e.stopPropagation()}>
+            <span style={{ fontSize: 28 }}>📅</span>
+            <NotesPopinTitle>Titre à paraître</NotesPopinTitle>
+            <NotesPopinText>Le titre sera enregistré en noté</NotesPopinText>
+            <NotesPopinBtn onClick={() => { setNotesPopinOpen(false); confirmAdd(false) }}>OK</NotesPopinBtn>
+          </NotesPopinBox>
+        </NotesPopinOverlay>,
+        document.body
       )}
     </>
   )

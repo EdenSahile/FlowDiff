@@ -165,7 +165,7 @@ const PeriodBtn = styled.button<{ $active: boolean }>`
 const TabBar = styled.div`
   max-width: 1100px;
   margin: 0 auto;
-  padding: 0 ${({ theme }) => theme.spacing.lg} ${({ theme }) => theme.spacing.md};
+  padding: 2px ${({ theme }) => theme.spacing.lg} ${({ theme }) => theme.spacing.md};
   display: flex;
   align-items: center;
   gap: 6px;

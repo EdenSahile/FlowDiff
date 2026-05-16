@@ -592,6 +592,51 @@ const ParaitreNoticeEl = styled.div`
   margin-top: 10px;
 `
 
+const NotesPopinContentEl = styled.div`
+  background: #fff;
+  border-radius: 14px;
+  padding: 32px 28px;
+  max-width: 380px;
+  width: 100%;
+  box-shadow: 0 24px 64px rgba(10,18,35,0.30);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  text-align: center;
+  animation: ${modalIn} 0.22s ease;
+`
+
+const NotesPopinTitleEl = styled.p`
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 16px;
+  font-weight: 700;
+  color: ${({ theme }) => theme.colors.navy};
+  margin: 0;
+`
+
+const NotesPopinTextEl = styled.p`
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 14px;
+  color: ${({ theme }) => theme.colors.gray[600]};
+  line-height: 1.5;
+  margin: 0;
+`
+
+const NotesPopinBtnEl = styled.button`
+  padding: 11px 32px;
+  border: none;
+  border-radius: 8px;
+  background: ${({ theme }) => theme.colors.navy};
+  color: #fff;
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .15s;
+  &:hover { background: ${({ theme }) => theme.colors.primaryHover}; }
+`
+
 /* ── Actions secondaires horizontales ── */
 const SecondaryActionsHoriz = styled.div`
   display: flex;
@@ -1283,9 +1328,10 @@ export function FicheProduitPage() {
   const [alertOpen, setAlertOpen]   = useState(false)
   const listBtnRef = useRef<HTMLButtonElement>(null)
 
-  const [pagesOpen, setPagesOpen] = useState(false)
-  const [pageIdx, setPageIdx]     = useState(0)
-  const [videoOpen, setVideoOpen] = useState(false)
+  const [pagesOpen, setPagesOpen]       = useState(false)
+  const [pageIdx, setPageIdx]           = useState(0)
+  const [videoOpen, setVideoOpen]       = useState(false)
+  const [notesPopinOpen, setNotesPopinOpen] = useState(false)
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -1573,7 +1619,7 @@ export function FicheProduitPage() {
               <PricePublicLabelEl>TTC</PricePublicLabelEl>
             </PriceRowEl>
 
-            {(isOrderable || isEpuise) && <PriceDividerEl />}
+            {(isOrderable || isEpuise || isAParaitre) && <PriceDividerEl />}
 
             {isOrderable && (
               <>
@@ -1617,9 +1663,30 @@ export function FicheProduitPage() {
             )}
 
             {isAParaitre && (
-              <ParaitreNoticeEl>
-                🚫 <span>Ce titre n'est pas encore commandable. La commande s'effectue via votre représentant commercial.</span>
-              </ParaitreNoticeEl>
+              <OrderZoneEl>
+                <QtyStepperLg>
+                  <QtyBtnLg onClick={() => setQty(q => Math.max(1, q - 1))} disabled={qty <= 1} aria-label="Diminuer">−</QtyBtnLg>
+                  <QtyInputLg
+                    type="number"
+                    value={qty}
+                    min={1}
+                    onChange={e => { const n = parseInt(e.target.value); if (n >= 1) setQty(n) }}
+                    aria-label="Quantité"
+                  />
+                  <QtyBtnLg onClick={() => setQty(q => q + 1)} aria-label="Augmenter">+</QtyBtnLg>
+                </QtyStepperLg>
+                <AddBtnMain
+                  $added={false}
+                  onClick={() => setNotesPopinOpen(true)}
+                  aria-label="Ajouter au panier"
+                >
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                  </svg>
+                  Ajouter au panier
+                </AddBtnMain>
+              </OrderZoneEl>
             )}
           </PriceZone>
 
@@ -1836,6 +1903,18 @@ export function FicheProduitPage() {
           anchorRect={listAnchor}
           onClose={() => setListAnchor(null)}
         />
+      )}
+
+      {notesPopinOpen && createPortal(
+        <ModalOverlay onClick={() => setNotesPopinOpen(false)}>
+          <NotesPopinContentEl onClick={e => e.stopPropagation()}>
+            <span style={{ fontSize: 32 }}>📅</span>
+            <NotesPopinTitleEl>Titre à paraître</NotesPopinTitleEl>
+            <NotesPopinTextEl>Le titre sera enregistré en noté et conservé indéfiniment</NotesPopinTextEl>
+            <NotesPopinBtnEl onClick={() => { setNotesPopinOpen(false); performAdd(false) }}>OK</NotesPopinBtnEl>
+          </NotesPopinContentEl>
+        </ModalOverlay>,
+        document.body
       )}
     </Page>
   )

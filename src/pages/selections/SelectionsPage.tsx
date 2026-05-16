@@ -242,6 +242,7 @@ const FilterBar = styled.div`
   display: flex;
   gap: ${({ theme }) => theme.spacing.xs};
   overflow-x: auto;
+  padding-top: 5px;
   padding-bottom: 2px;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
@@ -274,6 +275,24 @@ const FilterPill = styled.button<{ $active: boolean; $variant?: 'prix' | 'offre'
   display: flex;
   align-items: center;
   gap: 5px;
+  &:hover:not(:disabled) {
+    background-color: ${({ $active, $variant, theme }) => {
+      if ($active && $variant === 'prix') return '#6A1B9A'
+      if ($active && $variant === 'offre') return '#1B5E20'
+      if ($active) return theme.colors.primaryHover
+      if ($variant === 'prix') return '#F3E5F5'
+      if ($variant === 'offre') return '#E8F5E9'
+      return theme.colors.navyLight
+    }};
+    border-color: ${({ $active, $variant, theme }) => {
+      if ($active && $variant === 'prix') return '#6A1B9A'
+      if ($active && $variant === 'offre') return '#1B5E20'
+      if ($active) return theme.colors.primaryHover
+      if ($variant === 'prix') return '#7B1FA2'
+      if ($variant === 'offre') return '#2E7D32'
+      return theme.colors.navy
+    }};
+  }
 `
 
 const GreenDot = styled.span`

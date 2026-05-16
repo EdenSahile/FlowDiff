@@ -203,6 +203,104 @@ const InfoNote = styled.p`
   line-height: ${({ theme }) => theme.typography.lineHeights.relaxed};
 `
 
+const PolicySection = styled.div`
+  margin-bottom: ${({ theme }) => theme.spacing.lg};
+`
+
+const PolicyEyebrow = styled.p`
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: ${({ theme }) => theme.colors.accent};
+  margin: 0 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  &::before {
+    content: '';
+    width: 18px;
+    height: 1.5px;
+    background: ${({ theme }) => theme.colors.accent};
+    display: inline-block;
+  }
+`
+
+const PolicyGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+
+  ${mq.belowMd} {
+    grid-template-columns: 1fr;
+  }
+`
+
+const PolicyTile = styled.div<{ $variant: 'gold' | 'navy' }>`
+  background: ${({ theme }) => theme.colors.white};
+  border: 1.5px solid rgba(42,42,40,.07);
+  border-radius: 12px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    border-radius: 3px 0 0 3px;
+    background: ${({ $variant, theme }) =>
+      $variant === 'navy' ? theme.colors.navy : theme.colors.accent};
+  }
+`
+
+const PolicyTileIcon = styled.div<{ $variant: 'gold' | 'navy' }>`
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: ${({ $variant, theme }) =>
+    $variant === 'navy' ? theme.colors.primaryLight : theme.colors.accentLight};
+  color: ${({ $variant, theme }) =>
+    $variant === 'navy' ? theme.colors.navy : '#7a5c00'};
+  margin-bottom: 2px;
+`
+
+const PolicyTileLabel = styled.p`
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: ${({ theme }) => theme.colors.gray[400]};
+  margin: 0;
+`
+
+const PolicyTileValue = styled.p`
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 14px;
+  font-weight: 700;
+  color: ${({ theme }) => theme.colors.navy};
+  margin: 0;
+  letter-spacing: -0.01em;
+`
+
+const PolicyTileDesc = styled.p`
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 11.5px;
+  color: ${({ theme }) => theme.colors.gray[600]};
+  line-height: 1.5;
+  margin: 0;
+`
+
 /* ── Component ── */
 export function MonComptePage() {
   const { user } = useAuthContext()
@@ -283,6 +381,41 @@ export function MonComptePage() {
           </Field>
         </CardBody>
       </Card>
+
+      <PolicySection>
+        <PolicyEyebrow>Gestion des commandes</PolicyEyebrow>
+        <PolicyGrid>
+          <PolicyTile $variant="gold">
+            <PolicyTileIcon $variant="gold">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                <line x1="16" y1="2" x2="16" y2="6"/>
+                <line x1="8" y1="2" x2="8" y2="6"/>
+                <line x1="3" y1="10" x2="21" y2="10"/>
+              </svg>
+            </PolicyTileIcon>
+            <PolicyTileLabel>Notés — titres à paraître</PolicyTileLabel>
+            <PolicyTileValue>Conservés indéfiniment</PolicyTileValue>
+            <PolicyTileDesc>
+              Les titres à paraître ajoutés au panier sont enregistrés en noté jusqu'à leur mise en disponibilité.
+            </PolicyTileDesc>
+          </PolicyTile>
+
+          <PolicyTile $variant="navy">
+            <PolicyTileIcon $variant="navy">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+            </PolicyTileIcon>
+            <PolicyTileLabel>Reliquats — titres en réassort</PolicyTileLabel>
+            <PolicyTileValue>3 mois (fin de mois)</PolicyTileValue>
+            <PolicyTileDesc>
+              Les reliquats sont conservés 3 mois et expédiés avec votre prochaine commande.
+            </PolicyTileDesc>
+          </PolicyTile>
+        </PolicyGrid>
+      </PolicySection>
 
       <InfoNote>
         Pour modifier vos informations (adresse, email, téléphone), veuillez contacter votre
