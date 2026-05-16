@@ -4,7 +4,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model Libraire {
@@ -59,4 +58,33 @@ enum StatutCommande {
   EN_ATTENTE
   CONFIRMEE
   ANNULEE
+}
+
+model Livre {
+  id              String   @id
+  isbn            String   @unique
+  title           String
+  authors         String[]
+  publisher       String
+  collection      String?
+  universe        String
+  type            String
+  price           Float
+  priceTTC        Float
+  format          String
+  genre           String?
+  language        String?  @default("Français")
+  pages           Int?
+  publicationDate String
+  description     String
+  programme       String?
+  fictif          Boolean  @default(false)
+  statut          String?
+  delaiReimp      String?
+  topVente        Boolean  @default(false)
+  selection       Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("livres")
 }
