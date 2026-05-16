@@ -1,10 +1,10 @@
-import { useState, useDeferredValue, useMemo } from 'react'
+import { useState, useDeferredValue, useMemo, useEffect } from 'react'
 import styled from 'styled-components'
 import { mq } from '@/lib/responsive'
 import { BookCard } from '@/components/catalogue/BookCard'
 import { UniverseFilter } from '@/components/catalogue/UniverseFilter'
-import { getBooksByType, searchBooks } from '@/data/mockBooks'
-import type { Universe, StockStatut } from '@/data/mockBooks'
+import { getBooksByTypeAsync, searchBooksLocal } from '@/services/books'
+import type { Universe, StockStatut, Book } from '@/data/mockBooks'
 import { Input } from '@/components/ui/Input'
 import { BackButton } from '@/components/ui/BackButton'
 
@@ -233,12 +233,17 @@ export function FondsPage() {
   const [universe, setUniverse] = useState<Universe | null>(null)
   const [statut, setStatut]     = useState<StockStatut | null>(null)
   const [sort, setSort]         = useState<SortKey>('pertinence')
+  const [allFonds, setAllFonds] = useState<Book[]>([])
   const deferred = useDeferredValue(query)
+
+  useEffect(() => {
+    getBooksByTypeAsync('fonds').then(setAllFonds).catch(console.error)
+  }, [])
 
   const sorted = useMemo(() => {
     let books = deferred.trim()
-      ? searchBooks(deferred).filter(b => b.type === 'fonds')
-      : getBooksByType('fonds')
+      ? searchBooksLocal(allFonds, deferred)
+      : [...allFonds]
 
     if (universe) books = books.filter(b => b.universe === universe)
     if (statut)   books = books.filter(b => b.statut === statut)
@@ -247,7 +252,7 @@ export function FondsPage() {
     if (sort === 'prix_asc')  return [...books].sort((a, b) => a.priceTTC - b.priceTTC)
     if (sort === 'prix_desc') return [...books].sort((a, b) => b.priceTTC - a.priceTTC)
     return books
-  }, [deferred, universe, statut, sort])
+  }, [allFonds, deferred, universe, statut, sort])
 
   const contextLabel = universe ? ` · ${universe}` : ' · toutes thématiques'
 

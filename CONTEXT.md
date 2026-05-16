@@ -50,7 +50,7 @@ _(1 test pré-existant failing : `useDashboardConfig.test.ts > has 3 bottomPanel
 | 4 | Créer `src/lib/supabase.ts` (client singleton) | ✅ |
 | 5 | Créer `src/services/books.ts` + tests `searchBooksLocal` | ✅ |
 | 6 | Créer `prisma/seed.ts` + exécuter le seed | ✅ |
-| 7 | Migrer `FondsPage.tsx` | - [ ] |
+| 7 | Migrer `FondsPage.tsx` | ✅ |
 | 8 | Migrer `NouveautesPage.tsx` | - [ ] |
 | 9 | Migrer `AParaitrePage.tsx` | - [ ] |
 | 10 | Migrer `TopVentesPage.tsx` | - [ ] |
