@@ -1,9 +1,9 @@
-import { useState, useDeferredValue } from 'react'
+import { useState, useDeferredValue, useEffect, useMemo } from 'react'
 import styled, { keyframes } from 'styled-components'
 import { BookCard } from '@/components/catalogue/BookCard'
 import { UniverseFilter } from '@/components/catalogue/UniverseFilter'
-import { getBooksByType, searchBooks } from '@/data/mockBooks'
-import type { Universe } from '@/data/mockBooks'
+import { getBooksByTypeAsync, searchBooksLocal } from '@/services/books'
+import type { Universe, Book } from '@/data/mockBooks'
 import { Input } from '@/components/ui/Input'
 import { BackButton } from '@/components/ui/BackButton'
 
@@ -174,17 +174,22 @@ function IconEmpty() {
 }
 
 export function AParaitrePage() {
-  const [universe, setUniverse] = useState<Universe | null>(null)
-  const [query, setQuery]       = useState('')
+  const [universe, setUniverse]         = useState<Universe | null>(null)
+  const [query, setQuery]               = useState('')
+  const [allAParaitre, setAllAParaitre] = useState<Book[]>([])
   const deferred = useDeferredValue(query)
 
-  let aParaitre = deferred.trim()
-    ? searchBooks(deferred).filter(b => b.type === 'a-paraitre')
-    : getBooksByType('a-paraitre')
+  useEffect(() => {
+    getBooksByTypeAsync('a-paraitre').then(setAllAParaitre).catch(console.error)
+  }, [])
 
-  if (universe) {
-    aParaitre = aParaitre.filter(b => b.universe === universe)
-  }
+  const aParaitre = useMemo(() => {
+    let books = deferred.trim()
+      ? searchBooksLocal(allAParaitre, deferred)
+      : [...allAParaitre]
+    if (universe) books = books.filter(b => b.universe === universe)
+    return books
+  }, [allAParaitre, deferred, universe])
 
   const programmes = [...new Set(aParaitre.map(b => b.programme ?? 'Autres'))].sort()
 
