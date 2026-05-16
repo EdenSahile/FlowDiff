@@ -4,7 +4,8 @@ import { useNavigate } from 'react-router-dom'
 import { theme } from '@/lib/theme'
 import { formatPrice } from '@/lib/format'
 import styled, { keyframes } from 'styled-components'
-import { MOCK_BOOKS, type Book, type Universe } from '@/data/mockBooks'
+import { getAllBooksAsync } from '@/services/books'
+import type { Book, Universe } from '@/data/mockBooks'
 import { BookCard } from '@/components/catalogue/BookCard'
 import { BookCover } from '@/components/catalogue/BookCover'
 import { useCart } from '@/contexts/CartContext'
@@ -66,8 +67,8 @@ function getRankedBooks(books: Book[]) {
     .sort((a, b) => (SALES[b.id]?.units ?? 0) - (SALES[a.id]?.units ?? 0))
 }
 
-function getSection(type: 'nouveaute' | 'fonds', universe: TabView) {
-  const base = MOCK_BOOKS.filter(b =>
+function getSection(books: Book[], type: 'nouveaute' | 'fonds', universe: TabView) {
+  const base = books.filter(b =>
     b.type === type &&
     (universe === 'tous' || b.universe === universe)
   )
@@ -583,8 +584,13 @@ export function TopVentesPage() {
 
   const [period,    setPeriod] = useState<Period>('30j')  // eslint-disable-line @typescript-eslint/no-unused-vars
   const [activeTab, setTab]    = useState<TabView>('tous')
+  const [allBooks, setAllBooks] = useState<Book[]>([])
   const { addToCart }          = useCart()
   const { showToast }          = useToast()
+
+  useEffect(() => {
+    getAllBooksAsync().then(setAllBooks).catch(console.error)
+  }, [])
 
   const handleAdd = (book: Book) => {
     addToCart(book, 1)
@@ -594,8 +600,8 @@ export function TopVentesPage() {
   const showUniverse    = activeTab === 'tous'
   const sectionUniverse = activeTab !== 'tous' ? activeTab : undefined
 
-  const nouveautes = getSection('nouveaute', activeTab)
-  const fonds      = getSection('fonds',     activeTab)
+  const nouveautes = getSection(allBooks, 'nouveaute', activeTab)
+  const fonds      = getSection(allBooks, 'fonds',     activeTab)
 
   return (
     <Page>
