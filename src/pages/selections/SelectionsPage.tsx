@@ -2,7 +2,8 @@ import { useState, useMemo, useRef, useEffect } from 'react'
 import styled, { keyframes } from 'styled-components'
 import { useNavigate } from 'react-router-dom'
 import { useCart } from '@/contexts/CartContext'
-import { MOCK_BOOKS, UNIVERSES, type Universe } from '@/data/mockBooks'
+import { getAllBooksAsync } from '@/services/books'
+import { UNIVERSES, type Universe, type Book } from '@/data/mockBooks'
 import { MOCK_SERIES, type Serie, type OffreCommerciale } from '@/data/mockSeries'
 import { BookCover } from '@/components/catalogue/BookCover'
 import { mq } from '@/lib/responsive'
@@ -1160,6 +1161,11 @@ export function SelectionsPage() {
   const [filter, setFilter] = useState<FilterType>('Tous')
   const [offreOnly, setOffreOnly] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const [allBooks, setAllBooks] = useState<Book[]>([])
+
+  useEffect(() => {
+    getAllBooksAsync().then(setAllBooks).catch(console.error)
+  }, [])
 
   /* État détail */
   const [selectedSerie, setSelectedSerie] = useState<Serie | null>(null)
@@ -1185,7 +1191,7 @@ export function SelectionsPage() {
       if (q) {
         const inNom = s.nom.toLowerCase().includes(q)
         const inAuteur = s.auteur.toLowerCase().includes(q)
-        const inBooks = MOCK_BOOKS.some(
+        const inBooks = allBooks.some(
           b =>
             s.bookIds.includes(b.id) &&
             (b.title.toLowerCase().includes(q) ||
@@ -1196,7 +1202,7 @@ export function SelectionsPage() {
       }
       return true
     })
-  }, [filter, offreOnly, searchQuery])
+  }, [allBooks, filter, offreOnly, searchQuery])
 
   /* Groupement par catégorie */
   const groupedSections = useMemo(() => {
@@ -1212,10 +1218,10 @@ export function SelectionsPage() {
   const serieBooks = useMemo(() => {
     if (!selectedSerie) return []
     return selectedSerie.bookIds
-      .map(id => MOCK_BOOKS.find(b => b.id === id))
+      .map(id => allBooks.find(b => b.id === id))
       .filter(Boolean)
-      .sort((a, b) => b!.publicationDate.localeCompare(a!.publicationDate)) as typeof MOCK_BOOKS
-  }, [selectedSerie])
+      .sort((a, b) => b!.publicationDate.localeCompare(a!.publicationDate)) as Book[]
+  }, [allBooks, selectedSerie])
 
   const filteredDetailBooks = useMemo(() => {
     const q = detailSearch.trim().toLowerCase()
@@ -1278,7 +1284,7 @@ export function SelectionsPage() {
   // Ajouter un titre individuel (séries sans OP)
   function handleAdd(bookId: string, qty: number, e: React.MouseEvent) {
     e.stopPropagation()
-    const book = MOCK_BOOKS.find(b => b.id === bookId)
+    const book = allBooks.find(b => b.id === bookId)
     if (!book) return
     addToCart(book, qty)
     setAddedMap(prev => ({ ...prev, [bookId]: true }))
