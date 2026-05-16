@@ -64,7 +64,7 @@ _(1 test pré-existant failing : `useDashboardConfig.test.ts > has 3 bottomPanel
 - Prisma 7 : `url` retirée de `schema.prisma` — connexion gérée par `prisma.config.ts` (déjà configuré)
 - Connexion directe Supabase échoue en local (host legacy `db.*.supabase.co`) → migration SQL créée manuellement dans `prisma/migrations/20260516000000_add_livre/`
 - Table `livres` créée dans Supabase + RLS activé + policy SELECT publique ✅
-- Clé anon Supabase : `sb_publishable_uW2NNz2XlOBfas952_vZYA_NrCnqd3L`
+
 - **Pour le seed (Task 6)** : `npx tsx prisma/seed.ts` — si `PrismaClientInitializationError`, la connexion DB locale échoue toujours ; dans ce cas utiliser le client Supabase JS directement depuis le seed (contournement)
 - **Pattern de migration pages** : `useState<Book[]>([])` + `useEffect` → `getBooksByTypeAsync/getAllBooksAsync`
 - **Seed** : `prisma/seed.ts` utilise Supabase JS directement (clé anon a seulement SELECT → SQL généré dans `prisma/seed.sql` exécuté depuis le dashboard Supabase) ✅
