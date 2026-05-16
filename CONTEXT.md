@@ -8,7 +8,8 @@
 
 ## État du build
 TS clean · 168/169 tests passants · session 2026-05-16  
-_(1 test pré-existant failing : `useDashboardConfig.test.ts > has 3 bottomPanels all visible` — non lié, ignoré)_
+_(1 test pré-existant failing : `useDashboardConfig.test.ts > has 3 bottomPanels all visible` — non lié, ignoré)_  
+**Intégration Supabase catalogue** : 13/13 pages migrées ✅
 
 **Refonte design pages** : NouveautesPage, AParaitrePage, TopVentesPage, SelectionsPage, FlashInfosPage, HistoriquePage, MonComptePage, RecherchePage, AuteurPage, ContactPage, FacturationPage, ParametresPage, EDIPage, OfficesPage ✅  
 **Onboarding** : Tour guidé Driver.js 7 étapes + TooltipInfo métier + "Revoir le tour" ✅  
@@ -35,37 +36,33 @@ _(1 test pré-existant failing : `useDashboardConfig.test.ts > has 3 bottomPanel
 
 ---
 
-## Session en cours — Intégration Supabase catalogue livres
+## Session en cours — Back-Office Admin FlowDiff (Phase 1)
 
-**Spec complète** : `docs/superpowers/specs/2026-05-16-supabase-books-design.md`  
-**Plan détaillé** : `docs/superpowers/plans/2026-05-16-supabase-books.md`
+**Spec complète** : `docs/superpowers/specs/2026-05-16-admin-backoffice-design.md`  
+**Plan détaillé** : `docs/superpowers/plans/2026-05-16-admin-backoffice.md`
 
 ### Checklist tâches
 
 | # | Tâche | Statut |
 |---|-------|--------|
-| 1 | Variables d'env (`VITE_SUPABASE_URL` + `VITE_SUPABASE_ANON_KEY`) + install `@supabase/supabase-js` | ✅ |
-| 2 | Modèle `Livre` dans `prisma/schema.prisma` + migration SQL générée | ✅ |
-| 3 | Exécuter le SQL + politique RLS dans Supabase dashboard *(action manuelle utilisateur)* | ✅ |
-| 4 | Créer `src/lib/supabase.ts` (client singleton) | ✅ |
-| 5 | Créer `src/services/books.ts` + tests `searchBooksLocal` | ✅ |
-| 6 | Créer `prisma/seed.ts` + exécuter le seed | ✅ |
-| 7 | Migrer `FondsPage.tsx` | ✅ |
-| 8 | Migrer `NouveautesPage.tsx` | ✅ |
-| 9 | Migrer `AParaitrePage.tsx` | ✅ |
-| 10 | Migrer `TopVentesPage.tsx` | ✅ |
-| 11 | Migrer `FicheProduitPage.tsx` | ✅ |
-| 12 | Migrer `RecherchePage.tsx` | ✅ |
-| 13 | Migrer `SelectionsPage.tsx` | ✅ |
+| 1 | SQL tables `commandes` + `libraires` + RLS + seed *(Supabase dashboard)* | ⬜ |
+| 2 | Admin types (`src/admin/types.ts`) + adminTheme (`src/admin/adminTheme.ts`) | ⬜ |
+| 3 | `AdminAuthContext` + `useAdminAuth` hook | ⬜ |
+| 4 | `adminServices.ts` + tests (`computeCAMois`, `computeTop5`) | ⬜ |
+| 5 | `AdminRoute` guard + `AdminLoginPage` (identifiants pré-remplis) | ⬜ |
+| 6 | `AdminLayout` + `StatutBadge` + `AdminModal` | ⬜ |
+| 7 | Câblage routes admin dans `App.tsx` | ⬜ |
+| 8 | `AdminDashboardPage` (KPIs + tableaux synthèse) | ⬜ |
+| 9 | `AdminCataloguePage` (liste + CRUD add/edit/delete) | ⬜ |
+| 10 | `AdminCommandesPage` (liste + statut inline + détail modal) | ⬜ |
+| 11 | `AdminLibrairesPage` (liste + edit modal remise/statut/reliquat) | ⬜ |
+| 12 | Tests finaux + CONTEXT.md | ⬜ |
 
 ### Notes techniques
 
-- `DATABASE_URL` corrigé : `@` du mot de passe encodé en `%40%40` (format : `postgresql://postgres:SupaFlowDiff%40%40!!@db.cuekimkchzllcdygqogf.supabase.co:5432/postgres`)
-- Prisma 7 : `url` retirée de `schema.prisma` — connexion gérée par `prisma.config.ts` (déjà configuré)
-- Connexion directe Supabase échoue en local (host legacy `db.*.supabase.co`) → migration SQL créée manuellement dans `prisma/migrations/20260516000000_add_livre/`
-- Table `livres` créée dans Supabase + RLS activé + policy SELECT publique ✅
-
-- **Pour le seed (Task 6)** : `npx tsx prisma/seed.ts` — si `PrismaClientInitializationError`, la connexion DB locale échoue toujours ; dans ce cas utiliser le client Supabase JS directement depuis le seed (contournement)
-- **Pattern de migration pages** : `useState<Book[]>([])` + `useEffect` → `getBooksByTypeAsync/getAllBooksAsync`
-- **Seed** : `prisma/seed.ts` utilise Supabase JS directement (clé anon a seulement SELECT → SQL généré dans `prisma/seed.sql` exécuté depuis le dashboard Supabase) ✅
-- **Prochaine tâche** : Task 7 — migrer FondsPage.tsx
+- Route admin : `/admin/*` dans `App.tsx`, enveloppé par `AdminAuthProvider` + sous-router `AdminRoutes`
+- Auth admin : localStorage flag — identifiants dans `src/admin/contexts/AdminAuthContext.tsx` (ne pas mettre dans CONTEXT.md)
+- Style : `src/admin/adminTheme.ts` — sidebar `#1a1a2e`, accent `#4361ee`, fond `#f8f9fa`
+- Supabase : clé anon + RLS `FOR ALL USING (true)` pour la démo (à restreindre en prod)
+- Tables à créer : `commandes` + `libraires` (la table `livres` existe déjà)
+- Seed : 3 libraires (LIB001/LIB002/LIB003) + 8 commandes (statuts variés) — SQL dans le plan Task 1
