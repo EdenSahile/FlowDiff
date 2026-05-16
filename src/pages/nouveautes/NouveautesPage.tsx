@@ -3,8 +3,8 @@ import { useNotifications } from '@/contexts/NotificationsContext'
 import styled, { keyframes } from 'styled-components'
 import { BookCard } from '@/components/catalogue/BookCard'
 import { UniverseFilter } from '@/components/catalogue/UniverseFilter'
-import { getBooksByType, searchBooks } from '@/data/mockBooks'
-import type { Universe } from '@/data/mockBooks'
+import { getBooksByTypeAsync, searchBooksLocal } from '@/services/books'
+import type { Universe, Book } from '@/data/mockBooks'
 import { Input } from '@/components/ui/Input'
 import { mq } from '@/lib/responsive'
 import { BackButton } from '@/components/ui/BackButton'
@@ -202,15 +202,20 @@ export function NouveautesPage() {
   const { markAsRead } = useNotifications()
   useEffect(() => { markAsRead('nouveautes') }, [markAsRead])
 
-  const [universe, setUniverse] = useState<Universe | null>(null)
-  const [query, setQuery]       = useState('')
-  const [sort, setSort]         = useState<SortKey>('pertinence')
+  const [universe, setUniverse]       = useState<Universe | null>(null)
+  const [query, setQuery]             = useState('')
+  const [sort, setSort]               = useState<SortKey>('pertinence')
+  const [allNouveautes, setAllNouveautes] = useState<Book[]>([])
   const deferred = useDeferredValue(query)
+
+  useEffect(() => {
+    getBooksByTypeAsync('nouveaute').then(setAllNouveautes).catch(console.error)
+  }, [])
 
   const nouveautes = useMemo(() => {
     let books = deferred.trim()
-      ? searchBooks(deferred).filter(b => b.type === 'nouveaute')
-      : getBooksByType('nouveaute')
+      ? searchBooksLocal(allNouveautes, deferred)
+      : [...allNouveautes]
 
     if (universe) books = books.filter(b => b.universe === universe)
 
@@ -218,7 +223,7 @@ export function NouveautesPage() {
     if (sort === 'prix_asc')  return [...books].sort((a, b) => a.priceTTC - b.priceTTC)
     if (sort === 'prix_desc') return [...books].sort((a, b) => b.priceTTC - a.priceTTC)
     return books
-  }, [deferred, universe, sort])
+  }, [allNouveautes, deferred, universe, sort])
 
   const contextLabel = universe ? ` · ${universe}` : ' · toutes thématiques'
 
