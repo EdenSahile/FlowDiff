@@ -1,7 +1,8 @@
 import { useEffect, useState, useMemo } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import styled, { keyframes } from 'styled-components'
-import { MOCK_BOOKS, PRICE_RANGES, type Book, type Universe } from '@/data/mockBooks'
+import { getAllBooksAsync } from '@/services/books'
+import { PRICE_RANGES, type Book, type Universe } from '@/data/mockBooks'
 import { BookCard } from '@/components/catalogue/BookCard'
 import { BackButton } from '@/components/ui/BackButton'
 import { mq } from '@/lib/responsive'
@@ -18,10 +19,10 @@ function normalise(s: string) {
   return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
 }
 
-function searchCatalog(query: string): Book[] {
+function searchCatalog(catalog: Book[], query: string): Book[] {
   const q = normalise(query.trim())
   if (!q) return []
-  return MOCK_BOOKS.filter(b =>
+  return catalog.filter(b =>
     normalise(b.title).includes(q) ||
     b.authors.some(a => normalise(a).includes(q)) ||
     normalise(b.publisher).includes(q) ||
@@ -445,21 +446,26 @@ export function RecherchePage() {
   const pFormats  = params.get('formats')?.split(',').filter(Boolean) ?? []
 
   const [universeFilter, setUniverseFilter] = useState<Universe | null>(null)
+  const [allBooks, setAllBooks] = useState<Book[]>([])
+
+  useEffect(() => {
+    getAllBooksAsync().then(setAllBooks).catch(console.error)
+  }, [])
 
   /* Si l'ISBN est dans le catalogue, rediriger direct vers la fiche */
   useEffect(() => {
-    if (!q) return
+    if (!q || allBooks.length === 0) return
     const isbn = q.replace(/[\s-]/g, '')
     if (isIsbn(isbn)) {
-      const found = MOCK_BOOKS.find(b => b.isbn === isbn)
+      const found = allBooks.find(b => b.isbn === isbn)
       if (found) navigate(`/livre/${found.id}`, { replace: true })
     }
-  }, [q, navigate])
+  }, [q, allBooks, navigate])
 
   /* Résultats catalogue — texte puis filtres avancés */
   const paramsStr = params.toString()
   const allResults = useMemo(() => {
-    let books = q ? searchCatalog(q) : [...MOCK_BOOKS]
+    let books = q ? searchCatalog(allBooks, q) : [...allBooks]
 
     if (pUniverse) books = books.filter(b => b.universe === pUniverse)
     if (pGenres.length)  books = books.filter(b => b.genre && pGenres.includes(b.genre))
@@ -473,7 +479,7 @@ export function RecherchePage() {
     return books
   // paramsStr est dérivé de pUniverse/pGenres/pLangues/pPrix/pFormats — changement unique
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [q, paramsStr])
+  }, [allBooks, q, paramsStr])
 
   const results = useMemo(() =>
     universeFilter ? allResults.filter(b => b.universe === universeFilter) : allResults,
@@ -485,7 +491,7 @@ export function RecherchePage() {
 
   /* Cas ISBN hors catalogue */
   const isbnNotFound = q && isIsbn(q.replace(/[\s-]/g, '')) &&
-    !MOCK_BOOKS.find(b => b.isbn === q.replace(/[\s-]/g, ''))
+    !allBooks.find(b => b.isbn === q.replace(/[\s-]/g, ''))
 
   /* ── Rendu ── */
   if (!q && !hasAdvancedFilters) {
