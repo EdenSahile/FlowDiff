@@ -3,7 +3,8 @@ import { BackButton as BackNavButton } from '@/components/ui/BackButton'
 import { createPortal } from 'react-dom'
 import { useParams, useNavigate } from 'react-router-dom'
 import styled, { keyframes } from 'styled-components'
-import { getBookById, MOCK_BOOKS } from '@/data/mockBooks'
+import { getBookByIdAsync, getBooksByTypeAsync } from '@/services/books'
+import type { Book } from '@/data/mockBooks'
 import { BookCover } from '@/components/catalogue/BookCover'
 import { useCart } from '@/contexts/CartContext'
 import { useToast } from '@/contexts/ToastContext'
@@ -1333,11 +1334,34 @@ export function FicheProduitPage() {
   const [videoOpen, setVideoOpen]       = useState(false)
   const [notesPopinOpen, setNotesPopinOpen] = useState(false)
 
+  const [book, setBook]               = useState<Book | null>(null)
+  const [bookLoading, setBookLoading] = useState(true)
+  const [similar, setSimilar]         = useState<Book[]>([])
+
   useEffect(() => {
     window.scrollTo(0, 0)
+    if (!id) { setBookLoading(false); return }
+    setBookLoading(true)
+    setBook(null)
+    setSimilar([])
+    getBookByIdAsync(id).then(b => {
+      setBook(b)
+      setBookLoading(false)
+      if (b) {
+        getBooksByTypeAsync(b.type).then(all => {
+          setSimilar(all.filter(x => x.universe === b.universe && x.id !== b.id).slice(0, 7))
+        }).catch(console.error)
+      }
+    }).catch(() => setBookLoading(false))
   }, [id])
 
-  const book = id ? getBookById(id) : undefined
+  if (bookLoading) {
+    return (
+      <Page style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
+        <span style={{ color: '#6B6B68', fontFamily: 'Open Sans, sans-serif' }}>Chargement…</span>
+      </Page>
+    )
+  }
 
   if (!book) {
     return (
@@ -1489,8 +1513,6 @@ export function FicheProduitPage() {
     book.statut === 'sur_commande' ? 'Sur commande' :
     book.statut === 'en_reimp'     ? 'En réimpression' :
     book.statut === 'rupture'      ? 'Rupture de stock' : 'Disponible'
-  const similar = MOCK_BOOKS.filter(b => b.universe === book.universe && b.id !== book.id).slice(0, 7)
-
   return (
     <Page>
       <BackNavButton />

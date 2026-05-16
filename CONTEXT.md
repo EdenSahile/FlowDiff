@@ -54,7 +54,7 @@ _(1 test pré-existant failing : `useDashboardConfig.test.ts > has 3 bottomPanel
 | 8 | Migrer `NouveautesPage.tsx` | ✅ |
 | 9 | Migrer `AParaitrePage.tsx` | ✅ |
 | 10 | Migrer `TopVentesPage.tsx` | ✅ |
-| 11 | Migrer `FicheProduitPage.tsx` | - [ ] |
+| 11 | Migrer `FicheProduitPage.tsx` | ✅ |
 | 12 | Migrer `RecherchePage.tsx` | - [ ] |
 | 13 | Migrer `SelectionsPage.tsx` | - [ ] |
 
