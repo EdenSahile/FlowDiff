@@ -7,9 +7,10 @@
 ---
 
 ## État du build
-TS clean · 168/169 tests passants · session 2026-05-16  
+TS clean · 173/174 tests passants · session 2026-05-17  
 _(1 test pré-existant failing : `useDashboardConfig.test.ts > has 3 bottomPanels all visible` — non lié, ignoré)_  
-**Intégration Supabase catalogue** : 13/13 pages migrées ✅
+**Intégration Supabase catalogue** : 13/13 pages migrées ✅  
+**Back-Office Admin FlowDiff Phase 1** : 12/12 tâches terminées ✅
 
 **Refonte design pages** : NouveautesPage, AParaitrePage, TopVentesPage, SelectionsPage, FlashInfosPage, HistoriquePage, MonComptePage, RecherchePage, AuteurPage, ContactPage, FacturationPage, ParametresPage, EDIPage, OfficesPage ✅  
 **Onboarding** : Tour guidé Driver.js 7 étapes + TooltipInfo métier + "Revoir le tour" ✅  
@@ -45,18 +46,18 @@ _(1 test pré-existant failing : `useDashboardConfig.test.ts > has 3 bottomPanel
 
 | # | Tâche | Statut |
 |---|-------|--------|
-| 1 | SQL tables `commandes` + `libraires` + RLS + seed *(Supabase dashboard)* | ⬜ |
-| 2 | Admin types (`src/admin/types.ts`) + adminTheme (`src/admin/adminTheme.ts`) | ⬜ |
-| 3 | `AdminAuthContext` + `useAdminAuth` hook | ⬜ |
-| 4 | `adminServices.ts` + tests (`computeCAMois`, `computeTop5`) | ⬜ |
-| 5 | `AdminRoute` guard + `AdminLoginPage` (identifiants pré-remplis) | ⬜ |
-| 6 | `AdminLayout` + `StatutBadge` + `AdminModal` | ⬜ |
-| 7 | Câblage routes admin dans `App.tsx` | ⬜ |
-| 8 | `AdminDashboardPage` (KPIs + tableaux synthèse) | ⬜ |
-| 9 | `AdminCataloguePage` (liste + CRUD add/edit/delete) | ⬜ |
-| 10 | `AdminCommandesPage` (liste + statut inline + détail modal) | ⬜ |
-| 11 | `AdminLibrairesPage` (liste + edit modal remise/statut/reliquat) | ⬜ |
-| 12 | Tests finaux + CONTEXT.md | ⬜ |
+| 1 | SQL tables `commandes` + `libraires` + RLS + seed *(Supabase dashboard)* | ✅ |
+| 2 | Admin types (`src/admin/types.ts`) + adminTheme (`src/admin/adminTheme.ts`) | ✅ |
+| 3 | `AdminAuthContext` + `useAdminAuth` hook | ✅ |
+| 4 | `adminServices.ts` + tests (`computeCAMois`, `computeTop5`) | ✅ |
+| 5 | `AdminRoute` guard + `AdminLoginPage` (identifiants pré-remplis) | ✅ |
+| 6 | `AdminLayout` + `StatutBadge` + `AdminModal` | ✅ |
+| 7 | Câblage routes admin dans `App.tsx` | ✅ |
+| 8 | `AdminDashboardPage` (KPIs + tableaux synthèse) | ✅ |
+| 9 | `AdminCataloguePage` (liste + CRUD add/edit/delete) | ✅ |
+| 10 | `AdminCommandesPage` (liste + statut inline + détail modal) | ✅ |
+| 11 | `AdminLibrairesPage` (liste + edit modal remise/statut/reliquat) | ✅ |
+| 12 | Tests finaux + CONTEXT.md | ✅ |
 
 ### Notes techniques
 
