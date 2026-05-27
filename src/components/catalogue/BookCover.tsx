@@ -2,8 +2,53 @@ import { memo, useState, useEffect } from 'react'
 import styled from 'styled-components'
 import type { Universe } from '@/data/mockBooks'
 
+/* ══════════════════════════════════════════════
+   Module-level cover cache (survit aux re-renders)
+   string  = URL trouvée
+   null    = aucune cover disponible
+   absent  = pas encore cherché
+   ══════════════════════════════════════════════ */
+const coverCache = new Map<string, string | null>()
+const pendingFetches = new Map<string, Promise<string | null>>()
 
-/* ── decorative SVG by universe ── */
+async function fetchGoogleBooksCover(isbn: string): Promise<string | null> {
+  if (coverCache.has(isbn)) return coverCache.get(isbn)!
+  if (pendingFetches.has(isbn)) return pendingFetches.get(isbn)!
+
+  const promise = (async (): Promise<string | null> => {
+    try {
+      const res = await fetch(
+        `https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}&fields=items(volumeInfo/imageLinks)&maxResults=1`
+      )
+      if (!res.ok) { coverCache.set(isbn, null); return null }
+      const data = await res.json()
+      const links = data?.items?.[0]?.volumeInfo?.imageLinks
+      const raw: string | undefined =
+        links?.large || links?.medium || links?.thumbnail || links?.smallThumbnail
+      if (!raw) { coverCache.set(isbn, null); return null }
+      // Améliore la qualité + force HTTPS + retire le curl décoratif
+      const url = raw
+        .replace('zoom=1', 'zoom=3')
+        .replace('http://', 'https://')
+        .replace('&edge=curl', '')
+      coverCache.set(isbn, url)
+      return url
+    } catch {
+      coverCache.set(isbn, null)
+      return null
+    } finally {
+      pendingFetches.delete(isbn)
+    }
+  })()
+
+  pendingFetches.set(isbn, promise)
+  return promise
+}
+
+/* ── États de la machine de couverture ── */
+type CoverState = 'openlibrary' | 'googlebooks' | 'failed'
+
+/* ── Déco SVG par univers ── */
 function Deco({ universe, accent, w, h }: { universe: Universe; accent: string; w: number; h: number }) {
   const mid = w / 2
   switch (universe) {
@@ -58,7 +103,7 @@ function Deco({ universe, accent, w, h }: { universe: Universe; accent: string; 
   }
 }
 
-/* ── Styled wrappers ── */
+/* ── Styled components ── */
 const Wrapper = styled.div<{ $w: number; $h: number; $fill?: boolean }>`
   width: ${({ $w, $fill }) => $fill ? '100%' : `${$w}px`};
   height: ${({ $h, $fill }) => $fill ? '100%' : `${$h}px`};
@@ -132,6 +177,18 @@ const AuthorText = styled.div<{ $fs: number }>`
   text-overflow: ellipsis;
 `
 
+const CoverImg = styled.img<{ $visible: boolean }>`
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+  opacity: ${({ $visible }) => ($visible ? 1 : 0)};
+  transition: opacity 0.25s ease;
+`
+
 /* ── Props ── */
 interface Props {
   isbn: string
@@ -145,18 +202,6 @@ interface Props {
   fill?: boolean
 }
 
-const CoverImg = styled.img<{ $visible: boolean }>`
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-  display: block;
-  opacity: ${({ $visible }) => ($visible ? 1 : 0)};
-  transition: opacity 0.25s ease;
-`
-
 function BookCoverBase({
   isbn,
   alt,
@@ -168,10 +213,31 @@ function BookCoverBase({
   collection,
   fill = false,
 }: Props) {
-  const [imgFailed, setImgFailed] = useState(false)
+  const [coverState, setCoverState] = useState<CoverState>('openlibrary')
   const [imgLoaded, setImgLoaded] = useState(false)
+  const [googleUrl, setGoogleUrl] = useState<string | null>(null)
 
-  useEffect(() => { setImgFailed(false); setImgLoaded(false) }, [isbn])
+  // Reset quand l'ISBN change
+  useEffect(() => {
+    setCoverState('openlibrary')
+    setImgLoaded(false)
+    setGoogleUrl(null)
+  }, [isbn])
+
+  // Fetch Google Books quand Open Library échoue
+  useEffect(() => {
+    if (coverState !== 'googlebooks') return
+    let cancelled = false
+    fetchGoogleBooksCover(isbn).then(url => {
+      if (cancelled) return
+      if (url) {
+        setGoogleUrl(url)
+      } else {
+        setCoverState('failed')
+      }
+    })
+    return () => { cancelled = true }
+  }, [coverState, isbn])
 
   const titleFs  = Math.max(8,  Math.round(height * 0.10))
   const authorFs = Math.max(7,  Math.round(height * 0.08))
@@ -180,11 +246,13 @@ function BookCoverBase({
 
   const fallbackBg     = '#232f3e'
   const fallbackAccent = '#C9A84C'
-  const openLibraryUrl = `https://covers.openlibrary.org/b/isbn/${isbn}-M.jpg`
+
+  // URL selon l'état actuel
+  const openLibraryUrl = `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`
 
   return (
     <Wrapper $w={width} $h={height} $fill={fill}>
-      {/* Fallback always rendered underneath */}
+      {/* Placeholder toujours en dessous */}
       <Bg $bg={fallbackBg} />
       <Spine $accent={fallbackAccent} />
       {pubLabel && !fill && <PubBadge>{pubLabel}</PubBadge>}
@@ -196,18 +264,44 @@ function BookCoverBase({
         </TitleArea>
       )}
 
-      {/* Real cover fades in on top once loaded */}
-      {!imgFailed && (
+      {/* Open Library — tentative 1 */}
+      {coverState === 'openlibrary' && (
         <CoverImg
           src={openLibraryUrl}
           alt={alt}
           loading="lazy"
           $visible={imgLoaded}
-          onError={() => setImgFailed(true)}
+          onError={() => {
+            setImgLoaded(false)
+            setCoverState('googlebooks')
+          }}
+          onLoad={(e) => {
+            const img = e.currentTarget
+            // Open Library renvoie une image 1×1 si pas de couverture
+            if (img.naturalWidth < 10 || img.naturalHeight < 10) {
+              setCoverState('googlebooks')
+            } else {
+              setImgLoaded(true)
+            }
+          }}
+        />
+      )}
+
+      {/* Google Books — tentative 2 */}
+      {coverState === 'googlebooks' && googleUrl && (
+        <CoverImg
+          src={googleUrl}
+          alt={alt}
+          loading="lazy"
+          $visible={imgLoaded}
+          onError={() => {
+            setImgLoaded(false)
+            setCoverState('failed')
+          }}
           onLoad={(e) => {
             const img = e.currentTarget
             if (img.naturalWidth < 10 || img.naturalHeight < 10) {
-              setImgFailed(true)
+              setCoverState('failed')
             } else {
               setImgLoaded(true)
             }
