@@ -56,7 +56,7 @@ export async function updateLibraire(id: string, data: Partial<Libraire>): Promi
 }
 
 export async function addLivre(data: LivreInsert): Promise<void> {
-  const { error } = await supabase.from('livres').insert([data])
+  const { error } = await supabase.from('livres').insert([{ ...data, id: crypto.randomUUID() }])
   if (error) throw error
 }
 

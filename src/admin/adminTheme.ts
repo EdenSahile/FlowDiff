@@ -20,5 +20,11 @@ export const adminColors = {
     annule:         '#95a5a6',
     actif:          '#2ecc71',
     bloque:         '#e74c3c',
+    disponible:     '#2ecc71',
+    stock_limite:   '#f39c12',
+    sur_commande:   '#3498db',
+    en_reimp:       '#e67e22',
+    epuise:         '#e74c3c',
+    rupture:        '#c0392b',
   },
 } as const

@@ -1,4 +1,4 @@
-import { useState, useDeferredValue, useMemo, useEffect } from 'react'
+import { useState, useDeferredValue, useMemo, useEffect, useCallback } from 'react'
 import { useNotifications } from '@/contexts/NotificationsContext'
 import styled, { keyframes } from 'styled-components'
 import { BookCard } from '@/components/catalogue/BookCard'
@@ -8,6 +8,7 @@ import type { Universe, Book } from '@/data/mockBooks'
 import { Input } from '@/components/ui/Input'
 import { mq } from '@/lib/responsive'
 import { BackButton } from '@/components/ui/BackButton'
+import { useRefetchOnFocus } from '@/hooks/useRefetchOnFocus'
 
 type SortKey = 'pertinence' | 'titre' | 'prix_asc' | 'prix_desc'
 
@@ -211,6 +212,11 @@ export function NouveautesPage() {
   useEffect(() => {
     getBooksByTypeAsync('nouveaute').then(setAllNouveautes).catch(console.error)
   }, [])
+
+  const refetch = useCallback(() => {
+    getBooksByTypeAsync('nouveaute').then(setAllNouveautes).catch(console.error)
+  }, [])
+  useRefetchOnFocus(refetch)
 
   const nouveautes = useMemo(() => {
     let books = deferred.trim()

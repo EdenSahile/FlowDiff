@@ -52,6 +52,9 @@ export function AdminCataloguePage() {
       await reload()
       setModal(null)
       setSelected(null)
+    } catch (err) {
+      console.error('Erreur lors de la sauvegarde :', err)
+      alert('Une erreur est survenue lors de la sauvegarde. Vérifiez la console.')
     } finally {
       setSaving(false)
     }
@@ -96,6 +99,7 @@ export function AdminCataloguePage() {
               <Th>ISBN</Th>
               <Th>Prix TTC</Th>
               <Th>Type</Th>
+              <Th>Dispo.</Th>
               <Th style={{ width: 120 }}>Actions</Th>
             </tr>
           </thead>
@@ -120,6 +124,7 @@ export function AdminCataloguePage() {
                 <Td style={{ fontFamily: 'monospace', fontSize: 12 }}>{book.isbn}</Td>
                 <Td>{book.priceTTC?.toFixed(2)} €</Td>
                 <Td><StatutBadge statut={book.type} /></Td>
+                <Td><StatutBadge statut={book.statut ?? 'disponible'} /></Td>
                 <Td>
                   <Actions>
                     <ActionBtn onClick={() => { setSelected(book); setModal('edit') }}>Modifier</ActionBtn>
@@ -157,10 +162,10 @@ export function AdminCataloguePage() {
   )
 }
 
-function LivreForm({ book, onSave, saving }: { book: Book | null; onSave: (d: LivreInsert) => void; saving: boolean }) {
+function LivreForm({ book, onSave, saving }: { book: Book | null; onSave: (d: LivreInsert) => Promise<void>; saving: boolean }) {
   const ref = useRef<HTMLFormElement>(null)
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     const fd = new FormData(ref.current!)
     const data: LivreInsert = {
@@ -175,8 +180,9 @@ function LivreForm({ book, onSave, saving }: { book: Book | null; onSave: (d: Li
       format:          fd.get('format') as string,
       publicationDate: fd.get('publicationDate') as string,
       description:     fd.get('description') as string,
+      statut:          fd.get('statut') as string,
     }
-    onSave(data)
+    await onSave(data)
   }
 
   return (
@@ -192,6 +198,7 @@ function LivreForm({ book, onSave, saving }: { book: Book | null; onSave: (d: Li
         <FormField label="Date de parution" name="publicationDate" defaultValue={book?.publicationDate} required />
         <SelectField label="Univers" name="universe" defaultValue={book?.universe} options={['Littérature','BD / Mangas','Jeunesse','Adulte-pratique']} />
         <SelectField label="Type" name="type" defaultValue={book?.type} options={['fonds','nouveaute','a-paraitre']} />
+        <SelectField label="Disponibilité" name="statut" defaultValue={book?.statut ?? 'disponible'} options={['disponible','stock_limite','sur_commande','en_reimp','epuise','rupture']} />
       </FormGrid>
       <TextAreaField label="Description" name="description" defaultValue={book?.description} />
       <FormActions>

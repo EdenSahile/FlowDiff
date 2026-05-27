@@ -222,6 +222,25 @@ En permanence : **Panier** (droite, avec badge quantité) +  à gauche du panier
 
 ---
 
+## Sous-agents — règle obligatoire
+
+Les sous-agents démarrent à froid : ils ne lisent pas CLAUDE.md, ni CONTEXT.md, ni les hooks.
+Ils ne savent **que** ce qui est dans leur `prompt`.
+
+### Ce que le prompt de chaque sous-agent doit toujours contenir
+
+1. **Stack technique** — Vite 5 + React 18 + TypeScript strict + styled-components v6 + React Router v6
+2. **Règles de style** — jamais hardcoder les couleurs, toujours `theme.colors.*` via `src/lib/theme.ts`
+3. **Règles de travail** — cocher `[x]` dans CONTEXT.md dès qu'une tâche est terminée, s'arrêter et remonter le résultat
+4. **Section "Session en cours"** de CONTEXT.md — tâches + statut actuel
+5. **Sa mission précise** — fichiers concernés, chemins exacts, ce qu'il doit faire et ne pas faire
+6. **Contraintes spécifiques** à sa tâche (ex: ne pas toucher au design, TS doit rester clean)
+
+### Règle
+Ne jamais spawner un sous-agent avec un prompt vague. Un sous-agent mal briefé produit du code incorrect ou casse ce qui existe.
+
+---
+
 ## Skills actifs — invocation automatique
 
 Les skills suivants sont installés via les plugins `superpowers` et `code-review`.

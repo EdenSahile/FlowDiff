@@ -1,4 +1,4 @@
-import { useState, useDeferredValue, useMemo, useEffect } from 'react'
+import { useState, useDeferredValue, useMemo, useEffect, useCallback } from 'react'
 import styled from 'styled-components'
 import { mq } from '@/lib/responsive'
 import { BookCard } from '@/components/catalogue/BookCard'
@@ -7,6 +7,7 @@ import { getBooksByTypeAsync, searchBooksLocal } from '@/services/books'
 import type { Universe, StockStatut, Book } from '@/data/mockBooks'
 import { Input } from '@/components/ui/Input'
 import { BackButton } from '@/components/ui/BackButton'
+import { useRefetchOnFocus } from '@/hooks/useRefetchOnFocus'
 
 // Colors must stay in sync with STATUT_CONFIG in src/components/ui/StockStatus.tsx
 const DISPO_OPTIONS: Array<{ value: StockStatut; label: string; color: string | null }> = [
@@ -239,6 +240,11 @@ export function FondsPage() {
   useEffect(() => {
     getBooksByTypeAsync('fonds').then(setAllFonds).catch(console.error)
   }, [])
+
+  const refetch = useCallback(() => {
+    getBooksByTypeAsync('fonds').then(setAllFonds).catch(console.error)
+  }, [])
+  useRefetchOnFocus(refetch)
 
   const sorted = useMemo(() => {
     let books = deferred.trim()

@@ -22,6 +22,12 @@ const LABELS: Record<string, string> = {
   annule:         'Annulé',
   actif:          'Actif',
   bloque:         'Bloqué',
+  disponible:     'Disponible',
+  stock_limite:   'Stock limité',
+  sur_commande:   'Sur commande',
+  en_reimp:       'En réimpression',
+  epuise:         'Épuisé',
+  rupture:        'Rupture',
 }
 
 export function StatutBadge({ statut }: { statut: string }) {

@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { BackButton as BackNavButton } from '@/components/ui/BackButton'
 import { createPortal } from 'react-dom'
 import { useParams, useNavigate } from 'react-router-dom'
@@ -15,6 +15,7 @@ import { slugifyAuthor } from '@/lib/slugify'
 import { theme } from '@/lib/theme'
 import { formatPrice } from '@/lib/format'
 import { mq } from '@/lib/responsive'
+import { useRefetchOnFocus } from '@/hooks/useRefetchOnFocus'
 
 /* ── Formats physiques ── */
 type FormatId = 'broche' | 'poche'
@@ -1355,6 +1356,12 @@ export function FicheProduitPage() {
     }).catch(() => setBookLoading(false))
   }, [id])
 
+  const refetchBook = useCallback(() => {
+    if (!id) return
+    getBookByIdAsync(id).then(b => { if (b) setBook(b) }).catch(console.error)
+  }, [id])
+  useRefetchOnFocus(refetchBook)
+
   if (bookLoading) {
     return (
       <Page style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
@@ -1509,7 +1516,7 @@ export function FicheProduitPage() {
   const coverBadgeLabel =
     book.selection ? 'SÉLECTION' : book.type === 'nouveaute' ? 'NOUVEAUTÉ' : 'À PARAÎTRE'
   const stockLabel =
-    book.statut === 'disponible'   ? 'Disponible immédiatement' :
+    book.statut === 'disponible'   ? 'Disponible' :
     book.statut === 'sur_commande' ? 'Sur commande' :
     book.statut === 'en_reimp'     ? 'En réimpression' :
     book.statut === 'rupture'      ? 'Rupture de stock' : 'Disponible'
