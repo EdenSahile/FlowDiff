@@ -1035,7 +1035,10 @@ export function EDIPage() {
               <PanelText>Notre service clients EDI est à votre disposition.</PanelText>
               <HelpRow>📞 01 40 20 40 20</HelpRow>
               <HelpRow>✉ edi@flowdiff.fr</HelpRow>
-              <ContactBtn onClick={() => navigate('/contact')}>Nous contacter</ContactBtn>
+              <ContactBtn onClick={() => {
+                const body = `Nom : ${user?.nomLibrairie ?? ''}\nNuméro de compte : ${user?.codeClient ?? ''}\n\n`
+                window.location.href = `mailto:edi@flowdiff.fr?subject=${encodeURIComponent('Support EDI — ' + (user?.nomLibrairie ?? ''))}&body=${encodeURIComponent(body)}`
+              }}>Nous contacter</ContactBtn>
             </PanelCard>
           </RightPanel>
         </MainLayout>
