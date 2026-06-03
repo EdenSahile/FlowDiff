@@ -41,13 +41,6 @@ function fmtTime(iso: string): string {
   return new Date(iso).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
 }
 
-const DIFFUSEURS = [
-  'Diffuseur 1',
-  'Diffuseur 2',
-  'Diffuseur 3',
-  'Diffuseur 4',
-  'Diffuseur 5',
-]
 
 /* ════════════════════════════════════════════════════
    STYLED — layout racine
@@ -868,26 +861,7 @@ export function EDIPage() {
             </MetaRow>
           </Card>
 
-          {/* Diffuseurs connectés */}
-          <Card>
-            <CardTitle>Diffuseurs connectés ({DIFFUSEURS.length})</CardTitle>
-            {DIFFUSEURS.map(d => (
-              <DiffuseurItem key={d}>
-                <DiffName>
-                  <GreenDot />
-                  {d}
-                </DiffName>
-                <ActiveBadge>Actif</ActiveBadge>
-              </DiffuseurItem>
-            ))}
-            <GererBtn
-              onClick={() => showToast('Fonctionnalité disponible prochainement', 'error')}
-            >
-              Gérer mes partenaires
-            </GererBtn>
-          </Card>
-
-          {/* Flux en cours */}
+{/* Flux en cours */}
           <Card id="flux-en-cours">
             <CardTitle>Flux en cours</CardTitle>
             <FluxGrid>
