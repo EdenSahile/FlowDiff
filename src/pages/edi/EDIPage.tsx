@@ -767,6 +767,12 @@ export function EDIPage() {
   const [selectedMessage, setSelectedMessage] = useState<EDIMessage | null>(null)
   const [refInput, setRefInput] = useState('')
   const [isbnSearch, setIsbnSearch] = useState('')
+  const [showAll, setShowAll] = useState(false)
+
+  function handleFilterChange(key: EDIFilter) {
+    setActiveFilter(key)
+    setShowAll(false)
+  }
 
   const isbnFiltered = isbnSearch.trim()
     ? messages.filter(m => messageContainsISBN(m, isbnSearch))
@@ -777,7 +783,7 @@ export function EDIPage() {
 
   const previewRows = [...filtered]
     .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
-    .slice(isbnSearch.trim() ? 0 : -5)
+    .slice(isbnSearch.trim() || showAll ? 0 : -5)
 
   const pendingOrdersCount = messages.filter(m => m.type === 'ORDERS' && m.status === 'PENDING').length
 
@@ -941,7 +947,7 @@ export function EDIPage() {
                 { key: 'DESADV', label: 'Expéditions' },
                 { key: 'INVOIC', label: 'Factures' },
               ] as { key: EDIFilter; label: string }[]).map(({ key, label }) => (
-                <Tab key={key} $active={activeFilter === key} onClick={() => setActiveFilter(key)}>
+                <Tab key={key} $active={activeFilter === key} onClick={() => handleFilterChange(key)}>
                   {label}
                 </Tab>
               ))}
@@ -1011,11 +1017,13 @@ export function EDIPage() {
                 </Table>
                 </TableScrollWrapper>
 
-                <VoirTout>
-                  <VoirToutLink onClick={() => setActiveFilter('ALL')}>
-                    Voir tout l'historique →
-                  </VoirToutLink>
-                </VoirTout>
+                {!showAll && filtered.length > 5 && (
+                  <VoirTout>
+                    <VoirToutLink onClick={() => setShowAll(true)}>
+                      Voir plus
+                    </VoirToutLink>
+                  </VoirTout>
+                )}
               </>
             )}
           </HistoriqueSection>
@@ -1031,7 +1039,7 @@ export function EDIPage() {
               <PrimaryBtn onClick={() => navigate('/panier')}>
                 ↑ Envoyer une commande
               </PrimaryBtn>
-              <LinkSmall onClick={() => setActiveFilter('ORDERS')}>
+              <LinkSmall onClick={() => handleFilterChange('ORDERS')}>
                 Voir les commandes en attente ({pendingOrdersCount}) →
               </LinkSmall>
             </PanelCard>
