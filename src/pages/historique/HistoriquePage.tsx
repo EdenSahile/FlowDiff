@@ -168,6 +168,18 @@ const OrderDate = styled.div`
   margin-top: 2px;
 `
 
+const RefBadge = styled.span`
+  display: inline-block;
+  margin-top: 4px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: ${({ theme }) => theme.colors.navyLight};
+  color: ${({ theme }) => theme.colors.navy};
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 11px;
+  font-weight: ${({ theme }) => theme.typography.weights.semibold};
+`
+
 /* ── Badge statut ── */
 const StatusBadge = styled.span<{ $bg: string; $text: string }>`
   display: inline-flex;
@@ -796,6 +808,7 @@ export function HistoriquePage() {
               <OrderCardHeader>
                 <div>
                   <OrderNumero>{order.numero}</OrderNumero>
+                  {order.referenceCommande && <RefBadge>Réf : {order.referenceCommande}</RefBadge>}
                   <OrderDate>{formatDate(order.date)}</OrderDate>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
