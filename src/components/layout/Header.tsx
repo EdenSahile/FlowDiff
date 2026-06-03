@@ -103,7 +103,7 @@ const BurgerBtn = styled.button`
 const RightSection = styled.div`
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   flex-shrink: 0;
 
   @media (max-width: calc(${({ theme }) => theme.breakpoints.mobile} - 1px)) {
@@ -111,9 +111,18 @@ const RightSection = styled.div`
     margin-left: auto;
     gap: 8px;
   }
+`
 
-  @media (max-width: 479px) {
-    gap: 6px;
+const NavSeparator = styled.div`
+  display: none;
+
+  @media (min-width: ${({ theme }) => theme.breakpoints.mobile}) {
+    display: block;
+    width: 1px;
+    height: 18px;
+    background: ${({ theme }) => theme.colors.gray[200]};
+    margin: 0 6px;
+    flex-shrink: 0;
   }
 `
 
@@ -472,8 +481,8 @@ const CartBtn = styled.button<{ $hasItems: boolean }>`
   display: flex;
   align-items: center;
   gap: 6px;
-  height: 34px;
-  padding: 0 14px;
+  height: 38px;
+  padding: 0 16px;
   border-radius: ${({ theme }) => theme.radii.md};
   cursor: pointer;
   font-family: ${({ theme }) => theme.typography.fontFamily};
@@ -527,9 +536,11 @@ const CartBadge = styled.span`
 const ListsBtn = styled.button<{ $hasLists: boolean }>`
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 5px;
-  height: 34px;
-  padding: 0 12px;
+  width: 38px;
+  height: 38px;
+  padding: 0;
   border-radius: ${({ theme }) => theme.radii.md};
   cursor: pointer;
   font-family: ${({ theme }) => theme.typography.fontFamily};
@@ -539,25 +550,24 @@ const ListsBtn = styled.button<{ $hasLists: boolean }>`
   transition: all .15s;
   white-space: nowrap;
 
-  /* Mobile : style doré (symétrique avec CartBtn) */
+  /* Mobile : style doré */
   ${({ $hasLists }) => $hasLists ? `
-    background: #D4A843;
+    background: rgba(212,168,67,0.15);
     border: 1.5px solid #D4A843;
-    color: #232f3e;
-    box-shadow: 0 2px 8px rgba(212,168,67,0.35);
-    &:hover { background: #E0B84A; border-color: #E0B84A; }
+    color: #D4A843;
+    &:hover { background: rgba(212,168,67,0.25); }
   ` : `
     background: transparent;
-    border: 1.5px solid rgba(212,168,67,0.5);
-    color: #D4A843;
-    &:hover { background: rgba(212,168,67,0.12); border-color: rgba(212,168,67,0.7); }
+    border: 1.5px solid rgba(255,255,255,0.25);
+    color: rgba(255,255,255,0.7);
+    &:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.4); }
   `}
 
-  /* Desktop : style clair */
+  /* Desktop : icône seule, style discret */
   @media (min-width: ${({ theme }) => theme.breakpoints.mobile}) {
     background: transparent;
     border: 1.5px solid ${({ theme }) => theme.colors.gray[200]};
-    color: ${({ theme }) => theme.colors.gray[600]};
+    color: ${({ theme }) => theme.colors.gray[400]};
     box-shadow: none;
 
     &:hover {
@@ -567,8 +577,9 @@ const ListsBtn = styled.button<{ $hasLists: boolean }>`
     }
 
     ${({ $hasLists }) => $hasLists && `
-      border-color: rgba(212,168,67,0.5);
+      border-color: rgba(212,168,67,0.6);
       color: #D4A843;
+      &:hover { border-color: #D4A843; color: #D4A843; background: rgba(212,168,67,0.06); }
     `}
   }
 `
@@ -585,9 +596,7 @@ const ListsBadge = styled.span`
 `
 
 const ListsLabel = styled.span`
-  @media (max-width: 479px) {
-    display: none;
-  }
+  display: none;
 `
 
 /* ── Panneau Listes ── */
@@ -1248,14 +1257,9 @@ export function Header({ cartCount = 0, onBurgerClick, onCartClick }: HeaderProp
         <RightSection>
           <DesktopOnly>
             <NotificationBell />
-            <HelpBtn
-              onClick={() => navigate('/aide')}
-              aria-label="Aide"
-              title="Aide"
-            >
-              <IconHelp />
-            </HelpBtn>
           </DesktopOnly>
+
+          <NavSeparator />
 
           {/* ─ Bouton Listes ─ */}
           <ListsBtn

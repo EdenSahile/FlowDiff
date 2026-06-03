@@ -171,7 +171,7 @@ const BookLayout = styled.div`
 /* ── Colonne gauche sticky ── */
 const CoverColNew = styled.div`
   position: sticky;
-  top: 94px;
+  top: calc(${({ theme }) => theme.layout.headerHeight} + ${({ theme }) => theme.layout.demoBannerHeight} + 4px);
 
   ${mq.belowMd} {
     position: static;

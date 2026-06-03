@@ -13,8 +13,8 @@ const Wrapper = styled.div`
 `
 
 const BellBtn = styled.button<{ $active: boolean }>`
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   border: 1.5px solid ${({ $active }) => $active ? theme.colors.accent : 'rgba(255,255,255,.2)'};
   background: ${({ $active }) => $active ? 'rgba(201,168,76,.12)' : 'rgba(255,255,255,.08)'};

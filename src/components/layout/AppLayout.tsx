@@ -26,6 +26,13 @@ const MainColumn = styled.div`
   overflow-y: auto;
 `
 
+const StickyBand = styled.div`
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  flex-shrink: 0;
+`
+
 const PageContent = styled.main`
   flex: 1;
 
@@ -49,12 +56,14 @@ export function AppLayout({ children }: AppLayoutProps) {
       <Sidebar />
       <BurgerMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
       <MainColumn>
-        <Header
-          cartCount={totalItems}
-          onBurgerClick={() => setMenuOpen(true)}
-          onCartClick={() => navigate('/panier')}
-        />
-        <DemoBanner />
+        <StickyBand>
+          <Header
+            cartCount={totalItems}
+            onBurgerClick={() => setMenuOpen(true)}
+            onCartClick={() => navigate('/panier')}
+          />
+          <DemoBanner />
+        </StickyBand>
         <PageContent>
           {children}
         </PageContent>

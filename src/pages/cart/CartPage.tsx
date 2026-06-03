@@ -814,7 +814,7 @@ const ItemsCol = styled.div``
 const RecapCol = styled.div`
   ${mq.md} {
     position: sticky;
-    top: calc(${({ theme }) => theme.layout.headerHeight} + 16px);
+    top: calc(${({ theme }) => theme.layout.headerHeight} + ${({ theme }) => theme.layout.demoBannerHeight} + 16px);
   }
 `
 

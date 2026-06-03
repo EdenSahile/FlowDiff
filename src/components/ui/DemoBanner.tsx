@@ -2,8 +2,6 @@ import styled from 'styled-components'
 import { mq } from '@/lib/responsive'
 
 const BannerWrap = styled.aside`
-  position: sticky;
-  z-index: 98;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -19,9 +17,6 @@ const BannerWrap = styled.aside`
   white-space: normal;
   flex-shrink: 0;
 
-  /* Collé sous le header mobile */
-  top: ${({ theme }) => theme.layout.mobileHeaderHeight};
-
   ${mq.md} {
     height: ${({ theme }) => theme.layout.demoBannerHeight};
     padding: 0 16px;
@@ -29,8 +24,6 @@ const BannerWrap = styled.aside`
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    /* Collé sous le topbar desktop */
-    top: ${({ theme }) => theme.layout.headerHeight};
   }
 `
 

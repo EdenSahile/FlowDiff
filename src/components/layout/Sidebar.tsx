@@ -201,6 +201,7 @@ const toolItems = [
 const infoItems = [
   { to: '/contact',     label: 'Contact'     },
   { to: '/flash-infos', label: 'Flash Infos' },
+  { to: '/aide',        label: 'Aide'        },
 ]
 
 export function Sidebar() {
