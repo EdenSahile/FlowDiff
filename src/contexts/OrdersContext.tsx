@@ -57,6 +57,8 @@ interface OrdersContextValue {
     deliveryMode: 'standard' | 'specific'
     deliveryDate?: string
     transmissionMode: 'FLOWDIFF' | 'EDI'
+    referenceCommande?: string
+    referencesParLigne?: Record<string, string>
   }) => Order
 }
 
@@ -116,8 +118,10 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
     deliveryMode: 'standard' | 'specific'
     deliveryDate?: string
     transmissionMode: 'FLOWDIFF' | 'EDI'
+    referenceCommande?: string
+    referencesParLigne?: Record<string, string>
   }): Order {
-    const orderItems: OrderItem[] = params.items.map(({ book, quantity, statut, enReliquat }) => ({
+    const orderItems: OrderItem[] = params.items.map(({ book, quantity, statut, enReliquat, ebookOption }) => ({
       bookId: book.id,
       title: book.title,
       author: book.authors.join(', '),
@@ -129,6 +133,9 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
       universe: book.universe,
       statut,
       enReliquat,
+      referenceLigne: params.referencesParLigne
+        ? (params.referencesParLigne[ebookOption ? `${book.id}::${ebookOption.isbnEbook}` : book.id]?.trim() || undefined)
+        : undefined,
     }))
 
     const order: Order = {
@@ -142,6 +149,7 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
       deliveryDate: params.deliveryDate,
       transmissionMode: params.transmissionMode,
       ediStatus: params.transmissionMode === 'EDI' ? 'PENDING' : undefined,
+      referenceCommande: params.referenceCommande,
       items: orderItems,
       subtotalHT: params.subtotalHT,
       remiseAmount: params.remiseAmount,
