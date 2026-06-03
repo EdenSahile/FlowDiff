@@ -52,6 +52,7 @@ export interface OrderItem {
   typeCommande?: TypeCommande
   statut?: StockStatut
   enReliquat?: boolean
+  referenceLigne?: string
 }
 
 export interface Order {
@@ -75,6 +76,7 @@ export interface Order {
   shipment?: Shipment
   transmissionMode?: 'FLOWDIFF' | 'EDI'
   ediStatus?: 'PENDING' | 'SENT' | 'ACK' | 'ERROR'
+  referenceCommande?: string
 }
 
 export const MOCK_CLIENT_NAMES: Record<string, string> = {

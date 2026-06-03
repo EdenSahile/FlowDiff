@@ -8,12 +8,14 @@ export interface ORDERSLine {
   ean: string
   title: string
   qtyRequested: number
+  referenceLigne?: string
 }
 
 export interface ORDERSPayload {
   orderId: string
   diffuseur: string
   lines: ORDERSLine[]
+  referenceGlobale?: string
 }
 
 export interface DESADVLine {
