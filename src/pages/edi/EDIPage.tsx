@@ -812,10 +812,6 @@ export function EDIPage() {
     }
   }
 
-  function handleSaveParams() {
-    showToast('Paramètres sauvegardés')
-  }
-
   const today   = new Date()
   const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000)
   const dateRange = `${fmtDate(weekAgo.toISOString())} → ${fmtDate(today.toISOString())}`
@@ -1043,62 +1039,6 @@ export function EDIPage() {
           </RightPanel>
         </MainLayout>
 
-        {/* ── Paramètres EDI ── */}
-        <ParamsCard>
-          <SectionTitle style={{ marginBottom: 16 }}>Paramètres EDI</SectionTitle>
-          <ParamsGrid>
-            {/* Colonne gauche — toggles */}
-            <div>
-              <ToggleRow>
-                <ToggleIcon>✉</ToggleIcon>
-                <ToggleInfo>
-                  <ToggleLabel>Préférer EDI par défaut</ToggleLabel>
-                  <ToggleSub>Toutes vos commandes seront envoyées via EDI.</ToggleSub>
-                </ToggleInfo>
-                <ToggleSwitch>
-                  <input
-                    type="checkbox"
-                    checked={params.preferEdiByDefault}
-                    onChange={e => updateParams({ preferEdiByDefault: e.target.checked })}
-                  />
-                  <span />
-                </ToggleSwitch>
-              </ToggleRow>
-
-              <ToggleRow>
-                <ToggleIcon>✉</ToggleIcon>
-                <ToggleInfo>
-                  <ToggleLabel>Notifications par email</ToggleLabel>
-                  <ToggleSub>Recevoir un email à chaque échange important.</ToggleSub>
-                </ToggleInfo>
-                <ToggleSwitch>
-                  <input
-                    type="checkbox"
-                    checked={params.emailNotifications}
-                    onChange={e => updateParams({ emailNotifications: e.target.checked })}
-                  />
-                  <span />
-                </ToggleSwitch>
-              </ToggleRow>
-            </div>
-
-            {/* Colonne droite — délai + bouton */}
-            <ParamsRight>
-              <DelayRow>
-                <DelayLabel>Délai de relance en cas d'absence d'accusé</DelayLabel>
-                <DelaySelect
-                  value={params.relanceDelay}
-                  onChange={e => updateParams({ relanceDelay: e.target.value as '12h' | '24h' | '48h' })}
-                >
-                  <option value="12h">12 heures</option>
-                  <option value="24h">24 heures</option>
-                  <option value="48h">48 heures</option>
-                </DelaySelect>
-              </DelayRow>
-              <ModifierBtn onClick={handleSaveParams}>Modifier les paramètres</ModifierBtn>
-            </ParamsRight>
-          </ParamsGrid>
-        </ParamsCard>
       </Page>
 
       {/* ── Footer EDI ── */}

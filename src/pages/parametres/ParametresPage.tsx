@@ -4,6 +4,7 @@ import { useAuthContext } from '@/contexts/AuthContext'
 import { useToast } from '@/contexts/ToastContext'
 import { newsletterSchema } from '@/lib/formSchemas'
 import { useOnboarding } from '@/contexts/OnboardingContext'
+import { useEDI } from '@/contexts/EDIContext'
 import { mq } from '@/lib/responsive'
 import { BackButton } from '@/components/ui/BackButton'
 
@@ -290,6 +291,7 @@ export function ParametresPage() {
   const { user } = useAuthContext()
   const { showToast } = useToast()
   const { resetTour } = useOnboarding()
+  const { params: ediParams, updateParams: updateEdiParams } = useEDI()
 
   const [prefs, setPrefs] = useState<NotifPrefs>(DEFAULT_PREFS)
   const [selected, setSelected] = useState<Set<string>>(new Set(['nouveautes', 'flashinfos']))
@@ -392,6 +394,25 @@ export function ParametresPage() {
               <Toggle checked={prefs.universes[u]} onChange={v => setUniverse(u, v)} />
             </Row>
           ))}
+        </Section>
+
+        {/* ── EDI ── */}
+        <Section>
+          <SectionTitle>EDI — Échanges de données</SectionTitle>
+          <Row>
+            <RowLabel>Préférer EDI par défaut</RowLabel>
+            <Toggle
+              checked={ediParams.preferEdiByDefault}
+              onChange={v => updateEdiParams({ preferEdiByDefault: v })}
+            />
+          </Row>
+          <Row>
+            <RowLabel>Notifications EDI par email</RowLabel>
+            <Toggle
+              checked={ediParams.emailNotifications}
+              onChange={v => updateEdiParams({ emailNotifications: v })}
+            />
+          </Row>
         </Section>
 
         <SaveButton
