@@ -32,26 +32,38 @@ function rowToBook(row: Row): Book {
 }
 
 export async function getAllBooksAsync(): Promise<Book[]> {
-  const { data, error } = await supabase.from('livres').select('*')
-  if (error) return MOCK_BOOKS
-  return (data ?? []).length > 0 ? (data ?? []).map(rowToBook) : MOCK_BOOKS
+  try {
+    const { data, error } = await supabase.from('livres').select('*')
+    if (error) throw error
+    return (data ?? []).length > 0 ? (data ?? []).map(rowToBook) : MOCK_BOOKS
+  } catch {
+    return MOCK_BOOKS
+  }
 }
 
 export async function getBooksByTypeAsync(type: BookType, universe?: Universe): Promise<Book[]> {
-  const base = supabase.from('livres').select('*').eq('type', type)
-  const query = universe ? base.eq('universe', universe) : base
-  const { data, error } = await query
-  if (error) {
+  try {
+    const base = supabase.from('livres').select('*').eq('type', type)
+    const query = universe ? base.eq('universe', universe) : base
+    const { data, error } = await query
+    if (error) throw error
+    const fallback = MOCK_BOOKS.filter(b => b.type === type)
+    const result = (data ?? []).map(rowToBook)
+    return result.length > 0 ? result : (universe ? fallback.filter(b => b.universe === universe) : fallback)
+  } catch {
     const fallback = MOCK_BOOKS.filter(b => b.type === type)
     return universe ? fallback.filter(b => b.universe === universe) : fallback
   }
-  return (data ?? []).map(rowToBook)
 }
 
 export async function getBookByIdAsync(id: string): Promise<Book | null> {
-  const { data, error } = await supabase.from('livres').select('*').eq('id', id).single()
-  if (error) return getBookByIdLocal(id) ?? null
-  return rowToBook(data as Row)
+  try {
+    const { data, error } = await supabase.from('livres').select('*').eq('id', id).single()
+    if (error) throw error
+    return rowToBook(data as Row)
+  } catch {
+    return getBookByIdLocal(id) ?? null
+  }
 }
 
 export function searchBooksLocal(books: Book[], query: string): Book[] {
