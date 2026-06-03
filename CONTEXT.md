@@ -7,7 +7,7 @@
 ---
 
 ## État du build
-TS clean · 173/174 tests passants · session 2026-05-17  
+TS clean · 173/174 tests passants · session 2026-06-03  
 _(1 test pré-existant failing : `useDashboardConfig.test.ts > has 3 bottomPanels all visible` — non lié, ignoré)_  
 **Intégration Supabase catalogue** : 13/13 pages migrées ✅  
 **Back-Office Admin FlowDiff Phase 1** : 12/12 tâches terminées ✅
@@ -33,21 +33,9 @@ _(1 test pré-existant failing : `useDashboardConfig.test.ts > has 3 bottomPanel
 **AuteurPage — liste livres** : suppression groupement par mois · grille plate triée du plus récent au plus ancien · sans filtre 2 ans ✅  
 **Bouton "Ajouter au panier"** : toujours navy quelle que soit la disponibilité (suppression couleurs inline selon statut dans FicheProduitPage) ✅  
 **BookCard — en réimpression** : bouton "Ajouter au panier" affiché (layout coverFirst : `isIndispo = isEpuise` uniquement) ✅  
-**Mon Compte — Reliquat accepté** : champ lecture seule · badge Oui (vert) / Non (gris) · `reliquatAccepte` dans MockUser + AuthUser · LIB001 true, LIB002 false, LIB003 true ✅
+**Mon Compte — Reliquat accepté** : champ lecture seule · badge Oui (vert) / Non (gris) · `reliquatAccepte` dans MockUser + AuthUser · LIB001 true, LIB002 false, LIB003 true ✅  
+**EDI — Refonte header icônes** : StickyBand + ListsLabel dynamique ✅  
+**EDI — Fixes tableau** : suppression colonne Diffuseur · N° commande ORDRSP via `getOrderRef` · onglet Factures avec N° facture + ISBN search ✅  
+**EDI — Renumérotation** : CMD-YYYY-MMDD-XXX → CMD0000001-CMD0000012 (mocks EDI) + CMD0000013-CMD0000014 (mockOrders) · compteur initial à 14 · STORAGE_VERSION v3 · ACK/DESADV refs corrigés ✅  
+**EDI — Références de commande** : section référence dans CartPage (global + par article) · RFF+CR dans template ORDERS · badge HistoriquePage ✅
 
----
-
-## Session en cours — Correction IDs orphelins (pages blanches)
-
-**Cause** : réécriture de `mockBooks.ts` laisse 5 fichiers avec des IDs supprimés → `getBookById(id)` → `undefined` → crash pages blanches.
-
-### Checklist tâches
-
-| # | Fichier | Statut |
-|---|---------|--------|
-| T1 | `src/data/mockSeries.ts` — réécriture complète (25 séries avec IDs valides) | ✅ |
-| T2 | `src/data/mockSelections.ts` — remplacer 5 IDs orphelins | ✅ |
-| T3 | `src/data/mockFlashInfos.ts` — remplacer 3 `bookId` orphelins | ✅ |
-| T4 | `src/pages/top-ventes/TopVentesPage.tsx` — SALES : remplacer 8 IDs orphelins | ✅ |
-| T5 | `src/data/mockOrders.ts` — remplacer IDs orphelins dans les lignes de commande | ✅ |
-| T6 | `npx tsc --noEmit` + `npx vitest run` propres | ✅ |
