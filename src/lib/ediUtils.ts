@@ -350,18 +350,70 @@ const EDIFACT_TEMPLATES: Record<EDIMessageType, (msg: EDIMessage) => string> = {
     return segments.join('\n')
   },
 
-  INVOIC: (msg) => [
-    `UNB+UNOC:3+GLN-DIFFUSEUR:14+301234XXXXXXX:14+${fmtEdifactDate(msg.createdAt)}:${fmtEdifactTime(msg.createdAt)}+1'`,
-    `UNH+1+INVOIC:D:96A:UN'`,
-    `BGM+380+${msg.documentRef}+9'`,
-    `DTM+137:${fmtEdifactDate(msg.createdAt)}:102'`,
-    `NAD+SE+GLN-DIFFUSEUR::9'`,
-    `NAD+BY+301234XXXXXXX::9'`,
-    `MOA+79:856.00:EUR'`,
-    `TAX+7+VAT+++:::5.5+S'`,
-    `UNS+S'`,
-    `UNZ+8+1'`,
-  ].join('\n'),
+  INVOIC: (msg) => {
+    const p    = msg.payload as Partial<INVOICPayload>
+    const lines    = p.lines    ?? []
+    const orderIds = p.orderIds ?? []
+    const currency = p.currency ?? 'EUR'
+    const TVA      = 5.5
+    const DIVISOR  = 1 + TVA / 100  // 1.055
+
+    /* Échappe les caractères spéciaux EDIFACT dans les chaînes libres */
+    const esc = (s: string) => s.replace(/[?+:']/g, c => `?${c}`)
+
+    /* Totaux calculés depuis les lignes — conservés en string pour garder les 2 décimales */
+    const totalTTC = lines.reduce((s, l) => s + l.unitPriceTTC * l.qty, 0).toFixed(2)
+    const totalHT  = (parseFloat(totalTTC) / DIVISOR).toFixed(2)
+    const totalTax = (parseFloat(totalTTC) - parseFloat(totalHT)).toFixed(2)
+
+    const seg: string[] = [
+      `UNB+UNOC:3+GLN-DIFFUSEUR:14+301234XXXXXXX:14+${fmtEdifactDate(msg.createdAt)}:${fmtEdifactTime(msg.createdAt)}+1'`,
+      `UNH+1+INVOIC:D:96A:UN'`,
+      `BGM+380+${msg.documentRef}+9'`,
+      `DTM+137:${fmtEdifactDate(msg.createdAt)}:102'`,
+    ]
+
+    /* Une référence de commande par orderIds */
+    orderIds.forEach(id => seg.push(`RFF+ON:${id}'`))
+
+    seg.push(
+      `NAD+SE+GLN-DIFFUSEUR::9'`,
+      `NAD+BY+301234XXXXXXX::9'`,
+      `CUX+2:${currency}:4'`,
+    )
+
+    /* Lignes articles */
+    lines.forEach((line, i) => {
+      const unitHT  = (line.unitPriceTTC / DIVISOR).toFixed(4)
+      const lineHT  = (line.unitPriceTTC * line.qty / DIVISOR).toFixed(2)
+      const lineTax = (line.unitPriceTTC * line.qty - parseFloat(lineHT)).toFixed(2)
+      seg.push(
+        `LIN+${i + 1}++${line.ean}:EN'`,
+        `IMD+F++:::${esc(line.title)}'`,
+        `QTY+47:${line.qty}'`,
+        `PRI+AAA:${unitHT}:CA'`,
+        `MOA+203:${lineHT}:${currency}'`,
+        `TAX+7+VAT+++:::${TVA}+S'`,
+        `MOA+124:${lineTax}:${currency}'`,
+      )
+    })
+
+    /* Récapitulatif */
+    seg.push(
+      `UNS+S'`,
+      `MOA+77:${totalHT}:${currency}'`,
+      `MOA+9:${totalTTC}:${currency}'`,
+      `TAX+7+VAT+++:::${TVA}+S'`,
+      `MOA+124:${totalTax}:${currency}'`,
+    )
+
+    /* UNT : seg.length = nb de segments avant UNT
+       = UNB(non compté) + tout le reste — donc : (seg.length - 1) depuis UNH + 1 pour UNT = seg.length */
+    seg.push(`UNT+${seg.length}+1'`)
+    seg.push(`UNZ+1+1'`)
+
+    return seg.join('\n')
+  },
 }
 
 export function generateEdifactPlaceholder(msg: EDIMessage): string {
