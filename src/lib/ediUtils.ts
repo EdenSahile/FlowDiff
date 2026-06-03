@@ -286,11 +286,13 @@ const EDIFACT_TEMPLATES: Record<EDIMessageType, (msg: EDIMessage) => string> = {
       `DTM+137:${fmtEdifactDate(msg.createdAt)}:102'`,
       `NAD+BY+301234XXXXXXX::9'`,
       `NAD+SU+GLN-DIFFUSEUR::9'`,
+      ...(p.referenceGlobale ? [`RFF+CR:${p.referenceGlobale}'`] : []),
     ]
     const lineSegments = Array.isArray(p.lines)
       ? p.lines.flatMap((line, i) => [
           `LIN+${i + 1}++${line.ean}:EN'`,
           `QTY+21:${line.qtyRequested}'`,
+          ...(line.referenceLigne ? [`RFF+CR:${line.referenceLigne}'`] : []),
         ])
       : [`LIN+1++9782070360024:EN'`, `QTY+21:${p.totalQty ?? 5}'`]
     // UNT compte UNH→UNT inclus : (header - UNB) + lignes + UNS + UNT
