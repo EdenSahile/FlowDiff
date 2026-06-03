@@ -104,10 +104,16 @@ export function EDIProvider({ children }: { children: ReactNode }) {
         createdAt: now.toISOString(),
         orderId: order.id,
         payload: {
-          orderId: order.id,
-          numero: order.numero,
-          lines: order.items.length,
-          totalQty: order.items.reduce((s, i) => s + i.quantity, 0),
+          orderId: order.numero,
+          diffuseur: 'Interforum (Editis)',
+          lines: order.items.map((item, i) => ({
+            lineNumber: i + 1,
+            ean: item.isbn,
+            title: item.title,
+            qtyRequested: item.quantity,
+            referenceLigne: item.referenceLigne,
+          })),
+          referenceGlobale: order.referenceCommande,
         },
       }
 
@@ -123,7 +129,7 @@ export function EDIProvider({ children }: { children: ReactNode }) {
           detail: 'Acceptée',
           createdAt: new Date(now.getTime() + 3000).toISOString(),
           orderId: order.id,
-          payload: { ackRef: `ACK-${order.numero}`, decision: 'accepted' },
+          payload: { orderId: order.numero, ackRef: `ACK-${order.numero}`, decision: 'accepted' },
         }
         setMessages(prev => [...prev, ack])
       }, 3000)
@@ -138,7 +144,7 @@ export function EDIProvider({ children }: { children: ReactNode }) {
           detail: `${order.items.reduce((s, i) => s + i.quantity, 0)} ex.`,
           createdAt: new Date(now.getTime() + 8000).toISOString(),
           orderId: order.id,
-          payload: { desadvRef: `DESADV-${order.numero}`, status: 'complete' },
+          payload: { orderId: order.numero, desadvRef: `DESADV-${order.numero}`, status: 'complete' },
         }
         setMessages(prev => [...prev, desadv])
       }, 8000)
