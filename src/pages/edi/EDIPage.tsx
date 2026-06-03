@@ -776,11 +776,10 @@ export function EDIPage() {
   function handleExport() {
     exportToCSV(
       `edi-${user?.codeClient ?? 'export'}`,
-      ['Date', 'Type', 'Diffuseur', 'Référence', 'Statut', 'Détail'],
+      ['Date', 'Type', 'Référence', 'Statut', 'Détail'],
       filtered.map(m => [
         fmtDateTime(m.createdAt),
         formatEDITypeLabel(m.type),
-        m.diffuseur,
         m.documentRef,
         formatEDIStatusLabel(m.status),
         m.detail,
@@ -817,7 +816,7 @@ export function EDIPage() {
             <PageEyebrow>Outils</PageEyebrow>
             <Title>EDI — Échanges de données informatisés</Title>
             <Subtitle>
-              Suivez vos flux EDI avec Dilicom et consultez l'historique des échanges avec vos diffuseurs.
+              Suivez vos commandes et livraisons avec Dilicom.
             </Subtitle>
           </TitleBlock>
           <DocBtn
@@ -930,9 +929,9 @@ export function EDIPage() {
               {([
                 { key: 'ALL',    label: 'Tous' },
                 { key: 'ORDERS', label: 'Commandes' },
-                { key: 'ORDRSP', label: 'Accusés (ORDRSP)' },
-                { key: 'DESADV', label: 'Expéditions (DESADV)' },
-                { key: 'INVOIC', label: 'Factures (INVOIC)' },
+                { key: 'ORDRSP', label: 'Accusés de réception' },
+                { key: 'DESADV', label: 'Expéditions' },
+                { key: 'INVOIC', label: 'Factures' },
               ] as { key: EDIFilter; label: string }[]).map(({ key, label }) => (
                 <Tab key={key} $active={activeFilter === key} onClick={() => setActiveFilter(key)}>
                   {label}
@@ -954,7 +953,6 @@ export function EDIPage() {
                     <tr>
                       <Th>Date / Heure</Th>
                       <Th>Type de message</Th>
-                      <Th>Diffuseur</Th>
                       <Th>N° commande</Th>
                       <Th>Statut</Th>
                       <Th>Détail</Th>
@@ -968,7 +966,6 @@ export function EDIPage() {
                           {fmtDate(msg.createdAt)} {fmtTime(msg.createdAt)}
                         </Td>
                         <Td>{formatEDITypeLabel(msg.type)}</Td>
-                        <Td>{msg.diffuseur}</Td>
                         <Td style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem' }}>
                           {msg.documentRef}
                         </Td>
@@ -995,7 +992,7 @@ export function EDIPage() {
                     ))}
                     {previewRows.length === 0 && (
                       <tr>
-                        <Td colSpan={7} style={{ textAlign: 'center', color: '#6B6B68', padding: '24px' }}>
+                        <Td colSpan={6} style={{ textAlign: 'center', color: '#6B6B68', padding: '24px' }}>
                           {isbnSearch.trim() && activeFilter === 'INVOIC'
                             ? 'Aucun message disponible.'
                             : 'Aucun message pour ce filtre.'}
@@ -1032,9 +1029,9 @@ export function EDIPage() {
             </PanelCard>
 
             <PanelCard>
-              <PanelTitle>Voir un message EDI</PanelTitle>
+              <PanelTitle>Rechercher une commande</PanelTitle>
               <PanelText>
-                Collez un numéro de document pour afficher le message.
+                Saisissez un numéro de commande pour consulter son statut.
               </PanelText>
               <RefRow>
                 <RefInput
