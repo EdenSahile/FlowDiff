@@ -168,16 +168,29 @@ const OrderDate = styled.div`
   margin-top: 2px;
 `
 
-const RefBadge = styled.span`
+const RefBadge = styled.div`
   display: inline-block;
-  margin-top: 4px;
-  padding: 2px 8px;
+  margin-top: 3px;
+  margin-bottom: 1px;
+  padding: 2px 10px;
   border-radius: 10px;
-  background: ${({ theme }) => theme.colors.navyLight};
-  color: ${({ theme }) => theme.colors.navy};
+  background: ${({ theme }) => theme.colors.accent};
+  color: ${({ theme }) => theme.colors.white};
   font-family: ${({ theme }) => theme.typography.fontFamily};
   font-size: 11px;
   font-weight: ${({ theme }) => theme.typography.weights.semibold};
+  letter-spacing: 0.02em;
+`
+
+const RefItemLine = styled.div`
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 11px;
+  color: ${({ theme }) => theme.colors.gray[400]};
+  margin-top: 2px;
+  & span {
+    color: ${({ theme }) => theme.colors.navy};
+    font-weight: ${({ theme }) => theme.typography.weights.semibold};
+  }
 `
 
 /* ── Badge statut ── */
@@ -887,6 +900,9 @@ export function HistoriquePage() {
                           <ReturnDeadlineText style={{ textAlign: 'left', marginTop: '3px' }}>
                             Date limite retour : {getItemReturnDeadline(item, order.date)}
                           </ReturnDeadlineText>
+                        )}
+                        {item.referenceLigne && (
+                          <RefItemLine>Réf. : <span>{item.referenceLigne}</span></RefItemLine>
                         )}
                       </ItemInfo>
                       <ItemQtyPrice>
