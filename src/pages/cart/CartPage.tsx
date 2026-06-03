@@ -578,47 +578,41 @@ const DatePickerLabel = styled.label`
 /* ══════════════════════════════════════════════════════
    RÉFÉRENCE COMMANDE
 ══════════════════════════════════════════════════════ */
-const RefCard = styled.div`
+
+const RefGlobalRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
   background: ${({ theme }) => theme.colors.white};
   border: 1px solid ${({ theme }) => theme.colors.gray[200]};
-  padding: ${({ theme }) => theme.spacing.lg};
+  margin-bottom: ${({ theme }) => theme.spacing.md};
 `
 
-const RefOptional = styled.span`
-  font-size: ${({ theme }) => theme.typography.sizes.xs};
-  font-weight: ${({ theme }) => theme.typography.weights.normal};
-  color: ${({ theme }) => theme.colors.gray[400]};
-  margin-left: 6px;
-`
-
-const RefHint = styled.p`
-  font-size: ${({ theme }) => theme.typography.sizes.xs};
-  color: ${({ theme }) => theme.colors.gray[400]};
-  margin: 4px 0 12px;
-`
-
-const RefToggle = styled.div`
-  display: flex;
-  gap: 8px;
-  margin-bottom: 12px;
-`
-
-const RefToggleBtn = styled.button<{ $active: boolean }>`
-  padding: 6px 14px;
-  border-radius: 20px;
+const RefGlobalLabel = styled.label`
   font-family: ${({ theme }) => theme.typography.fontFamily};
-  font-size: ${({ theme }) => theme.typography.sizes.sm};
+  font-size: ${({ theme }) => theme.typography.sizes.xs};
   font-weight: ${({ theme }) => theme.typography.weights.semibold};
-  border: 1.5px solid ${({ $active, theme }) => $active ? theme.colors.navy : theme.colors.gray[200]};
-  background: ${({ $active, theme }) => $active ? theme.colors.navy : 'transparent'};
-  color: ${({ $active, theme }) => $active ? theme.colors.white : theme.colors.gray[600]};
-  cursor: pointer;
-  transition: all .15s;
-  &:hover:not(:disabled) {
-    border-color: ${({ theme }) => theme.colors.navy};
-    color: ${({ theme }) => theme.colors.navy};
-    background: transparent;
-  }
+  color: ${({ theme }) => theme.colors.navy};
+  white-space: nowrap;
+  flex-shrink: 0;
+`
+
+const ItemRefRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid ${({ theme }) => theme.colors.gray[100]};
+`
+
+const ItemRefLabel = styled.label`
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: ${({ theme }) => theme.typography.sizes.xs};
+  color: ${({ theme }) => theme.colors.gray[400]};
+  white-space: nowrap;
+  flex-shrink: 0;
 `
 
 const RefInput = styled.input`
@@ -636,26 +630,6 @@ const RefInput = styled.input`
   &::placeholder { color: ${({ theme }) => theme.colors.gray[400]}; }
 `
 
-const RefLineList = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-`
-
-const RefLineRow = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-`
-
-const RefLineLabel = styled.div`
-  font-size: ${({ theme }) => theme.typography.sizes.xs};
-  font-weight: ${({ theme }) => theme.typography.weights.semibold};
-  color: ${({ theme }) => theme.colors.navy};
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-`
 
 /* ══════════════════════════════════════════════════════
    ÉTATS VIDE / SUCCÈS
@@ -1187,7 +1161,6 @@ export function CartPage() {
   const [billingErrors, setBillingErrors]       = useState<FormErrors>({})
   const [localTransmission, setLocalTransmission] = useState<TransmissionMode>(transmissionMode)
   const [saveAsDefault, setSaveAsDefault]       = useState(false)
-  const [refMode, setRefMode]                   = useState<'global' | 'par-ligne'>('global')
   const [refGlobale, setRefGlobale]             = useState('')
   const [refsParLigne, setRefsParLigne]         = useState<Record<string, string>>({})
 
@@ -1261,8 +1234,8 @@ export function CartPage() {
       deliveryMode: delivery,
       deliveryDate: delivery === 'specific' ? specificDate : undefined,
       transmissionMode: localTransmission,
-      referenceCommande: refMode === 'global' ? (refGlobale.trim() || undefined) : undefined,
-      referencesParLigne: refMode === 'par-ligne' ? refsParLigne : undefined,
+      referenceCommande: refGlobale.trim() || undefined,
+      referencesParLigne: Object.keys(refsParLigne).length > 0 ? refsParLigne : undefined,
     })
     void effectiveBilling // billing address acknowledged
     clearCart()
@@ -1561,6 +1534,16 @@ export function CartPage() {
           {/* ══ 1. TITRES INDIVIDUELS — groupés par univers ══ */}
           {items.length > 0 && (
             <Section>
+              <RefGlobalRow>
+                <RefGlobalLabel>Réf. commande</RefGlobalLabel>
+                <RefInput
+                  type="text"
+                  maxLength={35}
+                  placeholder="Référence globale (BC, rayon, projet…)"
+                  value={refGlobale}
+                  onChange={e => setRefGlobale(e.target.value)}
+                />
+              </RefGlobalRow>
               {Object.entries(itemsByUniverse).map(([universe, universeItems]) => (
                 <div key={universe}>
                   <UniverseGroupLabel>{universe}</UniverseGroupLabel>
@@ -1642,6 +1625,16 @@ export function CartPage() {
                       </DeleteBtn>
                     </div>
                   </ItemFooter>
+                  <ItemRefRow>
+                    <ItemRefLabel>Réf.</ItemRefLabel>
+                    <RefInput
+                      type="text"
+                      maxLength={35}
+                      placeholder="Référence pour ce titre…"
+                      value={refsParLigne[key] ?? ''}
+                      onChange={e => setRefsParLigne(prev => ({ ...prev, [key]: e.target.value }))}
+                    />
+                  </ItemRefRow>
                 </ItemInfo>
               </ItemCard>
               )
@@ -1771,55 +1764,6 @@ export function CartPage() {
           })}
         </Section>
       )}
-
-          {/* ── Référence commande ── */}
-          {items.length > 0 && (
-            <Section>
-              <RefCard>
-                <SectionTitle style={{ marginBottom: 4 }}>
-                  Référence commande<RefOptional>(optionnel)</RefOptional>
-                </SectionTitle>
-                <RefHint>
-                  Associez une référence interne (BC, rayon, projet…) incluse dans le message EDI.
-                </RefHint>
-                <RefToggle>
-                  <RefToggleBtn $active={refMode === 'global'} onClick={() => setRefMode('global')}>
-                    Référence globale
-                  </RefToggleBtn>
-                  <RefToggleBtn $active={refMode === 'par-ligne'} onClick={() => setRefMode('par-ligne')}>
-                    Par article
-                  </RefToggleBtn>
-                </RefToggle>
-                {refMode === 'global' ? (
-                  <RefInput
-                    type="text"
-                    maxLength={35}
-                    placeholder="Ex : BC-2026-0412, Rayon-Littérature…"
-                    value={refGlobale}
-                    onChange={e => setRefGlobale(e.target.value)}
-                  />
-                ) : (
-                  <RefLineList>
-                    {items.map(item => {
-                      const key = getItemKey(item)
-                      return (
-                        <RefLineRow key={key}>
-                          <RefLineLabel>{item.book.title}</RefLineLabel>
-                          <RefInput
-                            type="text"
-                            maxLength={35}
-                            placeholder="Référence pour ce titre…"
-                            value={refsParLigne[key] ?? ''}
-                            onChange={e => setRefsParLigne(prev => ({ ...prev, [key]: e.target.value }))}
-                          />
-                        </RefLineRow>
-                      )
-                    })}
-                  </RefLineList>
-                )}
-              </RefCard>
-            </Section>
-          )}
 
           {/* ── Livraison ── */}
           <Section>
