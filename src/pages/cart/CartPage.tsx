@@ -1151,9 +1151,6 @@ export function CartPage() {
       }
       setBillingErrors({})
     }
-    if (page === 'transmission' && saveAsDefault) {
-      setTransmissionMode(localTransmission)
-    }
     const next = getNextStep(page as CheckoutStep)
     if (next) setPage(next)
   }
@@ -1379,8 +1376,11 @@ export function CartPage() {
       </FormCard>
 
       <NavActions>
-        <Button variant="primary" size="lg" fullWidth onClick={goNext}>
-          Suivant — Confirmation
+        <Button variant="primary" size="lg" fullWidth onClick={() => {
+          if (saveAsDefault) setTransmissionMode(localTransmission)
+          handleConfirmOrder()
+        }}>
+          Envoyer la commande
         </Button>
         <Button variant="ghost" size="md" fullWidth onClick={goBack}>
           <IconChevronLeft /> Adresses
@@ -1388,90 +1388,6 @@ export function CartPage() {
       </NavActions>
     </Page>
   )
-
-  /* ────────── TUNNEL — ÉTAPE 4 : Confirmation finale ────────── */
-  if (page === 'final') {
-    const effectiveBilling = sameAsDelivery ? deliveryAddress : billingAddress
-    return (
-      <Page>
-        <PageTitle style={{ marginBottom: '4px' }}>Confirmation finale</PageTitle>
-        <ClientCode>Code client : <ClientCodeBold>{user?.codeClient ?? '—'}</ClientCodeBold></ClientCode>
-        <CheckoutStepper current="final" />
-
-        <RecapCard>
-          <RecapTitle>Récapitulatif complet</RecapTitle>
-
-          {items.map(({ book, quantity }) => (
-            <RecapRow key={book.id}>
-              <span>{book.title} × {quantity}</span>
-              <span>{fmt(book.priceTTC * quantity)}</span>
-            </RecapRow>
-          ))}
-
-          {opGroups.map(op => (
-            <div key={op.id} style={{ margin: '8px 0', padding: '8px 0', borderTop: '1px dashed #eee' }}>
-              <RecapRow style={{ fontWeight: 700, color: theme.colors.success }}>
-                <span>OP — {op.opTitle}</span><span></span>
-              </RecapRow>
-              {op.books.map(({ book, quantity }) => (
-                <RecapRow key={book.id} style={{ paddingLeft: 12 }}>
-                  <span>{book.title} × {quantity}</span>
-                  <span>{fmt(book.priceTTC * quantity)}</span>
-                </RecapRow>
-              ))}
-              <RecapRow style={{ paddingLeft: 12, color: theme.colors.success }}>
-                <span>{op.cadeau.emoji} {op.cadeau.label} × {op.cadeau.quantity} (offert)</span>
-                <span>0,00 €</span>
-              </RecapRow>
-              <RecapRow style={{ paddingLeft: 12, color: '#8B6914' }}>
-                <span>PLV × {op.plv.quantity}</span>
-                <span>{fmt(op.plv.pricePerUnit * op.plv.quantity)}</span>
-              </RecapRow>
-            </div>
-          ))}
-
-          <div style={{ borderTop: '1px solid #eee', marginTop: '12px', paddingTop: '12px' }}>
-            <RecapRow><span>Livraison</span><span>{deliveryLabel}</span></RecapRow>
-            <RecapRow>
-              <span>Transmission</span>
-              <span>{localTransmission === 'EDI' ? '📡 EDI Dilicom' : '🌐 FlowDiff'}</span>
-            </RecapRow>
-            <RecapRow><span>Montant HT</span><span>{fmt(montantHT)}</span></RecapRow>
-            <RecapRow><span>Remise</span><span>− {fmt(remiseAmount / 1.055)}</span></RecapRow>
-            <RecapRow><span>Net HT</span><span>{fmt(netHT)}</span></RecapRow>
-            <RecapRow><span>TVA 5,5%</span><span>{fmt(tva)}</span></RecapRow>
-            <RecapRow style={{ fontWeight: 700, fontSize: '1rem', color: theme.colors.success, paddingTop: '8px' }}>
-              <span>Total TTC</span><span>{fmt(totalTTC)}</span>
-            </RecapRow>
-          </div>
-        </RecapCard>
-
-        <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
-          <div style={{ flex: 1 }}>
-            <AddressSummary>
-              <AddressSummaryLabel>Livraison</AddressSummaryLabel>
-              <AddressSummaryValue>{fmtAddress(deliveryAddress)}</AddressSummaryValue>
-            </AddressSummary>
-          </div>
-          <div style={{ flex: 1 }}>
-            <AddressSummary>
-              <AddressSummaryLabel>Facturation</AddressSummaryLabel>
-              <AddressSummaryValue>{fmtAddress(effectiveBilling)}</AddressSummaryValue>
-            </AddressSummary>
-          </div>
-        </div>
-
-        <NavActions>
-          <Button variant="primary" size="lg" fullWidth onClick={handleConfirmOrder}>
-            Confirmer la commande
-          </Button>
-          <Button variant="ghost" size="md" fullWidth onClick={goBack}>
-            <IconChevronLeft /> Mode de transmission
-          </Button>
-        </NavActions>
-      </Page>
-    )
-  }
 
   /* ════════════════════════════════════════════════════════
      PANIER PRINCIPAL
