@@ -1031,36 +1031,6 @@ export function EDIPage() {
           {/* Panneau droit */}
           <RightPanel>
             <PanelCard>
-              <PanelTitle>Envoyer une commande via EDI</PanelTitle>
-              <PanelText>
-                Vos commandes sont envoyées automatiquement.<br />
-                Vous pouvez aussi envoyer manuellement une commande.
-              </PanelText>
-              <PrimaryBtn onClick={() => navigate('/panier')}>
-                ↑ Envoyer une commande
-              </PrimaryBtn>
-              <LinkSmall onClick={() => handleFilterChange('ORDERS')}>
-                Voir les commandes en attente ({pendingOrdersCount}) →
-              </LinkSmall>
-            </PanelCard>
-
-            <PanelCard>
-              <PanelTitle>Rechercher une commande</PanelTitle>
-              <PanelText>
-                Saisissez un numéro de commande pour consulter son statut.
-              </PanelText>
-              <RefRow>
-                <RefInput
-                  placeholder="Ex. CMD0000001"
-                  value={refInput}
-                  onChange={e => setRefInput(e.target.value)}
-                  onKeyDown={e => e.key === 'Enter' && handleShowMessage()}
-                />
-                <AfficherBtn onClick={handleShowMessage}>Afficher</AfficherBtn>
-              </RefRow>
-            </PanelCard>
-
-            <PanelCard>
               <PanelTitle>Besoin d'aide ?</PanelTitle>
               <PanelText>Notre service clients EDI est à votre disposition.</PanelText>
               <HelpRow>📞 01 40 20 40 20</HelpRow>
