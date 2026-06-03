@@ -41,6 +41,14 @@ function fmtTime(iso: string): string {
   return new Date(iso).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
 }
 
+/* Retourne le N° de commande (CMD-...) quelle que soit le type de message.
+   Pour ORDRSP, documentRef est l'ACK ref — le vrai CMD est dans payload.orderId. */
+function getOrderRef(msg: EDIMessage): string {
+  const p = msg.payload as Record<string, unknown>
+  if (typeof p.orderId === 'string' && p.orderId.length > 0) return p.orderId
+  return msg.documentRef
+}
+
 
 /* ════════════════════════════════════════════════════
    STYLED — layout racine
@@ -780,7 +788,7 @@ export function EDIPage() {
       filtered.map(m => [
         fmtDateTime(m.createdAt),
         formatEDITypeLabel(m.type),
-        m.documentRef,
+        getOrderRef(m),
         formatEDIStatusLabel(m.status),
         m.detail,
       ])
@@ -916,7 +924,7 @@ export function EDIPage() {
               <SearchIcon>🔍</SearchIcon>
               <ISBNInput
                 type="text"
-                placeholder="Rechercher par ISBN / EAN ou N° commande"
+                placeholder={activeFilter === 'INVOIC' ? 'Rechercher par N° facture ou N° commande' : 'Rechercher par ISBN / EAN ou N° commande'}
                 value={isbnSearch}
                 onChange={e => setIsbnSearch(e.target.value)}
               />
@@ -953,7 +961,7 @@ export function EDIPage() {
                     <tr>
                       <Th>Date / Heure</Th>
                       <Th>Type de message</Th>
-                      <Th>N° commande</Th>
+                      <Th>{activeFilter === 'INVOIC' ? 'N° facture' : 'N° commande'}</Th>
                       <Th>Statut</Th>
                       <Th>Détail</Th>
                       <Th>Voir</Th>
@@ -967,7 +975,7 @@ export function EDIPage() {
                         </Td>
                         <Td>{formatEDITypeLabel(msg.type)}</Td>
                         <Td style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem' }}>
-                          {msg.documentRef}
+                          {activeFilter === 'INVOIC' ? msg.documentRef : getOrderRef(msg)}
                         </Td>
                         <Td>
                           <StatusBadgeTable $status={msg.status === 'ERROR' ? 'ERROR' : msg.type}>
@@ -1035,7 +1043,7 @@ export function EDIPage() {
               </PanelText>
               <RefRow>
                 <RefInput
-                  placeholder="Ex. CMD-2026-0426-001"
+                  placeholder="Ex. CMD0000001"
                   value={refInput}
                   onChange={e => setRefInput(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && handleShowMessage()}

@@ -211,7 +211,15 @@ export const MOCK_EDI_MESSAGES: EDIMessage[] = [
     diffuseur: 'Diffuseur 2',
     detail: '856,00 € TTC',
     createdAt: '2026-04-22T15:45:00.000Z',
-    payload: { invoiceRef: 'INV-2026-0422-001', amountTTC: 856.0, currency: 'EUR' },
+    payload: {
+      invoiceRef: 'INV-2026-0422-001', amountTTC: 856.0, currency: 'EUR',
+      orderIds: ['CMD-2026-0422-001'],
+      lines: [
+        { ean: '9782070360024', title: 'Le Voyageur des confins T.1',      qty: 2, unitPriceTTC: 12.90 },
+        { ean: '9782253004226', title: 'Le Petit Prince',                   qty: 3, unitPriceTTC:  8.50 },
+        { ean: '9782070541027', title: "L'Étranger",                        qty: 1, unitPriceTTC:  7.90 },
+      ],
+    },
   },
   // ── Messages récents (affichés dans le tableau de la page) ────────────
   {
@@ -436,7 +444,32 @@ export const MOCK_EDI_MESSAGES: EDIMessage[] = [
     diffuseur: 'Diffuseur 4',
     detail: '1 234,50 € TTC',
     createdAt: '2026-04-27T09:16:00.000Z',
-    payload: { invoiceRef: 'INV-2026-0427-001', amountTTC: 1234.50, currency: 'EUR' },
+    payload: {
+      invoiceRef: 'INV-2026-0427-001', amountTTC: 1234.50, currency: 'EUR',
+      orderIds: ['CMD-2026-0427-001'],
+      lines: [
+        { ean: '9781234567890', title: "L'Été des sirènes", qty: 10, unitPriceTTC: 72.50 },
+        { ean: '9781234567891', title: 'Dragon Ball Z T.3', qty: 15, unitPriceTTC: 55.00 },
+      ],
+    },
+  },
+  {
+    id: 'edi-invoic-multi-1',
+    type: 'INVOIC',
+    status: 'RECEIVED',
+    documentRef: 'INV-2026-0430-001',
+    diffuseur: 'Diffuseur 1',
+    detail: '2 187,30 € TTC',
+    createdAt: '2026-04-30T14:00:00.000Z',
+    payload: {
+      invoiceRef: 'INV-2026-0430-001', amountTTC: 2187.30, currency: 'EUR',
+      orderIds: ['CMD-2026-0426-001', 'CMD-2026-0426-002'],
+      lines: [
+        { ean: '9782070360024', title: 'Le Voyageur des confins T.1',      qty: 15, unitPriceTTC: 12.90 },
+        { ean: '9782075017346', title: 'Kaguya-sama T.1',                  qty: 11, unitPriceTTC:  7.99 },
+        { ean: '9782812919483', title: "Pâtisserie – L'ultime référence",  qty:  4, unitPriceTTC: 45.00 },
+      ],
+    },
   },
   {
     id: 'edi-err-1',

@@ -139,7 +139,6 @@ export function DesadvGroupedList({ messages, onSelect, isbnFilter }: Props) {
           <tr>
             <Th style={{ width: 28 }} />
             <Th>N° commande</Th>
-            <Th>Diffuseur</Th>
             <Th>Livraisons</Th>
             <Th>Expédiés / Confirmés</Th>
             <Th>Statut</Th>
@@ -148,7 +147,7 @@ export function DesadvGroupedList({ messages, onSelect, isbnFilter }: Props) {
         <tbody>
           {grouped.length === 0 ? (
             <tr>
-              <Td colSpan={6} style={{ textAlign: 'center', color: '#6B6B68', padding: '24px' }}>
+              <Td colSpan={5} style={{ textAlign: 'center', color: '#6B6B68', padding: '24px' }}>
                 {isbnFilter ? 'Aucun message disponible.' : 'Aucune expédition liée à une commande.'}
               </Td>
             </tr>
@@ -158,7 +157,6 @@ export function DesadvGroupedList({ messages, onSelect, isbnFilter }: Props) {
                 <GroupTr onClick={() => toggle(group.orderId)}>
                   <Td><ExpandIcon>{isOpen(group.orderId) ? '▼' : '▶'}</ExpandIcon></Td>
                   <Td><Mono>{group.orderId}</Mono></Td>
-                  <Td>{group.diffuseur}</Td>
                   <Td>{group.desadvs.length} DESADV</Td>
                   <Td>
                     <ProgressMono>
@@ -179,7 +177,7 @@ export function DesadvGroupedList({ messages, onSelect, isbnFilter }: Props) {
                       <TreeTd>└</TreeTd>
                       <Td><Mono>{fmtDate(desadv.createdAt)} {fmtTime(desadv.createdAt)}</Mono></Td>
                       <Td><Mono>{desadv.documentRef}</Mono></Td>
-                      <Td colSpan={2}><SubDetail>{linesSummary(p.lines)}</SubDetail></Td>
+                      <Td><SubDetail>{linesSummary(p.lines)}</SubDetail></Td>
                       <Td>
                         <EyeBtn
                           onClick={e => { e.stopPropagation(); onSelect(desadv) }}
@@ -206,7 +204,6 @@ export function DesadvGroupedList({ messages, onSelect, isbnFilter }: Props) {
                 <tr key={msg.id}>
                   <Td style={{ width: 28 }} />
                   <Td><Mono>{fmtDate(msg.createdAt)} {fmtTime(msg.createdAt)}</Mono></Td>
-                  <Td>{msg.diffuseur}</Td>
                   <Td><Mono>{msg.documentRef}</Mono></Td>
                   <Td><SubDetail>{msg.detail}</SubDetail></Td>
                   <Td>

@@ -48,6 +48,21 @@ export interface ORDRSPPayload {
   lines: ORDRSPLine[]
 }
 
+export interface INVOICLine {
+  ean: string
+  title: string
+  qty: number
+  unitPriceTTC: number
+}
+
+export interface INVOICPayload {
+  invoiceRef: string
+  amountTTC: number
+  currency: string
+  orderIds: string[]
+  lines: INVOICLine[]
+}
+
 export interface EDIMessage {
   id: string
   type: EDIMessageType
@@ -172,6 +187,11 @@ export function messageContainsISBN(msg: EDIMessage, query: string): boolean {
     const p = msg.payload as Partial<DESADVPayload>
     if (p.orderId?.toLowerCase().includes(q)) return true
     return (p.lines ?? []).some(l => l.isbn.includes(q))
+  }
+  if (msg.type === 'INVOIC') {
+    const p = msg.payload as Partial<INVOICPayload>
+    if ((p.orderIds ?? []).some(id => id.toLowerCase().includes(q))) return true
+    return (p.lines ?? []).some(l => l.ean.includes(q))
   }
   return false
 }
