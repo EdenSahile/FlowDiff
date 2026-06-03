@@ -45,7 +45,7 @@ const fadeIn = keyframes`from{opacity:0;transform:translateY(8px)}to{opacity:1;t
 /* ── Styled ── */
 const Page = styled.div`
   padding: ${({ theme }) => theme.spacing.md};
-  max-width: 540px;
+  max-width: 960px;
   margin: 0 auto;
   animation: ${fadeIn} .25s ease;
   @media (prefers-reduced-motion: reduce) { animation: none; }
@@ -54,6 +54,14 @@ const Page = styled.div`
 
 const PageHeader = styled.div`
   margin-bottom: ${({ theme }) => theme.spacing.xl};
+`
+
+const SectionsGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  margin-bottom: ${({ theme }) => theme.spacing.lg};
+  ${mq.md} { grid-template-columns: 1fr 1fr; }
 `
 
 const PageEyebrow = styled.p`
@@ -88,7 +96,6 @@ const Section = styled.div`
   border: 1px solid ${({ theme }) => theme.colors.gray[100]};
   border-radius: ${({ theme }) => theme.radii.xl};
   overflow: hidden;
-  margin-bottom: ${({ theme }) => theme.spacing.lg};
 `
 
 const SectionTitle = styled.div`
@@ -340,6 +347,7 @@ export function ParametresPage() {
       </PageHeader>
 
       <form onSubmit={handleSave}>
+        <SectionsGrid>
         {/* ── Notifications ── */}
         <Section>
           <SectionTitle>Notifications</SectionTitle>
@@ -414,6 +422,7 @@ export function ParametresPage() {
             />
           </Row>
         </Section>
+        </SectionsGrid>
 
         <SaveButton
           type="submit"
