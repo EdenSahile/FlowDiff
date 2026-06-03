@@ -11,6 +11,21 @@ function ordersKey(codeClient: string | undefined) {
   return `bookflow_orders_${codeClient ?? 'guest'}`
 }
 
+/* ── Migration localStorage : efface les commandes ancienne numérotation ── */
+const STORAGE_VERSION_KEY = 'bookflow_storage_version'
+const STORAGE_VERSION = '2'
+
+function migrateStorage() {
+  if (localStorage.getItem(STORAGE_VERSION_KEY) === STORAGE_VERSION) return
+  Object.keys(localStorage)
+    .filter(k => k.startsWith('bookflow_orders_'))
+    .forEach(k => localStorage.removeItem(k))
+  localStorage.setItem(ORDER_COUNTER_KEY, String(ORDER_COUNTER_INITIAL))
+  localStorage.setItem(STORAGE_VERSION_KEY, STORAGE_VERSION)
+}
+
+migrateStorage()
+
 /* ── Génération numéro de commande ── */
 const ORDER_COUNTER_KEY = 'bookflow_order_counter'
 
