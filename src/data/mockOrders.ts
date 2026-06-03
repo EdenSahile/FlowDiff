@@ -96,6 +96,7 @@ export const MOCK_ORDERS: Record<string, Order[]> = {
       commandePar: 'Marc Dupont',
       adresseLivraison: '12 rue du Parc, 75001 Paris',
       deliveryMode: 'standard',
+      referenceCommande: 'BC-2026-0412',
       items: [
         {
           bookId: 'f-lit-mathieu',
