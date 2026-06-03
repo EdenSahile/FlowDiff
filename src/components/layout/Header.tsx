@@ -563,7 +563,7 @@ const ListsBtn = styled.button<{ $hasLists: boolean }>`
     &:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.4); }
   `}
 
-  /* Desktop : icône seule, style discret */
+  /* Desktop */
   @media (min-width: ${({ theme }) => theme.breakpoints.mobile}) {
     background: transparent;
     border: 1.5px solid ${({ theme }) => theme.colors.gray[200]};
@@ -577,6 +577,8 @@ const ListsBtn = styled.button<{ $hasLists: boolean }>`
     }
 
     ${({ $hasLists }) => $hasLists && `
+      width: auto;
+      padding: 0 12px;
       border-color: rgba(212,168,67,0.6);
       color: #D4A843;
       &:hover { border-color: #D4A843; color: #D4A843; background: rgba(212,168,67,0.06); }
@@ -595,8 +597,8 @@ const ListsBadge = styled.span`
   line-height: 1.6;
 `
 
-const ListsLabel = styled.span`
-  display: none;
+const ListsLabel = styled.span<{ $show: boolean }>`
+  display: ${({ $show }) => $show ? 'inline' : 'none'};
 `
 
 /* ── Panneau Listes ── */
@@ -1269,7 +1271,7 @@ export function Header({ cartCount = 0, onBurgerClick, onCartClick }: HeaderProp
             aria-label={`Mes listes — ${lists.length} liste${lists.length !== 1 ? 's' : ''}`}
           >
             <IconLists />
-            <ListsLabel>Listes</ListsLabel>
+            <ListsLabel $show={lists.length > 0}>Listes</ListsLabel>
             {lists.length > 0 && (
               <ListsBadge>{lists.length}</ListsBadge>
             )}
