@@ -18,8 +18,6 @@ const SidebarContainer = styled.aside`
     width: ${({ theme }) => theme.layout.sidebarWidth};
     flex-shrink: 0;
     height: 100vh;
-    position: sticky;
-    top: 0;
     background-color: ${({ theme }) => theme.colors.navy};
     z-index: 99;
   }

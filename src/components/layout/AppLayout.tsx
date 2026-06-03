@@ -13,9 +13,9 @@ import { OnboardingTour } from '@/components/onboarding/OnboardingTour'
 
 const LayoutRoot = styled.div`
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
   background-color: ${({ theme }) => theme.colors.gray[50]};
-  overflow-x: hidden;
 `
 
 const MainColumn = styled.div`
@@ -23,6 +23,7 @@ const MainColumn = styled.div`
   min-width: 0;
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
 `
 
 const PageContent = styled.main`
