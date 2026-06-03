@@ -645,11 +645,7 @@ export function HistoriquePage() {
   const { returns, loading: returnsLoading, stats: returnsStats } = useReturns()
 
   const allOrders = useMemo(() => {
-    const sorted = clientOrders.slice().sort((a, b) => b.date.localeCompare(a.date))
-    const pinnedIdx = sorted.findIndex(o => o.status === 'livré')
-    if (pinnedIdx <= 0) return sorted
-    const [pinned] = sorted.splice(pinnedIdx, 1)
-    return [pinned, ...sorted]
+    return clientOrders.slice().sort((a, b) => b.date.localeCompare(a.date))
   }, [clientOrders])
 
   const filtered = useMemo(() => {
