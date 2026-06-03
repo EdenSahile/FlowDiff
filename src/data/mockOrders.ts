@@ -87,8 +87,8 @@ export const MOCK_ORDERS: Record<string, Order[]> = {
   LIB001: [
     {
       id: 'ord-001',
-      numero: 'CMD0000001',
-      date: '2025-03-18',
+      numero: 'CMD0000013',
+      date: '2026-05-25',
       status: 'en préparation',
       codeClient: 'LIB001',
       commandePar: 'Marc Dupont',
@@ -126,8 +126,8 @@ export const MOCK_ORDERS: Record<string, Order[]> = {
     },
     {
       id: 'ord-002',
-      numero: 'CMD0000002',
-      date: '2026-05-20',
+      numero: 'CMD0000014',
+      date: '2026-05-28',
       status: 'livré',
       codeClient: 'LIB001',
       commandePar: 'Sophie Martin',

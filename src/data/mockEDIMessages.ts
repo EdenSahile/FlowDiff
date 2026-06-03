@@ -7,12 +7,12 @@ export const MOCK_EDI_MESSAGES: EDIMessage[] = [
     id: 'edi-old-1',
     type: 'ORDERS',
     status: 'PENDING',
-    documentRef: 'CMD-2026-0425-001',
+    documentRef: 'CMD0000004',
     diffuseur: 'Diffuseur 1',
     detail: '5 lignes / 10 ex.',
     createdAt: '2026-04-25T16:00:00.000Z',
     payload: {
-      orderId: 'CMD-2026-0425-001',
+      orderId: 'CMD0000004',
       diffuseur: 'Diffuseur 1',
       lines: [
         { lineNumber: 1, ean: '9782070360024', title: 'Le Voyageur des confins T.1',      qtyRequested: 3 },
@@ -32,7 +32,7 @@ export const MOCK_EDI_MESSAGES: EDIMessage[] = [
     detail: 'Partielle',
     createdAt: '2026-04-25T17:00:00.000Z',
     payload: {
-      orderId: 'CMD-2026-0425-001',
+      orderId: 'CMD0000004',
       orderResponseId: 'ACK-2026-0425-001',
       responseDate: '2026-04-25T17:00:00Z',
       globalStatus: 'PARTIAL',
@@ -55,7 +55,7 @@ export const MOCK_EDI_MESSAGES: EDIMessage[] = [
     createdAt: '2026-04-29T08:00:00.000Z',
     payload: {
       desadvRef: 'DESADV-2026-0429-001',
-      orderId: 'CMD-2026-0425-001',
+      orderId: 'CMD0000004',
       lines: [
         { isbn: '9782070360024', qtyShipped: 3 },
         { isbn: '9782075017346', qtyShipped: 2 },
@@ -74,7 +74,7 @@ export const MOCK_EDI_MESSAGES: EDIMessage[] = [
     createdAt: '2026-05-05T08:00:00.000Z',
     payload: {
       desadvRef: 'DESADV-2026-0505-001',
-      orderId: 'CMD-2026-0425-001',
+      orderId: 'CMD0000004',
       lines: [
         { isbn: '9782344044285', qtyShipped: 1 },
       ],
@@ -84,12 +84,12 @@ export const MOCK_EDI_MESSAGES: EDIMessage[] = [
     id: 'edi-old-2',
     type: 'ORDERS',
     status: 'PENDING',
-    documentRef: 'CMD-2026-0424-001',
+    documentRef: 'CMD0000002',
     diffuseur: 'Diffuseur 2',
     detail: '3 lignes / 6 ex.',
     createdAt: '2026-04-24T11:00:00.000Z',
     payload: {
-      orderId: 'CMD-2026-0424-001',
+      orderId: 'CMD0000002',
       diffuseur: 'Diffuseur 2',
       lines: [
         { lineNumber: 1, ean: '9782070360024', title: 'Le Voyageur des confins T.1', qtyRequested: 2 },
@@ -107,7 +107,7 @@ export const MOCK_EDI_MESSAGES: EDIMessage[] = [
     detail: 'Acceptée',
     createdAt: '2026-04-24T12:00:00.000Z',
     payload: {
-      orderId: 'CMD-2026-0424-001',
+      orderId: 'CMD0000002',
       orderResponseId: 'ACK-2026-0424-001',
       responseDate: '2026-04-24T12:00:00Z',
       globalStatus: 'ACCEPTED',
@@ -128,7 +128,7 @@ export const MOCK_EDI_MESSAGES: EDIMessage[] = [
     createdAt: '2026-04-28T10:00:00.000Z',
     payload: {
       desadvRef: 'DESADV-2026-0428-001',
-      orderId: 'CMD-2026-0424-001',
+      orderId: 'CMD0000002',
       lines: [
         { isbn: '9782070360024', qtyShipped: 2 },
         { isbn: '9782253004226', qtyShipped: 3 },
@@ -140,12 +140,12 @@ export const MOCK_EDI_MESSAGES: EDIMessage[] = [
     id: 'edi-old-3',
     type: 'ORDERS',
     status: 'PENDING',
-    documentRef: 'CMD-2026-0424-002',
+    documentRef: 'CMD0000003',
     diffuseur: 'Diffuseur 3',
     detail: '7 lignes / 17 ex.',
     createdAt: '2026-04-24T14:30:00.000Z',
     payload: {
-      orderId: 'CMD-2026-0424-002',
+      orderId: 'CMD0000003',
       diffuseur: 'Diffuseur 3',
       lines: [
         { lineNumber: 1, ean: '9782075017346', title: 'Kaguya-sama T.1',                     qtyRequested: 4 },
@@ -167,7 +167,7 @@ export const MOCK_EDI_MESSAGES: EDIMessage[] = [
     detail: 'Partielle',
     createdAt: '2026-04-24T15:30:00.000Z',
     payload: {
-      orderId: 'CMD-2026-0424-002',
+      orderId: 'CMD0000003',
       orderResponseId: 'ACK-2026-0424-002',
       responseDate: '2026-04-24T15:30:00Z',
       globalStatus: 'PARTIAL',
@@ -192,7 +192,7 @@ export const MOCK_EDI_MESSAGES: EDIMessage[] = [
     createdAt: '2026-04-28T11:00:00.000Z',
     payload: {
       desadvRef: 'DESADV-2026-0428-002',
-      orderId: 'CMD-2026-0424-002',
+      orderId: 'CMD0000003',
       lines: [
         { isbn: '9782075017346', qtyShipped: 4 },
         { isbn: '9782756099736', qtyShipped: 3 },
@@ -213,7 +213,7 @@ export const MOCK_EDI_MESSAGES: EDIMessage[] = [
     createdAt: '2026-04-22T15:45:00.000Z',
     payload: {
       invoiceRef: 'INV-2026-0422-001', amountTTC: 856.0, currency: 'EUR',
-      orderIds: ['CMD-2026-0422-001'],
+      orderIds: ['CMD0000001'],
       lines: [
         { ean: '9782070360024', title: 'Le Voyageur des confins T.1',      qty: 2, unitPriceTTC: 12.90 },
         { ean: '9782253004226', title: 'Le Petit Prince',                   qty: 3, unitPriceTTC:  8.50 },
@@ -226,12 +226,12 @@ export const MOCK_EDI_MESSAGES: EDIMessage[] = [
     id: 'edi-orders-0426-003',
     type: 'ORDERS',
     status: 'SENT',
-    documentRef: 'CMD-2026-0426-003',
+    documentRef: 'CMD0000005',
     diffuseur: 'Diffuseur 3',
     detail: '2 lignes / 10 ex.',
     createdAt: '2026-04-26T09:45:00.000Z',
     payload: {
-      orderId: 'CMD-2026-0426-003',
+      orderId: 'CMD0000005',
       diffuseur: 'Diffuseur 3',
       lines: [
         { lineNumber: 1, ean: '9782070360024', title: 'Le Voyageur des confins T.1', qtyRequested: 6 },
@@ -243,12 +243,12 @@ export const MOCK_EDI_MESSAGES: EDIMessage[] = [
     id: 'edi-rec-1',
     type: 'ORDERS',
     status: 'SENT',
-    documentRef: 'CMD-2026-0426-002',
+    documentRef: 'CMD0000006',
     diffuseur: 'Diffuseur 1',
     detail: '3 lignes / 22 ex.',
     createdAt: '2026-04-26T11:02:00.000Z',
     payload: {
-      orderId: 'CMD-2026-0426-002',
+      orderId: 'CMD0000006',
       diffuseur: 'Diffuseur 1',
       lines: [
         { lineNumber: 1, ean: '9782070360024', title: 'Le Voyageur des confins T.1',     qtyRequested: 10 },
@@ -261,12 +261,12 @@ export const MOCK_EDI_MESSAGES: EDIMessage[] = [
     id: 'edi-rec-2',
     type: 'ORDERS',
     status: 'SENT',
-    documentRef: 'CMD-2026-0426-001',
+    documentRef: 'CMD0000007',
     diffuseur: 'Diffuseur 4',
     detail: '2 lignes / 8 ex.',
     createdAt: '2026-04-26T14:32:00.000Z',
     payload: {
-      orderId: 'CMD-2026-0426-001',
+      orderId: 'CMD0000007',
       diffuseur: 'Diffuseur 4',
       lines: [
         { lineNumber: 1, ean: '9782070360024', title: 'Le Voyageur des confins T.1', qtyRequested: 5 },
@@ -283,7 +283,7 @@ export const MOCK_EDI_MESSAGES: EDIMessage[] = [
     detail: 'Acceptée',
     createdAt: '2026-04-26T14:33:00.000Z',
     payload: {
-      orderId: 'CMD-2026-0426-001',
+      orderId: 'CMD0000007',
       orderResponseId: 'ACK-2026-0426-001',
       responseDate: '2026-04-26T14:33:00Z',
       globalStatus: 'ACCEPTED',
@@ -303,7 +303,7 @@ export const MOCK_EDI_MESSAGES: EDIMessage[] = [
     createdAt: '2026-04-29T09:00:00.000Z',
     payload: {
       desadvRef: 'DESADV-2026-0429-002',
-      orderId: 'CMD-2026-0426-001',
+      orderId: 'CMD0000007',
       lines: [
         { isbn: '9782070360024', qtyShipped: 5 },
         { isbn: '9782075017346', qtyShipped: 3 },
@@ -319,7 +319,7 @@ export const MOCK_EDI_MESSAGES: EDIMessage[] = [
     detail: 'Partielle',
     createdAt: '2026-04-26T15:10:00.000Z',
     payload: {
-      orderId: 'CMD-2026-0426-002',
+      orderId: 'CMD0000006',
       orderResponseId: 'ACK-2026-0426-002',
       responseDate: '2026-04-26T15:10:00Z',
       globalStatus: 'PARTIAL',
@@ -340,7 +340,7 @@ export const MOCK_EDI_MESSAGES: EDIMessage[] = [
     createdAt: '2026-04-29T10:00:00.000Z',
     payload: {
       desadvRef: 'DESADV-2026-0429-003',
-      orderId: 'CMD-2026-0426-002',
+      orderId: 'CMD0000006',
       lines: [
         { isbn: '9782070360024', qtyShipped: 10 },
         { isbn: '9782075017346', qtyShipped: 3  },
@@ -356,7 +356,7 @@ export const MOCK_EDI_MESSAGES: EDIMessage[] = [
     detail: 'Refusée',
     createdAt: '2026-04-26T18:05:00.000Z',
     payload: {
-      orderId: 'CMD-2026-0426-003',
+      orderId: 'CMD0000005',
       orderResponseId: 'ACK-2026-0426-003',
       responseDate: '2026-04-26T18:05:00Z',
       globalStatus: 'REJECTED',
@@ -371,12 +371,12 @@ export const MOCK_EDI_MESSAGES: EDIMessage[] = [
     id: 'edi-orders-0427-001',
     type: 'ORDERS',
     status: 'SENT',
-    documentRef: 'CMD-2026-0427-001',
+    documentRef: 'CMD0000008',
     diffuseur: 'Diffuseur 4',
     detail: '2 lignes / 25 ex.',
     createdAt: '2026-04-27T07:00:00.000Z',
     payload: {
-      orderId: 'CMD-2026-0427-001',
+      orderId: 'CMD0000008',
       diffuseur: 'Diffuseur 4',
       lines: [
         { lineNumber: 1, ean: '9781234567890', title: "L'Été des sirènes", qtyRequested: 10 },
@@ -393,7 +393,7 @@ export const MOCK_EDI_MESSAGES: EDIMessage[] = [
     detail: 'Partielle',
     createdAt: '2026-04-27T08:30:00.000Z',
     payload: {
-      orderId: 'CMD-2026-0427-001',
+      orderId: 'CMD0000008',
       orderResponseId: 'ACK-2026-0427-001',
       responseDate: '2026-04-27T08:30:00Z',
       globalStatus: 'PARTIAL',
@@ -413,7 +413,7 @@ export const MOCK_EDI_MESSAGES: EDIMessage[] = [
     createdAt: '2026-04-27T09:15:00.000Z',
     payload: {
       desadvRef: 'DESADV-2026-0427-001',
-      orderId: 'CMD-2026-0427-001',
+      orderId: 'CMD0000008',
       lines: [
         { isbn: '9781234567890', qtyShipped: 5 },
         { isbn: '9781234567891', qtyShipped: 13 },
@@ -430,7 +430,7 @@ export const MOCK_EDI_MESSAGES: EDIMessage[] = [
     createdAt: '2026-04-30T10:00:00.000Z',
     payload: {
       desadvRef: 'DESADV-2026-0430-001',
-      orderId: 'CMD-2026-0427-001',
+      orderId: 'CMD0000008',
       lines: [
         { isbn: '9781234567890', qtyShipped: 3 },
       ],
@@ -446,7 +446,7 @@ export const MOCK_EDI_MESSAGES: EDIMessage[] = [
     createdAt: '2026-04-27T09:16:00.000Z',
     payload: {
       invoiceRef: 'INV-2026-0427-001', amountTTC: 1234.50, currency: 'EUR',
-      orderIds: ['CMD-2026-0427-001'],
+      orderIds: ['CMD0000008'],
       lines: [
         { ean: '9781234567890', title: "L'Été des sirènes", qty: 10, unitPriceTTC: 72.50 },
         { ean: '9781234567891', title: 'Dragon Ball Z T.3', qty: 15, unitPriceTTC: 55.00 },
@@ -463,7 +463,7 @@ export const MOCK_EDI_MESSAGES: EDIMessage[] = [
     createdAt: '2026-04-30T14:00:00.000Z',
     payload: {
       invoiceRef: 'INV-2026-0430-001', amountTTC: 2187.30, currency: 'EUR',
-      orderIds: ['CMD-2026-0426-001', 'CMD-2026-0426-002'],
+      orderIds: ['CMD0000007', 'CMD0000006'],
       lines: [
         { ean: '9782070360024', title: 'Le Voyageur des confins T.1',      qty: 15, unitPriceTTC: 12.90 },
         { ean: '9782075017346', title: 'Kaguya-sama T.1',                  qty: 11, unitPriceTTC:  7.99 },
@@ -479,7 +479,7 @@ export const MOCK_EDI_MESSAGES: EDIMessage[] = [
     diffuseur: 'Diffuseur 2',
     detail: 'Erreur de format — champ GLN manquant',
     createdAt: '2026-05-08T14:22:00.000Z',
-    payload: { errorCode: 'MISSING_GLN', orderId: 'CMD-2026-0508-001' },
+    payload: { errorCode: 'MISSING_GLN', orderId: 'CMD0000012' },
   },
   {
     id: 'edi-desadv-partial-1',
@@ -491,7 +491,7 @@ export const MOCK_EDI_MESSAGES: EDIMessage[] = [
     createdAt: '2026-05-06T09:00:00.000Z',
     payload: {
       desadvRef: 'DESADV-2026-0506-001',
-      orderId: 'CMD-2026-0503-001',
+      orderId: 'CMD0000009',
       lines: [
         { isbn: '9782070360024', qtyShipped: 2 },
       ],
@@ -507,7 +507,7 @@ export const MOCK_EDI_MESSAGES: EDIMessage[] = [
     createdAt: '2026-05-07T11:30:00.000Z',
     payload: {
       desadvRef: 'DESADV-2026-0507-001',
-      orderId: 'CMD-2026-0504-001',
+      orderId: 'CMD0000010',
       lines: [
         { isbn: '9782075017346', qtyShipped: 1 },
       ],
@@ -523,7 +523,7 @@ export const MOCK_EDI_MESSAGES: EDIMessage[] = [
     createdAt: '2026-05-08T08:15:00.000Z',
     payload: {
       desadvRef: 'DESADV-2026-0508-002',
-      orderId: 'CMD-2026-0505-001',
+      orderId: 'CMD0000011',
       lines: [
         { isbn: '9782344044285', qtyShipped: 3 },
       ],
