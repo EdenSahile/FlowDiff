@@ -1375,6 +1375,43 @@ export function CartPage() {
         />
       </FormCard>
 
+      {/* ── Récapitulatif commande ── */}
+      <RecapCard style={{ marginBottom: theme.spacing.xl }}>
+        <RecapTitle>Récapitulatif de votre commande</RecapTitle>
+
+        {/* Titres */}
+        {items.map(({ book, quantity }) => (
+          <RecapRow key={book.id}>
+            <span>{book.title} × {quantity}</span>
+            <span>{fmt(book.priceTTC * quantity)}</span>
+          </RecapRow>
+        ))}
+        {opGroups.map(op => op.books.map(({ book, quantity }) => (
+          <RecapRow key={book.id}>
+            <span>{book.title} × {quantity}</span>
+            <span>{fmt(book.priceTTC * quantity)}</span>
+          </RecapRow>
+        )))}
+
+        {/* Total */}
+        <RecapRow style={{ fontWeight: 700, color: theme.colors.navy, borderTop: `1px solid ${theme.colors.gray[200]}`, paddingTop: '10px', marginTop: '6px' }}>
+          <span>Total TTC</span>
+          <span>{fmt(totalTTC)}</span>
+        </RecapRow>
+
+        {/* Adresses */}
+        <div style={{ display: 'flex', gap: '12px', marginTop: theme.spacing.md }}>
+          <AddressSummary style={{ flex: 1 }}>
+            <AddressSummaryLabel>Adresse de livraison</AddressSummaryLabel>
+            <AddressSummaryValue>{fmtAddress(deliveryAddress)}</AddressSummaryValue>
+          </AddressSummary>
+          <AddressSummary style={{ flex: 1 }}>
+            <AddressSummaryLabel>Adresse de facturation</AddressSummaryLabel>
+            <AddressSummaryValue>{fmtAddress(sameAsDelivery ? deliveryAddress : billingAddress)}</AddressSummaryValue>
+          </AddressSummary>
+        </div>
+      </RecapCard>
+
       <NavActions>
         <Button variant="primary" size="lg" fullWidth onClick={() => {
           if (saveAsDefault) setTransmissionMode(localTransmission)
