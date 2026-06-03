@@ -908,12 +908,22 @@ export function EDIPage() {
               </FluxItem>
             </FluxGrid>
           </Card>
+
+          {/* Besoin d'aide */}
+          <Card>
+            <CardTitle>Besoin d'aide ?</CardTitle>
+            <PanelText>Notre service clients EDI est à votre disposition.</PanelText>
+            <HelpRow>📞 01 40 20 40 20</HelpRow>
+            <HelpRow>✉ edi@flowdiff-fictif.fr</HelpRow>
+            <ContactBtn onClick={() => {
+              const body = `Nom : ${user?.nomLibrairie ?? ''}\nNuméro de compte : ${user?.codeClient ?? ''}\n\n`
+              window.location.href = `mailto:edi@flowdiff-fictif.fr?subject=${encodeURIComponent('Support EDI — ' + (user?.nomLibrairie ?? ''))}&body=${encodeURIComponent(body)}`
+            }}>Nous contacter</ContactBtn>
+          </Card>
         </StatsRow>
 
-        {/* ── Corps (table + panel droit) ── */}
-        <MainLayout>
-          {/* Table historique */}
-          <HistoriqueSection id="historique">
+        {/* ── Tableau historique ── */}
+        <HistoriqueSection id="historique">
             <SectionHeader>
               <SectionTitle>Historique des échanges</SectionTitle>
               <SectionActions>
@@ -1022,22 +1032,7 @@ export function EDIPage() {
                 )}
               </>
             )}
-          </HistoriqueSection>
-
-          {/* Panneau droit */}
-          <RightPanel>
-            <PanelCard>
-              <PanelTitle>Besoin d'aide ?</PanelTitle>
-              <PanelText>Notre service clients EDI est à votre disposition.</PanelText>
-              <HelpRow>📞 01 40 20 40 20</HelpRow>
-              <HelpRow>✉ edi@flowdiff-fictif.fr</HelpRow>
-              <ContactBtn onClick={() => {
-                const body = `Nom : ${user?.nomLibrairie ?? ''}\nNuméro de compte : ${user?.codeClient ?? ''}\n\n`
-                window.location.href = `mailto:edi@flowdiff-fictif.fr?subject=${encodeURIComponent('Support EDI — ' + (user?.nomLibrairie ?? ''))}&body=${encodeURIComponent(body)}`
-              }}>Nous contacter</ContactBtn>
-            </PanelCard>
-          </RightPanel>
-        </MainLayout>
+        </HistoriqueSection>
 
       </Page>
 
