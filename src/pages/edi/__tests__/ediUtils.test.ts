@@ -171,11 +171,38 @@ describe('generateEdifactPlaceholder', () => {
     expect(result).toContain("CPS+1'")
   })
 
-  it('INVOIC contient BGM+380 et TAX', () => {
-    const msg = { ...base, type: 'INVOIC' as const, status: 'RECEIVED' as const }
+  it('INVOIC contient BGM+380, UNA, NAD+BY/SU, CNT, MOA+79 et PRI+AAB', () => {
+    const msg = {
+      ...base,
+      type: 'INVOIC' as const,
+      status: 'RECEIVED' as const,
+      documentRef: 'INV-001',
+      payload: {
+        invoiceRef: 'INV-001', amountTTC: 100, currency: 'EUR',
+        orderIds: ['CMD0000001'],
+        lines: [{ ean: '9782070360024', title: 'Le Petit Prince', qty: 2, unitPriceTTC: 8.50, author: 'Antoine de Saint-Exupéry' }],
+      },
+    }
     const result = generateEdifactPlaceholder(msg)
+    expect(result.startsWith("UNA:+.? '")).toBe(true)
+    expect(result).toContain("UNH+INV-001+INVOIC:D:96A:UN:EAN008'")
     expect(result).toContain("BGM+380+")
-    expect(result).toContain("TAX+7+VAT")
+    expect(result).toContain("NAD+BY+ClientGLN::9'")
+    expect(result).toContain("NAD+SU+DiffuseurGLN::9'")
+    expect(result).toContain("RFF+API:ClientGLN'")
+    expect(result).toContain("CUX+2:EUR:3'")
+    expect(result).toContain("RFF+ON:CMD0000001'")
+    expect(result).toContain("PIA+5+9782070360024:SA'")
+    expect(result).toContain("IMD+L+010+")
+    expect(result).toContain("IMD+L+050+")
+    expect(result).toContain("QTY+47:2'")
+    expect(result).toContain("MOA+146:")
+    expect(result).toContain("MOA+203:")
+    expect(result).toContain("PRI+AAB:8.5'")
+    expect(result).toContain("CNT+1:1'")
+    expect(result).toContain("MOA+79:")
+    expect(result).toContain("MOA+9:")
+    expect(result).toContain(`UNZ+1+INV-001'`)
   })
 
   it('ORDERS commence par UNA et utilise UNOC:3', () => {
