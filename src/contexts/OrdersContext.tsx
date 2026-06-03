@@ -12,10 +12,15 @@ function ordersKey(codeClient: string | undefined) {
 }
 
 /* ── Génération numéro de commande ── */
+const ORDER_COUNTER_KEY = 'bookflow_order_counter'
+
+const ORDER_COUNTER_INITIAL = 2 // CMD0000001 et CMD0000002 sont réservés aux mocks
+
 function generateNumero(): string {
-  const year = new Date().getFullYear()
-  const rand = String(Math.floor(1000 + Math.random() * 9000))
-  return `CMD-${year}-${rand}`
+  const current = parseInt(localStorage.getItem(ORDER_COUNTER_KEY) ?? String(ORDER_COUNTER_INITIAL), 10)
+  const next = current + 1
+  localStorage.setItem(ORDER_COUNTER_KEY, String(next))
+  return `CMD${String(next).padStart(7, '0')}`
 }
 
 function todayISO(): string {
@@ -52,8 +57,11 @@ function loadOrders(key: string): Order[] {
       const parsed = JSON.parse(stored)
       const result = storedOrdersSchema.safeParse(parsed)
       if (!result.success) { localStorage.removeItem(key); return base }
-      const existingIds = new Set(base.map(o => o.id))
-      const extras = (result.data as Order[]).filter(o => !existingIds.has(o.id))
+      const existingIds     = new Set(base.map(o => o.id))
+      const existingNumeros = new Set(base.map(o => o.numero))
+      const extras = (result.data as Order[]).filter(
+        o => !existingIds.has(o.id) && !existingNumeros.has(o.numero)
+      )
       return [...base, ...extras]
     }
   } catch {
