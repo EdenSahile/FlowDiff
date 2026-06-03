@@ -9,6 +9,9 @@ export interface ORDERSLine {
   title: string
   qtyRequested: number
   referenceLigne?: string
+  authors?: string[]
+  publisher?: string
+  publishYear?: string
 }
 
 export interface ORDERSPayload {
@@ -16,6 +19,7 @@ export interface ORDERSPayload {
   diffuseur: string
   lines: ORDERSLine[]
   referenceGlobale?: string
+  clientCode?: string
 }
 
 export interface DESADVLine {
@@ -276,29 +280,103 @@ function fmtEdifactTime(iso: string): string {
   return iso.slice(11, 16).replace(':', '')
 }
 
+function escEdifact(s: string): string {
+  return s.replace(/[?+:']/g, c => `?${c}`)
+}
+
+const BUYER_GLN = 'ClientGLN'
+const SUPPLIER_GLN = 'DiffuseurGLN'
+
+// Retourne les segments IMD 009/010/011 pour le premier auteur
+function parseAuthorImd(author: string): string[] {
+  const parts = author.trim().split(/\s+/)
+  if (parts.length < 2) {
+    return [
+      `IMD+L+009+:::${escEdifact(author + '.')}'`,
+      `IMD+L+010+:::${escEdifact(author)}'`,
+    ]
+  }
+  const lastName  = parts[parts.length - 1]
+  const firstName = parts.slice(0, -1).join(' ')
+  return [
+    `IMD+L+009+:::${escEdifact(`${lastName}, ${firstName}.`)}'`,
+    `IMD+L+010+:::${escEdifact(lastName)}'`,
+    `IMD+L+011+:::${escEdifact(firstName)}'`,
+  ]
+}
+
+// Découpe un titre long en segments IMD+L+050 (35 chars desc + 35 chars continuation par segment)
+function titleToImd050(title: string): string[] {
+  const escaped = escEdifact(title)
+  if (escaped.length <= 35) return [`IMD+L+050+:::${escaped}'`]
+  const segments: string[] = []
+  let remaining = escaped
+  while (remaining.length > 0) {
+    const desc = remaining.slice(0, 35)
+    remaining  = remaining.slice(35)
+    if (remaining.length > 0) {
+      const cont = remaining.slice(0, 35)
+      remaining  = remaining.slice(35)
+      segments.push(`IMD+L+050+:::${desc}:${cont}'`)
+    } else {
+      segments.push(`IMD+L+050+:::${desc}'`)
+    }
+  }
+  return segments
+}
+
 const EDIFACT_TEMPLATES: Record<EDIMessageType, (msg: EDIMessage) => string> = {
   ORDERS: (msg) => {
     const p = msg.payload as Partial<ORDERSPayload> & { totalQty?: number }
+    const lineCount = Array.isArray(p.lines) ? p.lines.length : 1
+    const totalQty  = Array.isArray(p.lines)
+      ? p.lines.reduce((s, l) => s + l.qtyRequested, 0)
+      : (p.totalQty ?? 5)
     const header = [
-      `UNB+UNOA:1+301234XXXXXXX:14+GLN-DIFFUSEUR:14+${fmtEdifactDate(msg.createdAt)}:${fmtEdifactTime(msg.createdAt)}+1'`,
-      `UNH+1+ORDERS:D:96A:UN'`,
+      `UNB+UNOC:3+${BUYER_GLN}:14+${SUPPLIER_GLN}:14+${fmtEdifactDate(msg.createdAt)}:${fmtEdifactTime(msg.createdAt)}+1'`,
+      `UNH+${msg.documentRef}+ORDERS:D:96A:UN:EAN008'`,
       `BGM+220+${msg.documentRef}+9'`,
       `DTM+137:${fmtEdifactDate(msg.createdAt)}:102'`,
-      `NAD+BY+301234XXXXXXX::9'`,
-      `NAD+SU+GLN-DIFFUSEUR::9'`,
-      ...(p.referenceGlobale ? [`RFF+CR:${p.referenceGlobale}'`] : []),
+      `NAD+BY+${BUYER_GLN}::9'`,
+      `NAD+SU+${SUPPLIER_GLN}::9'`,
+      ...(p.clientCode ? [`RFF+API:${escEdifact(p.clientCode)}'`] : []),
+      `CUX+2:EUR:9'`,
+      ...(p.referenceGlobale ? [`RFF+CR:${escEdifact(p.referenceGlobale)}'`] : []),
     ]
     const lineSegments = Array.isArray(p.lines)
-      ? p.lines.flatMap((line, i) => [
-          `LIN+${i + 1}++${line.ean}:EN'`,
-          `QTY+21:${line.qtyRequested}'`,
-          ...(line.referenceLigne ? [`RFF+CR:${line.referenceLigne}'`] : []),
-        ])
-      : [`LIN+1++9782070360024:EN'`, `QTY+21:${p.totalQty ?? 5}'`]
-    // UNT compte UNH→UNT inclus : (header - UNB) + lignes + UNS + UNT
-    const untCount = header.length + lineSegments.length + 1
-    const footer = [`UNS+S'`, `UNT+${untCount}+1'`, `UNZ+1+1'`]
-    return [...header, ...lineSegments, ...footer].join('\n')
+      ? p.lines.flatMap((line, i) => {
+          const authorImds    = line.authors?.length ? parseAuthorImd(line.authors[0]) : []
+          const publisherImds = line.publisher ? [`IMD+L+109+:::${escEdifact(line.publisher)}'`] : []
+          const yearImds      = line.publishYear ? [`IMD+L+170+:::${line.publishYear}'`] : []
+          return [
+            `LIN+${i + 1}++${line.ean}:EN'`,
+            `PIA+5+${line.ean}:IB'`,
+            ...authorImds,
+            ...titleToImd050(line.title),
+            ...publisherImds,
+            `IMD+L+180+:::Livre'`,
+            ...yearImds,
+            `QTY+21:${line.qtyRequested}'`,
+            ...(line.referenceLigne ? [`RFF+LI:${escEdifact(line.referenceLigne)}'`] : []),
+          ]
+        })
+      : [
+          `LIN+1++9782070360024:EN'`,
+          `PIA+5+9782070360024:IB'`,
+          `IMD+L+050+:::Titre non renseigné'`,
+          `IMD+L+180+:::Livre'`,
+          `QTY+21:${p.totalQty ?? 5}'`,
+        ]
+    // UNT = segments UNH→UNT inclus : (header - UNB) + lignes + UNS + CNT×2 + UNT
+    const untCount = header.length + lineSegments.length + 3
+    const footer = [
+      `UNS+S'`,
+      `CNT+1:${lineCount}'`,
+      `CNT+2:${totalQty}'`,
+      `UNT+${untCount}+${msg.documentRef}'`,
+      `UNZ+1+1'`,
+    ]
+    return [`UNA:+.? '`, ...header, ...lineSegments, ...footer].join('\n')
   },
 
   ORDRSP: (msg) => {
@@ -362,9 +440,6 @@ const EDIFACT_TEMPLATES: Record<EDIMessageType, (msg: EDIMessage) => string> = {
     const TVA      = 5.5
     const DIVISOR  = 1 + TVA / 100  // 1.055
 
-    /* Échappe les caractères spéciaux EDIFACT dans les chaînes libres */
-    const esc = (s: string) => s.replace(/[?+:']/g, c => `?${c}`)
-
     /* Totaux calculés depuis les lignes — conservés en string pour garder les 2 décimales */
     const totalTTC = lines.reduce((s, l) => s + l.unitPriceTTC * l.qty, 0).toFixed(2)
     const totalHT  = (parseFloat(totalTTC) / DIVISOR).toFixed(2)
@@ -393,7 +468,7 @@ const EDIFACT_TEMPLATES: Record<EDIMessageType, (msg: EDIMessage) => string> = {
       const lineTax = (line.unitPriceTTC * line.qty - parseFloat(lineHT)).toFixed(2)
       seg.push(
         `LIN+${i + 1}++${line.ean}:EN'`,
-        `IMD+F++:::${esc(line.title)}'`,
+        `IMD+F++:::${escEdifact(line.title)}'`,
         `QTY+47:${line.qty}'`,
         `PRI+AAA:${unitHT}:CA'`,
         `MOA+203:${lineHT}:${currency}'`,

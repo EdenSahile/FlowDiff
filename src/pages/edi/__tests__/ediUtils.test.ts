@@ -151,10 +151,10 @@ describe('generateEdifactPlaceholder', () => {
     payload: {},
   }
 
-  it('ORDERS contient les segments UNH et BGM+220', () => {
+  it('ORDERS contient UNH avec docRef et BGM+220', () => {
     const msg = { ...base, type: 'ORDERS' as const, status: 'SENT' as const }
     const result = generateEdifactPlaceholder(msg)
-    expect(result).toContain("UNH+1+ORDERS:D:96A:UN'")
+    expect(result).toContain("UNH+CMD-2026-0426-001+ORDERS:D:96A:UN:EAN008'")
     expect(result).toContain("BGM+220+CMD-2026-0426-001")
   })
 
@@ -178,10 +178,107 @@ describe('generateEdifactPlaceholder', () => {
     expect(result).toContain("TAX+7+VAT")
   })
 
-  it('retourne toujours UNB et UNZ', () => {
+  it('ORDERS commence par UNA et utilise UNOC:3', () => {
     const msg = { ...base, type: 'ORDERS' as const, status: 'SENT' as const }
     const result = generateEdifactPlaceholder(msg)
-    expect(result).toContain("UNB+UNOA:1+")
+    expect(result.startsWith("UNA:+.? '")).toBe(true)
+    expect(result).toContain("UNB+UNOC:3+ClientGLN:14+DiffuseurGLN:14+")
     expect(result).toContain("UNZ+")
+  })
+
+  it('ORDERS — UNH et UNT utilisent le documentRef', () => {
+    const msg = { ...base, type: 'ORDERS' as const, status: 'SENT' as const }
+    const result = generateEdifactPlaceholder(msg)
+    expect(result).toContain(`UNH+${base.documentRef}+ORDERS:D:96A:UN:EAN008'`)
+    expect(result).toContain(`+${base.documentRef}'`)
+  })
+
+  it('ORDERS contient CUX devise commande (qualificateur 9)', () => {
+    const msg = { ...base, type: 'ORDERS' as const, status: 'SENT' as const }
+    expect(generateEdifactPlaceholder(msg)).toContain("CUX+2:EUR:9'")
+  })
+
+  it('ORDERS contient PIA, IMD titre et IMD type Livre par article', () => {
+    const msg = {
+      ...base,
+      type: 'ORDERS' as const,
+      status: 'SENT' as const,
+      payload: {
+        orderId: 'CMD-001',
+        diffuseur: 'Diffuseur 1',
+        lines: [{ lineNumber: 1, ean: '9782070360024', title: 'Le Voyageur', qtyRequested: 3 }],
+      },
+    }
+    const result = generateEdifactPlaceholder(msg)
+    expect(result).toContain("PIA+5+9782070360024:IB'")
+    expect(result).toContain("IMD+L+050+:::Le Voyageur'")
+    expect(result).toContain("IMD+L+180+:::Livre'")
+  })
+
+  it('ORDERS contient les IMD auteur 009/010/011 quand authors est fourni', () => {
+    const msg = {
+      ...base,
+      type: 'ORDERS' as const,
+      status: 'SENT' as const,
+      payload: {
+        orderId: 'CMD-001',
+        diffuseur: 'Diffuseur 1',
+        lines: [{
+          lineNumber: 1, ean: '9782070360024', title: 'Titre', qtyRequested: 1,
+          authors: ['Kamel Daoud'], publisher: 'Gallimard', publishYear: '2024',
+        }],
+      },
+    }
+    const result = generateEdifactPlaceholder(msg)
+    expect(result).toContain("IMD+L+009+:::Daoud, Kamel.'")
+    expect(result).toContain("IMD+L+010+:::Daoud'")
+    expect(result).toContain("IMD+L+011+:::Kamel'")
+    expect(result).toContain("IMD+L+109+:::Gallimard'")
+    expect(result).toContain("IMD+L+170+:::2024'")
+  })
+
+  it('ORDERS contient RFF+API avec le code client', () => {
+    const msg = {
+      ...base,
+      type: 'ORDERS' as const,
+      status: 'SENT' as const,
+      payload: { orderId: 'CMD-001', diffuseur: 'D1', lines: [], clientCode: 'LIB001' },
+    }
+    expect(generateEdifactPlaceholder(msg)).toContain("RFF+API:LIB001'")
+  })
+
+  it('ORDERS split les titres longs en plusieurs IMD+L+050', () => {
+    const longTitle = 'A'.repeat(36) // 36 chars → split en desc(35) + cont(1)
+    const msg = {
+      ...base,
+      type: 'ORDERS' as const,
+      status: 'SENT' as const,
+      payload: {
+        orderId: 'CMD-001',
+        diffuseur: 'D1',
+        lines: [{ lineNumber: 1, ean: '9782070360024', title: longTitle, qtyRequested: 1 }],
+      },
+    }
+    const result = generateEdifactPlaceholder(msg)
+    expect(result).toContain(`IMD+L+050+:::${'A'.repeat(35)}:A'`)
+  })
+
+  it('ORDERS contient CNT lignes et CNT quantité totale', () => {
+    const msg = {
+      ...base,
+      type: 'ORDERS' as const,
+      status: 'SENT' as const,
+      payload: {
+        orderId: 'CMD-001',
+        diffuseur: 'Diffuseur 1',
+        lines: [
+          { lineNumber: 1, ean: '9782070360024', title: 'Titre A', qtyRequested: 3 },
+          { lineNumber: 2, ean: '9782075017346', title: 'Titre B', qtyRequested: 2 },
+        ],
+      },
+    }
+    const result = generateEdifactPlaceholder(msg)
+    expect(result).toContain("CNT+1:2'")
+    expect(result).toContain("CNT+2:5'")
   })
 })

@@ -5,6 +5,7 @@ import {
 import { useAuthContext } from '@/contexts/AuthContext'
 import { useOrders } from '@/contexts/OrdersContext'
 import { MOCK_EDI_MESSAGES } from '@/data/mockEDIMessages'
+import { MOCK_BOOKS } from '@/data/mockBooks'
 import type { EDIMessage, EDIParams } from '@/lib/ediUtils'
 
 export type { EDIMessage, EDIParams }
@@ -21,7 +22,7 @@ interface EDIContextValue {
 
 const EDIContext = createContext<EDIContextValue | null>(null)
 
-const MOCK_EDI_VERSION = 'v6' // incrémenter à chaque modification de MOCK_EDI_MESSAGES
+const MOCK_EDI_VERSION = 'v7' // incrémenter à chaque modification de MOCK_EDI_MESSAGES
 
 function messagesKey(cc: string)  { return `bookflow_edi_${cc}` }
 function paramsKey(cc: string)    { return `bookflow_edi_params_${cc}` }
@@ -106,14 +107,21 @@ export function EDIProvider({ children }: { children: ReactNode }) {
         payload: {
           orderId: order.numero,
           diffuseur: 'Interforum (Editis)',
-          lines: order.items.map((item, i) => ({
-            lineNumber: i + 1,
-            ean: item.isbn,
-            title: item.title,
-            qtyRequested: item.quantity,
-            referenceLigne: item.referenceLigne,
-          })),
+          lines: order.items.map((item, i) => {
+            const book = MOCK_BOOKS.find(b => b.isbn === item.isbn)
+            return {
+              lineNumber: i + 1,
+              ean: item.isbn,
+              title: item.title,
+              qtyRequested: item.quantity,
+              referenceLigne: item.referenceLigne,
+              authors: book?.authors,
+              publisher: book?.publisher,
+              publishYear: book?.publicationDate?.slice(0, 4),
+            }
+          }),
           referenceGlobale: order.referenceCommande,
+          clientCode: codeClient,
         },
       }
 
