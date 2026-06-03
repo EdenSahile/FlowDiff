@@ -16,7 +16,7 @@ export const MOCK_SELECTIONS: Selection[] = [
     description: 'Les séries cultes qui font la BD',
     univers: 'BD/Mangas',
     isOffreSpeciale: true,
-    bookIds: ['f-bd-01', 'f-bd-02', 'n-bd-02', 'n-bd-03'],
+    bookIds: ['f-bd-demon-01', 'f-bd-jjk-01', 'n-bd-02', 'n-bd-03'],
   },
   {
     id: 'sel-manga',
@@ -31,7 +31,7 @@ export const MOCK_SELECTIONS: Selection[] = [
     titre: 'Rentrée scolaire',
     description: 'Les incontournables pour les jeunes lecteurs',
     univers: 'Jeunesse',
-    bookIds: ['f-jes-01', 'f-jes-02', 'n-jes-01', 'n-jes-02'],
+    bookIds: ['f-jes-animaux', 'f-jes-passe-03', 'n-jes-01', 'n-jes-02'],
   },
   {
     id: 'sel-saint-valentin',
@@ -39,7 +39,7 @@ export const MOCK_SELECTIONS: Selection[] = [
     description: 'Offrir un livre, c\'est offrir un monde',
     univers: 'Littérature',
     isOffreSpeciale: true,
-    bookIds: ['n-lit-02', 'n-lit-01', 'f-lit-02', 'n-lit-03'],
+    bookIds: ['n-lit-02', 'n-lit-01', 'f-lit-perrin', 'n-lit-03'],
   },
   {
     id: 'sel-fetes-meres',
@@ -54,7 +54,7 @@ export const MOCK_SELECTIONS: Selection[] = [
     titre: 'Grands classiques',
     description: 'Les piliers de la littérature à avoir en rayon',
     univers: 'Littérature',
-    bookIds: ['f-lit-01', 'f-lit-02', 'f-lit-03', 'n-lit-01', 'n-lit-03'],
+    bookIds: ['f-lit-mathieu', 'f-lit-perrin', 'f-lit-colombani', 'n-lit-01', 'n-lit-03'],
   },
   {
     id: 'sel-bien-etre',

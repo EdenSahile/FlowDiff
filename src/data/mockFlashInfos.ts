@@ -79,8 +79,8 @@ export const MOCK_FLASH_INFOS: FlashInfo[] = [
     imageUrl: 'https://picsum.photos/seed/jk-rowling/400/250',
     videoUrl: null,
     text: 'Gallimard Jeunesse publie une longue interview de J.K. Rowling à l\'occasion des 25 ans d\'Harry Potter en France. Un bel outil de communication en librairie.',
-    bookId: 'f-jes-01',
-    bookIsbn: '9782070584628',
+    bookId: 'f-jes-animaux',
+    bookIsbn: '9782070585113',
     date: '2026-04-12',
   },
   {
@@ -91,8 +91,8 @@ export const MOCK_FLASH_INFOS: FlashInfo[] = [
     imageUrl: 'https://picsum.photos/seed/folio-junior/400/250',
     videoUrl: null,
     text: 'Gallimard Jeunesse lance une opération promotionnelle "3 achetés = 1 offert" sur toute la collection Folio Junior en mai. Commandez dès maintenant pour être prêts.',
-    bookId: 'f-jes-02',
-    bookIsbn: '9782070625734',
+    bookId: 'f-jes-passe-03',
+    bookIsbn: '9782070665167',
     date: '2026-04-07',
   },
   {
@@ -127,8 +127,8 @@ export const MOCK_FLASH_INFOS: FlashInfo[] = [
     imageUrl: 'https://picsum.photos/seed/etranger-collector/400/250',
     videoUrl: null,
     text: 'À l\'occasion des 80 ans de sa parution, Gallimard sort une édition collector de L\'Étranger avec une préface inédite et des reproductions de manuscrits. Disponible dès le 20 mai.',
-    bookId: 'f-lit-01',
-    bookIsbn: '9782070360024',
+    bookId: 'f-lit-mathieu',
+    bookIsbn: '9782330094058',
     date: '2026-04-09',
   },
   {

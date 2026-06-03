@@ -37,33 +37,17 @@ _(1 test pré-existant failing : `useDashboardConfig.test.ts > has 3 bottomPanel
 
 ---
 
-## Session en cours — Back-Office Admin FlowDiff (Phase 1)
+## Session en cours — Correction IDs orphelins (pages blanches)
 
-**Spec complète** : `docs/superpowers/specs/2026-05-16-admin-backoffice-design.md`  
-**Plan détaillé** : `docs/superpowers/plans/2026-05-16-admin-backoffice.md`
+**Cause** : réécriture de `mockBooks.ts` laisse 5 fichiers avec des IDs supprimés → `getBookById(id)` → `undefined` → crash pages blanches.
 
 ### Checklist tâches
 
-| # | Tâche | Statut |
-|---|-------|--------|
-| 1 | SQL tables `commandes` + `libraires` + RLS + seed *(Supabase dashboard)* | ✅ |
-| 2 | Admin types (`src/admin/types.ts`) + adminTheme (`src/admin/adminTheme.ts`) | ✅ |
-| 3 | `AdminAuthContext` + `useAdminAuth` hook | ✅ |
-| 4 | `adminServices.ts` + tests (`computeCAMois`, `computeTop5`) | ✅ |
-| 5 | `AdminRoute` guard + `AdminLoginPage` (identifiants pré-remplis) | ✅ |
-| 6 | `AdminLayout` + `StatutBadge` + `AdminModal` | ✅ |
-| 7 | Câblage routes admin dans `App.tsx` | ✅ |
-| 8 | `AdminDashboardPage` (KPIs + tableaux synthèse) | ✅ |
-| 9 | `AdminCataloguePage` (liste + CRUD add/edit/delete) | ✅ |
-| 10 | `AdminCommandesPage` (liste + statut inline + détail modal) | ✅ |
-| 11 | `AdminLibrairesPage` (liste + edit modal remise/statut/reliquat) | ✅ |
-| 12 | Tests finaux + CONTEXT.md | ✅ |
-
-### Notes techniques
-
-- Route admin : `/admin/*` dans `App.tsx`, enveloppé par `AdminAuthProvider` + sous-router `AdminRoutes`
-- Auth admin : localStorage flag — identifiants dans `src/admin/contexts/AdminAuthContext.tsx` (ne pas mettre dans CONTEXT.md)
-- Style : `src/admin/adminTheme.ts` — sidebar `#1a1a2e`, accent `#4361ee`, fond `#f8f9fa`
-- Supabase : clé anon + RLS `FOR ALL USING (true)` pour la démo (à restreindre en prod)
-- Tables à créer : `commandes` + `libraires` (la table `livres` existe déjà)
-- Seed : 3 libraires (LIB001/LIB002/LIB003) + 8 commandes (statuts variés) — SQL dans le plan Task 1
+| # | Fichier | Statut |
+|---|---------|--------|
+| T1 | `src/data/mockSeries.ts` — réécriture complète (25 séries avec IDs valides) | ✅ |
+| T2 | `src/data/mockSelections.ts` — remplacer 5 IDs orphelins | ✅ |
+| T3 | `src/data/mockFlashInfos.ts` — remplacer 3 `bookId` orphelins | ✅ |
+| T4 | `src/pages/top-ventes/TopVentesPage.tsx` — SALES : remplacer 8 IDs orphelins | ✅ |
+| T5 | `src/data/mockOrders.ts` — remplacer IDs orphelins dans les lignes de commande | ✅ |
+| T6 | `npx tsc --noEmit` + `npx vitest run` propres | ✅ |

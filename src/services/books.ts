@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase'
+import { MOCK_BOOKS, getBookById as getBookByIdLocal } from '@/data/mockBooks'
 import type { Book, BookType, Universe } from '@/data/mockBooks'
 
 type Row = Record<string, unknown>
@@ -32,21 +33,24 @@ function rowToBook(row: Row): Book {
 
 export async function getAllBooksAsync(): Promise<Book[]> {
   const { data, error } = await supabase.from('livres').select('*')
-  if (error) throw error
-  return (data ?? []).map(rowToBook)
+  if (error) return MOCK_BOOKS
+  return (data ?? []).length > 0 ? (data ?? []).map(rowToBook) : MOCK_BOOKS
 }
 
 export async function getBooksByTypeAsync(type: BookType, universe?: Universe): Promise<Book[]> {
   const base = supabase.from('livres').select('*').eq('type', type)
   const query = universe ? base.eq('universe', universe) : base
   const { data, error } = await query
-  if (error) throw error
+  if (error) {
+    const fallback = MOCK_BOOKS.filter(b => b.type === type)
+    return universe ? fallback.filter(b => b.universe === universe) : fallback
+  }
   return (data ?? []).map(rowToBook)
 }
 
 export async function getBookByIdAsync(id: string): Promise<Book | null> {
   const { data, error } = await supabase.from('livres').select('*').eq('id', id).single()
-  if (error) return null
+  if (error) return getBookByIdLocal(id) ?? null
   return rowToBook(data as Row)
 }
 
