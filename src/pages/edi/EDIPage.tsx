@@ -782,8 +782,8 @@ export function EDIPage() {
   const counts   = getFluxCounts(messages)
 
   const previewRows = [...filtered]
-    .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
-    .slice(isbnSearch.trim() || showAll ? 0 : -5)
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    .slice(0, isbnSearch.trim() || showAll ? undefined : 5)
 
   const pendingOrdersCount = messages.filter(m => m.type === 'ORDERS' && m.status === 'PENDING').length
 
