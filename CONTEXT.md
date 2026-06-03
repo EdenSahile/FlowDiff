@@ -7,7 +7,7 @@
 ---
 
 ## État du build
-TS clean · 173/174 tests passants · session 2026-06-03  
+TS clean · 180/181 tests passants · session 2026-06-03  
 _(1 test pré-existant failing : `useDashboardConfig.test.ts > has 3 bottomPanels all visible` — non lié, ignoré)_  
 **Intégration Supabase catalogue** : 13/13 pages migrées ✅  
 **Back-Office Admin FlowDiff Phase 1** : 12/12 tâches terminées ✅
@@ -37,5 +37,6 @@ _(1 test pré-existant failing : `useDashboardConfig.test.ts > has 3 bottomPanel
 **EDI — Refonte header icônes** : StickyBand + ListsLabel dynamique ✅  
 **EDI — Fixes tableau** : suppression colonne Diffuseur · N° commande ORDRSP via `getOrderRef` · onglet Factures avec N° facture + ISBN search ✅  
 **EDI — Renumérotation** : CMD-YYYY-MMDD-XXX → CMD0000001-CMD0000012 (mocks EDI) + CMD0000013-CMD0000014 (mockOrders) · compteur initial à 14 · STORAGE_VERSION v3 · ACK/DESADV refs corrigés ✅  
-**EDI — Références de commande** : section référence dans CartPage (global + par article) · RFF+CR dans template ORDERS · badge HistoriquePage ✅
+**EDI — Références de commande** : section référence dans CartPage (global + par article) · RFF+CR dans template ORDERS · badge HistoriquePage ✅  
+**EDI — ORDERS production EDIFACT** : UNA · UNOC:3 · GLN placeholders · UNH/UNT docRef · CUX:9 · RFF+LI/API · IMD auteur(009/010/011)/titre(050, split)/éditeur(109)/année(170)/Livre(180) · CNT · parseAuthorImd · titleToImd050 · mockEDIMessages enrichis · MOCK_EDI_VERSION v7 ✅
 
