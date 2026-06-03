@@ -194,7 +194,7 @@ const accountItems = [
 ]
 
 const toolItems = [
-  { to: '/edi',     label: 'EDI',     tooltip: undefined },
+  { to: '/edi',     label: 'Transmissions',     tooltip: undefined },
   { to: '/offices', label: 'Offices', tooltip: undefined },
 ]
 
