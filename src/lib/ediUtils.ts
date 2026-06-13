@@ -381,34 +381,48 @@ const EDIFACT_TEMPLATES: Record<EDIMessageType, (msg: EDIMessage) => string> = {
   },
 
   ORDRSP: (msg) => {
-    const p = msg.payload as Partial<ORDRSPPayload>
+    const p     = msg.payload as Partial<ORDRSPPayload>
     const lines = p.lines ?? []
-    const bgmStatus = '4'
-    const segments: string[] = [
-      `UNB+UNOC:3+GLN-DIFFUSEUR:14+301234XXXXXXX:14+${fmtEdifactDate(msg.createdAt)}:${fmtEdifactTime(msg.createdAt)}+1'`,
-      `UNH+1+ORDRSP:D:96A:UN'`,
+    const totalConfirmed = lines.reduce((s, l) => s + l.qtyConfirmed, 0)
+
+    // BGM status : 4=changed, 27=not accepted, 29=accepted
+    const bgmStatus = p.globalStatus === 'ACCEPTED' ? '29' : p.globalStatus === 'REJECTED' ? '27' : '4'
+
+    const seg: string[] = [
+      `UNH+${msg.documentRef}+ORDRSP:D:96A:UN:EAN008'`,
       `BGM+231+${msg.documentRef}+${bgmStatus}'`,
       `DTM+137:${fmtEdifactDate(msg.createdAt)}:102'`,
       `RFF+ON:${p.orderId ?? msg.documentRef}'`,
-      `NAD+SE+GLN-DIFFUSEUR::9'`,
-      `NAD+BY+301234XXXXXXX::9'`,
+      `NAD+SE+${SUPPLIER_GLN}::9'`,
+      `NAD+BY+${BUYER_GLN}::9'`,
+      `CUX+2:EUR:9'`,
     ]
-    if (p.rejectionReason) {
-      segments.push(`FTX+ZZZ+++${p.rejectionReason}'`)
-    }
+
+    if (p.rejectionReason) seg.push(`FTX+ZZZ+++${escEdifact(p.rejectionReason)}'`)
+
     lines.forEach((line, i) => {
-      segments.push(`LIN+${i + 1}++${line.ean}:EN'`)
-      segments.push(`QTY+21:${line.qtyRequested}'`)
-      segments.push(`QTY+1:${line.qtyConfirmed}'`)
-      if (line.backorderQty) segments.push(`QTY+83:${line.backorderQty}'`)
-      if (line.estimatedDelivery) segments.push(`DTM+358:${line.estimatedDelivery.replace(/-/g, '')}:102'`)
-      if (line.note) segments.push(`FTX+ZZZ+++${line.note}'`)
+      seg.push(`LIN+${i + 1}++${line.ean}:EN'`)
+      seg.push(`PIA+5+${line.ean}:IB'`)
+      seg.push(`RFF+LI:${line.lineNumber ?? i + 1}'`)
+      seg.push(`QTY+21:${line.qtyRequested}'`)
+      seg.push(`QTY+1:${line.qtyConfirmed}'`)
+      if (line.backorderQty)      seg.push(`QTY+83:${line.backorderQty}'`)
+      if (line.estimatedDelivery) seg.push(`DTM+358:${line.estimatedDelivery.replace(/-/g, '')}:102'`)
+      if (line.note)              seg.push(`FTX+ZZZ+++${escEdifact(line.note)}'`)
     })
-    segments.push(`UNS+S'`)
-    // UNT : segments.length inclut UNB (non compté) mais pas UNT → net = segments.length
-    segments.push(`UNT+${segments.length}+1'`)
-    segments.push(`UNZ+1+1'`)
-    return segments.join('\n')
+
+    seg.push(`UNS+S'`)
+    seg.push(`CNT+1:${lines.length}'`)
+    seg.push(`CNT+2:${totalConfirmed}'`)
+    // UNT = segments UNH→UNT inclus (seg.length avant UNT + 1 pour UNT lui-même)
+    seg.push(`UNT+${seg.length + 1}+${msg.documentRef}'`)
+
+    return [
+      `UNA:+.? '`,
+      `UNB+UNOC:3+${SUPPLIER_GLN}:14+${BUYER_GLN}:14+${fmtEdifactDate(msg.createdAt)}:${fmtEdifactTime(msg.createdAt)}+${msg.documentRef}'`,
+      ...seg,
+      `UNZ+1+${msg.documentRef}'`,
+    ].join('\n')
   },
 
   DESADV: (msg) => {
