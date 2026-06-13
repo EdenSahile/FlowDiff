@@ -14,7 +14,8 @@ const fmtPct = (n: number) =>
 /* ── HTML template ── */
 function buildHtml(f: Facture): string {
   const lignesHtml = f.lignes.map((l, i) => {
-    const ppHT = l.ppTTC / 1.055
+    // ppHT = donnée source (tarif éditeur) ; le prix public TTC en est dérivé
+    const ppTTC = l.ppHT * 1.055
     return `
     <tr class="${i % 2 === 0 ? 'row-even' : 'row-odd'}">
       <td class="center">${i + 1}</td>
@@ -22,8 +23,8 @@ function buildHtml(f: Facture): string {
       <td class="mono">${l.isbn}</td>
       <td>${l.editeur}</td>
       <td class="center">${l.quantite}</td>
-      <td class="right gray">${fmtEur(l.ppTTC)}</td>
-      <td class="right gray">${fmtEur(ppHT)}</td>
+      <td class="right gray">${fmtEur(ppTTC)}</td>
+      <td class="right gray">${fmtEur(l.ppHT)}</td>
       <td class="center remise-pct">${fmtPct(l.remisePct)}</td>
       <td class="right bold">${fmtEur(l.puHT)}</td>
       <td class="right bold">${fmtEur(l.montantHT)}</td>

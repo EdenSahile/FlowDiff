@@ -57,5 +57,6 @@ _(1 test pré-existant failing : `useDashboardConfig.test.ts > has 3 bottomPanel
 **EDI — Fixes tableau** : suppression colonne Diffuseur · N° commande ORDRSP via `getOrderRef` · onglet Factures avec N° facture + ISBN search ✅  
 **EDI — Renumérotation** : CMD-YYYY-MMDD-XXX → CMD0000001-CMD0000012 (mocks EDI) + CMD0000013-CMD0000014 (mockOrders) · compteur initial à 14 · STORAGE_VERSION v3 · ACK/DESADV refs corrigés ✅  
 **EDI — Références de commande** : section référence dans CartPage (global + par article) · RFF+CR dans template ORDERS · badge HistoriquePage ✅  
+**Facture PDF — PP HT donnée source** : `LigneFacture.ppTTC` → `ppHT` (tarif éditeur = source de vérité) · PP TTC dérivé = `ppHT × 1,055` dans `invoicePdf.ts` (avant : PP HT reconstruit par `ppTTC / 1,055`, illisible pour le comptable) · 40 lignes migrées · valeurs affichées + totaux inchangés · TS clean ✅  
 **EDI — ORDERS production EDIFACT** : UNA · UNOC:3 · GLN placeholders · UNH/UNT docRef · CUX:9 · RFF+LI/API · IMD auteur(009/010/011)/titre(050, split)/éditeur(109)/année(170)/Livre(180) · CNT · parseAuthorImd · titleToImd050 · mockEDIMessages enrichis · MOCK_EDI_VERSION v7 ✅
 
