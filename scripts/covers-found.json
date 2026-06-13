@@ -1,0 +1,522 @@
+[
+  {
+    "isbn": "9782258210271",
+    "title": "Avant qu'il ne soit trop tard. Chroniques 2015-2025 par l'auteur du Prix Goncourt 2024 \"Houris\"",
+    "authors": [
+      "Kamel Daoud"
+    ],
+    "cover": "https://books.google.com/books/content?id=G59DEQAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api",
+    "universe": "Littérature",
+    "type": "nouveaute",
+    "query": "Houris Kamel Daoud"
+  },
+  {
+    "isbn": "9782246831464",
+    "title": "Jacaranda",
+    "authors": [
+      "Gaël Faye"
+    ],
+    "cover": "https://books.google.com/books/content?id=9jsNEQAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api",
+    "universe": "Littérature",
+    "type": "nouveaute",
+    "query": "Jacaranda Gaël Faye"
+  },
+  {
+    "isbn": "9782806251787",
+    "title": "Mercure d'Amélie Nothomb (Fiche de lecture)",
+    "authors": [
+      "lePetitLitteraire,",
+      "Nausicaa Dewez"
+    ],
+    "cover": "https://books.google.com/books/content?id=STRs_4ba5FIC&printsec=frontcover&img=1&zoom=3&source=gbs_api",
+    "universe": "Littérature",
+    "type": "nouveaute",
+    "query": "Fille sans visage Amélie Nothomb"
+  },
+  {
+    "isbn": "9782369146827",
+    "title": "Le Sillage de la baleine",
+    "authors": [
+      "Francisco Coloane"
+    ],
+    "cover": "https://books.google.com/books/content?id=i9V2EAAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api",
+    "universe": "Littérature",
+    "type": "a-paraitre",
+    "query": "Sillage baleine"
+  },
+  {
+    "isbn": "9782330108724",
+    "title": "Leurs enfants après eux",
+    "authors": [
+      "Nicolas Mathieu"
+    ],
+    "cover": "https://books.google.com/books/content?id=ZANfDwAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api",
+    "universe": "Littérature",
+    "type": "fonds",
+    "query": "Leurs enfants après eux Nicolas Mathieu"
+  },
+  {
+    "isbn": "9782246813927",
+    "title": "La tresse",
+    "authors": [
+      "Laetitia Colombani"
+    ],
+    "cover": "https://books.google.com/books/content?id=Fd6fDgAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api",
+    "universe": "Littérature",
+    "type": "fonds",
+    "query": "La Tresse Laetitia Colombani"
+  },
+  {
+    "isbn": "9782340046757",
+    "title": "Allemand - Réussir la traduction aux concours",
+    "authors": [
+      "Sigrid Hasler-Bécane"
+    ],
+    "cover": "https://books.google.com/books/content?id=hhtEEAAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api",
+    "universe": "Littérature",
+    "type": "fonds",
+    "query": "En attendant Bojangles Olivier Bourdeaut"
+  },
+  {
+    "isbn": "9782330081171",
+    "title": "L'ordre du jour",
+    "authors": [
+      "Eric Vuillard"
+    ],
+    "cover": "https://books.google.com/books/content?id=CAm4DgAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api",
+    "universe": "Littérature",
+    "type": "fonds",
+    "query": "L'Ordre du jour Eric Vuillard"
+  },
+  {
+    "isbn": "9782081471757",
+    "title": "Sérotonine",
+    "authors": [
+      "Michel Houellebecq"
+    ],
+    "cover": "https://books.google.com/books/content?id=PtoRvgEACAAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api",
+    "universe": "Littérature",
+    "type": "fonds",
+    "query": "Sérotonine Houellebecq"
+  },
+  {
+    "isbn": "9782808684309",
+    "title": "Normal People de Sally Rooney (Analyse de l'œuvre)",
+    "authors": [
+      "Cassandra Gibbons"
+    ],
+    "cover": "https://books.google.com/books/content?id=2eS-EAAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api",
+    "universe": "Littérature",
+    "type": "fonds",
+    "query": "Normal People Sally Rooney"
+  },
+  {
+    "isbn": "9782226497833",
+    "title": "Coffret Valérie Perrin - Intégrale",
+    "authors": [
+      "Valérie Perrin"
+    ],
+    "cover": "https://books.google.com/books/content?id=eiISEQAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api",
+    "universe": "Littérature",
+    "type": "fonds",
+    "query": "Changer l'eau des fleurs Valérie Perrin"
+  },
+  {
+    "isbn": "9782246820505",
+    "title": "La carte postale",
+    "authors": [
+      "Anne Berest"
+    ],
+    "cover": "https://books.google.com/books/content?id=0rU0EAAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api",
+    "universe": "Littérature",
+    "type": "fonds",
+    "query": "La Carte postale Anne Berest"
+  },
+  {
+    "isbn": "9782709663724",
+    "title": "Les gratitudes",
+    "authors": [
+      "Delphine de Vigan"
+    ],
+    "cover": "https://books.google.com/books/content?id=dvqFDwAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api",
+    "universe": "Littérature",
+    "type": "fonds",
+    "query": "Les Gratitudes Delphine de Vigan"
+  },
+  {
+    "isbn": "9782072888021",
+    "title": "Le pays des autres",
+    "authors": [
+      "Leïla Slimani"
+    ],
+    "cover": "https://books.google.com/books/content?id=ZNvQDwAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api",
+    "universe": "Littérature",
+    "type": "fonds",
+    "query": "Le Pays des autres Leila Slimani"
+  },
+  {
+    "isbn": "9782073003720",
+    "title": "Regardez-nous danser",
+    "authors": [
+      "Leïla Slimani"
+    ],
+    "cover": "https://books.google.com/books/content?id=rBq4EAAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api",
+    "universe": "Littérature",
+    "type": "fonds",
+    "query": "Regardez-nous danser Leila Slimani"
+  },
+  {
+    "isbn": "9782709660358",
+    "title": "Toutes les familles heureuses",
+    "authors": [
+      "Hervé Le Tellier"
+    ],
+    "cover": "https://books.google.com/books/content?id=Ki4tDwAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api",
+    "universe": "Littérature",
+    "type": "fonds",
+    "query": "Toutes les familles heureuses Hervé Le Tellier"
+  },
+  {
+    "isbn": "9781974734634",
+    "title": "Dandadan, Vol. 1",
+    "authors": [
+      "Yukinobu Tatsu"
+    ],
+    "cover": "https://books.google.com/books/content?id=4C_vzgEACAAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api",
+    "universe": "BD/Mangas",
+    "type": "nouveaute",
+    "query": "Dandadan Yukinobu Tatsu tome 1"
+  },
+  {
+    "isbn": "9782413054580",
+    "title": "Blue Box Chapitre 1",
+    "authors": [
+      "Miura Koji"
+    ],
+    "cover": "https://books.google.com/books/content?id=pMKdEAAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api",
+    "universe": "BD/Mangas",
+    "type": "nouveaute",
+    "query": "Blue Box Kouji Miura tome 1"
+  },
+  {
+    "isbn": "9791032712375",
+    "title": "Jujutsu Kaisen T15",
+    "authors": [
+      "Gege Akutami"
+    ],
+    "cover": "https://books.google.com/books/content?id=mplxEAAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api",
+    "universe": "BD/Mangas",
+    "type": "fonds",
+    "query": "Jujutsu Kaisen tome 1 Gege Akutami"
+  },
+  {
+    "isbn": "9791032708408",
+    "title": "Jujutsu Kaisen T08",
+    "authors": [
+      "Gege Akutami"
+    ],
+    "cover": "https://books.google.com/books/content?id=yFwlEAAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api",
+    "universe": "BD/Mangas",
+    "type": "fonds",
+    "query": "Jujutsu Kaisen tome 2"
+  },
+  {
+    "isbn": "9791032716359",
+    "title": "My Hero Academia Team-up Mission T05",
+    "authors": [
+      "Kohei Horikoshi",
+      "Yoko Akiyama"
+    ],
+    "cover": "https://books.google.com/books/content?id=0hj9EAAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api",
+    "universe": "BD/Mangas",
+    "type": "fonds",
+    "query": "My Hero Academia tome 1 Kohei Horikoshi"
+  },
+  {
+    "isbn": "9791032708385",
+    "title": "My Hero Academia Team-up Mission T02 - Tome 2",
+    "authors": [
+      "Kohei Horikoshi",
+      "Ryoko Akiyama"
+    ],
+    "cover": "https://books.google.com/books/content?id=o2E0EAAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api",
+    "universe": "BD/Mangas",
+    "type": "fonds",
+    "query": "My Hero Academia tome 2"
+  },
+  {
+    "isbn": "9791039121569",
+    "title": "Demon Slayer School Days T02",
+    "authors": [
+      "Natsuki Hokami",
+      "Koyoharu Gotouge"
+    ],
+    "cover": "https://books.google.com/books/content?id=WFDNEAAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api",
+    "universe": "BD/Mangas",
+    "type": "fonds",
+    "query": "Demon Slayer tome 1 Koyoharu Gotouge"
+  },
+  {
+    "isbn": "9791039120616",
+    "title": "Demon Slayer School Days T01",
+    "authors": [
+      "Natsuki Hokami",
+      "Koyoharu Gotouge"
+    ],
+    "cover": "https://books.google.com/books/content?id=VFDNEAAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api",
+    "universe": "BD/Mangas",
+    "type": "fonds",
+    "query": "Demon Slayer tome 2"
+  },
+  {
+    "isbn": "9782823877533",
+    "title": "ONE-PUNCH MAN - tome 01",
+    "authors": [
+      "One",
+      "Yusuke Murata"
+    ],
+    "cover": "https://books.google.com/books/content?id=nYLXDwAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api",
+    "universe": "BD/Mangas",
+    "type": "fonds",
+    "query": "One-Punch Man tome 1 ONE"
+  },
+  {
+    "isbn": "9782823878462",
+    "title": "Spy x Family - Tome 1",
+    "authors": [
+      "Tatsuya Endo"
+    ],
+    "cover": "https://books.google.com/books/content?id=24nrDwAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api",
+    "universe": "BD/Mangas",
+    "type": "fonds",
+    "query": "Spy x Family tome 1 Tatsuya Endo"
+  },
+  {
+    "isbn": "9782823853919",
+    "title": "Vinland Saga - tome 1",
+    "authors": [
+      "Makoto Yukimura"
+    ],
+    "cover": "https://books.google.com/books/content?id=59KNDQAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api",
+    "universe": "BD/Mangas",
+    "type": "fonds",
+    "query": "Vinland Saga tome 1 Makoto Yukimura"
+  },
+  {
+    "isbn": "9782322556861",
+    "title": "La Boussole de nos émotions",
+    "authors": [
+      "Frédem Segelstein"
+    ],
+    "cover": "https://books.google.com/books/content?id=bOJqEQAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api",
+    "universe": "BD/Mangas",
+    "type": "fonds",
+    "query": "L'Arabe du futur tome 1 Riad Sattouf"
+  },
+  {
+    "isbn": "9782091320151",
+    "title": "Français 3e - ABC du Brevet Réussite Famille - Brevet 2025 - Cours, Méthode, Exercices + Guide parents pour aider son enfant à réussir - EPUB",
+    "authors": [
+      "Cécile de Cazanove"
+    ],
+    "cover": "https://books.google.com/books/content?id=ayIgEAAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api",
+    "universe": "BD/Mangas",
+    "type": "fonds",
+    "query": "L'Arabe du futur tome 2"
+  },
+  {
+    "isbn": "9782370730923",
+    "title": "Le pouvoir de la voix",
+    "authors": [
+      "Jean Abitbol"
+    ],
+    "cover": "https://books.google.com/books/content?id=cM7hCwAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api",
+    "universe": "BD/Mangas",
+    "type": "fonds",
+    "query": "Les Cahiers d'Esther tome 1 Riad Sattouf"
+  },
+  {
+    "isbn": "9782017079361",
+    "title": "Heartstopper - Tome 1 - Le roman graphique à l'origine de la série Netflix",
+    "authors": [
+      "Alice Oseman",
+      "Valérie Drouet"
+    ],
+    "cover": "https://books.google.com/books/content?id=ZOSmDwAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api",
+    "universe": "Jeunesse",
+    "type": "fonds",
+    "query": "Heartstopper tome 1 Alice Oseman"
+  },
+  {
+    "isbn": "9782017079378",
+    "title": "Heartstopper - Tome 2",
+    "authors": [
+      "Alice Oseman",
+      "Valérie Drouet"
+    ],
+    "cover": "https://books.google.com/books/content?id=K3e_DwAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api",
+    "universe": "Jeunesse",
+    "type": "fonds",
+    "query": "Heartstopper tome 2"
+  },
+  {
+    "isbn": "9782017110200",
+    "title": "Heartstopper - Tome 3",
+    "authors": [
+      "Alice Oseman",
+      "Valérie Drouet"
+    ],
+    "cover": "https://books.google.com/books/content?id=tjbnDwAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api",
+    "universe": "Jeunesse",
+    "type": "fonds",
+    "query": "Heartstopper tome 3"
+  },
+  {
+    "isbn": "9782075164252",
+    "title": "La Passe-Miroir (Tome 1) - Les Fiancés de l'hiver",
+    "authors": [
+      "Christelle Dabos",
+      "Vanyda"
+    ],
+    "cover": "https://books.google.com/books/content?id=VJmeEQAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api",
+    "universe": "Jeunesse",
+    "type": "fonds",
+    "query": "La Passe-Miroir tome 1 Christelle Dabos"
+  },
+  {
+    "isbn": "9782075081757",
+    "title": "La Passe-miroir (Livre 2) - Les Disparus du Clairdelune",
+    "authors": [
+      "Christelle Dabos"
+    ],
+    "cover": "https://books.google.com/books/content?id=16pvDwAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api",
+    "universe": "Jeunesse",
+    "type": "fonds",
+    "query": "La Passe-Miroir tome 2 Les Disparus"
+  },
+  {
+    "isbn": "9782745984401",
+    "title": "Six of crows, Tome 01",
+    "authors": [
+      "Leigh Bardugo",
+      "Anath Riveline"
+    ],
+    "cover": "https://books.google.com/books/content?id=h9EcDQAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api",
+    "universe": "Jeunesse",
+    "type": "fonds",
+    "query": "Six of Crows tome 1 Leigh Bardugo"
+  },
+  {
+    "isbn": "9781781109137",
+    "title": "Les Animaux fantastiques, vie et habitat",
+    "authors": [
+      "J.K. Rowling",
+      "Norbert Dragonneau"
+    ],
+    "cover": "https://books.google.com/books/content?id=9qzYDgAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api",
+    "universe": "Jeunesse",
+    "type": "fonds",
+    "query": "Les Animaux fantastiques J.K. Rowling"
+  },
+  {
+    "isbn": "9782036082793",
+    "title": "Un rien peut tout changer - le carnet officiel",
+    "authors": [
+      "James Clear"
+    ],
+    "cover": "https://books.google.com/books/content?id=5QyyEQAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api",
+    "universe": "Adulte-pratique",
+    "type": "fonds",
+    "query": "Atomic Habits James Clear"
+  },
+  {
+    "isbn": "9782226425676",
+    "title": "Homo deus",
+    "authors": [
+      "Yuval Noah Harari"
+    ],
+    "cover": "https://books.google.com/books/content?id=FbstDwAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api",
+    "universe": "Adulte-pratique",
+    "type": "fonds",
+    "query": "Homo Deus Yuval Noah Harari"
+  },
+  {
+    "isbn": "9782226431431",
+    "title": "21 Leçons pour le XXIème siècle",
+    "authors": [
+      "Yuval Noah Harari"
+    ],
+    "cover": "https://books.google.com/books/content?id=s1xqDwAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api",
+    "universe": "Adulte-pratique",
+    "type": "fonds",
+    "query": "21 leçons XXIe siècle Harari"
+  },
+  {
+    "isbn": "9781250123817",
+    "title": "Factfulness",
+    "authors": [
+      "Hans Rosling",
+      "Anna Rosling Rönnlund",
+      "Ola Rosling"
+    ],
+    "cover": "https://books.google.com/books/content?id=j-4yDwAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api",
+    "universe": "Adulte-pratique",
+    "type": "fonds",
+    "query": "Factfulness Hans Rosling"
+  },
+  {
+    "isbn": "9782823854169",
+    "title": "Ikigai",
+    "authors": [
+      "Héctor García",
+      "Francesc Miralles"
+    ],
+    "cover": "https://books.google.com/books/content?id=YOh1DgAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api",
+    "universe": "Adulte-pratique",
+    "type": "fonds",
+    "query": "Ikigaï Francesc Miralles"
+  },
+  {
+    "isbn": "9782080251817",
+    "title": "Une vie sur notre planète",
+    "authors": [
+      "David Attenborough"
+    ],
+    "cover": "https://books.google.com/books/content?id=iWEsEAAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api",
+    "universe": "Adulte-pratique",
+    "type": "fonds",
+    "query": "Une vie sur notre planète David Attenborough"
+  },
+  {
+    "isbn": "9782228926799",
+    "title": "Une histoire du corps humain à l'usage de ses occupants",
+    "authors": [
+      "Bill Bryson"
+    ],
+    "cover": "https://books.google.com/books/content?id=STD7DwAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api",
+    "universe": "Adulte-pratique",
+    "type": "fonds",
+    "query": "Le Corps humain Bill Bryson"
+  },
+  {
+    "isbn": "9782359321036",
+    "title": "Pilates : le guide complet",
+    "authors": [],
+    "cover": "https://books.google.com/books/content?id=S_5WPDpkKK4C&printsec=frontcover&img=1&zoom=3&source=gbs_api",
+    "universe": "Adulte-pratique",
+    "type": "fonds",
+    "query": "Méthode Pilates complète"
+  },
+  {
+    "isbn": "9782036072237",
+    "title": "Mon premier Larousse de la cuisine autour du monde",
+    "authors": [
+      "Agnès Besson",
+      "Clémentine Derodit"
+    ],
+    "cover": "https://books.google.com/books/content?id=3PQkEQAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api",
+    "universe": "Adulte-pratique",
+    "type": "fonds",
+    "query": "Larousse cuisine"
+  }
+]

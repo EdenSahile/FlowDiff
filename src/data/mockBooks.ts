@@ -32,6 +32,7 @@ export interface Book {
   delaiReimp?: string
   topVente?: boolean
   selection?: boolean
+  coverUrl?: string
 }
 
 /* ── Genres par univers ── */
@@ -114,7 +115,7 @@ const _RAW_MOCK_BOOKS: Book[] = [
   },
   {
     id: 'n-lit-02',
-    isbn: '9782221259146',
+    isbn: '9782246831464',
     title: 'Jacaranda',
     authors: ['Gaël Faye'],
     publisher: 'Robert Laffont',
@@ -225,7 +226,7 @@ const _RAW_MOCK_BOOKS: Book[] = [
 
   {
     id: 'ap-lit-01',
-    isbn: '9782072979958',
+    isbn: '9782369146827',
     title: 'Le Sillage de la baleine',
     authors: ['Francisco Coloane'],
     publisher: 'Gallimard',
@@ -310,7 +311,7 @@ const _RAW_MOCK_BOOKS: Book[] = [
   },
   {
     id: 'f-lit-colombani',
-    isbn: '9782246814436',
+    isbn: '9782246813927',
     title: 'La Tresse',
     authors: ['Laetitia Colombani'],
     publisher: 'Grasset',
@@ -360,7 +361,7 @@ const _RAW_MOCK_BOOKS: Book[] = [
   },
   {
     id: 'f-lit-berest',
-    isbn: '9782246821427',
+    isbn: '9782246820505',
     title: 'La Carte postale',
     authors: ['Anne Berest'],
     publisher: 'Grasset',
@@ -484,7 +485,7 @@ const _RAW_MOCK_BOOKS: Book[] = [
   /* ── One-Punch Man ── */
   {
     id: 'f-bd-opm',
-    isbn: '9782331024474',
+    isbn: '9782823877533',
     title: 'One-Punch Man T.1',
     authors: ['ONE', 'Yusuke Murata'],
     publisher: 'Kurokawa', collection: 'Shōnen',
@@ -514,7 +515,7 @@ const _RAW_MOCK_BOOKS: Book[] = [
   /* ── Vinland Saga ── */
   {
     id: 'f-bd-vinland',
-    isbn: '9782756093802',
+    isbn: '9782823853919',
     title: 'Vinland Saga T.1',
     authors: ['Makoto Yukimura'],
     publisher: 'Kurokawa', collection: 'Seinen',
@@ -632,7 +633,7 @@ const _RAW_MOCK_BOOKS: Book[] = [
   },
   {
     id: 'f-pra-homo',
-    isbn: '9782226393876',
+    isbn: '9782226425676',
     title: "Homo Deus — Une brève histoire de l'avenir",
     authors: ['Yuval Noah Harari'],
     publisher: 'Albin Michel',
@@ -657,7 +658,7 @@ const _RAW_MOCK_BOOKS: Book[] = [
   },
   {
     id: 'f-pra-factfulness',
-    isbn: '9782221218532',
+    isbn: '9781250123817',
     title: 'Factfulness',
     authors: ['Hans Rosling', 'Ola Rosling', 'Anna Rosling Rönnlund'],
     publisher: 'Robert Laffont',
@@ -669,7 +670,7 @@ const _RAW_MOCK_BOOKS: Book[] = [
   },
   {
     id: 'f-pra-attenborough',
-    isbn: '9782501155229',
+    isbn: '9782080251817',
     title: 'Une vie sur notre planète',
     authors: ['David Attenborough'],
     publisher: 'Marabout',

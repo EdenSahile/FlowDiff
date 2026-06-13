@@ -1059,6 +1059,7 @@ export function OfficesPage() {
                             universe={book.universe}
                             authors={book.authors}
                             publisher={book.publisher}
+                            coverUrl={book.coverUrl}
                           />
                         </div>
                         <BookMeta>

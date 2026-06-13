@@ -715,6 +715,7 @@ export function BookCard({ book, showType = false, coverFirst = false }: Props) 
                 collection={book.collection}
                 width={108}
                 height={158}
+                coverUrl={book.coverUrl}
               />
             </Book3D>
             {book.topVente && <TopVenteBadge>Top vente</TopVenteBadge>}
@@ -875,6 +876,7 @@ export function BookCard({ book, showType = false, coverFirst = false }: Props) 
             authors={book.authors}
             publisher={book.publisher}
             collection={book.collection}
+            coverUrl={book.coverUrl}
           />
           <StarWrap ref={starRef}>
             <StarBtn

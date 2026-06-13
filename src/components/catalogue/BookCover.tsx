@@ -3,6 +3,56 @@ import styled from 'styled-components'
 import type { Universe } from '@/data/mockBooks'
 
 /* ══════════════════════════════════════════════
+   URLs de couverture confirmées (Google Books content URLs stables)
+   Évite les appels API simultanés depuis le navigateur.
+   ══════════════════════════════════════════════ */
+const DIRECT_COVER_URLS: Record<string, string> = {
+  // ── Littérature ──
+  '9782258210271': 'https://books.google.com/books/content?id=G59DEQAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api',
+  '9782246831464': 'https://books.google.com/books/content?id=9jsNEQAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api',
+  '9782369146827': 'https://books.google.com/books/content?id=i9V2EAAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api',
+  '9782073003720': 'https://books.google.com/books/content?id=rBq4EAAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api',
+  '9782330108724': 'https://books.google.com/books/content?id=ZANfDwAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api',
+  '9782246813927': 'https://books.google.com/books/content?id=Fd6fDgAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api',
+  '9782330081171': 'https://books.google.com/books/content?id=CAm4DgAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api',
+  '9782081471757': 'https://books.google.com/books/content?id=PtoRvgEACAAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api',
+  '9782709660358': 'https://books.google.com/books/content?id=Ki4tDwAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api',
+  '9782246820505': 'https://books.google.com/books/content?id=0rU0EAAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api',
+  '9782709663724': 'https://books.google.com/books/content?id=dvqFDwAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api',
+  '9782072888021': 'https://books.google.com/books/content?id=ZNvQDwAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api',
+  // ── BD/Mangas ──
+  '9781974734634': 'https://books.google.com/books/content?id=4C_vzgEACAAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api',
+  '9782413054580': 'https://books.google.com/books/content?id=pMKdEAAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api',
+  '9791032712375': 'https://books.google.com/books/content?id=mplxEAAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api',
+  '9791032708408': 'https://books.google.com/books/content?id=yFwlEAAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api',
+  '9791032716359': 'https://books.google.com/books/content?id=0hj9EAAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api',
+  '9791032708385': 'https://books.google.com/books/content?id=o2E0EAAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api',
+  '9791039121569': 'https://books.google.com/books/content?id=WFDNEAAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api',
+  '9791039120616': 'https://books.google.com/books/content?id=VFDNEAAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api',
+  '9782823877533': 'https://books.google.com/books/content?id=nYLXDwAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api',
+  '9782823878462': 'https://books.google.com/books/content?id=24nrDwAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api',
+  '9782823853919': 'https://books.google.com/books/content?id=59KNDQAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api',
+  // ── Jeunesse ──
+  '9782017079361': 'https://books.google.com/books/content?id=ZOSmDwAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api',
+  '9782075164252': 'https://books.google.com/books/content?id=VJmeEQAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api',
+  '9782075081757': 'https://books.google.com/books/content?id=16pvDwAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api',
+  '9781781109137': 'https://books.google.com/books/content?id=9qzYDgAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api',
+  '9782017079378': 'https://books.google.com/books/content?id=K3e_DwAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api',
+  '9782017110200': 'https://books.google.com/books/content?id=tjbnDwAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api',
+  '9782745984401': 'https://books.google.com/books/content?id=h9EcDQAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api',
+  // ── Adulte-pratique ──
+  '9782823854169': 'https://books.google.com/books/content?id=YOh1DgAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api',
+  '9782228926799': 'https://books.google.com/books/content?id=STD7DwAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api',
+  '9782036082793': 'https://books.google.com/books/content?id=5QyyEQAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api',
+  '9782226425676': 'https://books.google.com/books/content?id=FbstDwAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api',
+  '9782226431431': 'https://books.google.com/books/content?id=s1xqDwAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api',
+  '9781250123817': 'https://books.google.com/books/content?id=j-4yDwAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api',
+  '9782080251817': 'https://books.google.com/books/content?id=iWEsEAAAQBaj&printsec=frontcover&img=1&zoom=3&source=gbs_api',
+  '9782359321036': 'https://books.google.com/books/content?id=S_5WPDpkKK4C&printsec=frontcover&img=1&zoom=3&source=gbs_api',
+  '9782036072237': 'https://books.google.com/books/content?id=3PQkEQAAQBAJ&printsec=frontcover&img=1&zoom=3&source=gbs_api',
+}
+
+/* ══════════════════════════════════════════════
    Module-level cover cache (survit aux re-renders)
    string  = URL trouvée
    null    = aucune cover disponible
@@ -14,6 +64,13 @@ const pendingFetches = new Map<string, Promise<string | null>>()
 async function fetchGoogleBooksCover(isbn: string): Promise<string | null> {
   if (coverCache.has(isbn)) return coverCache.get(isbn)!
   if (pendingFetches.has(isbn)) return pendingFetches.get(isbn)!
+
+  // URL directe confirmée — pas d'appel API
+  const directUrl = DIRECT_COVER_URLS[isbn]
+  if (directUrl) {
+    coverCache.set(isbn, directUrl)
+    return directUrl
+  }
 
   const promise = (async (): Promise<string | null> => {
     try {
@@ -48,7 +105,7 @@ async function fetchGoogleBooksCover(isbn: string): Promise<string | null> {
 }
 
 /* ── États de la machine de couverture ── */
-type CoverState = 'openlibrary' | 'googlebooks' | 'failed'
+type CoverState = 'googlebooks' | 'googlebooks-zoom1' | 'openlibrary' | 'failed'
 
 /* ── Déco SVG par univers ── */
 function Deco({ universe, accent, w, h }: { universe: Universe; accent: string; w: number; h: number }) {
@@ -202,6 +259,7 @@ interface Props {
   publisher?: string
   collection?: string
   fill?: boolean
+  coverUrl?: string
 }
 
 function BookCoverBase({
@@ -214,21 +272,23 @@ function BookCoverBase({
   publisher = '',
   collection,
   fill = false,
+  coverUrl,
 }: Props) {
   const [coverState, setCoverState] = useState<CoverState>('googlebooks')
   const [imgLoaded, setImgLoaded] = useState(false)
-  const [googleUrl, setGoogleUrl] = useState<string | null>(null)
+  const [googleUrl, setGoogleUrl] = useState<string | null>(coverUrl ?? null)
 
-  // Reset quand l'ISBN change
+  // Reset quand l'ISBN ou coverUrl change
   useEffect(() => {
     setCoverState('googlebooks')
     setImgLoaded(false)
-    setGoogleUrl(null)
-  }, [isbn])
+    setGoogleUrl(coverUrl ?? null)
+  }, [isbn, coverUrl])
 
-  // Fetch Google Books en premier
+  // Fetch Google Books uniquement si pas de coverUrl fournie
   useEffect(() => {
     if (coverState !== 'googlebooks') return
+    if (googleUrl) return
     let cancelled = false
     fetchGoogleBooksCover(isbn).then(url => {
       if (cancelled) return
@@ -239,7 +299,7 @@ function BookCoverBase({
       }
     })
     return () => { cancelled = true }
-  }, [coverState, isbn])
+  }, [coverState, isbn, googleUrl])
 
   const titleFs  = Math.max(8,  Math.round(height * 0.10))
   const authorFs = Math.max(7,  Math.round(height * 0.08))
@@ -249,8 +309,10 @@ function BookCoverBase({
   const fallbackBg     = '#232f3e'
   const fallbackAccent = '#C9A84C'
 
-  // URL selon l'état actuel
-  const openLibraryUrl = `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`
+  // zoom=1 est plus permissif que zoom=3 pour les livres peu connus
+  const googleZoom1Url = googleUrl ? googleUrl.replace(/&zoom=\d/, '&zoom=1') : null
+  // Open Library uniquement pour les livres sans coverUrl Supabase (mockBooks)
+  const openLibraryUrl = !coverUrl ? `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg` : null
 
   return (
     <Wrapper $w={width} $h={height} $fill={fill}>
@@ -266,21 +328,18 @@ function BookCoverBase({
         </TitleArea>
       )}
 
-      {/* Google Books — source principale */}
+      {/* Google Books zoom=3 — source principale */}
       {coverState === 'googlebooks' && googleUrl && (
         <CoverImg
           src={googleUrl}
           alt={alt}
           loading="lazy"
           $visible={imgLoaded}
-          onError={() => {
-            setImgLoaded(false)
-            setCoverState('openlibrary')
-          }}
+          onError={() => { setImgLoaded(false); setCoverState('googlebooks-zoom1') }}
           onLoad={(e) => {
             const img = e.currentTarget
             if (img.naturalWidth < 10 || img.naturalHeight < 10) {
-              setCoverState('openlibrary')
+              setCoverState('googlebooks-zoom1')
             } else {
               setImgLoaded(true)
             }
@@ -288,17 +347,33 @@ function BookCoverBase({
         />
       )}
 
-      {/* Open Library — fallback */}
-      {coverState === 'openlibrary' && (
+      {/* Google Books zoom=1 — fallback si zoom=3 échoue */}
+      {coverState === 'googlebooks-zoom1' && googleZoom1Url && (
+        <CoverImg
+          src={googleZoom1Url}
+          alt={alt}
+          loading="lazy"
+          $visible={imgLoaded}
+          onError={() => { setImgLoaded(false); setCoverState(openLibraryUrl ? 'openlibrary' : 'failed') }}
+          onLoad={(e) => {
+            const img = e.currentTarget
+            if (img.naturalWidth < 10 || img.naturalHeight < 10) {
+              setCoverState(openLibraryUrl ? 'openlibrary' : 'failed')
+            } else {
+              setImgLoaded(true)
+            }
+          }}
+        />
+      )}
+
+      {/* Open Library — uniquement pour les mockBooks sans coverUrl */}
+      {coverState === 'openlibrary' && openLibraryUrl && (
         <CoverImg
           src={openLibraryUrl}
           alt={alt}
           loading="lazy"
           $visible={imgLoaded}
-          onError={() => {
-            setImgLoaded(false)
-            setCoverState('failed')
-          }}
+          onError={() => { setImgLoaded(false); setCoverState('failed') }}
           onLoad={(e) => {
             const img = e.currentTarget
             if (img.naturalWidth < 10 || img.naturalHeight < 10) {
@@ -314,5 +389,8 @@ function BookCoverBase({
 }
 
 export const BookCover = memo(BookCoverBase, (prev, next) =>
-  prev.isbn === next.isbn && prev.width === next.width && prev.height === next.height
+  prev.isbn === next.isbn &&
+  prev.width === next.width &&
+  prev.height === next.height &&
+  prev.coverUrl === next.coverUrl
 )

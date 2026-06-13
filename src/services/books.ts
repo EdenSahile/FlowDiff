@@ -28,6 +28,7 @@ function rowToBook(row: Row): Book {
     delaiReimp:      (row.delaiReimp as string) || undefined,
     topVente:        (row.topVente as boolean) || undefined,
     selection:       (row.selection as boolean) || undefined,
+    coverUrl:        (row.cover_url as string) || undefined,
   }
 }
 

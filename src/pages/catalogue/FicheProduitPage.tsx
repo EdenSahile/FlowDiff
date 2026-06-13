@@ -1548,6 +1548,7 @@ export function FicheProduitPage() {
               universe={book.universe}
               authors={book.authors}
               publisher={book.publisher}
+              coverUrl={book.coverUrl}
             />
             {showCoverBadge && <CoverBadgeDetail>{coverBadgeLabel}</CoverBadgeDetail>}
           </CoverFrame>
@@ -1815,7 +1816,7 @@ export function FicheProduitPage() {
               return (
                 <SimilarCardNew key={b.id} onClick={() => navigate(`/livre/${b.id}`)}>
                   <SimilarCoverNew>
-                    <BookCover isbn={b.isbn} alt={b.title} width={120} height={180} universe={b.universe} authors={b.authors} publisher={b.publisher} />
+                    <BookCover isbn={b.isbn} alt={b.title} width={120} height={180} universe={b.universe} authors={b.authors} publisher={b.publisher} coverUrl={b.coverUrl} />
                   </SimilarCoverNew>
                   <SimilarBodyNew>
                     <SimilarUniverseBadgeEl $bg={bStyle.bg} $color={bStyle.color}>{b.universe}</SimilarUniverseBadgeEl>
