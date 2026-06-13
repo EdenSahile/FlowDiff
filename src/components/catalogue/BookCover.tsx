@@ -17,8 +17,10 @@ async function fetchGoogleBooksCover(isbn: string): Promise<string | null> {
 
   const promise = (async (): Promise<string | null> => {
     try {
+      const apiKey = import.meta.env.VITE_GOOGLE_BOOKS_API_KEY as string | undefined
+      const keyParam = apiKey ? `&key=${apiKey}` : ''
       const res = await fetch(
-        `https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}&fields=items(volumeInfo/imageLinks)&maxResults=1`
+        `https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}&fields=items(volumeInfo/imageLinks)&maxResults=1${keyParam}`
       )
       if (!res.ok) { coverCache.set(isbn, null); return null }
       const data = await res.json()
@@ -213,18 +215,18 @@ function BookCoverBase({
   collection,
   fill = false,
 }: Props) {
-  const [coverState, setCoverState] = useState<CoverState>('openlibrary')
+  const [coverState, setCoverState] = useState<CoverState>('googlebooks')
   const [imgLoaded, setImgLoaded] = useState(false)
   const [googleUrl, setGoogleUrl] = useState<string | null>(null)
 
   // Reset quand l'ISBN change
   useEffect(() => {
-    setCoverState('openlibrary')
+    setCoverState('googlebooks')
     setImgLoaded(false)
     setGoogleUrl(null)
   }, [isbn])
 
-  // Fetch Google Books quand Open Library échoue
+  // Fetch Google Books en premier
   useEffect(() => {
     if (coverState !== 'googlebooks') return
     let cancelled = false
@@ -233,7 +235,7 @@ function BookCoverBase({
       if (url) {
         setGoogleUrl(url)
       } else {
-        setCoverState('failed')
+        setCoverState('openlibrary')
       }
     })
     return () => { cancelled = true }
@@ -264,22 +266,21 @@ function BookCoverBase({
         </TitleArea>
       )}
 
-      {/* Open Library — tentative 1 */}
-      {coverState === 'openlibrary' && (
+      {/* Google Books — source principale */}
+      {coverState === 'googlebooks' && googleUrl && (
         <CoverImg
-          src={openLibraryUrl}
+          src={googleUrl}
           alt={alt}
           loading="lazy"
           $visible={imgLoaded}
           onError={() => {
             setImgLoaded(false)
-            setCoverState('googlebooks')
+            setCoverState('openlibrary')
           }}
           onLoad={(e) => {
             const img = e.currentTarget
-            // Open Library renvoie une image 1×1 si pas de couverture
             if (img.naturalWidth < 10 || img.naturalHeight < 10) {
-              setCoverState('googlebooks')
+              setCoverState('openlibrary')
             } else {
               setImgLoaded(true)
             }
@@ -287,10 +288,10 @@ function BookCoverBase({
         />
       )}
 
-      {/* Google Books — tentative 2 */}
-      {coverState === 'googlebooks' && googleUrl && (
+      {/* Open Library — fallback */}
+      {coverState === 'openlibrary' && (
         <CoverImg
-          src={googleUrl}
+          src={openLibraryUrl}
           alt={alt}
           loading="lazy"
           $visible={imgLoaded}
