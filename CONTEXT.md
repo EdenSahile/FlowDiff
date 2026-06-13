@@ -6,6 +6,25 @@
 
 ---
 
+## Session en cours — Vraies couvertures (suite)
+
+Branche `feat/real-book-covers`. Réparation des couvertures cassées détectées par `scripts/detect-missing-covers.mjs`.
+
+### Étape 1 — Re-fetch des 23 covers cassées ✅
+- [x] Créer `scripts/refetch-covers.mjs` (détection dynamique + override manuel → Google isbn → Google titre → OL isbn → OL search titre, validation octets **avec retry** vs rate-limit OL, update `cover_url` seul)
+- [x] **23/23 réparées.** 18 auto (Google/OL) + 5 via `MANUAL_OVERRIDE` (cover_i OL vérifiés : Les Deux Gredins, James et la Grosse Pêche, La Potion magique de Georges Bouillon, La Zizanie [cover FR], Le Lion la Sorcière). Vérifié : `detect-missing-covers.mjs` ne liste plus aucune des 23.
+
+### Étape 2 — Remplacer les 5 titres Slimani fictifs ⏸ BLOQUÉ quota Google (reprise demain)
+- [~] `scripts/replace-slimani.mjs` prêt (vrais titres : Le pays des autres, Regardez-nous danser, J'emporterai le feu, Dans le jardin de l'ogre, Le parfum des fleurs la nuit). Cible les ISBN fictifs `…010/011/012/013/015`, met `fictif=false`.
+- **Bloqué** : quota journalier Google Books épuisé (429) → run = 0/5, base intacte. **Décision : attendre reset Google demain** (langRestrict=fr → ISBN FR + covers françaises propres) plutôt qu'OL (ISBN étrangers).
+- [ ] Demain : relancer `node scripts/replace-slimani.mjs` puis vérifier `detect-missing-covers.mjs`.
+
+### Étape 3 — Disambiguïsation de tomes (covers partagées) — à faire après étape 2 (Google demain)
+- [ ] My Hero Academia T.2-T.4 (`9782344003459`, `…005002`, `…006467`) → re-fetch par titre exact « My Hero Academia Tome N »
+- [ ] Cahiers d'Esther T.2 (`9782370739007`) → a hérité de la cover du T.1, re-fetch par titre exact « Les Cahiers d'Esther — Histoires de mes 11 ans »
+
+---
+
 ## État du build
 TS clean · 180/181 tests passants · session 2026-06-03  
 _(1 test pré-existant failing : `useDashboardConfig.test.ts > has 3 bottomPanels all visible` — non lié, ignoré)_  
