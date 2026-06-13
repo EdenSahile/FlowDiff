@@ -45,6 +45,10 @@ next-env.d.ts
 .playwright-mcp/
 /screenshots/
 
+# …sauf les captures du README (portfolio)
+!docs/screenshots/
+!docs/screenshots/**
+
 # docs internes — ne pas inclure dans src/
 src/**/*.md
 
