@@ -1,6 +1,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import Anthropic from '@anthropic-ai/sdk'
 import { createClient } from '@supabase/supabase-js'
+import OpenAI from 'openai'
+import { Pinecone } from '@pinecone-database/pinecone'
 
 // ─── Base de connaissance statique ────────────────────────────────────────────
 
@@ -106,15 +108,52 @@ async function buildContext(type: QuestionType, message: string, codeClient: str
   }
 
   if (type === 'rag') {
+    const openaiKey = process.env.OPENAI_API_KEY
     const pineconeKey = process.env.PINECONE_API_KEY
-    if (!pineconeKey) {
-      // Stub RAG : fallback sur la base statique
+    const indexName = process.env.PINECONE_INDEX ?? 'flowdiff-docs'
+
+    if (!openaiKey || !pineconeKey) {
       return `Informations disponibles (base statique) :\n${STATIC_KNOWLEDGE_TEXT}`
     }
-    // TODO : brancher Pinecone quand les clés sont disponibles
-    // const embedding = await openai.embeddings.create(...)
-    // const results = await pinecone.index('flowdiff-docs').query(...)
-    return `Informations disponibles :\n${STATIC_KNOWLEDGE_TEXT}`
+
+    try {
+      // 1. Vectorise la question
+      const openai = new OpenAI({ apiKey: openaiKey })
+      const embeddingRes = await openai.embeddings.create({
+        model: 'text-embedding-3-small',
+        input: message,
+      })
+      const vector = embeddingRes.data[0].embedding
+
+      // 2. Cherche les 3 chunks les plus proches dans Pinecone
+      const pc = new Pinecone({ apiKey: pineconeKey })
+      const index = pc.index(indexName)
+      const queryRes = await index.query({
+        vector,
+        topK: 3,
+        includeMetadata: true,
+      })
+
+      if (!queryRes.matches?.length) {
+        return `Informations disponibles (base statique) :\n${STATIC_KNOWLEDGE_TEXT}`
+      }
+
+      // 3. Construit le contexte depuis les chunks récupérés
+      const chunks = queryRes.matches
+        .map((m) => {
+          const meta = m.metadata as { text?: string; source?: string; page?: number } | undefined
+          if (!meta?.text) return null
+          const ref = meta.source ? ` (${meta.source}${meta.page ? `, p.${meta.page}` : ''})` : ''
+          return `${meta.text}${ref}`
+        })
+        .filter(Boolean)
+        .join('\n\n---\n\n')
+
+      return `Documents de référence :\n${chunks}`
+    } catch (ragErr) {
+      console.error('[Aidenia RAG]', ragErr)
+      return `Informations disponibles (base statique) :\n${STATIC_KNOWLEDGE_TEXT}`
+    }
   }
 
   // static
