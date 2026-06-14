@@ -23,6 +23,16 @@ Branche `feat/real-book-covers`. `detect-missing-covers.mjs` → « Aucune. Tout
 
 ---
 
+## Session en cours — Sélections : rayons Netflix
+
+- [ ] 1. `HorizontalShelf` — flex scroll-x + scroll-snap sur les tuiles
+- [ ] 2. Flèches ‹ › desktop (useRef + scrollBy smooth)
+- [ ] 3. Vraies couvertures dans les tuiles (BookCover via premier livre de la série)
+- [ ] 4. En-têtes de sections améliorés (accent coloré)
+- [ ] 5. CONTEXT.md — mise à jour
+
+---
+
 ## État du build
 TS clean · 180/181 tests passants · session 2026-06-03  
 _(1 test pré-existant failing : `useDashboardConfig.test.ts > has 3 bottomPanels all visible` — non lié, ignoré)_  

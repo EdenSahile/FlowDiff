@@ -10,97 +10,6 @@ import { mq } from '@/lib/responsive'
 import { BackButton as BackNavButton } from '@/components/ui/BackButton'
 
 /* ══════════════════════════════════════════════
-   COUVERTURE SÉRIE — dégradé générique par univers
-   (évite d'afficher une couverture de titre précis)
-══════════════════════════════════════════════ */
-const UNIVERSE_COVER_GRADIENTS: Record<string, [string, string]> = {
-  'BD/Mangas':       ['#C08F2A', '#8B6514'],
-  'Littérature':     ['#4E8C70', '#2D6450'],
-  'Jeunesse':        ['#7E6BC4', '#5A4A9A'],
-  'Adulte-pratique': ['#7A8FA0', '#5A6E80'],
-}
-const DEFAULT_COVER_GRADIENT: [string, string] = ['#5B7EA6', '#3D6391']
-
-function SerieCover({ serie }: { serie: Serie; width?: number; height?: number }) {
-  const [g0, g1] = UNIVERSE_COVER_GRADIENTS[serie.univers] ?? DEFAULT_COVER_GRADIENT
-  const initials = serie.nom
-    .split(/\s+/)
-    .filter(w => w.length > 1)
-    .slice(0, 2)
-    .map(w => w[0].toUpperCase())
-    .join('') || serie.nom[0].toUpperCase()
-
-  return (
-    <CoverWrapper>
-      <CoverFallback style={{ background: `linear-gradient(160deg, ${g0} 0%, ${g1} 100%)` }}>
-        <CoverFallbackSpine />
-        <CoverFallbackInitials>{initials}</CoverFallbackInitials>
-        <CoverFallbackText>{serie.nom}</CoverFallbackText>
-        <CoverFallbackLabel>couv. fictive</CoverFallbackLabel>
-      </CoverFallback>
-    </CoverWrapper>
-  )
-}
-
-const CoverWrapper = styled.div`
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-`
-
-const CoverFallback = styled.div`
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 10px 8px 6px;
-  gap: 4px;
-`
-
-const CoverFallbackInitials = styled.div`
-  font-size: 30px;
-  font-weight: 900;
-  color: rgba(255, 255, 255, 0.55);
-  letter-spacing: -0.02em;
-  line-height: 1;
-  flex-shrink: 0;
-`
-
-const CoverFallbackSpine = styled.div`
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 5px;
-  background: rgba(201, 168, 76, 0.6);
-`
-
-const CoverFallbackText = styled.div`
-  font-size: 11px;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.82);
-  text-align: center;
-  line-height: 1.3;
-  display: -webkit-box;
-  -webkit-line-clamp: 5;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  flex: 1;
-  display: flex;
-  align-items: center;
-`
-
-const CoverFallbackLabel = styled.div`
-  font-size: 9px;
-  color: rgba(255, 255, 255, 0.3);
-  font-style: italic;
-  letter-spacing: 0.02em;
-  flex-shrink: 0;
-`
-
-/* ══════════════════════════════════════════════
    TYPES DE FILTRES
 ══════════════════════════════════════════════ */
 type FilterType = Universe | 'Tous' | 'Prix littéraire'
@@ -315,8 +224,8 @@ const SectionHeader = styled.div`
   align-items: center;
   justify-content: space-between;
   margin-bottom: ${({ theme }) => theme.spacing.md};
-  padding-bottom: 10px;
-  border-bottom: 1.5px solid ${({ theme }) => theme.colors.gray[200]};
+  padding-left: 12px;
+  border-left: 3px solid ${({ theme }) => theme.colors.accent};
 `
 
 const SectionTitle = styled.h2`
@@ -335,23 +244,68 @@ const SectionCount = styled.span`
   border-radius: ${({ theme }) => theme.radii.lg};
 `
 
-/* ── Grille responsive : 2→3→4→5 colonnes ── */
-const TileGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-  ${mq.sm} { grid-template-columns: repeat(3, 1fr); gap: 12px; }
-  ${mq.md} { grid-template-columns: repeat(4, 1fr); gap: 14px; }
-  ${mq.lg} { grid-template-columns: repeat(5, 1fr); gap: 14px; }
+/* ── Rayon horizontal Netflix ── */
+const ShelfOuter = styled.div`
+  position: relative;
 `
 
-/* ── Tuile : ratio couverture 2:3 ── */
+const HorizontalShelf = styled.div`
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-bottom: 10px;
+  &::-webkit-scrollbar { display: none; }
+`
+
+const ChevronBtn = styled.button<{ $side: 'left' | 'right' }>`
+  display: none;
+  ${mq.md} {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  position: absolute;
+  top: calc(50% - 5px);
+  transform: translateY(-50%);
+  ${({ $side }) => $side === 'left' ? 'left: 0;' : 'right: 0;'}
+  z-index: 10;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1.5px solid ${({ theme }) => theme.colors.gray[200]};
+  box-shadow: 0 2px 12px rgba(30, 58, 95, 0.18);
+  cursor: pointer;
+  color: ${({ theme }) => theme.colors.navy};
+  transition: background 0.15s, box-shadow 0.15s, transform 0.15s;
+  &:hover {
+    background: ${({ theme }) => theme.colors.navy};
+    color: #fff;
+    box-shadow: 0 4px 20px rgba(30, 58, 95, 0.28);
+    transform: translateY(-50%) scale(1.06);
+  }
+`
+
+const CoverWrapper = styled.div`
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+`
+
+/* ── Tuile : ratio couverture 2:3, largeur fixe pour le rayon horizontal ── */
 const Tile = styled.button`
   position: relative;
   border: none;
   border-radius: ${({ theme }) => theme.radii.lg};
   overflow: hidden;
-  width: 100%;
+  flex-shrink: 0;
+  scroll-snap-align: start;
+  width: 120px;
+  ${mq.sm} { width: 135px; }
+  ${mq.md} { width: 150px; }
   aspect-ratio: 2 / 3;
   cursor: pointer;
   padding: 0;
@@ -1050,6 +1004,12 @@ const ResultCount = styled.div`
 `
 
 /* ── Icônes ── */
+function IconChevronLeft() {
+  return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+}
+function IconChevronRight() {
+  return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+}
 function IconTrophy({ size = 11 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -1134,7 +1094,16 @@ function PLVSection({ offre, nom }: { offre: OffreCommerciale; nom: string }) {
 function HeroTile({ serie, onClick }: { serie: Serie; onClick: () => void }) {
   return (
     <Tile onClick={onClick} aria-label={`Voir la série ${serie.nom}`}>
-      <SerieCover serie={serie} />
+      <CoverWrapper>
+        <BookCover
+          isbn={serie.coverBookId}
+          alt={serie.nom}
+          width={150}
+          height={225}
+          universe={serie.univers}
+          coverUrl={serie.coverUrl}
+        />
+      </CoverWrapper>
       <TileGradient />
       {serie.isOffreSpeciale && <OffreBadge />}
       {serie.isPrixLitteraire && <PrixBadge><IconTrophy size={8} /> Prix</PrixBadge>}
@@ -1146,6 +1115,35 @@ function HeroTile({ serie, onClick }: { serie: Serie; onClick: () => void }) {
         </TileCount>
       </TileLabel>
     </Tile>
+  )
+}
+
+/* ══════════════════════════════════════════════
+   RAYON HORIZONTAL — shelf + flèches desktop
+══════════════════════════════════════════════ */
+function SerieShelf({ series, onSelect }: { series: Serie[]; onSelect: (s: Serie) => void }) {
+  const shelfRef = useRef<HTMLDivElement>(null)
+
+  function scroll(dir: 'left' | 'right') {
+    const el = shelfRef.current
+    if (!el) return
+    el.scrollBy({ left: dir === 'left' ? -480 : 480, behavior: 'smooth' })
+  }
+
+  return (
+    <ShelfOuter>
+      <ChevronBtn $side="left" onClick={() => scroll('left')} aria-label="Défiler à gauche">
+        <IconChevronLeft />
+      </ChevronBtn>
+      <HorizontalShelf ref={shelfRef}>
+        {series.map(serie => (
+          <HeroTile key={serie.id} serie={serie} onClick={() => onSelect(serie)} />
+        ))}
+      </HorizontalShelf>
+      <ChevronBtn $side="right" onClick={() => scroll('right')} aria-label="Défiler à droite">
+        <IconChevronRight />
+      </ChevronBtn>
+    </ShelfOuter>
   )
 }
 
@@ -1332,7 +1330,14 @@ export function SelectionsPage() {
         {/* ── Header série ── */}
         <SerieHeader>
           <SerieHeaderCover>
-            <SerieCover serie={selectedSerie} width={80} height={120} />
+            <BookCover
+              isbn={selectedSerie.coverBookId}
+              alt={selectedSerie.nom}
+              width={80}
+              height={120}
+              universe={selectedSerie.univers}
+              coverUrl={selectedSerie.coverUrl}
+            />
           </SerieHeaderCover>
 
           <SerieHeaderInfo>
@@ -1620,15 +1625,7 @@ export function SelectionsPage() {
               <SectionTitle>{categorie}</SectionTitle>
               <SectionCount>{series.length} série{series.length > 1 ? 's' : ''}</SectionCount>
             </SectionHeader>
-            <TileGrid>
-              {series.map(serie => (
-                <HeroTile
-                  key={serie.id}
-                  serie={serie}
-                  onClick={() => setSelectedSerie(serie)}
-                />
-              ))}
-            </TileGrid>
+            <SerieShelf series={series} onSelect={setSelectedSerie} />
           </Section>
         ))
       )}
