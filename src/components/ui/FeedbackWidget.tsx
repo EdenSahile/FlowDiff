@@ -48,7 +48,7 @@ const spin = keyframes`
 const FAB = styled.button<{ $open: boolean }>`
   position: fixed;
   bottom: calc(${({ theme }) => theme.layout.bottomNavHeight} + 16px);
-  right: 20px;
+  left: 20px;
   z-index: 900;
   width: 52px;
   height: 52px;
@@ -79,7 +79,7 @@ const FAB = styled.button<{ $open: boolean }>`
 
   @media (min-width: ${({ theme }) => theme.breakpoints.mobile}) {
     bottom: calc(${({ theme }) => theme.layout.footerHeight} + 24px);
-    right: 28px;
+    left: 28px;
     width: 56px;
     height: 56px;
   }
@@ -88,7 +88,7 @@ const FAB = styled.button<{ $open: boolean }>`
 const Panel = styled.div`
   position: fixed;
   bottom: calc(${({ theme }) => theme.layout.bottomNavHeight} + 80px);
-  right: 20px;
+  left: 20px;
   z-index: 900;
   width: min(340px, calc(100vw - 40px));
   background: ${({ theme }) => theme.colors.white};
@@ -100,7 +100,7 @@ const Panel = styled.div`
 
   @media (min-width: ${({ theme }) => theme.breakpoints.mobile}) {
     bottom: calc(${({ theme }) => theme.layout.footerHeight} + 84px);
-    right: 28px;
+    left: 28px;
   }
 `
 
