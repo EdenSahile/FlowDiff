@@ -20,7 +20,7 @@ const spin = keyframes`
 
 export const FAB = styled.button`
   position: fixed;
-  bottom: calc(${({ theme }) => theme.layout.bottomNavHeight} + 16px);
+  bottom: ${({ theme }) => theme.layout.bottomNavHeight};
   right: 20px;
   z-index: 901;
   width: 52px;
@@ -46,7 +46,7 @@ export const FAB = styled.button`
   }
 
   @media (min-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    bottom: calc(${({ theme }) => theme.layout.footerHeight} + 24px);
+    bottom: ${({ theme }) => theme.layout.footerHeight};
     right: 28px;
     width: 56px;
     height: 56px;
@@ -68,7 +68,7 @@ export const OnlineDot = styled.span`
 
 export const ChatWindow = styled.div`
   position: fixed;
-  bottom: calc(${({ theme }) => theme.layout.bottomNavHeight} + 80px);
+  bottom: calc(${({ theme }) => theme.layout.bottomNavHeight} + 56px);
   right: 20px;
   z-index: 901;
   width: min(350px, calc(100vw - 32px));
@@ -83,7 +83,7 @@ export const ChatWindow = styled.div`
   animation: ${css`${slideUp}`} 220ms cubic-bezier(0.16, 1, 0.3, 1) both;
 
   @media (min-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    bottom: calc(${({ theme }) => theme.layout.footerHeight} + 88px);
+    bottom: calc(${({ theme }) => theme.layout.footerHeight} + 56px);
     right: 28px;
   }
 `
