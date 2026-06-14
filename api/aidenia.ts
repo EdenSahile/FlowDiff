@@ -47,11 +47,10 @@ function classify(message: string): QuestionType {
   const m = message.toLowerCase()
   if (/livre|disponib|catalogue|isbn|titre|auteur|série|tome|manga|bd|roman|stock/.test(m))
     return 'livres'
-  if (/commande|facture|panier|livraison|statut|historique|paiement|cmd/.test(m))
+  if (/commande|facture|panier|statut|historique|paiement|cmd/.test(m))
     return 'commandes'
-  if (/cgv|condition|retour|délai|remise|politique|tarif|règle/.test(m))
-    return 'rag'
-  return 'static'
+  // Tout le reste → RAG (Pinecone) avec fallback base statique
+  return 'rag'
 }
 
 // ─── Supabase service-role client (server-side uniquement) ───────────────────
