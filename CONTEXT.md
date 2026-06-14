@@ -6,22 +6,14 @@
 
 ---
 
-## Session en cours — Vraies couvertures (suite)
+## Couvertures — TERMINÉ ✅ (82/82 propres)
 
-Branche `feat/real-book-covers`. Réparation des couvertures cassées détectées par `scripts/detect-missing-covers.mjs`.
+Branche `feat/real-book-covers`. `detect-missing-covers.mjs` → « Aucune. Toutes les couvertures sont de vrais visuels. »
 
-### Étape 1 — Re-fetch des 23 covers cassées ✅
-- [x] Créer `scripts/refetch-covers.mjs` (détection dynamique + override manuel → Google isbn → Google titre → OL isbn → OL search titre, validation octets **avec retry** vs rate-limit OL, update `cover_url` seul)
-- [x] **23/23 réparées.** 18 auto (Google/OL) + 5 via `MANUAL_OVERRIDE` (cover_i OL vérifiés : Les Deux Gredins, James et la Grosse Pêche, La Potion magique de Georges Bouillon, La Zizanie [cover FR], Le Lion la Sorcière). Vérifié : `detect-missing-covers.mjs` ne liste plus aucune des 23.
-
-### Étape 2 — Remplacer les 5 titres Slimani fictifs ⏸ BLOQUÉ quota Google (reprise demain)
-- [~] `scripts/replace-slimani.mjs` prêt (vrais titres : Le pays des autres, Regardez-nous danser, J'emporterai le feu, Dans le jardin de l'ogre, Le parfum des fleurs la nuit). Cible les ISBN fictifs `…010/011/012/013/015`, met `fictif=false`.
-- **Bloqué** : quota journalier Google Books épuisé (429) → run = 0/5, base intacte. **Décision : attendre reset Google demain** (langRestrict=fr → ISBN FR + covers françaises propres) plutôt qu'OL (ISBN étrangers).
-- [ ] Demain : relancer `node scripts/replace-slimani.mjs` puis vérifier `detect-missing-covers.mjs`.
-
-### Étape 3 — Disambiguïsation de tomes (covers partagées) — à faire après étape 2 (Google demain)
-- [ ] My Hero Academia T.2-T.4 (`9782344003459`, `…005002`, `…006467`) → re-fetch par titre exact « My Hero Academia Tome N »
-- [ ] Cahiers d'Esther T.2 (`9782370739007`) → a hérité de la cover du T.1, re-fetch par titre exact « Les Cahiers d'Esther — Histoires de mes 11 ans »
+- **Étape 1** ✅ 23/23 covers cassées réparées (`scripts/refetch-covers.mjs`).
+- **Étape 2** ✅ 5 Slimani fictifs remplacés par de vrais titres + covers FR (`scripts/replace-slimani.mjs`) — `fictif=false`, nouveaux ISBN FR réels.
+- **Étape 3** ✅ tomes à covers partagées corrigés (`scripts/fix-tome-covers.mjs`) : MHA T.2-T.4 (covers série principale via OL) + Cahiers d'Esther T.2 (OL cover_i 12369452). Covers distinctes garanties (rejet des tailles partagées).
+- **Note résiduelle (non bloquant, invisible en UI)** : les ISBN des 3 MHA T.2-T.4 et de Cahiers d'Esther T.2 pointent encore vers les anciens ISBN fictifs (Google les mappait à d'autres livres Glénat) — seules les `cover_url` ont été corrigées. Les couvertures s'affichent correctement ; corriger les ISBN serait un nice-to-have.
 
 ---
 
