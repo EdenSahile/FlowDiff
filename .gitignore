@@ -42,6 +42,8 @@ next-env.d.ts
 *.png
 *.jpg
 *.jpeg
+!public/assets/
+!public/assets/**
 .playwright-mcp/
 /screenshots/
 
