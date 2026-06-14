@@ -53,6 +53,9 @@ next-env.d.ts
 !public/covers/
 !public/covers/**
 
+# PDFs à ingérer dans Pinecone — locaux uniquement, ne pas versionner
+public/docs/
+
 # docs internes — ne pas inclure dans src/
 src/**/*.md
 
