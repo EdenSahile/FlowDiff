@@ -9,6 +9,7 @@ export interface OfficeBook {
   priceTTC: number
   publicationDate: string
   proposedQty: number
+  coverUrl?: string
 }
 
 export interface Office {

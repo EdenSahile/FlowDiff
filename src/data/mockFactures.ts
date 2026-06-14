@@ -23,9 +23,9 @@ export interface LigneFacture {
   editeur:     string
   univers:     string
   quantite:    number
-  ppTTC:       number   // prix public TTC (prix affiché en librairie — source de vérité)
+  ppHT:        number   // prix public HT (tarif éditeur — source de vérité). PP TTC = ppHT × 1,055
   remisePct:   number   // taux de remise accordé (ex : 9)
-  puHT:        number   // (ppTTC / 1.055) × (1 − remisePct/100), arrondi à 2 décimales
+  puHT:        number   // ppHT × (1 − remisePct/100), arrondi à 2 décimales
   montantHT:   number   // puHT × quantite
   montantTTC:  number   // montantHT × 1.055
 }
@@ -79,10 +79,10 @@ export const MOCK_FACTURES: Record<string, Facture[]> = {
       refCommande: 'CMD-2026-0187',
       client: CLIENT_LIB001,
       lignes: [
-        { ref: 'f-lit-01', designation: "L'Étranger",                         isbn: '9782070360024', editeur: 'Éditeur 1', univers: 'Littérature', quantite: 8,  ppTTC: 5.17, remisePct: 9, puHT: 4.46, montantHT: 35.68, montantTTC: 37.64 },
-        { ref: 'f-lit-02', designation: 'Le Petit Prince',                     isbn: '9782070408504', editeur: 'Éditeur 1', univers: 'Littérature', quantite: 6,  ppTTC: 5.49, remisePct: 9, puHT: 4.74, montantHT: 28.44, montantTTC: 29.90 },
-        { ref: 'f-bd-01',  designation: 'Tintin au Tibet',                     isbn: '9782203001046', editeur: 'Éditeur 2', univers: 'BD/Mangas',   quantite: 4,  ppTTC: 9.18, remisePct: 9, puHT: 7.92, montantHT: 31.68, montantTTC: 33.42 },
-        { ref: 'f-jes-01', designation: "Harry Potter à l'école des sorciers", isbn: '9782070584628', editeur: 'Éditeur 3', univers: 'Jeunesse',    quantite: 5,  ppTTC: 7.91, remisePct: 9, puHT: 6.82, montantHT: 34.10, montantTTC: 35.98 },
+        { ref: 'f-lit-01', designation: "L'Étranger",                         isbn: '9782070360024', editeur: 'Éditeur 1', univers: 'Littérature', quantite: 8,  ppHT: 4.90, remisePct: 9, puHT: 4.46, montantHT: 35.68, montantTTC: 37.64 },
+        { ref: 'f-lit-02', designation: 'Le Petit Prince',                     isbn: '9782070408504', editeur: 'Éditeur 1', univers: 'Littérature', quantite: 6,  ppHT: 5.20, remisePct: 9, puHT: 4.74, montantHT: 28.44, montantTTC: 29.90 },
+        { ref: 'f-bd-01',  designation: 'Tintin au Tibet',                     isbn: '9782203001046', editeur: 'Éditeur 2', univers: 'BD/Mangas',   quantite: 4,  ppHT: 8.70, remisePct: 9, puHT: 7.92, montantHT: 31.68, montantTTC: 33.42 },
+        { ref: 'f-jes-01', designation: "Harry Potter à l'école des sorciers", isbn: '9782070584628', editeur: 'Éditeur 3', univers: 'Jeunesse',    quantite: 5,  ppHT: 7.50, remisePct: 9, puHT: 6.82, montantHT: 34.10, montantTTC: 35.98 },
       ],
       totalBrutHT: 142.70, remiseMontant: 12.80, netHT: 129.90,
       tauxTVA: 5.5, montantTVA: 7.14, totalTTC: 137.04,
@@ -98,9 +98,9 @@ export const MOCK_FACTURES: Record<string, Facture[]> = {
       refCommande: 'CMD-2025-0894',
       client: CLIENT_LIB001,
       lignes: [
-        { ref: 'f-lit-03',      designation: 'Notre-Dame de Paris',                          isbn: '9782253004226', editeur: 'Éditeur 4', univers: 'Littérature', quantite: 10, ppTTC: 6.22,  remisePct: 0, puHT: 5.90,  montantHT: 59.00, montantTTC: 62.25 },
-        { ref: 'f-bd-02',       designation: 'Astérix chez les Bretons',                     isbn: '9782012101517', editeur: 'Éditeur 5', univers: 'BD/Mangas',   quantite: 6,  ppTTC: 7.70,  remisePct: 0, puHT: 7.30,  montantHT: 43.80, montantTTC: 46.21 },
-        { ref: 'f-lit-sapiens', designation: "Sapiens — Une brève histoire de l'humanité",   isbn: '9782226257017', editeur: 'Éditeur 6', univers: 'Littérature', quantite: 3,  ppTTC: 14.98, remisePct: 0, puHT: 14.20, montantHT: 42.60, montantTTC: 44.94 },
+        { ref: 'f-lit-03',      designation: 'Notre-Dame de Paris',                          isbn: '9782253004226', editeur: 'Éditeur 4', univers: 'Littérature', quantite: 10, ppHT: 5.90,  remisePct: 0, puHT: 5.90,  montantHT: 59.00, montantTTC: 62.25 },
+        { ref: 'f-bd-02',       designation: 'Astérix chez les Bretons',                     isbn: '9782012101517', editeur: 'Éditeur 5', univers: 'BD/Mangas',   quantite: 6,  ppHT: 7.30,  remisePct: 0, puHT: 7.30,  montantHT: 43.80, montantTTC: 46.21 },
+        { ref: 'f-lit-sapiens', designation: "Sapiens — Une brève histoire de l'humanité",   isbn: '9782226257017', editeur: 'Éditeur 6', univers: 'Littérature', quantite: 3,  ppHT: 14.20, remisePct: 0, puHT: 14.20, montantHT: 42.60, montantTTC: 44.94 },
       ],
       totalBrutHT: 145.40, remiseMontant: 0, netHT: 145.40,
       tauxTVA: 5.5, montantTVA: 8.00, totalTTC: 153.40,
@@ -116,8 +116,8 @@ export const MOCK_FACTURES: Record<string, Facture[]> = {
       refCommande: 'CMD-2025-0801',
       client: CLIENT_LIB001,
       lignes: [
-        { ref: 'n-lit-02', designation: 'Chanson douce',        isbn: '9782072773396', editeur: 'Éditeur 1', univers: 'Littérature', quantite: 5, ppTTC: 14.14, remisePct: 0, puHT: 13.40, montantHT: 67.00, montantTTC: 70.69 },
-        { ref: 'n-bd-02',  designation: 'My Hero Academia T.1', isbn: '9782344000656', editeur: 'Éditeur 7', univers: 'BD/Mangas',   quantite: 8, ppTTC: 6.28,  remisePct: 0, puHT: 5.95,  montantHT: 47.60, montantTTC: 50.22 },
+        { ref: 'n-lit-02', designation: 'Chanson douce',        isbn: '9782072773396', editeur: 'Éditeur 1', univers: 'Littérature', quantite: 5, ppHT: 13.40, remisePct: 0, puHT: 13.40, montantHT: 67.00, montantTTC: 70.69 },
+        { ref: 'n-bd-02',  designation: 'My Hero Academia T.1', isbn: '9782344000656', editeur: 'Éditeur 7', univers: 'BD/Mangas',   quantite: 8, ppHT: 5.95,  remisePct: 0, puHT: 5.95,  montantHT: 47.60, montantTTC: 50.22 },
       ],
       totalBrutHT: 114.60, remiseMontant: 0, netHT: 114.60,
       tauxTVA: 5.5, montantTVA: 6.30, totalTTC: 120.90,
@@ -133,9 +133,9 @@ export const MOCK_FACTURES: Record<string, Facture[]> = {
       refCommande: 'CMD-2025-0776',
       client: CLIENT_LIB001,
       lignes: [
-        { ref: 'n-lit-01', designation: "L'Anomalie",                          isbn: '9782072886447', editeur: 'Éditeur 1', univers: 'Littérature', quantite: 4, ppTTC: 14.88, remisePct: 5, puHT: 13.40, montantHT: 53.60, montantTTC: 56.55 },
-        { ref: 'n-bd-03',  designation: 'Le Voyageur des confins T.1',         isbn: '9782370730220', editeur: 'Éditeur 9', univers: 'BD/Mangas',   quantite: 6, ppTTC: 10.55, remisePct: 5, puHT: 9.50,  montantHT: 57.00, montantTTC: 60.14 },
-        { ref: 'f-jes-01', designation: "Harry Potter à l'école des sorciers", isbn: '9782070584628', editeur: 'Éditeur 3', univers: 'Jeunesse',    quantite: 3, ppTTC: 7.91,  remisePct: 5, puHT: 7.12,  montantHT: 21.36, montantTTC: 22.53 },
+        { ref: 'n-lit-01', designation: "L'Anomalie",                          isbn: '9782072886447', editeur: 'Éditeur 1', univers: 'Littérature', quantite: 4, ppHT: 14.10, remisePct: 5, puHT: 13.40, montantHT: 53.60, montantTTC: 56.55 },
+        { ref: 'n-bd-03',  designation: 'Le Voyageur des confins T.1',         isbn: '9782370730220', editeur: 'Éditeur 9', univers: 'BD/Mangas',   quantite: 6, ppHT: 10.00, remisePct: 5, puHT: 9.50,  montantHT: 57.00, montantTTC: 60.14 },
+        { ref: 'f-jes-01', designation: "Harry Potter à l'école des sorciers", isbn: '9782070584628', editeur: 'Éditeur 3', univers: 'Jeunesse',    quantite: 3, ppHT: 7.50,  remisePct: 5, puHT: 7.12,  montantHT: 21.36, montantTTC: 22.53 },
       ],
       totalBrutHT: 138.90, remiseMontant: 6.94, netHT: 131.96,
       tauxTVA: 5.5, montantTVA: 7.26, totalTTC: 139.22,
@@ -151,8 +151,8 @@ export const MOCK_FACTURES: Record<string, Facture[]> = {
       refCommande: 'CMD-2025-0692',
       client: CLIENT_LIB001,
       lignes: [
-        { ref: 'n-jes-02', designation: 'Matilda',         isbn: '9782070514830', editeur: 'Éditeur 3', univers: 'Jeunesse',  quantite: 10, ppTTC: 6.22, remisePct: 0, puHT: 5.90, montantHT: 59.00, montantTTC: 62.25 },
-        { ref: 'n-bd-01',  designation: 'Kaguya-sama T.1', isbn: '9782505079385', editeur: 'Éditeur 8', univers: 'BD/Mangas', quantite: 8,  ppTTC: 6.28, remisePct: 0, puHT: 5.95, montantHT: 47.60, montantTTC: 50.22 },
+        { ref: 'n-jes-02', designation: 'Matilda',         isbn: '9782070514830', editeur: 'Éditeur 3', univers: 'Jeunesse',  quantite: 10, ppHT: 5.90, remisePct: 0, puHT: 5.90, montantHT: 59.00, montantTTC: 62.25 },
+        { ref: 'n-bd-01',  designation: 'Kaguya-sama T.1', isbn: '9782505079385', editeur: 'Éditeur 8', univers: 'BD/Mangas', quantite: 8,  ppHT: 5.95, remisePct: 0, puHT: 5.95, montantHT: 47.60, montantTTC: 50.22 },
       ],
       totalBrutHT: 106.60, remiseMontant: 0, netHT: 106.60,
       tauxTVA: 5.5, montantTVA: 5.86, totalTTC: 112.46,
@@ -168,10 +168,10 @@ export const MOCK_FACTURES: Record<string, Facture[]> = {
       refCommande: 'CMD-2025-0638',
       client: CLIENT_LIB001,
       lignes: [
-        { ref: 'f-lit-sapiens', designation: "Sapiens — Une brève histoire de l'humanité", isbn: '9782226257017', editeur: 'Éditeur 6', univers: 'Littérature', quantite: 4,  ppTTC: 14.98, remisePct: 9, puHT: 12.92, montantHT: 51.68, montantTTC: 54.52 },
-        { ref: 'f-bd-01',       designation: 'Tintin au Tibet',                            isbn: '9782203001046', editeur: 'Éditeur 2', univers: 'BD/Mangas',   quantite: 5,  ppTTC: 9.18,  remisePct: 9, puHT: 7.92,  montantHT: 39.60, montantTTC: 41.78 },
-        { ref: 'f-lit-03',      designation: 'Notre-Dame de Paris',                        isbn: '9782253004226', editeur: 'Éditeur 4', univers: 'Littérature', quantite: 3,  ppTTC: 6.22,  remisePct: 9, puHT: 5.37,  montantHT: 16.11, montantTTC: 17.00 },
-        { ref: 'f-lit-01',      designation: "L'Étranger",                                 isbn: '9782070360024', editeur: 'Éditeur 1', univers: 'Littérature', quantite: 10, ppTTC: 5.17,  remisePct: 9, puHT: 4.46,  montantHT: 44.60, montantTTC: 47.05 },
+        { ref: 'f-lit-sapiens', designation: "Sapiens — Une brève histoire de l'humanité", isbn: '9782226257017', editeur: 'Éditeur 6', univers: 'Littérature', quantite: 4,  ppHT: 14.20, remisePct: 9, puHT: 12.92, montantHT: 51.68, montantTTC: 54.52 },
+        { ref: 'f-bd-01',       designation: 'Tintin au Tibet',                            isbn: '9782203001046', editeur: 'Éditeur 2', univers: 'BD/Mangas',   quantite: 5,  ppHT: 8.70,  remisePct: 9, puHT: 7.92,  montantHT: 39.60, montantTTC: 41.78 },
+        { ref: 'f-lit-03',      designation: 'Notre-Dame de Paris',                        isbn: '9782253004226', editeur: 'Éditeur 4', univers: 'Littérature', quantite: 3,  ppHT: 5.90,  remisePct: 9, puHT: 5.37,  montantHT: 16.11, montantTTC: 17.00 },
+        { ref: 'f-lit-01',      designation: "L'Étranger",                                 isbn: '9782070360024', editeur: 'Éditeur 1', univers: 'Littérature', quantite: 10, ppHT: 4.90,  remisePct: 9, puHT: 4.46,  montantHT: 44.60, montantTTC: 47.05 },
       ],
       totalBrutHT: 167.00, remiseMontant: 15.01, netHT: 151.99,
       tauxTVA: 5.5, montantTVA: 8.36, totalTTC: 160.35,
@@ -187,9 +187,9 @@ export const MOCK_FACTURES: Record<string, Facture[]> = {
       refCommande: 'CMD-2025-0581',
       client: CLIENT_LIB001,
       lignes: [
-        { ref: 'f-lit-02', designation: 'Le Petit Prince',                    isbn: '9782070408504', editeur: 'Éditeur 1', univers: 'Littérature', quantite: 15, ppTTC: 5.49, remisePct: 0, puHT: 5.20, montantHT: 78.00, montantTTC: 82.29 },
-        { ref: 'f-bd-02',  designation: 'Astérix chez les Bretons',          isbn: '9782012101517', editeur: 'Éditeur 5', univers: 'BD/Mangas',   quantite: 8,  ppTTC: 7.70, remisePct: 0, puHT: 7.30, montantHT: 58.40, montantTTC: 61.61 },
-        { ref: 'f-jes-01', designation: "Harry Potter à l'école des sorciers", isbn: '9782070584628', editeur: 'Éditeur 3', univers: 'Jeunesse',    quantite: 6,  ppTTC: 7.91, remisePct: 0, puHT: 7.50, montantHT: 45.00, montantTTC: 47.48 },
+        { ref: 'f-lit-02', designation: 'Le Petit Prince',                    isbn: '9782070408504', editeur: 'Éditeur 1', univers: 'Littérature', quantite: 15, ppHT: 5.20, remisePct: 0, puHT: 5.20, montantHT: 78.00, montantTTC: 82.29 },
+        { ref: 'f-bd-02',  designation: 'Astérix chez les Bretons',          isbn: '9782012101517', editeur: 'Éditeur 5', univers: 'BD/Mangas',   quantite: 8,  ppHT: 7.30, remisePct: 0, puHT: 7.30, montantHT: 58.40, montantTTC: 61.61 },
+        { ref: 'f-jes-01', designation: "Harry Potter à l'école des sorciers", isbn: '9782070584628', editeur: 'Éditeur 3', univers: 'Jeunesse',    quantite: 6,  ppHT: 7.50, remisePct: 0, puHT: 7.50, montantHT: 45.00, montantTTC: 47.48 },
       ],
       totalBrutHT: 181.40, remiseMontant: 0, netHT: 181.40,
       tauxTVA: 5.5, montantTVA: 9.98, totalTTC: 191.38,
@@ -205,8 +205,8 @@ export const MOCK_FACTURES: Record<string, Facture[]> = {
       refCommande: 'CMD-2025-0510',
       client: CLIENT_LIB001,
       lignes: [
-        { ref: 'f-lit-02', designation: 'Le Petit Prince', isbn: '9782070408504', editeur: 'Éditeur 1', univers: 'Littérature', quantite: 20, ppTTC: 5.49, remisePct: 0, puHT: 5.20, montantHT: 104.00, montantTTC: 109.72 },
-        { ref: 'n-jes-02', designation: 'Matilda',         isbn: '9782070514830', editeur: 'Éditeur 3', univers: 'Jeunesse',    quantite: 8,  ppTTC: 6.22, remisePct: 0, puHT: 5.90, montantHT: 47.20,  montantTTC: 49.80  },
+        { ref: 'f-lit-02', designation: 'Le Petit Prince', isbn: '9782070408504', editeur: 'Éditeur 1', univers: 'Littérature', quantite: 20, ppHT: 5.20, remisePct: 0, puHT: 5.20, montantHT: 104.00, montantTTC: 109.72 },
+        { ref: 'n-jes-02', designation: 'Matilda',         isbn: '9782070514830', editeur: 'Éditeur 3', univers: 'Jeunesse',    quantite: 8,  ppHT: 5.90, remisePct: 0, puHT: 5.90, montantHT: 47.20,  montantTTC: 49.80  },
       ],
       totalBrutHT: 151.20, remiseMontant: 0, netHT: 151.20,
       tauxTVA: 5.5, montantTVA: 8.32, totalTTC: 159.52,
@@ -222,8 +222,8 @@ export const MOCK_FACTURES: Record<string, Facture[]> = {
       refCommande: 'CMD-2025-0477',
       client: CLIENT_LIB001,
       lignes: [
-        { ref: 'n-pra-02', designation: 'Guide Larousse du jardinage et du potager', isbn: '9782035876614', editeur: 'Éditeur 10', univers: 'Adulte-pratique', quantite: 4, ppTTC: 20.99, remisePct: 7, puHT: 18.50, montantHT: 74.00, montantTTC: 78.07 },
-        { ref: 'n-pra-01', designation: "Pâtisserie — L'ultime référence",           isbn: '9782812303067', editeur: 'Éditeur 10', univers: 'Adulte-pratique', quantite: 2, ppTTC: 42.09, remisePct: 7, puHT: 37.10, montantHT: 74.20, montantTTC: 78.28 },
+        { ref: 'n-pra-02', designation: 'Guide Larousse du jardinage et du potager', isbn: '9782035876614', editeur: 'Éditeur 10', univers: 'Adulte-pratique', quantite: 4, ppHT: 19.90, remisePct: 7, puHT: 18.50, montantHT: 74.00, montantTTC: 78.07 },
+        { ref: 'n-pra-01', designation: "Pâtisserie — L'ultime référence",           isbn: '9782812303067', editeur: 'Éditeur 10', univers: 'Adulte-pratique', quantite: 2, ppHT: 39.90, remisePct: 7, puHT: 37.10, montantHT: 74.20, montantTTC: 78.28 },
       ],
       totalBrutHT: 159.40, remiseMontant: 11.20, netHT: 148.20,
       tauxTVA: 5.5, montantTVA: 8.15, totalTTC: 156.35,
@@ -239,8 +239,8 @@ export const MOCK_FACTURES: Record<string, Facture[]> = {
       refCommande: 'CMD-2025-0401',
       client: CLIENT_LIB001,
       lignes: [
-        { ref: 'n-lit-01', designation: "L'Anomalie",       isbn: '9782072886447', editeur: 'Éditeur 1',  univers: 'Littérature', quantite: 5, ppTTC: 14.88, remisePct: 0, puHT: 14.10, montantHT: 70.50, montantTTC: 74.38 },
-        { ref: 'n-lit-03', designation: 'Histoire du fils', isbn: '9782283030066', editeur: 'Éditeur 11', univers: 'Littérature', quantite: 6, ppTTC: 12.34, remisePct: 0, puHT: 11.70, montantHT: 70.20, montantTTC: 74.06 },
+        { ref: 'n-lit-01', designation: "L'Anomalie",       isbn: '9782072886447', editeur: 'Éditeur 1',  univers: 'Littérature', quantite: 5, ppHT: 14.10, remisePct: 0, puHT: 14.10, montantHT: 70.50, montantTTC: 74.38 },
+        { ref: 'n-lit-03', designation: 'Histoire du fils', isbn: '9782283030066', editeur: 'Éditeur 11', univers: 'Littérature', quantite: 6, ppHT: 11.70, remisePct: 0, puHT: 11.70, montantHT: 70.20, montantTTC: 74.06 },
       ],
       totalBrutHT: 140.70, remiseMontant: 0, netHT: 140.70,
       tauxTVA: 5.5, montantTVA: 7.74, totalTTC: 148.44,
@@ -256,9 +256,9 @@ export const MOCK_FACTURES: Record<string, Facture[]> = {
       refCommande: 'CMD-2025-0368',
       client: CLIENT_LIB001,
       lignes: [
-        { ref: 'f-bd-01', designation: 'Tintin au Tibet',      isbn: '9782203001046', editeur: 'Éditeur 2', univers: 'BD/Mangas', quantite: 6,  ppTTC: 9.18, remisePct: 0, puHT: 8.70, montantHT: 52.20, montantTTC: 55.07 },
-        { ref: 'n-bd-02', designation: 'My Hero Academia T.1', isbn: '9782344000656', editeur: 'Éditeur 7', univers: 'BD/Mangas', quantite: 10, ppTTC: 6.28, remisePct: 0, puHT: 5.95, montantHT: 59.50, montantTTC: 62.77 },
-        { ref: 'n-bd-01', designation: 'Kaguya-sama T.1',      isbn: '9782505079385', editeur: 'Éditeur 8', univers: 'BD/Mangas', quantite: 6,  ppTTC: 6.28, remisePct: 0, puHT: 5.95, montantHT: 35.70, montantTTC: 37.66 },
+        { ref: 'f-bd-01', designation: 'Tintin au Tibet',      isbn: '9782203001046', editeur: 'Éditeur 2', univers: 'BD/Mangas', quantite: 6,  ppHT: 8.70, remisePct: 0, puHT: 8.70, montantHT: 52.20, montantTTC: 55.07 },
+        { ref: 'n-bd-02', designation: 'My Hero Academia T.1', isbn: '9782344000656', editeur: 'Éditeur 7', univers: 'BD/Mangas', quantite: 10, ppHT: 5.95, remisePct: 0, puHT: 5.95, montantHT: 59.50, montantTTC: 62.77 },
+        { ref: 'n-bd-01', designation: 'Kaguya-sama T.1',      isbn: '9782505079385', editeur: 'Éditeur 8', univers: 'BD/Mangas', quantite: 6,  ppHT: 5.95, remisePct: 0, puHT: 5.95, montantHT: 35.70, montantTTC: 37.66 },
       ],
       totalBrutHT: 147.40, remiseMontant: 0, netHT: 147.40,
       tauxTVA: 5.5, montantTVA: 8.11, totalTTC: 155.51,
@@ -274,9 +274,9 @@ export const MOCK_FACTURES: Record<string, Facture[]> = {
       refCommande: 'CMD-2025-0311',
       client: CLIENT_LIB001,
       lignes: [
-        { ref: 'f-jes-01',      designation: "Harry Potter à l'école des sorciers", isbn: '9782070584628', editeur: 'Éditeur 3', univers: 'Jeunesse', quantite: 12, ppTTC: 7.91, remisePct: 9, puHT: 6.82, montantHT: 81.84, montantTTC: 86.34 },
-        { ref: 'f-jes-charlie', designation: 'Charlie et la Chocolaterie',          isbn: '9782070584819', editeur: 'Éditeur 3', univers: 'Jeunesse', quantite: 8,  ppTTC: 6.22, remisePct: 9, puHT: 5.37, montantHT: 42.96, montantTTC: 45.32 },
-        { ref: 'n-jes-02',      designation: 'Matilda',                             isbn: '9782070514830', editeur: 'Éditeur 3', univers: 'Jeunesse', quantite: 10, ppTTC: 6.22, remisePct: 9, puHT: 5.37, montantHT: 53.70, montantTTC: 56.65 },
+        { ref: 'f-jes-01',      designation: "Harry Potter à l'école des sorciers", isbn: '9782070584628', editeur: 'Éditeur 3', univers: 'Jeunesse', quantite: 12, ppHT: 7.50, remisePct: 9, puHT: 6.82, montantHT: 81.84, montantTTC: 86.34 },
+        { ref: 'f-jes-charlie', designation: 'Charlie et la Chocolaterie',          isbn: '9782070584819', editeur: 'Éditeur 3', univers: 'Jeunesse', quantite: 8,  ppHT: 5.90, remisePct: 9, puHT: 5.37, montantHT: 42.96, montantTTC: 45.32 },
+        { ref: 'n-jes-02',      designation: 'Matilda',                             isbn: '9782070514830', editeur: 'Éditeur 3', univers: 'Jeunesse', quantite: 10, ppHT: 5.90, remisePct: 9, puHT: 5.37, montantHT: 53.70, montantTTC: 56.65 },
       ],
       totalBrutHT: 196.20, remiseMontant: 17.70, netHT: 178.50,
       tauxTVA: 5.5, montantTVA: 9.82, totalTTC: 188.32,
@@ -292,8 +292,8 @@ export const MOCK_FACTURES: Record<string, Facture[]> = {
       refCommande: 'CMD-2025-0274',
       client: CLIENT_LIB001,
       lignes: [
-        { ref: 'f-lit-01', designation: "L'Étranger",         isbn: '9782070360024', editeur: 'Éditeur 1', univers: 'Littérature', quantite: 15, ppTTC: 5.17, remisePct: 0, puHT: 4.90, montantHT: 73.50, montantTTC: 77.54 },
-        { ref: 'f-lit-03', designation: 'Notre-Dame de Paris', isbn: '9782253004226', editeur: 'Éditeur 4', univers: 'Littérature', quantite: 8,  ppTTC: 6.22, remisePct: 0, puHT: 5.90, montantHT: 47.20, montantTTC: 49.80 },
+        { ref: 'f-lit-01', designation: "L'Étranger",         isbn: '9782070360024', editeur: 'Éditeur 1', univers: 'Littérature', quantite: 15, ppHT: 4.90, remisePct: 0, puHT: 4.90, montantHT: 73.50, montantTTC: 77.54 },
+        { ref: 'f-lit-03', designation: 'Notre-Dame de Paris', isbn: '9782253004226', editeur: 'Éditeur 4', univers: 'Littérature', quantite: 8,  ppHT: 5.90, remisePct: 0, puHT: 5.90, montantHT: 47.20, montantTTC: 49.80 },
       ],
       totalBrutHT: 120.70, remiseMontant: 0, netHT: 120.70,
       tauxTVA: 5.5, montantTVA: 6.64, totalTTC: 127.34,
@@ -309,9 +309,9 @@ export const MOCK_FACTURES: Record<string, Facture[]> = {
       refCommande: 'CMD-2025-0218',
       client: CLIENT_LIB001,
       lignes: [
-        { ref: 'n-bd-03',       designation: 'Le Voyageur des confins T.1',                  isbn: '9782370730220', editeur: 'Éditeur 9', univers: 'BD/Mangas',   quantite: 5, ppTTC: 10.55, remisePct: 0, puHT: 10.00, montantHT: 50.00, montantTTC: 52.75 },
-        { ref: 'f-lit-sapiens', designation: "Sapiens — Une brève histoire de l'humanité",   isbn: '9782226257017', editeur: 'Éditeur 6', univers: 'Littérature', quantite: 4, ppTTC: 14.98, remisePct: 0, puHT: 14.20, montantHT: 56.80, montantTTC: 59.92 },
-        { ref: 'n-lit-02',      designation: 'Chanson douce',                                isbn: '9782072773396', editeur: 'Éditeur 1', univers: 'Littérature', quantite: 3, ppTTC: 14.14, remisePct: 0, puHT: 13.40, montantHT: 40.20, montantTTC: 42.41 },
+        { ref: 'n-bd-03',       designation: 'Le Voyageur des confins T.1',                  isbn: '9782370730220', editeur: 'Éditeur 9', univers: 'BD/Mangas',   quantite: 5, ppHT: 10.00, remisePct: 0, puHT: 10.00, montantHT: 50.00, montantTTC: 52.75 },
+        { ref: 'f-lit-sapiens', designation: "Sapiens — Une brève histoire de l'humanité",   isbn: '9782226257017', editeur: 'Éditeur 6', univers: 'Littérature', quantite: 4, ppHT: 14.20, remisePct: 0, puHT: 14.20, montantHT: 56.80, montantTTC: 59.92 },
+        { ref: 'n-lit-02',      designation: 'Chanson douce',                                isbn: '9782072773396', editeur: 'Éditeur 1', univers: 'Littérature', quantite: 3, ppHT: 13.40, remisePct: 0, puHT: 13.40, montantHT: 40.20, montantTTC: 42.41 },
       ],
       totalBrutHT: 147.00, remiseMontant: 0, netHT: 147.00,
       tauxTVA: 5.5, montantTVA: 8.09, totalTTC: 155.09,
@@ -327,8 +327,8 @@ export const MOCK_FACTURES: Record<string, Facture[]> = {
       refCommande: 'CMD-2025-0181',
       client: CLIENT_LIB001,
       lignes: [
-        { ref: 'f-bd-02', designation: 'Astérix chez les Bretons', isbn: '9782012101517', editeur: 'Éditeur 5', univers: 'BD/Mangas', quantite: 10, ppTTC: 7.70, remisePct: 5, puHT: 6.93, montantHT: 69.30, montantTTC: 73.11 },
-        { ref: 'f-bd-01', designation: 'Tintin au Tibet',          isbn: '9782203001046', editeur: 'Éditeur 2', univers: 'BD/Mangas', quantite: 8,  ppTTC: 9.18, remisePct: 5, puHT: 8.27, montantHT: 66.16, montantTTC: 69.80 },
+        { ref: 'f-bd-02', designation: 'Astérix chez les Bretons', isbn: '9782012101517', editeur: 'Éditeur 5', univers: 'BD/Mangas', quantite: 10, ppHT: 7.30, remisePct: 5, puHT: 6.93, montantHT: 69.30, montantTTC: 73.11 },
+        { ref: 'f-bd-01', designation: 'Tintin au Tibet',          isbn: '9782203001046', editeur: 'Éditeur 2', univers: 'BD/Mangas', quantite: 8,  ppHT: 8.70, remisePct: 5, puHT: 8.27, montantHT: 66.16, montantTTC: 69.80 },
       ],
       totalBrutHT: 142.60, remiseMontant: 7.14, netHT: 135.46,
       tauxTVA: 5.5, montantTVA: 7.45, totalTTC: 142.91,

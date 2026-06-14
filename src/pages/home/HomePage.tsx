@@ -2627,6 +2627,7 @@ export function HomePage() {
                                 universe={book.universe}
                                 authors={book.authors}
                                 publisher={book.publisher}
+                                coverUrl={book.coverUrl}
                               />
                             </MiniCoverWrap>
                             <UniverseBadge $bg={badge.bg} $text={badge.text}>

@@ -45,6 +45,14 @@ next-env.d.ts
 .playwright-mcp/
 /screenshots/
 
+# …sauf les captures du README (portfolio)
+!docs/screenshots/
+!docs/screenshots/**
+
+# …et les couvertures de livres auto-hébergées
+!public/covers/
+!public/covers/**
+
 # docs internes — ne pas inclure dans src/
 src/**/*.md
 

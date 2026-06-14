@@ -3,50 +3,10 @@ import styled from 'styled-components'
 import type { Universe } from '@/data/mockBooks'
 
 /* ══════════════════════════════════════════════
-   Module-level cover cache (survit aux re-renders)
-   string  = URL trouvée
-   null    = aucune cover disponible
-   absent  = pas encore cherché
+   Couvertures auto-hébergées dans /public/covers/{isbn}.jpg
+   (téléchargées via scripts/download-covers.mjs).
+   Plus aucune dépendance runtime à books.google.com / openlibrary.
    ══════════════════════════════════════════════ */
-const coverCache = new Map<string, string | null>()
-const pendingFetches = new Map<string, Promise<string | null>>()
-
-async function fetchGoogleBooksCover(isbn: string): Promise<string | null> {
-  if (coverCache.has(isbn)) return coverCache.get(isbn)!
-  if (pendingFetches.has(isbn)) return pendingFetches.get(isbn)!
-
-  const promise = (async (): Promise<string | null> => {
-    try {
-      const res = await fetch(
-        `https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}&fields=items(volumeInfo/imageLinks)&maxResults=1`
-      )
-      if (!res.ok) { coverCache.set(isbn, null); return null }
-      const data = await res.json()
-      const links = data?.items?.[0]?.volumeInfo?.imageLinks
-      const raw: string | undefined =
-        links?.large || links?.medium || links?.thumbnail || links?.smallThumbnail
-      if (!raw) { coverCache.set(isbn, null); return null }
-      // Améliore la qualité + force HTTPS + retire le curl décoratif
-      const url = raw
-        .replace('zoom=1', 'zoom=3')
-        .replace('http://', 'https://')
-        .replace('&edge=curl', '')
-      coverCache.set(isbn, url)
-      return url
-    } catch {
-      coverCache.set(isbn, null)
-      return null
-    } finally {
-      pendingFetches.delete(isbn)
-    }
-  })()
-
-  pendingFetches.set(isbn, promise)
-  return promise
-}
-
-/* ── États de la machine de couverture ── */
-type CoverState = 'openlibrary' | 'googlebooks' | 'failed'
 
 /* ── Déco SVG par univers ── */
 function Deco({ universe, accent, w, h }: { universe: Universe; accent: string; w: number; h: number }) {
@@ -186,7 +146,7 @@ const CoverImg = styled.img<{ $visible: boolean }>`
   object-position: center top;
   display: block;
   opacity: ${({ $visible }) => ($visible ? 1 : 0)};
-  transition: opacity 0.25s ease;
+  transition: opacity 0.12s ease;
 `
 
 /* ── Props ── */
@@ -200,6 +160,7 @@ interface Props {
   publisher?: string
   collection?: string
   fill?: boolean
+  coverUrl?: string
 }
 
 function BookCoverBase({
@@ -212,32 +173,15 @@ function BookCoverBase({
   publisher = '',
   collection,
   fill = false,
+  coverUrl,
 }: Props) {
-  const [coverState, setCoverState] = useState<CoverState>('openlibrary')
-  const [imgLoaded, setImgLoaded] = useState(false)
-  const [googleUrl, setGoogleUrl] = useState<string | null>(null)
+  // Source unique et fiable : coverUrl (Supabase → /covers/…) sinon l'image
+  // auto-hébergée par ISBN. Le placeholder reste en dessous comme secours.
+  const src = coverUrl || `/covers/${isbn}.jpg`
+  const [loaded, setLoaded] = useState(false)
 
-  // Reset quand l'ISBN change
-  useEffect(() => {
-    setCoverState('openlibrary')
-    setImgLoaded(false)
-    setGoogleUrl(null)
-  }, [isbn])
-
-  // Fetch Google Books quand Open Library échoue
-  useEffect(() => {
-    if (coverState !== 'googlebooks') return
-    let cancelled = false
-    fetchGoogleBooksCover(isbn).then(url => {
-      if (cancelled) return
-      if (url) {
-        setGoogleUrl(url)
-      } else {
-        setCoverState('failed')
-      }
-    })
-    return () => { cancelled = true }
-  }, [coverState, isbn])
+  // Reset l'état de chargement quand la source change
+  useEffect(() => { setLoaded(false) }, [src])
 
   const titleFs  = Math.max(8,  Math.round(height * 0.10))
   const authorFs = Math.max(7,  Math.round(height * 0.08))
@@ -246,9 +190,6 @@ function BookCoverBase({
 
   const fallbackBg     = '#232f3e'
   const fallbackAccent = '#C9A84C'
-
-  // URL selon l'état actuel
-  const openLibraryUrl = `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`
 
   return (
     <Wrapper $w={width} $h={height} $fill={fill}>
@@ -264,54 +205,26 @@ function BookCoverBase({
         </TitleArea>
       )}
 
-      {/* Open Library — tentative 1 */}
-      {coverState === 'openlibrary' && (
-        <CoverImg
-          src={openLibraryUrl}
-          alt={alt}
-          loading="lazy"
-          $visible={imgLoaded}
-          onError={() => {
-            setImgLoaded(false)
-            setCoverState('googlebooks')
-          }}
-          onLoad={(e) => {
-            const img = e.currentTarget
-            // Open Library renvoie une image 1×1 si pas de couverture
-            if (img.naturalWidth < 10 || img.naturalHeight < 10) {
-              setCoverState('googlebooks')
-            } else {
-              setImgLoaded(true)
-            }
-          }}
-        />
-      )}
-
-      {/* Google Books — tentative 2 */}
-      {coverState === 'googlebooks' && googleUrl && (
-        <CoverImg
-          src={googleUrl}
-          alt={alt}
-          loading="lazy"
-          $visible={imgLoaded}
-          onError={() => {
-            setImgLoaded(false)
-            setCoverState('failed')
-          }}
-          onLoad={(e) => {
-            const img = e.currentTarget
-            if (img.naturalWidth < 10 || img.naturalHeight < 10) {
-              setCoverState('failed')
-            } else {
-              setImgLoaded(true)
-            }
-          }}
-        />
-      )}
+      {/* Couverture auto-hébergée (locale) — chargement immédiat, fondu court */}
+      <CoverImg
+        src={src}
+        alt={alt}
+        loading="eager"
+        decoding="async"
+        $visible={loaded}
+        onLoad={(e) => {
+          const img = e.currentTarget
+          setLoaded(img.naturalWidth >= 10 && img.naturalHeight >= 10)
+        }}
+        onError={() => setLoaded(false)}
+      />
     </Wrapper>
   )
 }
 
 export const BookCover = memo(BookCoverBase, (prev, next) =>
-  prev.isbn === next.isbn && prev.width === next.width && prev.height === next.height
+  prev.isbn === next.isbn &&
+  prev.width === next.width &&
+  prev.height === next.height &&
+  prev.coverUrl === next.coverUrl
 )

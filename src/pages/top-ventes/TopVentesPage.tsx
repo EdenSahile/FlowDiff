@@ -499,7 +499,7 @@ function ListItem({
       <RowRank>{rank}</RowRank>
       <div style={{ flexShrink: 0, borderRadius: 4, overflow: 'hidden' }}>
         <BookCover isbn={book.isbn} alt={book.title} width={42} height={58}
-          universe={book.universe} authors={book.authors} publisher={book.publisher} />
+          universe={book.universe} authors={book.authors} publisher={book.publisher} coverUrl={book.coverUrl} />
       </div>
       <RowInfo>
         <RowTitle>{book.title}</RowTitle>

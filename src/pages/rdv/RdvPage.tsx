@@ -509,6 +509,7 @@ export function RdvPage() {
                     authors={book.authors}
                     publisher={book.publisher}
                     collection={book.collection}
+                    coverUrl={book.coverUrl}
                   />
 
                   {/* Infos + actions */}
