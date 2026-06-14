@@ -15,6 +15,12 @@ Branche `feat/real-book-covers`. `detect-missing-covers.mjs` → « Aucune. Tout
 - **Étape 3** ✅ tomes à covers partagées corrigés (`scripts/fix-tome-covers.mjs`) : MHA T.2-T.4 (covers série principale via OL) + Cahiers d'Esther T.2 (OL cover_i 12369452). Covers distinctes garanties (rejet des tailles partagées).
 - **Note résiduelle (non bloquant, invisible en UI)** : les ISBN des 3 MHA T.2-T.4 et de Cahiers d'Esther T.2 pointent encore vers les anciens ISBN fictifs (Google les mappait à d'autres livres Glénat) — seules les `cover_url` ont été corrigées. Les couvertures s'affichent correctement ; corriger les ISBN serait un nice-to-have.
 
+### Auto-hébergement + fixes affichage covers ✅
+- **Cause racine** : 56/82 `cover_url` pointaient vers `books.google.com` qui throttle le hotlinking navigateur → placeholders bleus. Bug fiche : `getBookByIdAsync` (`.single()`) échouait dans le navigateur → fallback MOCK_BOOKS sans coverUrl → BookCover retombait sur Google → bleu permanent.
+- **Fix** : `scripts/download-covers.mjs` télécharge les 82 covers dans `public/covers/{isbn}.jpg`, réécrit `cover_url → /covers/{isbn}.jpg`. `.gitignore` : exception `public/covers/`.
+- `BookCover.tsx` simplifié : charge `/covers/{isbn}.jpg` (ou coverUrl), placeholder en secours, `loading="eager"` + fondu 0,12s. **Supprimé** : table Google codée en dur, fetch API navigateur, machine d'états Google/OL.
+- `services/books.ts` : cache module-level (1 fetch Supabase/session) → plus de re-flash à la navigation ; `getBookByIdAsync` lit le cache (`.find`) au lieu du `.single()` fragile.
+
 ---
 
 ## État du build

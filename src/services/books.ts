@@ -32,39 +32,45 @@ function rowToBook(row: Row): Book {
   }
 }
 
+/* ─────────────────────────────────────────
+   Cache module-level : un seul fetch Supabase par session.
+   Évite le re-fetch (et le flash de placeholders) à chaque navigation,
+   et fiabilise getBookByIdAsync (lecture en mémoire plutôt que .single()).
+───────────────────────────────────────── */
+let booksCache: Book[] | null = null
+let booksPromise: Promise<Book[]> | null = null
+
+async function loadAllBooks(): Promise<Book[]> {
+  if (booksCache) return booksCache
+  if (booksPromise) return booksPromise
+  booksPromise = (async () => {
+    try {
+      const { data, error } = await supabase.from('livres').select('*')
+      if (error) throw error
+      booksCache = (data ?? []).length > 0 ? (data ?? []).map(rowToBook) : MOCK_BOOKS
+    } catch {
+      booksCache = MOCK_BOOKS
+    } finally {
+      booksPromise = null
+    }
+    return booksCache!
+  })()
+  return booksPromise
+}
+
 export async function getAllBooksAsync(): Promise<Book[]> {
-  try {
-    const { data, error } = await supabase.from('livres').select('*')
-    if (error) throw error
-    return (data ?? []).length > 0 ? (data ?? []).map(rowToBook) : MOCK_BOOKS
-  } catch {
-    return MOCK_BOOKS
-  }
+  return loadAllBooks()
 }
 
 export async function getBooksByTypeAsync(type: BookType, universe?: Universe): Promise<Book[]> {
-  try {
-    const base = supabase.from('livres').select('*').eq('type', type)
-    const query = universe ? base.eq('universe', universe) : base
-    const { data, error } = await query
-    if (error) throw error
-    const fallback = MOCK_BOOKS.filter(b => b.type === type)
-    const result = (data ?? []).map(rowToBook)
-    return result.length > 0 ? result : (universe ? fallback.filter(b => b.universe === universe) : fallback)
-  } catch {
-    const fallback = MOCK_BOOKS.filter(b => b.type === type)
-    return universe ? fallback.filter(b => b.universe === universe) : fallback
-  }
+  const all = await loadAllBooks()
+  const byType = all.filter(b => b.type === type)
+  return universe ? byType.filter(b => b.universe === universe) : byType
 }
 
 export async function getBookByIdAsync(id: string): Promise<Book | null> {
-  try {
-    const { data, error } = await supabase.from('livres').select('*').eq('id', id).single()
-    if (error) throw error
-    return rowToBook(data as Row)
-  } catch {
-    return getBookByIdLocal(id) ?? null
-  }
+  const all = await loadAllBooks()
+  return all.find(b => b.id === id) ?? getBookByIdLocal(id) ?? null
 }
 
 export function searchBooksLocal(books: Book[], query: string): Book[] {

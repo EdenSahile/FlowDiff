@@ -49,6 +49,10 @@ next-env.d.ts
 !docs/screenshots/
 !docs/screenshots/**
 
+# …et les couvertures de livres auto-hébergées
+!public/covers/
+!public/covers/**
+
 # docs internes — ne pas inclure dans src/
 src/**/*.md
 
