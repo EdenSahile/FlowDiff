@@ -69,9 +69,22 @@ async function buildContext(type: QuestionType, message: string, codeClient: str
     const supabase = getSupabaseAdmin()
     if (!supabase) return '[Catalogue non disponible — configuration Supabase manquante]'
 
-    // Extrait des mots-clés pour la recherche
+    // Détecte si le message contient un ISBN (10 ou 13 chiffres)
+    const isbnMatch = message.match(/\b(\d{10}|\d{13})\b/)
+    if (isbnMatch) {
+      const { data: byIsbn } = await supabase
+        .from('livres')
+        .select('titre, auteur, isbn, disponible, prix_ttc, editeur')
+        .eq('isbn', isbnMatch[1])
+        .limit(1)
+
+      if (byIsbn?.length) return `Livre trouvé :\n${byIsbn.map(formatBook).join('\n')}`
+      return `Aucun livre trouvé pour l'ISBN ${isbnMatch[1]} dans le catalogue.`
+    }
+
+    // Extrait des mots-clés pour la recherche par titre
     const keywords = message
-      .replace(/livre|disponible|est-ce que|trouver|cherche|avez-vous/gi, '')
+      .replace(/livre|disponible|est-ce que|trouver|cherche|avez-vous|statut|titre/gi, '')
       .trim()
       .slice(0, 60)
 
