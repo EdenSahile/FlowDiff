@@ -1091,7 +1091,7 @@ function PLVSection({ offre, nom }: { offre: OffreCommerciale; nom: string }) {
 /* ══════════════════════════════════════════════
    COMPOSANT TUILE
 ══════════════════════════════════════════════ */
-function HeroTile({ serie, onClick }: { serie: Serie; onClick: () => void }) {
+function HeroTile({ serie, resolvedCoverUrl, onClick }: { serie: Serie; resolvedCoverUrl?: string; onClick: () => void }) {
   return (
     <Tile onClick={onClick} aria-label={`Voir la série ${serie.nom}`}>
       <CoverWrapper>
@@ -1101,7 +1101,7 @@ function HeroTile({ serie, onClick }: { serie: Serie; onClick: () => void }) {
           width={150}
           height={225}
           universe={serie.univers}
-          coverUrl={serie.coverUrl}
+          coverUrl={resolvedCoverUrl}
         />
       </CoverWrapper>
       <TileGradient />
@@ -1121,7 +1121,7 @@ function HeroTile({ serie, onClick }: { serie: Serie; onClick: () => void }) {
 /* ══════════════════════════════════════════════
    RAYON HORIZONTAL — shelf + flèches desktop
 ══════════════════════════════════════════════ */
-function SerieShelf({ series, onSelect }: { series: Serie[]; onSelect: (s: Serie) => void }) {
+function SerieShelf({ series, allBooks, onSelect }: { series: Serie[]; allBooks: Book[]; onSelect: (s: Serie) => void }) {
   const shelfRef = useRef<HTMLDivElement>(null)
 
   function scroll(dir: 'left' | 'right') {
@@ -1136,9 +1136,17 @@ function SerieShelf({ series, onSelect }: { series: Serie[]; onSelect: (s: Serie
         <IconChevronLeft />
       </ChevronBtn>
       <HorizontalShelf ref={shelfRef}>
-        {series.map(serie => (
-          <HeroTile key={serie.id} serie={serie} onClick={() => onSelect(serie)} />
-        ))}
+        {series.map(serie => {
+          const coverBook = allBooks.find(b => b.id === serie.coverBookId)
+          return (
+            <HeroTile
+              key={serie.id}
+              serie={serie}
+              resolvedCoverUrl={coverBook?.coverUrl}
+              onClick={() => onSelect(serie)}
+            />
+          )
+        })}
       </HorizontalShelf>
       <ChevronBtn $side="right" onClick={() => scroll('right')} aria-label="Défiler à droite">
         <IconChevronRight />
@@ -1336,7 +1344,7 @@ export function SelectionsPage() {
               width={80}
               height={120}
               universe={selectedSerie.univers}
-              coverUrl={selectedSerie.coverUrl}
+              coverUrl={serieBooks[0]?.coverUrl}
             />
           </SerieHeaderCover>
 
@@ -1625,7 +1633,7 @@ export function SelectionsPage() {
               <SectionTitle>{categorie}</SectionTitle>
               <SectionCount>{series.length} série{series.length > 1 ? 's' : ''}</SectionCount>
             </SectionHeader>
-            <SerieShelf series={series} onSelect={setSelectedSerie} />
+            <SerieShelf series={series} allBooks={allBooks} onSelect={setSelectedSerie} />
           </Section>
         ))
       )}
