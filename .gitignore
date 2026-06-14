@@ -67,3 +67,4 @@ docs/dev/COMPTES_TEST.md
 # Superpowers — fichiers générés localement, non versionnés
 .superpowers/
 *.skill
+CONTEXT.md
