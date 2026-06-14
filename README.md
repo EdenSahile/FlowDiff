@@ -12,10 +12,10 @@
   <img alt="Tests" src="https://img.shields.io/badge/tests-180%2B%20passing-success">
 </p>
 
-**🔗 Démo live :** https://flowdiff-omega.vercel.app/login
+**🔗 Démo live :**`https://flowdiff-omega.vercel.app/login`
 **🔑 Connexion :** les identifiants de démo sont **déjà pré-remplis** — il suffit de cliquer sur **Se connecter**.
-
-![Aperçu FlowDiff — Tableau de bord](docs/screenshots/Dashboard.png)
+ 
+ 📸  ![Aperçu FlowDiff](docs/screenshots/dashboard.png)
 
 ---
 
@@ -106,9 +106,11 @@ npm run build    # build de production (tsc + vite)
 
 ## 📸 Captures
 
-| Catalogue | EDI EDIFACT |
-|---|---|
-| ![Catalogue FlowDiff](docs/screenshots/catalogue.png) | ![EDI EDIFACT](docs/screenshots/edi.png) |
+
+| Tableau de bord | Catalogue | EDI EDIFACT |
+|---|---|---|
+| ![Dashboard](docs/screenshots/dashboard.png) | ![Catalogue](docs/screenshots/catalogue.png) | ![EDI](docs/screenshots/edi.png) |
+
 
 ---
 
