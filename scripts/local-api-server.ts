@@ -1,23 +1,12 @@
 /**
  * Serveur local pour tester les routes /api/ sans vercel dev.
- * Usage : npx tsx scripts/local-api-server.ts
+ * Usage : npm run dev:api
+ * Le --watch de tsx détecte les changements dans ce fichier ET api/aidenia.ts
+ * car le handler est importé statiquement (pas dynamiquement).
  */
 import http from 'http'
 import { URL } from 'url'
-
-process.loadEnvFile?.('.env')
-
-// Polyfill process.env depuis .env manuellement si loadEnvFile absent
-if (!process.env.ANTHROPIC_API_KEY) {
-  const fs = await import('fs')
-  const dotenv = fs.readFileSync('.env', 'utf-8')
-  for (const line of dotenv.split('\n')) {
-    const [key, ...rest] = line.split('=')
-    if (key && !key.startsWith('#') && rest.length) {
-      process.env[key.trim()] = rest.join('=').trim().replace(/^"|"$/g, '')
-    }
-  }
-}
+import handler from '../api/aidenia.js'
 
 const PORT = 4000
 
@@ -46,16 +35,13 @@ const server = http.createServer(async (req, res) => {
         }
         const mockRes = {
           _status: 200,
-          _body: '',
           status(code: number) { this._status = code; return this },
           json(data: unknown) {
-            this._body = JSON.stringify(data)
             res.writeHead(this._status, { 'Content-Type': 'application/json' })
-            res.end(this._body)
+            res.end(JSON.stringify(data))
           },
         }
 
-        const { default: handler } = await import('../api/aidenia.js')
         await handler(mockReq as never, mockRes as never)
       } catch (err) {
         console.error('[local-api]', err)

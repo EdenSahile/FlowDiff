@@ -97,13 +97,29 @@ async function buildContext(type: QuestionType, message: string, codeClient: str
   }
 
   if (type === 'commandes') {
-    // Commandes/factures pas encore migrées dans Supabase — données mock côté client
-    return [
-      `Le libraire connecté a le code client : ${codeClient}.`,
-      'Les commandes et factures sont gérées localement dans l\'application.',
-      'Pour les détails précis, invitez le libraire à consulter les sections "Historique" et "Facturation" dans FlowDiff.',
-      'Vous pouvez lui indiquer comment y accéder et ce qu\'il peut y faire.',
-    ].join('\n')
+    const supabase = getSupabaseAdmin()
+    if (!supabase) return '[Commandes non disponibles — configuration Supabase manquante]'
+
+    const { data, error } = await supabase
+      .from('commandes')
+      .select('id, date, statut, montant_ht, montant_ttc, articles')
+      .eq('code_client', codeClient)
+      .order('date', { ascending: false })
+      .limit(10)
+
+    if (error || !data?.length) {
+      return `Aucune commande trouvée pour le code client ${codeClient}.`
+    }
+
+    const lines = data.map((c) => {
+      const date = new Date(c.date).toLocaleDateString('fr-FR')
+      const articles = Array.isArray(c.articles)
+        ? c.articles.map((a: Record<string, unknown>) => `${a.titre ?? a.isbn} (x${a.quantite ?? 1})`).join(', ')
+        : '—'
+      return `- ${date} | ${c.statut} | ${c.montant_ttc}€ TTC | Articles : ${articles}`
+    })
+
+    return `Dernières commandes du libraire (code client : ${codeClient}) :\n${lines.join('\n')}`
   }
 
   if (type === 'rag') {
