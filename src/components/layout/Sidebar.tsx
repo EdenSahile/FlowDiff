@@ -204,7 +204,39 @@ const infoItems = [
   { to: '/aide',        label: 'Aide'        },
 ]
 
-export function Sidebar() {
+const FeedbackBtn = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.45);
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 12px;
+  font-weight: 400;
+  padding: 6px 0;
+  text-align: left;
+  transition: color 0.15s;
+  margin-bottom: 8px;
+
+  &:hover { color: rgba(255, 255, 255, 0.75); }
+`
+
+function IconFeedbackSidebar() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+    </svg>
+  )
+}
+
+interface SidebarProps {
+  onFeedbackOpen?: () => void
+}
+
+export function Sidebar({ onFeedbackOpen }: SidebarProps) {
   const { user, logout } = useAuthContext()
   const navigate = useNavigate()
   const { pathname } = useLocation()
@@ -275,8 +307,13 @@ export function Sidebar() {
           </nav>
         </ScrollArea>
 
-        {/* ── Bas : logout + user ── */}
+        {/* ── Bas : feedback + logout + user ── */}
         <SidebarBottom>
+          {onFeedbackOpen && (
+            <FeedbackBtn onClick={onFeedbackOpen} aria-label="Donner un avis">
+              <IconFeedbackSidebar /> Donner un avis
+            </FeedbackBtn>
+          )}
           <LogoutBtn onClick={() => setConfirmLogout(true)}>
             <IconLogout /> Se déconnecter
           </LogoutBtn>

@@ -45,52 +45,13 @@ const spin = keyframes`
 
 // ─── Styled components ────────────────────────────────────────────────────────
 
-const FAB = styled.button<{ $open: boolean }>`
-  position: fixed;
-  bottom: calc(${({ theme }) => theme.layout.bottomNavHeight} + 16px);
-  left: 20px;
-  z-index: 900;
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  border: none;
-  background: ${({ theme }) => theme.colors.primary};
-  color: ${({ theme }) => theme.colors.accent};
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
-  transition: background 200ms ease, transform 150ms ease, box-shadow 200ms ease;
-
-  &:hover {
-    background: ${({ theme }) => theme.colors.primaryHover};
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-    transform: scale(1.06);
-  }
-
-  &:active {
-    transform: scale(0.96);
-  }
-
-  svg {
-    transition: opacity 150ms ease;
-  }
-
-  @media (min-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    bottom: calc(${({ theme }) => theme.layout.footerHeight} + 24px);
-    left: 28px;
-    width: 56px;
-    height: 56px;
-  }
-`
-
 const Panel = styled.div`
   position: fixed;
-  bottom: calc(${({ theme }) => theme.layout.bottomNavHeight} + 80px);
-  left: 20px;
+  /* Mobile : au-dessus de la BottomNav, pleine largeur */
+  bottom: calc(${({ theme }) => theme.layout.bottomNavHeight} + 12px);
+  left: 16px;
+  right: 16px;
   z-index: 900;
-  width: min(340px, calc(100vw - 40px));
   background: ${({ theme }) => theme.colors.white};
   border: 1px solid ${({ theme }) => theme.colors.gray[200]};
   border-radius: 16px;
@@ -99,8 +60,11 @@ const Panel = styled.div`
   overflow: hidden;
 
   @media (min-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    bottom: calc(${({ theme }) => theme.layout.footerHeight} + 84px);
-    left: 28px;
+    /* Desktop : ancré juste à droite de la sidebar, en bas */
+    bottom: 16px;
+    left: calc(${({ theme }) => theme.layout.sidebarWidth} + 12px);
+    right: auto;
+    width: 340px;
   }
 `
 
@@ -410,52 +374,51 @@ function IconSend() {
 
 type Status = 'idle' | 'loading' | 'success' | 'error'
 
-export function FeedbackWidget() {
+interface FeedbackWidgetProps {
+  isOpen: boolean
+  onClose: () => void
+}
+
+export function FeedbackWidget({ isOpen, onClose }: FeedbackWidgetProps) {
   const { pathname } = useLocation()
-  const [open, setOpen] = useState(false)
   const [message, setMessage] = useState('')
   const [status, setStatus] = useState<Status>('idle')
   const [errorText, setErrorText] = useState('')
   const [screenshot, setScreenshot] = useState<string | null>(null)
-  const [capturing, setCapturing] = useState(false)
   const [lightboxOpen, setLightboxOpen] = useState(false)
 
+  // Capture screenshot async quand le panel s'ouvre ; reset quand il se ferme
   useEffect(() => {
-    setOpen(false)
-    setLightboxOpen(false)
-    setScreenshot(null)
-    setMessage('')
-    setStatus('idle')
-    setErrorText('')
+    if (!isOpen) {
+      setLightboxOpen(false)
+      setScreenshot(null)
+      setMessage('')
+      setStatus('idle')
+      setErrorText('')
+      return
+    }
+    import('html2canvas').then(({ default: html2canvas }) =>
+      html2canvas(document.body, {
+        useCORS: true,
+        allowTaint: true,
+        scale: 1,
+        logging: false,
+      })
+        .then(canvas => setScreenshot(canvas.toDataURL('image/jpeg', 0.65)))
+        .catch(() => setScreenshot(null))
+    )
+  }, [isOpen])
+
+  // Fermer sur changement de route
+  useEffect(() => {
+    onClose()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname])
 
   const pageName = getPageName(pathname)
   const charCount = message.trim().length
   const tooLong = charCount > 500
   const canSubmit = isFeedbackValid(message) && status !== 'loading'
-
-  async function handleFabClick() {
-    if (open) {
-      handleClose()
-      return
-    }
-    setCapturing(true)
-    try {
-      const { default: html2canvas } = await import('html2canvas')
-      const canvas = await html2canvas(document.body, {
-        useCORS: true,
-        allowTaint: true,
-        scale: 1,
-        logging: false,
-      })
-      setScreenshot(canvas.toDataURL('image/jpeg', 0.65))
-    } catch {
-      setScreenshot(null)
-    } finally {
-      setCapturing(false)
-      setOpen(true)
-    }
-  }
 
   async function handleSubmit() {
     if (!canSubmit) return
@@ -483,8 +446,8 @@ export function FeedbackWidget() {
   }
 
   function handleClose() {
-    setOpen(false)
     setLightboxOpen(false)
+    onClose()
     if (status === 'success' || status === 'error') {
       setTimeout(() => {
         setStatus('idle')
@@ -493,18 +456,10 @@ export function FeedbackWidget() {
     }
   }
 
+  if (!isOpen) return null
+
   return (
     <>
-      <FAB
-        $open={open}
-        onClick={handleFabClick}
-        disabled={capturing}
-        aria-label={open ? 'Fermer le feedback' : capturing ? 'Capture en cours…' : 'Donner un feedback'}
-        title={open ? 'Fermer' : capturing ? 'Capture en cours…' : 'Feedback'}
-      >
-        {capturing ? <Spinner /> : open ? <IconClose /> : <IconMessage />}
-      </FAB>
-
       {lightboxOpen && screenshot && (
         <LightboxOverlay onClick={() => setLightboxOpen(false)}>
           <LightboxImg
@@ -518,92 +473,90 @@ export function FeedbackWidget() {
         </LightboxOverlay>
       )}
 
-      {open && (
-        <Panel role="dialog" aria-label="Formulaire de feedback">
-          <PanelHeader>
-            <IconMessage />
-            <PanelTitle>Votre avis</PanelTitle>
-            <HeaderCloseBtn onClick={handleClose} aria-label="Fermer">
-              <IconClose />
-            </HeaderCloseBtn>
-          </PanelHeader>
+      <Panel role="dialog" aria-label="Formulaire de feedback">
+        <PanelHeader>
+          <IconMessage />
+          <PanelTitle>Votre avis</PanelTitle>
+          <HeaderCloseBtn onClick={handleClose} aria-label="Fermer">
+            <IconClose />
+          </HeaderCloseBtn>
+        </PanelHeader>
 
-          {status === 'success' ? (
-            <SuccessState>
-              <SuccessIcon>
-                <IconCheck />
-              </SuccessIcon>
-              <SuccessTitle>Merci pour votre feedback !</SuccessTitle>
-              <SuccessText>
-                Votre message a bien été transmis au développeur.
-              </SuccessText>
-            </SuccessState>
-          ) : (
-            <PanelBody>
-              <InfoBanner>
-                Votre feedback sera envoyé par email au développeur du site. Envoi anonyme.
-              </InfoBanner>
+        {status === 'success' ? (
+          <SuccessState>
+            <SuccessIcon>
+              <IconCheck />
+            </SuccessIcon>
+            <SuccessTitle>Merci pour votre feedback !</SuccessTitle>
+            <SuccessText>
+              Votre message a bien été transmis au développeur.
+            </SuccessText>
+          </SuccessState>
+        ) : (
+          <PanelBody>
+            <InfoBanner>
+              Votre feedback sera envoyé par email au développeur du site. Envoi anonyme.
+            </InfoBanner>
 
-              <PageLabel>
-                <IconMapPin />
-                Page actuelle : <span>{pageName}</span>
-              </PageLabel>
+            <PageLabel>
+              <IconMapPin />
+              Page actuelle : <span>{pageName}</span>
+            </PageLabel>
 
-              {screenshot && (
-                <ScreenshotRow>
-                  <ScreenshotThumb
-                    onClick={() => setLightboxOpen(true)}
-                    title="Voir en grand"
-                    aria-label="Voir la capture d'écran en plein écran"
-                  >
-                    <img src={screenshot} alt="Capture d'écran" />
-                  </ScreenshotThumb>
-                  <ScreenshotLabel>Capture d'écran jointe — cliquer pour agrandir</ScreenshotLabel>
-                </ScreenshotRow>
+            {screenshot && (
+              <ScreenshotRow>
+                <ScreenshotThumb
+                  onClick={() => setLightboxOpen(true)}
+                  title="Voir en grand"
+                  aria-label="Voir la capture d'écran en plein écran"
+                >
+                  <img src={screenshot} alt="Capture d'écran" />
+                </ScreenshotThumb>
+                <ScreenshotLabel>Capture d'écran jointe — cliquer pour agrandir</ScreenshotLabel>
+              </ScreenshotRow>
+            )}
+
+            <div>
+              <label htmlFor="feedback-msg" style={{ display: 'none' }}>
+                Votre message
+              </label>
+              <Textarea
+                id="feedback-msg"
+                placeholder="Décrivez votre retour…"
+                value={message}
+                onChange={(e) => {
+                  setMessage(e.target.value)
+                  if (status === 'error') setStatus('idle')
+                }}
+                disabled={status === 'loading'}
+                aria-describedby="feedback-charcount"
+              />
+              <CharCount id="feedback-charcount" $warn={tooLong}>
+                {charCount}/500
+              </CharCount>
+            </div>
+
+            {status === 'error' && errorText && (
+              <ErrorMsg role="alert">{errorText} — Réessayez.</ErrorMsg>
+            )}
+
+            <SubmitButton
+              onClick={handleSubmit}
+              disabled={!canSubmit}
+              aria-busy={status === 'loading'}
+            >
+              {status === 'loading' ? (
+                <><Spinner /><span>Envoi en cours…</span></>
+              ) : (
+                <>
+                  <IconSend />
+                  Envoyer
+                </>
               )}
-
-              <div>
-                <label htmlFor="feedback-msg" style={{ display: 'none' }}>
-                  Votre message
-                </label>
-                <Textarea
-                  id="feedback-msg"
-                  placeholder="Décrivez votre retour…"
-                  value={message}
-                  onChange={(e) => {
-                    setMessage(e.target.value)
-                    if (status === 'error') setStatus('idle')
-                  }}
-                  disabled={status === 'loading'}
-                  aria-describedby="feedback-charcount"
-                />
-                <CharCount id="feedback-charcount" $warn={tooLong}>
-                  {charCount}/500
-                </CharCount>
-              </div>
-
-              {status === 'error' && errorText && (
-                <ErrorMsg role="alert">{errorText} — Réessayez.</ErrorMsg>
-              )}
-
-              <SubmitButton
-                onClick={handleSubmit}
-                disabled={!canSubmit}
-                aria-busy={status === 'loading'}
-              >
-                {status === 'loading' ? (
-                  'Envoi en cours…'
-                ) : (
-                  <>
-                    <IconSend />
-                    Envoyer
-                  </>
-                )}
-              </SubmitButton>
-            </PanelBody>
-          )}
-        </Panel>
-      )}
+            </SubmitButton>
+          </PanelBody>
+        )}
+      </Panel>
     </>
   )
 }

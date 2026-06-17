@@ -51,11 +51,12 @@ export function AppLayout({ children }: AppLayoutProps) {
   const { totalItems } = useCart()
   const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
+  const [feedbackOpen, setFeedbackOpen] = useState(false)
 
   return (
     <LayoutRoot>
-      <Sidebar />
-      <BurgerMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
+      <Sidebar onFeedbackOpen={() => setFeedbackOpen(true)} />
+      <BurgerMenu open={menuOpen} onClose={() => setMenuOpen(false)} onFeedbackOpen={() => setFeedbackOpen(true)} />
       <MainColumn>
         <StickyBand>
           <Header
@@ -71,7 +72,7 @@ export function AppLayout({ children }: AppLayoutProps) {
         <AppFooter />
       </MainColumn>
       <BottomNav />
-      <FeedbackWidget />
+      <FeedbackWidget isOpen={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
       <AideniaChat />
       <OnboardingTour />
     </LayoutRoot>
