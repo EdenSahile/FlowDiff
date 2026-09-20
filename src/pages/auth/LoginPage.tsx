@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom'
 import { useNavigate, useLocation } from 'react-router-dom'
 import styled from 'styled-components'
 import { useAuth } from '@/hooks/useAuth'
-import { loginSchema, getZodErrors, type LoginInput } from '@/lib/authUtils'
+import { loginSchema, getZodErrors, getSafeRedirectPath, type LoginInput } from '@/lib/authUtils'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { DemoBanner } from '@/components/ui/DemoBanner'
@@ -119,7 +119,7 @@ export function LoginPage() {
   const navigate = useNavigate()
   const location = useLocation()
   const { login } = useAuth()
-  const from = (location.state as { from?: string } | null)?.from ?? '/'
+  const from = getSafeRedirectPath((location.state as { from?: string } | null)?.from)
 
   const [form, setForm] = useState<LoginInput>({ identifier: 'LIB001', password: 'Libraire123!' })
   const [fieldErrors, setFieldErrors] = useState<Partial<Record<keyof LoginInput, string>>>({})

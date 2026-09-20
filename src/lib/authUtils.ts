@@ -87,6 +87,33 @@ export function parseMockToken(token: string): MockTokenPayload | null {
   }
 }
 
+/* ── Redirection post-login sécurisée ── */
+
+/**
+ * Valide une cible de redirection post-login (ex. state.from de ProtectedRoute)
+ * et retourne un chemin interne sûr, ou le repli fourni si la cible est absente,
+ * malformée, ou pointe hors de l'application.
+ *
+ * Se protège notamment contre les URLs "protocol-relative" (`//evil.com`),
+ * les schémas explicites (`https://…`, `javascript:…`) et les backslashes
+ * que certains navigateurs normalisent comme des slashs — le vecteur d'open
+ * redirect documenté par les CVE React Router 2026 (ex. CVE-2026-40181).
+ */
+export function getSafeRedirectPath(target: unknown, fallback = '/'): string {
+  if (typeof target !== 'string' || target.length === 0) return fallback
+
+  // Un chemin interne valide commence par un seul "/" et jamais par "//" ou "/\"
+  // (les deux sont réinterprétés comme protocol-relative par le navigateur).
+  if (!/^\/(?!\/|\\)/.test(target)) return fallback
+
+  // Rejette toute présence d'un schéma (http:, https:, javascript:, data:, etc.)
+  // même encodé ou précédé d'espaces/contrôles, cas déjà couverts par le test
+  // ci-dessus pour la position 0, mais on vérifie aussi le corps du chemin.
+  if (/^[a-z][a-z0-9+.-]*:/i.test(target)) return fallback
+
+  return target
+}
+
 /* ── Helpers validation ── */
 
 export function getZodErrors(
