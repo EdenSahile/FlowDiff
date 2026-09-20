@@ -36,39 +36,6 @@ const nouveautes = MOCK_BOOKS
 
 
 /* ── SVG Icons ── */
-function IconPackage() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 2 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
-      <polyline points="3.29 7 12 12 20.71 7" />
-      <line x1="12" y1="22" x2="12" y2="12" />
-    </svg>
-  )
-}
-
-function IconBooks() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-    </svg>
-  )
-}
-
-function IconClipboard() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
-      <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
-      <line x1="9" y1="12" x2="15" y2="12" />
-      <line x1="9" y1="16" x2="15" y2="16" />
-    </svg>
-  )
-}
-
 function IconChevron({ dir }: { dir: 'left' | 'right' }) {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -80,77 +47,12 @@ function IconChevron({ dir }: { dir: 'left' | 'right' }) {
   )
 }
 
-function IconOrders() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
-      <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
-      <polyline points="9 12 11 14 15 10" />
-    </svg>
-  )
-}
-
-function IconReceipt() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-      <polyline points="14 2 14 8 20 8" />
-      <line x1="9" y1="13" x2="15" y2="13" />
-      <line x1="9" y1="17" x2="15" y2="17" />
-    </svg>
-  )
-}
-
-function IconAlertClock() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <circle cx="12" cy="12" r="10" />
-      <polyline points="12 6 12 12 16 14" />
-    </svg>
-  )
-}
-
-function IconTruck() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <rect x="1" y="3" width="15" height="13" />
-      <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
-      <circle cx="5.5" cy="18.5" r="2.5" />
-      <circle cx="18.5" cy="18.5" r="2.5" />
-    </svg>
-  )
-}
-
 function IconCart() {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" />
       <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
-    </svg>
-  )
-}
-
-function IconEuro() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M4 10h12M4 14h12" />
-      <path d="M19.5 7A7.5 7.5 0 1 0 19.5 17" />
-    </svg>
-  )
-}
-
-function IconBox() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 2 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
-      <polyline points="3.29 7 12 12 20.71 7" /><line x1="12" y1="22" x2="12" y2="12" />
     </svg>
   )
 }
@@ -332,19 +234,6 @@ const DateValue = styled.span`
   line-height: 1.3;
 `
 
-function IconCalendar() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"
-      style={{ color: theme.colors.gray[400], flexShrink: 0 }}>
-      <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-      <line x1="16" y1="2" x2="16" y2="6" />
-      <line x1="8" y1="2" x2="8" y2="6" />
-      <line x1="3" y1="10" x2="21" y2="10" />
-    </svg>
-  )
-}
-
 /* ── Drag handles ── */
 const CardDragHandle = styled.div`
   position: absolute;
@@ -417,20 +306,6 @@ const ActionsSubtitle = styled.p`
   font-size: 11px;
   color: ${({ theme }) => theme.colors.gray[400]};
   margin: 0;
-`
-
-const SeeAllBtn = styled.button`
-  background: white;
-  border: 1px solid ${({ theme }) => theme.colors.gray[200]};
-  border-radius: ${({ theme }) => theme.radii.md};
-  padding: 6px 12px;
-  font-size: 12px;
-  font-weight: 500;
-  color: ${({ theme }) => theme.colors.gray[600]};
-  cursor: pointer;
-  white-space: nowrap;
-  flex-shrink: 0;
-  &:hover { border-color: ${({ theme }) => theme.colors.gray[400]}; }
 `
 
 const ActionsGrid = styled.div`
@@ -785,15 +660,6 @@ const PanelCard = styled.div<{ $dragging?: boolean; $dropTarget?: boolean }>`
   &:hover ${CardDragHandle} { opacity: 1; }
 `
 
-const PanelEyebrow = styled.p`
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: ${({ theme }) => theme.colors.accent};
-  margin: 0 0 2px;
-`
-
 const SectionLabel = styled.p`
   font-size: 10px;
   font-weight: 600;
@@ -867,44 +733,6 @@ const PanelExportBtn = styled.button`
   flex-shrink: 0;
   &:hover {
     background: ${({ theme }) => theme.colors.gray[100]};
-    color: ${({ theme }) => theme.colors.primary};
-  }
-`
-
-const ExportDropdownWrap = styled.div`
-  position: relative;
-`
-
-const ExportDropdownMenu = styled.div<{ $open: boolean }>`
-  display: ${({ $open }) => ($open ? 'block' : 'none')};
-  position: absolute;
-  top: calc(100% + 4px);
-  right: 0;
-  background: ${({ theme }) => theme.colors.white};
-  border: 1px solid ${({ theme }) => theme.colors.gray[200]};
-  border-radius: 8px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.10);
-  min-width: 180px;
-  z-index: 200;
-  padding: 4px 0;
-`
-
-const ExportDropdownItem = styled.button`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-  padding: 9px 14px;
-  background: none;
-  border: none;
-  font-size: 13px;
-  font-weight: 500;
-  color: ${({ theme }) => theme.colors.gray[800]};
-  cursor: pointer;
-  text-align: left;
-  white-space: nowrap;
-  &:hover {
-    background: ${({ theme }) => theme.colors.gray[50]};
     color: ${({ theme }) => theme.colors.primary};
   }
 `
@@ -1146,27 +974,6 @@ const ChartStatDelta = styled.span<{ $up: boolean }>`
   color: ${({ $up }) => $up ? '#16a34a' : '#DC2626'};
 `
 
-function IconSend() {
-  return (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" />
-    </svg>
-  )
-}
-
-function IconOffices() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 2 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
-      <polyline points="3.29 7 12 12 20.71 7" />
-      <line x1="12" y1="22" x2="12" y2="12" />
-      <path d="M6 20l-2-2 2-2" />
-    </svg>
-  )
-}
-
 function IconMonitorList() {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -1175,19 +982,6 @@ function IconMonitorList() {
       <path d="M8 21h8M12 16v5" />
       <line x1="6" y1="8" x2="18" y2="8" />
       <line x1="6" y1="12" x2="14" y2="12" />
-    </svg>
-  )
-}
-
-function IconEDI() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <rect x="3" y="3" width="18" height="18" rx="2" />
-      <line x1="3" y1="9" x2="21" y2="9" />
-      <line x1="3" y1="15" x2="21" y2="15" />
-      <line x1="9" y1="3" x2="9" y2="21" />
-      <line x1="15" y1="3" x2="15" y2="21" />
     </svg>
   )
 }
@@ -1201,15 +995,6 @@ function IconTrophy() {
       <path d="M12 17v4" />
       <path d="M8 21h8" />
       <path d="M6 3h12v8a6 6 0 0 1-12 0V3z" />
-    </svg>
-  )
-}
-
-function IconXCircle() {
-  return (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <circle cx="12" cy="12" r="10" /><line x1="15" y1="9" x2="9" y2="15" /><line x1="9" y1="9" x2="15" y2="15" />
     </svg>
   )
 }
@@ -1570,50 +1355,6 @@ const ReminderBtn = styled.button`
   transition: background 0.15s;
 
   &:hover { background: ${({ theme }) => theme.colors.primaryHover ?? theme.colors.navy}; }
-`
-
-/* ── Shortcuts panel (step 9) ── */
-const ShortcutList = styled.div`
-  display: flex;
-  flex-direction: column;
-`
-
-const ShortcutRow = styled(Link)`
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 11px 4px;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.gray[100]};
-  text-decoration: none;
-  color: inherit;
-  &:last-child { border-bottom: none; }
-  &:hover { background: ${({ theme }) => theme.colors.gray[50]}; }
-`
-
-const ShortcutIconWrap = styled.div`
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  background: ${({ theme }) => theme.colors.gray[100]};
-  color: ${({ theme }) => theme.colors.gray[600]};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  font-size: 18px;
-  line-height: 1;
-`
-
-const ShortcutRowLabel = styled.span`
-  flex: 1;
-  font-size: 13px;
-  color: ${({ theme }) => theme.colors.gray[800]};
-`
-
-const ShortcutChevron = styled.span`
-  font-size: 18px;
-  color: ${({ theme }) => theme.colors.gray[400]};
-  line-height: 1;
 `
 
 /* ── Quick actions (top fixed bar) ── */

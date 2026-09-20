@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 
 vi.mock('@/lib/supabase', () => ({
   supabase: {
@@ -6,6 +6,7 @@ vi.mock('@/lib/supabase', () => ({
   },
 }))
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { supabase } from '@/lib/supabase'
 import { computeCAMois, computeTop5 } from '@/admin/services/adminServices'
 import type { Commande } from '@/admin/types'

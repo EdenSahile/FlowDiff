@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import styled from 'styled-components'
 import { adminColors } from '@/admin/adminTheme'
 import { AdminModal } from '@/admin/components/AdminModal'
@@ -20,22 +20,16 @@ function fmt(n: number) {
 
 export function AdminCommandesPage() {
   const [commandes, setCommandes] = useState<Commande[]>([])
-  const [filtered, setFiltered] = useState<Commande[]>([])
   const [search, setSearch] = useState('')
   const [statutFilter, setStatutFilter] = useState('tous')
   const [loading, setLoading] = useState(true)
   const [detail, setDetail] = useState<Commande | null>(null)
 
-  async function reload() {
-    setLoading(true)
-    const data = await getAllCommandes()
-    setCommandes(data)
-    setLoading(false)
-  }
-
-  useEffect(() => { reload() }, [])
-
   useEffect(() => {
+    getAllCommandes().then(data => { setCommandes(data); setLoading(false) })
+  }, [])
+
+  const filtered = useMemo(() => {
     let list = commandes
     if (statutFilter !== 'tous') list = list.filter(c => c.statut === statutFilter)
     if (search.trim()) {
@@ -45,7 +39,7 @@ export function AdminCommandesPage() {
         c.code_client.toLowerCase().includes(q)
       )
     }
-    setFiltered(list)
+    return list
   }, [commandes, search, statutFilter])
 
   async function handleStatutChange(id: string, statut: StatutCommande) {

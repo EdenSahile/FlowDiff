@@ -172,14 +172,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return { success: true }
   }, [])
 
+  const codeClientForLogout = user?.codeClient
   const logout = useCallback(() => {
-    if (user?.codeClient) {
-      localStorage.removeItem(`bookflow_wishlist_username_${user.codeClient}`)
+    if (codeClientForLogout) {
+      localStorage.removeItem(`bookflow_wishlist_username_${codeClientForLogout}`)
     }
     localStorage.removeItem(TOKEN_KEY)
     setUser(null)
-    /* Panier et historique conservés — partagés entre tous les utilisateurs de la librairie */
-  }, [user?.codeClient])
+  }, [codeClientForLogout])
 
   const value = useMemo(
     () => ({ user, isLoading, login, register, logout }),

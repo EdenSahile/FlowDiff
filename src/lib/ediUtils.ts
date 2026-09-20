@@ -140,7 +140,8 @@ export function groupDESADVByOrder(messages: EDIMessage[]): {
 
     const shippedByIsbn = new Map<string, number>()
     desadvList.forEach(msg => {
-      ;(msg.payload as DESADVPayload).lines.forEach(l => {
+      const desadvPayload = msg.payload as DESADVPayload
+      desadvPayload.lines.forEach(l => {
         shippedByIsbn.set(l.isbn, (shippedByIsbn.get(l.isbn) ?? 0) + l.qtyShipped)
       })
     })

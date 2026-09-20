@@ -44,11 +44,12 @@ export function RdvProvider({ children }: { children: React.ReactNode }) {
   const key = rdvKey(user?.codeClient)
 
   const [items, setItems] = useState<RdvItem[]>(() => loadRdv(rdvKey(user?.codeClient)))
+  const [prevKey, setPrevKey] = useState(key)
 
-  /* Re-charger la sélection RDV quand l'utilisateur change (connexion/déconnexion) */
-  useEffect(() => {
+  if (prevKey !== key) {
+    setPrevKey(key)
     setItems(loadRdv(key))
-  }, [key])
+  }
 
   /* Persistance localStorage — clé par utilisateur (skip si non connecté) */
   useEffect(() => {

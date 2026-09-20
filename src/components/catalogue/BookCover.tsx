@@ -1,4 +1,4 @@
-import { memo, useState, useEffect } from 'react'
+import { memo, useState } from 'react'
 import styled from 'styled-components'
 import type { Universe } from '@/data/mockBooks'
 
@@ -178,10 +178,8 @@ function BookCoverBase({
   // Source unique et fiable : coverUrl (Supabase → /covers/…) sinon l'image
   // auto-hébergée par ISBN. Le placeholder reste en dessous comme secours.
   const src = coverUrl || `/covers/${isbn}.jpg`
-  const [loaded, setLoaded] = useState(false)
-
-  // Reset l'état de chargement quand la source change
-  useEffect(() => { setLoaded(false) }, [src])
+  const [loadedSrc, setLoadedSrc] = useState<string | null>(null)
+  const loaded = loadedSrc === src
 
   const titleFs  = Math.max(8,  Math.round(height * 0.10))
   const authorFs = Math.max(7,  Math.round(height * 0.08))
@@ -214,9 +212,9 @@ function BookCoverBase({
         $visible={loaded}
         onLoad={(e) => {
           const img = e.currentTarget
-          setLoaded(img.naturalWidth >= 10 && img.naturalHeight >= 10)
+          setLoadedSrc(img.naturalWidth >= 10 && img.naturalHeight >= 10 ? src : null)
         }}
-        onError={() => setLoaded(false)}
+        onError={() => setLoadedSrc(null)}
       />
     </Wrapper>
   )

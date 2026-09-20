@@ -121,43 +121,6 @@ const ClearCartBtn = styled.button`
   &:focus-visible { outline: 2px solid ${({ theme }) => theme.colors.error}; outline-offset: 2px; }
 `
 
-/* ══════════════════════════════════════════════════════
-   RÉSUMÉ FINANCIER
-══════════════════════════════════════════════════════ */
-const SummaryCard = styled.div`
-  background: ${({ theme }) => theme.colors.navy};
-  border-radius: ${({ theme }) => theme.radii.xl};
-  padding: ${({ theme }) => theme.spacing.lg};
-  margin-bottom: ${({ theme }) => theme.spacing.xl};
-  color: ${({ theme }) => theme.colors.white};
-`
-
-const SummaryTitle = styled.h2`
-  font-family: ${({ theme }) => theme.typography.fontFamily};
-  font-size: ${({ theme }) => theme.typography.sizes.xs};
-  font-weight: ${({ theme }) => theme.typography.weights.semibold};
-  margin-bottom: ${({ theme }) => theme.spacing.md};
-  opacity: .75;
-  text-transform: uppercase;
-  letter-spacing: .05em;
-`
-
-const SummaryRow = styled.div<{ $total?: boolean }>`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 5px 0;
-  font-family: ${({ theme }) => theme.typography.fontFamily};
-  font-size: ${({ $total, theme }) => $total ? theme.typography.sizes.xl : theme.typography.sizes.sm};
-  font-weight: ${({ $total, theme }) => $total ? theme.typography.weights.bold : theme.typography.weights.normal};
-  border-top: ${({ $total }) => $total ? '1px solid rgba(255,255,255,.2)' : 'none'};
-  margin-top: ${({ $total, theme }) => $total ? theme.spacing.sm : '0'};
-  padding-top: ${({ $total, theme }) => $total ? theme.spacing.sm : '5px'};
-`
-
-const SummaryLabel = styled.span`opacity: .8;`
-const SummaryValue = styled.span``
-
 const RemiseBadge = styled.span`
   background: rgba(255, 255, 255, 0.18);
   border: 1px solid rgba(255, 255, 255, 0.3);

@@ -579,21 +579,6 @@ const EpuiseNoticeEl = styled.p`
   margin: 8px 0 0;
 `
 
-const ParaitreNoticeEl = styled.div`
-  background: #FFF3E0;
-  border: 1px solid #E65100;
-  border-left: 4px solid #E65100;
-  border-radius: ${({ theme }) => theme.radii.md};
-  padding: 10px 14px;
-  font-family: ${({ theme }) => theme.typography.fontFamily};
-  font-size: 13px;
-  color: #C84B00;
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  margin-top: 10px;
-`
-
 const NotesPopinContentEl = styled.div`
   background: #fff;
   border-radius: 14px;
@@ -1338,13 +1323,22 @@ export function FicheProduitPage() {
   const [book, setBook]               = useState<Book | null>(null)
   const [bookLoading, setBookLoading] = useState(true)
   const [similar, setSimilar]         = useState<Book[]>([])
+  const [prevId, setPrevId]           = useState(id)
+
+  if (prevId !== id) {
+    setPrevId(id)
+    if (!id) {
+      setBookLoading(false)
+    } else {
+      setBookLoading(true)
+      setBook(null)
+      setSimilar([])
+    }
+  }
 
   useEffect(() => {
     window.scrollTo(0, 0)
-    if (!id) { setBookLoading(false); return }
-    setBookLoading(true)
-    setBook(null)
-    setSimilar([])
+    if (!id) return
     getBookByIdAsync(id).then(b => {
       setBook(b)
       setBookLoading(false)

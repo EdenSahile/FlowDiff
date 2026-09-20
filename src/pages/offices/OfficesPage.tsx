@@ -621,38 +621,6 @@ const QtyValue = styled.span`
   font-family: ${({ theme }) => theme.typography.fontFamilyMono};
 `
 
-/* ── Status badge with tooltip ── */
-const TooltipWrap = styled.div`
-  position: relative;
-  display: inline-flex;
-
-  .tt {
-    position: absolute;
-    bottom: calc(100% + 7px);
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(17, 17, 17, 0.88);
-    color: #fff;
-    font-size: 11px;
-    line-height: 1.4;
-    padding: 5px 10px;
-    border-radius: 4px;
-    white-space: nowrap;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.15s;
-    z-index: 50;
-    max-width: 220px;
-    white-space: normal;
-    width: max-content;
-    text-align: center;
-  }
-
-  &:hover .tt {
-    opacity: 1;
-  }
-`
-
 const StatusBadge = styled.button<{ $inclus: boolean }>`
   padding: 5px 14px;
   border-radius: 99px;

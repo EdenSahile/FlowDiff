@@ -266,20 +266,22 @@ export function DatePicker({ value, onChange, min, max, placeholder = 'JJ/MM/AAA
   const parsed = parseISO(value)
 
   const [open,     setOpen]     = useState(false)
+  const [prevOpen, setPrevOpen] = useState(false)
   const [view,     setView]     = useState<'months' | 'days'>('months')
   const [navYear,  setNavYear]  = useState(parsed?.year  ?? now.getFullYear())
   const [navMonth, setNavMonth] = useState(parsed?.month ?? now.getMonth())
 
   const containerRef = useRef<HTMLDivElement>(null)
 
-  /* Sync navigation avec la valeur courante à l'ouverture */
-  useEffect(() => {
-    if (!open) return
+  if (open && !prevOpen) {
     const p = parseISO(value)
     setNavYear(p?.year   ?? now.getFullYear())
     setNavMonth(p?.month ?? now.getMonth())
     setView('months')
-  }, [open]) // eslint-disable-line react-hooks/exhaustive-deps
+  }
+  if (open !== prevOpen) {
+    setPrevOpen(open)
+  }
 
   /* Fermeture clic extérieur */
   useEffect(() => {

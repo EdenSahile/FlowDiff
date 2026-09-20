@@ -131,7 +131,7 @@ export function useDashboardConfig() {
   }, [])
 
   const reset = useCallback(() => {
-    try { localStorage.removeItem(LS_KEY) } catch {}
+    try { localStorage.removeItem(LS_KEY) } catch { /* quota or incognito */ }
     setConfig(DEFAULT_CONFIG)
   }, [])
 

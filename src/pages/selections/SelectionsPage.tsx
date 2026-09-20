@@ -746,12 +746,6 @@ const PLVQtyRight = styled.div`
   flex-shrink: 0;
 `
 
-const PLVQtyTotal = styled.div`
-  font-size: 14px;
-  font-weight: 800;
-  color: ${({ theme }) => theme.colors.navy};
-`
-
 /* Bouton ajouter l'OP */
 const OPAddBtn = styled.button<{ $added?: boolean }>`
   width: 100%;

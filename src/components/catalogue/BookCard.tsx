@@ -13,7 +13,6 @@ import { StockStatus } from '@/components/ui/StockStatus'
 import { StockAlertModal } from '@/components/ui/StockAlertModal'
 import { theme } from '@/lib/theme'
 import { formatPrice } from '@/lib/format'
-import { useRdv } from '@/contexts/RdvContext'
 import { RdvPopup } from '@/components/catalogue/RdvPopup'
 
 const CATEGORY_COLORS: Record<string, { bg: string; text: string }> = {
@@ -299,15 +298,6 @@ const EpuiseNote = styled.p`
   text-align: center;
 `
 
-const NotesNote = styled.p`
-  font-size: 10.5px;
-  color: ${({ theme }) => theme.colors.gray[400]};
-  font-style: italic;
-  text-align: center;
-  margin: 0;
-  line-height: 1.3;
-`
-
 const AParaitreFooter = styled.div`
   display: flex;
   flex-direction: column;
@@ -367,45 +357,6 @@ const NotesPopinBtn = styled.button`
   cursor: pointer;
   transition: background .15s;
   &:hover { background: ${({ theme }) => theme.colors.primaryHover}; }
-`
-
-const RdvBadge = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  padding: 4px 10px;
-  background: ${({ theme }) => theme.colors.accentLight};
-  border: 1px solid ${({ theme }) => theme.colors.accent};
-  border-radius: ${({ theme }) => theme.radii.md};
-  font-family: ${({ theme }) => theme.typography.fontFamily};
-  font-size: 11px;
-  font-weight: 600;
-  color: #7a5c00;
-`
-
-const RdvBtn = styled.button`
-  width: 100%;
-  padding: 8px;
-  border: 1.5px solid ${({ theme }) => theme.colors.accent};
-  border-radius: ${({ theme }) => theme.radii.md};
-  background: transparent;
-  color: ${({ theme }) => theme.colors.navy};
-  font-family: ${({ theme }) => theme.typography.fontFamily};
-  font-size: 12.5px;
-  font-weight: ${({ theme }) => theme.typography.weights.semibold};
-  cursor: pointer;
-  transition: background .15s, color .15s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  letter-spacing: 0.02em;
-
-  &:hover {
-    background: ${({ theme }) => theme.colors.accent};
-    color: #3d2f00;
-  }
-  &:active { transform: scale(0.97); }
 `
 
 /* ══════════════════════════════════════
@@ -607,14 +558,6 @@ function IconStar({ filled }: { filled: boolean }) {
   )
 }
 
-function IconPlus() {
-  return (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-      <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-    </svg>
-  )
-}
-
 function IconCheck() {
   return (
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -635,7 +578,6 @@ export function BookCard({ book, showType = false, coverFirst = false }: Props) 
   const { showToast } = useToast()
   const { user }      = useAuth()
   const { isInAnyList, getListsContaining, removeFromList } = useWishlist()
-  const { isInRdv, getQty } = useRdv()
 
   const userRate: number = user?.remisesParUnivers?.[book.universe] != null
     ? user.remisesParUnivers[book.universe] / 100
@@ -648,7 +590,7 @@ export function BookCard({ book, showType = false, coverFirst = false }: Props) 
   const [rdvAnchor, setRdvAnchor] = useState<DOMRect | null>(null)
   const [notesPopinOpen, setNotesPopinOpen] = useState(false)
   const starRef = useRef<HTMLDivElement>(null)
-  const rdvBtnRef = useRef<HTMLButtonElement>(null)
+
 
   const isAParaitre  = book.type === 'a-paraitre'
   const isEpuise     = book.statut === 'epuise' || book.statut === 'rupture'
