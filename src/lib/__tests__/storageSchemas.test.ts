@@ -80,7 +80,7 @@ describe('storedOrdersSchema', () => {
   })
 
   it('refuse une commande sans id', () => {
-    const { id: _id, ...rest } = validOrder
+    const { id: _id, ...rest } = validOrder // eslint-disable-line @typescript-eslint/no-unused-vars
     expect(storedOrdersSchema.safeParse([rest]).success).toBe(false)
   })
 
@@ -108,16 +108,19 @@ describe('storedWishlistsSchema', () => {
   })
 
   it('refuse une liste sans id', () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { id: _id, ...rest } = validList
     expect(storedWishlistsSchema.safeParse([rest]).success).toBe(false)
   })
 
   it('refuse une liste sans name', () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { name: _name, ...rest } = validList
     expect(storedWishlistsSchema.safeParse([rest]).success).toBe(false)
   })
 
   it('refuse une liste sans createdAt', () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { createdAt: _ca, ...rest } = validList
     expect(storedWishlistsSchema.safeParse([rest]).success).toBe(false)
   })

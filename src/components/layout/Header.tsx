@@ -144,16 +144,6 @@ const SearchContainer = styled.div`
   }
 `
 
-const SearchWrap = styled.div`
-  position: relative;
-  display: flex;
-  align-items: center;
-
-  @media (max-width: calc(${({ theme }) => theme.breakpoints.mobile} - 1px)) {
-    flex: 1;
-  }
-`
-
 const SearchIconWrap = styled.span`
   position: absolute;
   left: 11px;
@@ -444,29 +434,6 @@ const DesktopOnly = styled.div`
 
   @media (min-width: ${({ theme }) => theme.breakpoints.mobile}) {
     display: flex;
-  }
-`
-
-const HelpBtn = styled.button`
-  width: 34px; height: 34px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.08);
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  transition: background 0.15s;
-  color: rgba(255,255,255,0.55);
-
-  &:hover { background: rgba(255,255,255,0.14); }
-
-  @media (min-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    background: transparent;
-    border: 1.5px solid ${({ theme }) => theme.colors.gray[200]};
-    color: ${({ theme }) => theme.colors.gray[400]};
-    &:hover { background: ${({ theme }) => theme.colors.gray[50]}; border-color: #b0a898; }
   }
 `
 
@@ -950,27 +917,6 @@ function IconSliders() {
       <circle cx="8" cy="6" r="2" fill="currentColor" stroke="none"/>
       <circle cx="16" cy="12" r="2" fill="currentColor" stroke="none"/>
       <circle cx="10" cy="18" r="2" fill="currentColor" stroke="none"/>
-    </svg>
-  )
-}
-
-function IconBell() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-      stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-      <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-    </svg>
-  )
-}
-
-function IconHelp() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-      stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="10"/>
-      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
-      <line x1="12" y1="17" x2="12.01" y2="17"/>
     </svg>
   )
 }

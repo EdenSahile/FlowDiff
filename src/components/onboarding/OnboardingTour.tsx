@@ -230,11 +230,12 @@ export function OnboardingTour() {
   const navigate = useNavigate()
   const location = useLocation()
 
-  /* Capture des valeurs stables dans des refs pour éviter les stale closures */
   const isDoneRef = useRef(isDone)
   const locationRef = useRef(location)
-  isDoneRef.current = isDone
-  locationRef.current = location
+  useEffect(() => {
+    isDoneRef.current = isDone
+    locationRef.current = location
+  })
 
   function launchDriver() {
     if (driverRef.current) {

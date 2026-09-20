@@ -857,22 +857,26 @@ export function FacturationPage() {
     return list
   }, [allFactures, dateFrom, dateTo, search, sortKey, sortDir])
 
-  /* ── Ref pour lire filtered dans les effects sans dépendance ── */
-  const filteredRef = useRef(filtered)
-  filteredRef.current = filtered
+  const [prevDateFrom, setPrevDateFrom] = useState(dateFrom)
+  const [prevDateTo, setPrevDateTo]     = useState(dateTo)
+  const [prevSearch, setPrevSearch]     = useState(search)
 
-  /* ── Auto-sélection quand le filtre date change ── */
-  useEffect(() => {
+  if (prevDateFrom !== dateFrom || prevDateTo !== dateTo) {
+    setPrevDateFrom(dateFrom)
+    setPrevDateTo(dateTo)
     setPage(1)
     if (dateFrom || dateTo) {
-      setSelectedIds(new Set(filteredRef.current.map(f => f.id)))
+      setSelectedIds(new Set(filtered.map(f => f.id)))
     } else {
       setSelectedIds(new Set())
     }
-  }, [dateFrom, dateTo])
+  }
 
-  /* ── Reset sélection quand la recherche change ── */
-  useEffect(() => { setSelectedIds(new Set()); setPage(1) }, [search])
+  if (prevSearch !== search) {
+    setPrevSearch(search)
+    setSelectedIds(new Set())
+    setPage(1)
+  }
 
   /* ── État du checkbox "tout sélectionner" ── */
   const allFilteredSelected = filtered.length > 0 && filtered.every(f => selectedIds.has(f.id))
@@ -894,7 +898,7 @@ export function FacturationPage() {
   function toggleRow(id: string) {
     setSelectedIds(prev => {
       const next = new Set(prev)
-      next.has(id) ? next.delete(id) : next.add(id)
+      if (next.has(id)) { next.delete(id) } else { next.add(id) }
       return next
     })
   }

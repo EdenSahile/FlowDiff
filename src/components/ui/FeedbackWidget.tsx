@@ -386,17 +386,22 @@ export function FeedbackWidget({ isOpen, onClose }: FeedbackWidgetProps) {
   const [errorText, setErrorText] = useState('')
   const [screenshot, setScreenshot] = useState<string | null>(null)
   const [lightboxOpen, setLightboxOpen] = useState(false)
+  const [prevIsOpen, setPrevIsOpen] = useState(isOpen)
 
-  // Capture screenshot async quand le panel s'ouvre ; reset quand il se ferme
-  useEffect(() => {
+  if (isOpen !== prevIsOpen) {
+    setPrevIsOpen(isOpen)
     if (!isOpen) {
       setLightboxOpen(false)
       setScreenshot(null)
       setMessage('')
       setStatus('idle')
       setErrorText('')
-      return
     }
+  }
+
+  // Capture screenshot async quand le panel s'ouvre
+  useEffect(() => {
+    if (!isOpen) return
     import('html2canvas').then(({ default: html2canvas }) =>
       html2canvas(document.body, {
         useCORS: true,

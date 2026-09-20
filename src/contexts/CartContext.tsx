@@ -199,12 +199,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   /* ── Titres individuels ── */
   const removeFromCart = useCallback((itemKey: string) =>
     setItems(prev => prev.filter(i => getItemKey(i) !== itemKey))
-  , [])
+  , [setItems])
 
   const updateQty = useCallback((itemKey: string, qty: number) => {
     if (qty < 1) { removeFromCart(itemKey); return }
     setItems(prev => prev.map(i => getItemKey(i) === itemKey ? { ...i, quantity: qty } : i))
-  }, [removeFromCart])
+  }, [removeFromCart, setItems])
 
   const addToCart = useCallback((book: Book, qty = 1, opts: AddToCartOptions = {}) => {
     const { ebookOption, enReliquat } = opts
@@ -245,7 +245,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   /* ── OPs ── */
   const removeOP = useCallback((opId: string) =>
     setOpGroups(prev => prev.filter(op => op.id !== opId))
-  , [])
+  , [setOpGroups])
 
   const addOPToCart = useCallback((group: Omit<OPCartGroup, 'id'>) => {
     const opCount = group.books.reduce((s, { quantity }) => s + quantity, 0)
@@ -268,12 +268,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const clearCart = useCallback(() => setCart({ items: [], opGroups: [] }), [])
 
+  const transmissionCodeClient = user?.codeClient
   const setTransmissionMode = useCallback((mode: TransmissionMode) => {
     setTransmissionModeState(mode)
-    if (user?.codeClient) {
-      localStorage.setItem(transmissionKey(user.codeClient), mode)
+    if (transmissionCodeClient) {
+      localStorage.setItem(transmissionKey(transmissionCodeClient), mode)
     }
-  }, [user?.codeClient])
+  }, [transmissionCodeClient])
 
   const value = useMemo(() => ({
     items,

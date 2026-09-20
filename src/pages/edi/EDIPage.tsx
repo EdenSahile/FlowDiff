@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react'
-import { useNavigate, useSearchParams, useLocation } from 'react-router-dom'
+import { useSearchParams, useLocation } from 'react-router-dom'
 import styled, { keyframes } from 'styled-components'
 import { useAuthContext } from '@/contexts/AuthContext'
 import { useEDI } from '@/contexts/EDIContext'
 import { theme } from '@/lib/theme'
-import { useToast } from '@/contexts/ToastContext'
 import { mq } from '@/lib/responsive'
 import { EDIMessageModal } from '@/components/edi/EDIMessageModal'
 import { useDemoState } from '@/contexts/DemoStateContext'
@@ -212,37 +211,6 @@ const ActiveBadge = styled.span`
   font-weight: ${({ theme }) => theme.typography.weights.medium};
 `
 
-/* statcard 2 — Diffuseurs */
-const DiffuseurItem = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 6px 0;
-  font-size: 0.8125rem;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.gray[100]};
-  &:last-of-type { border-bottom: none; }
-`
-
-const DiffName = styled.span`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: ${({ theme }) => theme.colors.navy};
-`
-
-const GererBtn = styled.button`
-  width: 100%;
-  margin-top: 14px;
-  padding: 8px;
-  border: 1.5px solid ${({ theme }) => theme.colors.gray[200]};
-  background: ${({ theme }) => theme.colors.white};
-  font-size: 0.8125rem;
-  font-family: ${({ theme }) => theme.typography.fontFamily};
-  color: ${({ theme }) => theme.colors.navy};
-  cursor: default;
-  opacity: 0.7;
-`
-
 /* statcard 3 — Flux */
 const FluxGrid = styled.div`
   display: grid;
@@ -282,17 +250,6 @@ const FluxLabel = styled.div`
 const FluxSub = styled.div`
   font-size: 0.75rem;
   color: ${({ theme }) => theme.colors.gray[400]};
-`
-
-/* ════════════════════════════════════════════════════
-   STYLED — layout principal (table + panel)
-════════════════════════════════════════════════════ */
-const MainLayout = styled.div`
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 20px;
-  margin-bottom: 24px;
-  ${mq.md} { grid-template-columns: 1fr 300px; }
 `
 
 /* ── Section Historique ── */
@@ -459,7 +416,7 @@ const DetailBadge = styled.span<{ $variant: 'warning' | 'error' }>`
   padding: 2px 8px;
   font-size: 0.75rem;
   font-weight: ${({ theme }) => theme.typography.weights.semibold};
-  background: ${({ $variant, theme }) =>
+  background: ${({ $variant }) =>
     $variant === 'error' ? '#FDECEA' : '#FFF7ED'};
   color: ${({ $variant, theme }) =>
     $variant === 'error' ? theme.colors.error : '#C2410C'};
@@ -491,26 +448,7 @@ const VoirToutLink = styled.button`
   &:hover { color: ${({ theme }) => theme.colors.primaryHover}; }
 `
 
-/* ── Panneau droit ── */
-const RightPanel = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-`
 
-const PanelCard = styled.div`
-  background: ${({ theme }) => theme.colors.white};
-  border: 1px solid ${({ theme }) => theme.colors.gray[100]};
-  border-radius: ${({ theme }) => theme.radii.xl};
-  padding: 18px;
-`
-
-const PanelTitle = styled.h3`
-  font-size: 0.9375rem;
-  font-weight: ${({ theme }) => theme.typography.weights.semibold};
-  color: ${({ theme }) => theme.colors.navy};
-  margin-bottom: 10px;
-`
 
 const PanelText = styled.p`
   font-size: 0.8125rem;
@@ -519,57 +457,10 @@ const PanelText = styled.p`
   line-height: 1.5;
 `
 
-const PrimaryBtn = styled.button`
-  width: 100%;
-  padding: 10px;
-  background: ${({ theme }) => theme.colors.navy};
-  color: ${({ theme }) => theme.colors.white};
-  border: none;
-  font-size: 0.875rem;
-  font-family: ${({ theme }) => theme.typography.fontFamily};
-  font-weight: ${({ theme }) => theme.typography.weights.semibold};
-  cursor: pointer;
-  margin-bottom: 10px;
-  &:hover { background: ${({ theme }) => theme.colors.primaryHover}; }
-`
 
-const LinkSmall = styled.button`
-  background: none;
-  border: none;
-  font-size: 0.8125rem;
-  color: ${({ theme }) => theme.colors.navy};
-  cursor: pointer;
-  font-family: ${({ theme }) => theme.typography.fontFamily};
-  text-decoration: underline;
-  padding: 0;
-`
 
-const RefRow = styled.div`
-  display: flex;
-  gap: 8px;
-`
 
-const RefInput = styled.input`
-  flex: 1;
-  padding: 8px 10px;
-  border: 1.5px solid ${({ theme }) => theme.colors.gray[200]};
-  font-size: 0.8125rem;
-  font-family: ${({ theme }) => theme.typography.fontFamilyMono};
-  color: ${({ theme }) => theme.colors.navy};
-  &:focus { outline: none; border-color: ${({ theme }) => theme.colors.navy}; }
-`
 
-const AfficherBtn = styled.button`
-  padding: 8px 14px;
-  border: 1.5px solid ${({ theme }) => theme.colors.navy};
-  background: ${({ theme }) => theme.colors.white};
-  font-size: 0.8125rem;
-  font-family: ${({ theme }) => theme.typography.fontFamily};
-  font-weight: ${({ theme }) => theme.typography.weights.medium};
-  color: ${({ theme }) => theme.colors.navy};
-  cursor: pointer;
-  &:hover { background: ${({ theme }) => theme.colors.gray[50]}; }
-`
 
 const HelpRow = styled.div`
   display: flex;
@@ -593,135 +484,17 @@ const ContactBtn = styled.button`
   &:hover { background: ${({ theme }) => theme.colors.gray[50]}; }
 `
 
-/* ════════════════════════════════════════════════════
-   STYLED — Paramètres EDI
-════════════════════════════════════════════════════ */
-const ParamsCard = styled.div`
-  background: ${({ theme }) => theme.colors.white};
-  border: 1px solid ${({ theme }) => theme.colors.gray[100]};
-  border-radius: ${({ theme }) => theme.radii.xl};
-  padding: 20px;
-  margin-bottom: 24px;
-`
 
-const ParamsGrid = styled.div`
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 24px;
-  align-items: start;
-  ${mq.md} { grid-template-columns: 1fr 1fr; }
-`
 
-const ToggleRow = styled.div`
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 10px 0;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.gray[100]};
-  &:last-child { border-bottom: none; }
-`
 
-const ToggleIcon = styled.div`
-  width: 32px; height: 32px;
-  background: ${({ theme }) => theme.colors.gray[100]};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  font-size: 0.875rem;
-`
 
-const ToggleInfo = styled.div`
-  flex: 1;
-`
 
-const ToggleLabel = styled.div`
-  font-size: 0.875rem;
-  font-weight: ${({ theme }) => theme.typography.weights.medium};
-  color: ${({ theme }) => theme.colors.navy};
-  margin-bottom: 2px;
-`
 
-const ToggleSub = styled.div`
-  font-size: 0.75rem;
-  color: ${({ theme }) => theme.colors.gray[400]};
-`
 
-const ToggleSwitch = styled.label`
-  position: relative;
-  display: inline-block;
-  width: 44px;
-  height: 24px;
-  flex-shrink: 0;
-  cursor: pointer;
 
-  input { opacity: 0; width: 0; height: 0; }
 
-  span {
-    position: absolute;
-    inset: 0;
-    background: ${({ theme }) => theme.colors.gray[200]};
-    transition: 0.2s;
-    &::before {
-      content: '';
-      position: absolute;
-      width: 18px; height: 18px;
-      left: 3px; bottom: 3px;
-      background: white;
-      transition: 0.2s;
-    }
-  }
 
-  input:checked + span {
-    background: ${({ theme }) => theme.colors.accent};
-  }
 
-  input:checked + span::before {
-    transform: translateX(20px);
-  }
-`
-
-const ParamsRight = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-`
-
-const DelayRow = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-`
-
-const DelayLabel = styled.span`
-  font-size: 0.875rem;
-  color: ${({ theme }) => theme.colors.navy};
-`
-
-const DelaySelect = styled.select`
-  padding: 8px 12px;
-  border: 1.5px solid ${({ theme }) => theme.colors.gray[200]};
-  background: ${({ theme }) => theme.colors.white};
-  font-size: 0.875rem;
-  font-family: ${({ theme }) => theme.typography.fontFamily};
-  color: ${({ theme }) => theme.colors.navy};
-  cursor: pointer;
-  &:focus { outline: none; border-color: ${({ theme }) => theme.colors.navy}; }
-`
-
-const ModifierBtn = styled.button`
-  align-self: flex-end;
-  padding: 8px 18px;
-  border: 1.5px solid ${({ theme }) => theme.colors.gray[200]};
-  background: ${({ theme }) => theme.colors.white};
-  font-size: 0.875rem;
-  font-family: ${({ theme }) => theme.typography.fontFamily};
-  font-weight: ${({ theme }) => theme.typography.weights.medium};
-  color: ${({ theme }) => theme.colors.navy};
-  cursor: pointer;
-  &:hover { background: ${({ theme }) => theme.colors.gray[50]}; }
-`
 
 /* ════════════════════════════════════════════════════
    STYLED — Footer EDI
@@ -745,10 +518,9 @@ const EDIFooter = styled.footer`
 ════════════════════════════════════════════════════ */
 export function EDIPage() {
   const { user } = useAuthContext()
-  const { messages, lastSync, params, updateParams } = useEDI()
+  const { messages, lastSync } = useEDI()
   const { markDesadvSeen } = useDemoState()
-  const { showToast } = useToast()
-  const navigate = useNavigate()
+
   const [searchParams] = useSearchParams()
   const location = useLocation()
 
@@ -765,7 +537,6 @@ export function EDIPage() {
     }
   }, [location.hash])
   const [selectedMessage, setSelectedMessage] = useState<EDIMessage | null>(null)
-  const [refInput, setRefInput] = useState('')
   const [isbnSearch, setIsbnSearch] = useState('')
   const [showAll, setShowAll] = useState(false)
 
@@ -785,8 +556,6 @@ export function EDIPage() {
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
     .slice(0, isbnSearch.trim() || showAll ? undefined : 5)
 
-  const pendingOrdersCount = messages.filter(m => m.type === 'ORDERS' && m.status === 'PENDING').length
-
   function handleExport() {
     exportToCSV(
       `edi-${user?.codeClient ?? 'export'}`,
@@ -799,17 +568,6 @@ export function EDIPage() {
         m.detail,
       ])
     )
-  }
-
-  function handleShowMessage() {
-    const found = messages.find(m =>
-      m.documentRef.toLowerCase() === refInput.trim().toLowerCase()
-    )
-    if (found) {
-      setSelectedMessage(found)
-    } else {
-      showToast('Référence introuvable', 'error')
-    }
   }
 
   const today   = new Date()

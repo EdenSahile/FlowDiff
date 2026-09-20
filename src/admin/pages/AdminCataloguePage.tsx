@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import styled from 'styled-components'
 import { adminColors } from '@/admin/adminTheme'
 import { AdminModal } from '@/admin/components/AdminModal'
@@ -12,7 +12,6 @@ const TYPES = ['fonds', 'nouveaute', 'a-paraitre'] as const
 
 export function AdminCataloguePage() {
   const [books, setBooks] = useState<Book[]>([])
-  const [filtered, setFiltered] = useState<Book[]>([])
   const [search, setSearch] = useState('')
   const [typeFilter, setTypeFilter] = useState('tous')
   const [loading, setLoading] = useState(true)
@@ -28,9 +27,11 @@ export function AdminCataloguePage() {
     setLoading(false)
   }
 
-  useEffect(() => { reload() }, [])
-
   useEffect(() => {
+    getAllBooksAsync().then(data => { setBooks(data); setLoading(false) })
+  }, [])
+
+  const filtered = useMemo(() => {
     let list = books
     if (typeFilter !== 'tous') list = list.filter(b => b.type === typeFilter)
     if (search.trim()) {
@@ -41,7 +42,7 @@ export function AdminCataloguePage() {
         b.isbn.includes(q)
       )
     }
-    setFiltered(list)
+    return list
   }, [books, search, typeFilter])
 
   async function handleSave(data: LivreInsert) {

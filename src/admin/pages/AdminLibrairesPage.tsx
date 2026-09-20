@@ -19,7 +19,9 @@ export function AdminLibrairesPage() {
     setLoading(false)
   }
 
-  useEffect(() => { reload() }, [])
+  useEffect(() => {
+    getAllLibraires().then(data => { setLibraires(data); setLoading(false) })
+  }, [])
 
   const filtered = search.trim()
     ? libraires.filter(l =>

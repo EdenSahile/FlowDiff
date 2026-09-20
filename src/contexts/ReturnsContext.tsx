@@ -30,10 +30,20 @@ export function ReturnsProvider({ children }: { children: React.ReactNode }) {
   const [returns, setReturns] = useState<ReturnRequest[]>([])
   const [loading, setLoading] = useState(true)
   const [stats, setStats] = useState<ReturnsStats | null>(null)
+  const [prevCodeClient, setPrevCodeClient] = useState(codeClient)
+
+  if (prevCodeClient !== codeClient) {
+    setPrevCodeClient(codeClient)
+    if (!codeClient) {
+      setReturns([])
+      setLoading(false)
+    } else {
+      setLoading(true)
+    }
+  }
 
   useEffect(() => {
-    if (!codeClient) { setReturns([]); setLoading(false); return }
-    setLoading(true)
+    if (!codeClient) return
     Promise.all([getReturns(codeClient), getReturnsStats(codeClient)]).then(([r, s]) => {
       setReturns(r)
       setStats(s)
