@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { computeTotals } from '@/contexts/CartContext'
+import { computeTotals, REMISE_RATES } from '@/contexts/CartContext'
 import type { CartItem, OPCartGroup } from '@/contexts/CartContext'
 
 const rates = { 'Littérature': 0.09, 'BD/Mangas': 0.10, 'Jeunesse': 0.08, 'Adulte-pratique': 0.09 }
@@ -15,6 +15,17 @@ function makeItem(priceTTC: number, universe: string, quantity = 1): CartItem {
     },
   }
 }
+
+describe('FLOW-RM-041 : remises par défaut par univers', () => {
+  it('définit BD/Mangas à 30%, Jeunesse à 30%, Littérature à 35%, Adulte-pratique à 35%', () => {
+    expect(REMISE_RATES).toStrictEqual({
+      'BD/Mangas': 0.30,
+      'Jeunesse': 0.30,
+      'Littérature': 0.35,
+      'Adulte-pratique': 0.35,
+    })
+  })
+})
 
 describe('computeTotals', () => {
   it('retourne des zéros pour un panier vide', () => {

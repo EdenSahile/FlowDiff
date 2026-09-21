@@ -203,8 +203,24 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const updateQty = useCallback((itemKey: string, qty: number) => {
     if (qty < 1) { removeFromCart(itemKey); return }
-    setItems(prev => prev.map(i => getItemKey(i) === itemKey ? { ...i, quantity: qty } : i))
-  }, [removeFromCart, setItems])
+    setCart(prev => {
+      const currentTotal =
+        prev.items.reduce((s, i) => s + i.quantity, 0) +
+        prev.opGroups.reduce((s, op) =>
+          s + op.books.reduce((ss, b) => ss + b.quantity, 0), 0)
+      const item = prev.items.find(i => getItemKey(i) === itemKey)
+      if (!item) return prev
+      const delta = qty - item.quantity
+      if (delta > 0 && currentTotal + delta > CART_LIMIT) {
+        showToast(
+          `Limite de démonstration atteinte (${CART_LIMIT} articles max). Veuillez vider votre panier pour continuer.`,
+          'error'
+        )
+        return prev
+      }
+      return { ...prev, items: prev.items.map(i => getItemKey(i) === itemKey ? { ...i, quantity: qty } : i) }
+    })
+  }, [removeFromCart, showToast])
 
   const addToCart = useCallback((book: Book, qty = 1, opts: AddToCartOptions = {}) => {
     const { ebookOption, enReliquat } = opts
@@ -213,7 +229,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         prev.items.reduce((s, i) => s + i.quantity, 0) +
         prev.opGroups.reduce((s, op) =>
           s + op.books.reduce((ss, b) => ss + b.quantity, 0), 0)
-      if (currentTotal >= CART_LIMIT) {
+      if (currentTotal + qty > CART_LIMIT) {
         showToast(
           `Limite de démonstration atteinte (${CART_LIMIT} articles max). Veuillez vider votre panier pour continuer.`,
           'error'
