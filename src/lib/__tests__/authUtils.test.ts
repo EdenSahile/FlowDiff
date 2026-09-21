@@ -1,5 +1,68 @@
-import { describe, it, expect } from 'vitest'
-import { getSafeRedirectPath } from '@/lib/authUtils'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { getSafeRedirectPath, createMockToken, parseMockToken } from '@/lib/authUtils'
+
+describe('createMockToken', () => {
+  beforeEach(() => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-06-15T12:00:00Z'))
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  it('génère un token dont le payload contient exp = iat + 8h', () => {
+    const token = createMockToken('user-1', 'LIB001')
+
+    const [, payloadB64] = token.split('.')
+    const payload = JSON.parse(atob(payloadB64))
+
+    expect(payload.exp).toBe(payload.iat + 8 * 60 * 60 * 1000)
+  })
+
+  it('inclut le userId et le codeClient dans le payload', () => {
+    const token = createMockToken('user-42', 'LIBX99')
+
+    const [, payloadB64] = token.split('.')
+    const payload = JSON.parse(atob(payloadB64))
+
+    expect(payload.sub).toBe('user-42')
+    expect(payload.codeClient).toBe('LIBX99')
+  })
+})
+
+describe('parseMockToken', () => {
+  beforeEach(() => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-06-15T12:00:00Z'))
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  it('retourne le payload pour un token non expiré', () => {
+    const token = createMockToken('user-1', 'LIB001')
+
+    const payload = parseMockToken(token)
+
+    expect(payload).not.toBeNull()
+    expect(payload!.sub).toBe('user-1')
+    expect(payload!.codeClient).toBe('LIB001')
+  })
+
+  it('retourne null pour un token expiré', () => {
+    const token = createMockToken('user-1', 'LIB001')
+
+    vi.advanceTimersByTime(8 * 60 * 60 * 1000 + 1)
+
+    expect(parseMockToken(token)).toBeNull()
+  })
+
+  it('retourne null pour un token malformé', () => {
+    expect(parseMockToken('pas-un-token')).toBeNull()
+  })
+})
 
 describe('getSafeRedirectPath', () => {
   it('accepte un chemin interne simple', () => {
