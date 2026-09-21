@@ -120,10 +120,9 @@ En permanence : **Panier** (droite, avec badge quantité) +  à gauche du panier
 - Bande annonce : lecteur vidéo intégré
 
 ### À paraître (sous Nouveautés)
-- **Consultation catalogue uniquement — aucune commande possible**
+- Commandables via l'app (comme les nouveautés et le fonds)
 - Tri par univers puis par programme (tranches 2-4 mois)
 - Bouton "Recevoir le catalogue" par email
-- Commande uniquement via représentant commercial
 
 ### Fonds
 - Titres déjà parus, commandables directement
@@ -164,8 +163,7 @@ En permanence : **Panier** (droite, avec badge quantité) +  à gauche du panier
 
 ## Règles métier importantes
 
-- Les **titres à paraître ne sont PAS commandables** via l'app — consultation catalogue uniquement
-- Les **titres de fonds et nouveautés du mois sont commandables** directement
+- Les **3 types de titres (fonds, nouveautés, à paraître) sont commandables** directement via l'app
 - Les remises sont **personnalisées par librairie** et s'appliquent automatiquement selon la thématique
 - L'app est **B2B exclusif** : aucun accès grand public
 

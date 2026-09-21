@@ -1385,7 +1385,7 @@ export function FicheProduitPage() {
   const isAParaitre    = book.type === 'a-paraitre'
   const isEpuise       = book.statut === 'epuise' || book.statut === 'rupture'
   const needsConfirm   = book.statut === 'sur_commande' || book.statut === 'en_reimp'
-  const isOrderable    = !isAParaitre && !isEpuise
+  const isOrderable    = !isEpuise
 
   const formattedDate = new Date(book.publicationDate).toLocaleDateString('fr-FR', {
     year: 'numeric', month: 'long', day: 'numeric',
