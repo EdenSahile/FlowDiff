@@ -221,6 +221,18 @@ describe('registerSchema', () => {
       }
     })
 
+    it('rejette un code trop court apres trim meme si la chaine brute depasse 3 caracteres', () => {
+      const input = { ...validInput, codeClient: '  a  ' }
+
+      const parsed = registerSchema.safeParse(input)
+
+      expect(parsed.success).toBe(false)
+      if (!parsed.success) {
+        const codeErrors = parsed.error.issues.filter(i => i.path[0] === 'codeClient')
+        expect(codeErrors.some(e => e.message === 'Code client invalide')).toBe(true)
+      }
+    })
+
     it('accepte un code de 3 caracteres (borne min)', () => {
       const input = { ...validInput, codeClient: 'abc' }
 

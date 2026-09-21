@@ -63,7 +63,7 @@
 - **Ce qu'on verifie** : si `parseMockToken` reussit (token structurellement valide et non expire) mais que `findUser` ne trouve aucun utilisateur correspondant au `codeClient` du payload, le `useEffect` supprime le token de `localStorage`.
 - **Verdict** : 🟢
 - **Justification** : code a nous. Meme raisonnement que FLOW-RM-006 et 007 : branchement conditionnel dans notre code, dependances mockables.
-- **Tests existants** : aucun. C'est le seul cas non couvert du lot.
+- **Tests existants** : 1 test dans `AuthContext.test.tsx` (« nettoie le token si le codeClient du payload ne correspond à aucun utilisateur connu »).
 
 ## Resume
 
@@ -94,4 +94,4 @@ Aucune regle dans cet etat.
 
 ## Ambiguites et points de revision
 
-Aucune ambiguite relevee dans l'audit pour ce lot. Les 8 regles portent sur du code a nous (fonctions pures, branchements conditionnels, schemas de validation) avec des dependances mockables (localStorage via jsdom, bcrypt.compare via mock). Le seul point d'attention est FLOW-RM-008 qui n'a aucun test existant.
+Aucune ambiguite relevee dans l'audit pour ce lot. Les 8 regles portent sur du code a nous (fonctions pures, branchements conditionnels, schemas de validation) avec des dependances mockables (localStorage via jsdom, bcrypt.compare via mock).
