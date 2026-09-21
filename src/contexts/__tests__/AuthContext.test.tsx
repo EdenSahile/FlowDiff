@@ -196,6 +196,34 @@ describe('AuthContext', () => {
 
       expect(localStorage.getItem('flowdiff_cart_shared')).not.toBeNull()
     })
+
+    it('ne crash pas si appelé sans user connecté', async () => {
+      const { result } = renderHook(() => useAuthContext(), { wrapper })
+      await waitFor(() => expect(result.current.isLoading).toBe(false))
+      expect(result.current.user).toBeNull()
+
+      act(() => {
+        result.current.logout()
+      })
+
+      expect(result.current.user).toBeNull()
+    })
+
+    it('fonctionne même si la clé wishlist_username n\'existe pas en localStorage', async () => {
+      const { result } = renderHook(() => useAuthContext(), { wrapper })
+      await waitFor(() => expect(result.current.isLoading).toBe(false))
+      await act(async () => {
+        await result.current.login({ identifier: VALID_IDENTIFIER, password: VALID_PASSWORD })
+      })
+      localStorage.removeItem(`bookflow_wishlist_username_${VALID_IDENTIFIER}`)
+
+      act(() => {
+        result.current.logout()
+      })
+
+      expect(result.current.user).toBeNull()
+      expect(localStorage.getItem('bookflow_token')).toBeNull()
+    })
   })
 
   describe('register', () => {

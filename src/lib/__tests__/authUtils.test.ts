@@ -119,6 +119,18 @@ describe('getSafeRedirectPath', () => {
     expect(getSafeRedirectPath('evil.com')).toBe('/')
     expect(getSafeRedirectPath('catalogue')).toBe('/')
   })
+
+  it('rejette le schéma data:', () => {
+    expect(getSafeRedirectPath('data:text/html,<h1>evil</h1>')).toBe('/')
+  })
+
+  it('accepte un chemin avec fragment (#)', () => {
+    expect(getSafeRedirectPath('/page#section')).toBe('/page#section')
+  })
+
+  it('laisse passer les caractères URL-encodés sans les décoder', () => {
+    expect(getSafeRedirectPath('/%2Fpage')).toBe('/%2Fpage')
+  })
 })
 
 describe('registerSchema', () => {
