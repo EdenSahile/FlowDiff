@@ -69,7 +69,7 @@ function makeBook(overrides: Partial<Book> = {}): Book {
 function prefillCart(items: Array<{ id: string; quantity: number }>) {
   localStorage.setItem(CART_KEY, JSON.stringify({
     items: items.map(({ id, quantity }) => ({
-      book: { id },
+      book: makeBook({ id }),
       quantity,
     })),
     opGroups: [],
@@ -112,7 +112,6 @@ describe('FLOW-RM-038 : limite du panier à 30 articles', () => {
   })
 
   it('refuse un ajout multi-quantité qui dépasse la limite (panier 29 + qty 3)', () => {
-    // Bug DEC-003 : le code vérifie currentTotal >= 30, pas currentTotal + qty > 30
     prefillCart([{ id: 'filler', quantity: 29 }])
 
     const { result } = renderHook(() => useCart(), { wrapper: Wrapper })
@@ -137,7 +136,6 @@ describe('FLOW-RM-038 : limite du panier à 30 articles', () => {
   })
 
   it('refuse un ajout sur un livre existant si le total dépasserait la limite', () => {
-    // Bug DEC-003 : le code vérifie currentTotal >= 30, pas currentTotal + qty > 30
     prefillCart([
       { id: 'existing-book', quantity: 3 },
       { id: 'other-books', quantity: 25 },
@@ -297,6 +295,53 @@ describe('FLOW-RM-047 : updateQty < 1 supprime l\'article', () => {
     act(() => {
       result.current.addToCart(makeBook({ id: 'livre-a' }), 1)
     })
+
+    act(() => {
+      result.current.updateQty('livre-a', 3)
+    })
+
+    expect(result.current.items[0].quantity).toBe(3)
+  })
+
+  it('refuse updateQty quand le nouveau total dépasserait CART_LIMIT', () => {
+    prefillCart([
+      { id: 'livre-a', quantity: 2 },
+      { id: 'autres', quantity: 27 },
+    ])
+
+    const { result } = renderHook(() => useCart(), { wrapper: Wrapper })
+
+    act(() => {
+      result.current.updateQty('livre-a', 5)
+    })
+
+    expect(result.current.items.find(i => i.book.id === 'livre-a')?.quantity).toBe(2)
+    expect(mockShowToast).toHaveBeenCalledWith(
+      expect.stringContaining(`${CART_LIMIT}`),
+      'error',
+    )
+  })
+
+  it('accepte updateQty quand le nouveau total atteint exactement CART_LIMIT', () => {
+    prefillCart([
+      { id: 'livre-a', quantity: 2 },
+      { id: 'autres', quantity: 25 },
+    ])
+
+    const { result } = renderHook(() => useCart(), { wrapper: Wrapper })
+
+    act(() => {
+      result.current.updateQty('livre-a', 5)
+    })
+
+    expect(result.current.items.find(i => i.book.id === 'livre-a')?.quantity).toBe(5)
+    expect(result.current.totalItems).toBe(30)
+  })
+
+  it('accepte updateQty qui diminue la quantité même au-dessus de la limite initiale', () => {
+    prefillCart([{ id: 'livre-a', quantity: 5 }])
+
+    const { result } = renderHook(() => useCart(), { wrapper: Wrapper })
 
     act(() => {
       result.current.updateQty('livre-a', 3)
