@@ -16,8 +16,8 @@ const ORDER_COUNTER_KEY = 'bookflow_order_counter'
 const ORDER_COUNTER_INITIAL = 14 // CMD0000001 à CMD0000014 réservés aux mocks
 
 /* ── Migration localStorage : efface les commandes ancienne numérotation ── */
-const STORAGE_VERSION_KEY = 'bookflow_storage_version'
-const STORAGE_VERSION = '3'
+export const STORAGE_VERSION_KEY = 'bookflow_storage_version'
+export const STORAGE_VERSION = '3'
 
 function migrateStorage() {
   if (localStorage.getItem(STORAGE_VERSION_KEY) === STORAGE_VERSION) return
