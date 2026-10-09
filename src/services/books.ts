@@ -1,61 +1,10 @@
-import { supabase } from '@/lib/supabase'
 import { MOCK_BOOKS, getBookById as getBookByIdLocal } from '@/data/mockBooks'
 import type { Book, BookType, Universe } from '@/data/mockBooks'
 
-type Row = Record<string, unknown>
-
-function rowToBook(row: Row): Book {
-  return {
-    id:              row.id as string,
-    isbn:            row.isbn as string,
-    title:           row.title as string,
-    authors:         row.authors as string[],
-    publisher:       row.publisher as string,
-    collection:      (row.collection as string) || undefined,
-    universe:        row.universe as Universe,
-    type:            row.type as BookType,
-    price:           row.price as number,
-    priceTTC:        row.priceTTC as number,
-    format:          row.format as string,
-    genre:           (row.genre as string) || undefined,
-    language:        (row.language as string) || undefined,
-    pages:           (row.pages as number) || undefined,
-    publicationDate: row.publicationDate as string,
-    description:     row.description as string,
-    programme:       (row.programme as string) || undefined,
-    fictif:          (row.fictif as boolean) || undefined,
-    statut:          (row.statut as Book['statut']) || undefined,
-    delaiReimp:      (row.delaiReimp as string) || undefined,
-    topVente:        (row.topVente as boolean) || undefined,
-    selection:       (row.selection as boolean) || undefined,
-    coverUrl:        (row.cover_url as string) || undefined,
-  }
-}
-
-/* ─────────────────────────────────────────
-   Cache module-level : un seul fetch Supabase par session.
-   Évite le re-fetch (et le flash de placeholders) à chaque navigation,
-   et fiabilise getBookByIdAsync (lecture en mémoire plutôt que .single()).
-───────────────────────────────────────── */
-let booksCache: Book[] | null = null
-let booksPromise: Promise<Book[]> | null = null
-
+/* Le catalogue vient de MOCK_BOOKS, en mémoire. Ces fonctions restent async
+   parce que les pages les consomment en await/then. */
 async function loadAllBooks(): Promise<Book[]> {
-  if (booksCache) return booksCache
-  if (booksPromise) return booksPromise
-  booksPromise = (async () => {
-    try {
-      const { data, error } = await supabase.from('livres').select('*')
-      if (error) throw error
-      booksCache = (data ?? []).length > 0 ? (data ?? []).map(rowToBook) : MOCK_BOOKS
-    } catch {
-      booksCache = MOCK_BOOKS
-    } finally {
-      booksPromise = null
-    }
-    return booksCache!
-  })()
-  return booksPromise
+  return MOCK_BOOKS
 }
 
 export async function getAllBooksAsync(): Promise<Book[]> {
