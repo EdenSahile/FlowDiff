@@ -183,14 +183,14 @@ En permanence : **Panier** (droite, avec badge quantité) +  à gauche du panier
 | Données | **Fichiers mock** dans `src/data/`, en mémoire, aucun appel réseau |
 | Persistance | **localStorage**, isolé par `codeClient` |
 | Base de données | **aucune.** Prisma reste installé, son schéma n'est branché sur rien |
-| API serveur | **une seule** fonction Vercel, `api/feedback.ts`, pour le formulaire d'avis |
+| API serveur | **aucune.** Pas de dossier `api/`, rien à déployer côté serveur |
 | Validation | **Zod** (tous les inputs) |
 | Tests | **Vitest** (jsdom) |
 | Déploiement | **Vercel**, https://flowdiff-omega.vercel.app |
 
-### Pas de base de données ni de backend de données
+### Il n'y a pas de backend
 
-Une seule fonction serverless subsiste, sans état : `api/feedback.ts`, qui envoie le formulaire d'avis par email. Elle ne lit ni n'écrit aucune donnée de l'application.
+**Aucune base de données, aucune fonction serverless, aucun endpoint.** L'application est un front statique pur : tout ce qu'elle affiche vient de fichiers embarqués dans le bundle, et tout ce qu'elle retient vit dans le `localStorage` du navigateur.
 
 C'est la propriété la plus importante du projet, et la source des erreurs passées quand elle n'était pas écrite ici.
 
@@ -207,7 +207,8 @@ Deux ensembles existent dans le repo sans être compilés ni atteignables. Ne pa
 | Quoi | Où | Pourquoi |
 |---|---|---|
 | Back-office `/admin/*` | `src/admin/`, non routé | dépendait d'un backend. Ses services échouent si on les appelle, et ses identifiants ont été retirés de la source |
-| Chatbot Aidénia | `parked/aidenia/`, hors de `src/` et de `api/` | sa recherche de livres passait par Supabase. Voir son README pour le réveiller |
+| Chatbot Aidénia | `parked/aidenia/` | sa recherche de livres passait par Supabase. Voir son README pour le réveiller |
+| Formulaire d'avis | `parked/feedback/` | dernier endpoint public, envoi d'email sans limite de débit. Voir son README, qui liste les 4 points à corriger avant tout redéploiement |
 
 ---
 

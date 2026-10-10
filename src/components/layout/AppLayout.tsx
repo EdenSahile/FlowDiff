@@ -6,7 +6,6 @@ import { BottomNav } from './BottomNav'
 import { Sidebar } from './Sidebar'
 import { BurgerMenu } from './BurgerMenu'
 import { DemoBanner } from '@/components/ui/DemoBanner'
-import { FeedbackWidget } from '@/components/ui/FeedbackWidget'
 import { AppFooter } from './AppFooter'
 import { useCart } from '@/contexts/CartContext'
 import { OnboardingTour } from '@/components/onboarding/OnboardingTour'
@@ -50,12 +49,14 @@ export function AppLayout({ children }: AppLayoutProps) {
   const { totalItems } = useCart()
   const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
-  const [feedbackOpen, setFeedbackOpen] = useState(false)
 
   return (
     <LayoutRoot>
-      <Sidebar onFeedbackOpen={() => setFeedbackOpen(true)} />
-      <BurgerMenu open={menuOpen} onClose={() => setMenuOpen(false)} onFeedbackOpen={() => setFeedbackOpen(true)} />
+      {/* onFeedbackOpen n'est plus passé : le formulaire d'avis est parqué
+          dans parked/feedback/. Sidebar et BurgerMenu masquent l'entrée
+          d'eux-mêmes quand la prop est absente. */}
+      <Sidebar />
+      <BurgerMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
       <MainColumn>
         <StickyBand>
           <Header
@@ -71,7 +72,6 @@ export function AppLayout({ children }: AppLayoutProps) {
         <AppFooter />
       </MainColumn>
       <BottomNav />
-      <FeedbackWidget isOpen={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
       <OnboardingTour />
     </LayoutRoot>
   )

@@ -7,6 +7,10 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: ['./src/test-setup.ts'],
+    // parked/ contient du code mis de côté, hors application. Sans cette
+    // exclusion, Vitest y ramasse des tests dont les imports pointent vers
+    // les emplacements d'origine, et qui échouent au chargement.
+    exclude: ['**/node_modules/**', '**/dist/**', 'parked/**'],
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
