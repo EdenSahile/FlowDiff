@@ -15,9 +15,6 @@ import { NotificationsProvider } from '@/contexts/NotificationsContext'
 import { DemoStateProvider } from '@/contexts/DemoStateContext'
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
 import { AppLayout } from '@/components/layout/AppLayout'
-import { AdminAuthProvider } from '@/admin/contexts/AdminAuthContext'
-import { AdminRoute } from '@/admin/AdminRoute'
-import { AdminLayout } from '@/admin/AdminLayout'
 
 const LoginPage        = lazy(() => import('@/pages/auth/LoginPage').then(m => ({ default: m.LoginPage })))
 const RegisterPage     = lazy(() => import('@/pages/auth/RegisterPage').then(m => ({ default: m.RegisterPage })))
@@ -45,12 +42,8 @@ const EDIPage          = lazy(() => import('@/pages/edi/EDIPage').then(m => ({ d
 const OfficesPage      = lazy(() => import('@/pages/offices/OfficesPage').then(m => ({ default: m.OfficesPage })))
 const AParaitrePage    = lazy(() => import('@/pages/a-paraitre/AParaitrePage').then(m => ({ default: m.AParaitrePage })))
 
-// Admin back-office (lazy-loaded)
-const AdminLoginPage     = lazy(() => import('@/admin/pages/AdminLoginPage').then(m => ({ default: m.AdminLoginPage })))
-const AdminDashboardPage = lazy(() => import('@/admin/pages/AdminDashboardPage').then(m => ({ default: m.AdminDashboardPage })))
-const AdminCataloguePage = lazy(() => import('@/admin/pages/AdminCataloguePage').then(m => ({ default: m.AdminCataloguePage })))
-const AdminCommandesPage = lazy(() => import('@/admin/pages/AdminCommandesPage').then(m => ({ default: m.AdminCommandesPage })))
-const AdminLibrairesPage = lazy(() => import('@/admin/pages/AdminLibrairesPage').then(m => ({ default: m.AdminLibrairesPage })))
+// Le back-office /admin/* n'est plus routé : il dépendait d'un backend qui
+// n'existe plus. Le code reste dans src/admin/, hors du build public.
 
 function usePrefetchPages() {
   useEffect(() => {
@@ -85,23 +78,6 @@ function usePrefetchPages() {
   }, [])
 }
 
-function AdminRoutes() {
-  return (
-    <Routes>
-      <Route path="login" element={<AdminLoginPage />} />
-      <Route element={<AdminRoute />}>
-        <Route element={<AdminLayout />}>
-          <Route path="dashboard" element={<AdminDashboardPage />} />
-          <Route path="catalogue" element={<AdminCataloguePage />} />
-          <Route path="commandes" element={<AdminCommandesPage />} />
-          <Route path="libraires" element={<AdminLibrairesPage />} />
-        </Route>
-      </Route>
-      <Route index element={<Navigate to="dashboard" replace />} />
-    </Routes>
-  )
-}
-
 function ProtectedLayout() {
   return (
     <AppLayout>
@@ -130,18 +106,6 @@ export default function App() {
               <OnboardingProvider>
               <Suspense fallback={<PageSkeleton />}>
               <Routes>
-                {/* Admin back-office — isolated from libraire auth */}
-                <Route
-                  path="/admin/*"
-                  element={
-                    <AdminAuthProvider>
-                      <Suspense fallback={null}>
-                        <AdminRoutes />
-                      </Suspense>
-                    </AdminAuthProvider>
-                  }
-                />
-
                 {/* Routes publiques */}
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />

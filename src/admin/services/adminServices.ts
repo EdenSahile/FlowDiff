@@ -1,4 +1,3 @@
-import { supabase } from '@/lib/supabase'
 import type { Commande, Libraire, LivreInsert, StatutCommande } from '@/admin/types'
 
 /* ── Pure helpers (exported for tests) ── */
@@ -25,53 +24,44 @@ export function computeTop5(commandes: Commande[]): { isbn: string; titre: strin
   return Object.values(map).sort((a, b) => b.total - a.total).slice(0, 5)
 }
 
-/* ── Supabase queries ── */
+/* ── Accès aux données ──
+   Le projet n'a plus de backend : le catalogue libraire lit MOCK_BOOKS.
+   Ces fonctions conservent leur signature pour que les écrans admin
+   compilent, mais elles échouent si on les appelle. Les écrans qui les
+   utilisent ne sont plus routés, donc rien ne les atteint. */
 
-export async function getAllCommandes(): Promise<Commande[]> {
-  const { data, error } = await supabase
-    .from('commandes')
-    .select('*')
-    .order('date', { ascending: false })
-  if (error) throw error
-  return (data ?? []) as Commande[]
+function noBackend(operation: string): never {
+  throw new Error(`[admin] ${operation} indisponible, le projet n'a pas de backend.`)
 }
 
-export async function updateCommandeStatut(id: string, statut: StatutCommande): Promise<void> {
-  const { error } = await supabase.from('commandes').update({ statut }).eq('id', id)
-  if (error) throw error
+export async function getAllCommandes(): Promise<Commande[]> {
+  noBackend('lecture des commandes')
+}
+
+export async function updateCommandeStatut(_id: string, _statut: StatutCommande): Promise<void> {
+  noBackend('mise à jour du statut de commande')
 }
 
 export async function getAllLibraires(): Promise<Libraire[]> {
-  const { data, error } = await supabase
-    .from('libraires')
-    .select('*')
-    .order('code_client', { ascending: true })
-  if (error) throw error
-  return (data ?? []) as Libraire[]
+  noBackend('lecture des libraires')
 }
 
-export async function updateLibraire(id: string, data: Partial<Libraire>): Promise<void> {
-  const { error } = await supabase.from('libraires').update(data).eq('id', id)
-  if (error) throw error
+export async function updateLibraire(_id: string, _data: Partial<Libraire>): Promise<void> {
+  noBackend('mise à jour d\'un libraire')
 }
 
-export async function addLivre(data: LivreInsert): Promise<void> {
-  const { error } = await supabase.from('livres').insert([{ ...data, id: crypto.randomUUID() }])
-  if (error) throw error
+export async function addLivre(_data: LivreInsert): Promise<void> {
+  noBackend('création d\'un livre')
 }
 
-export async function updateLivre(id: string, data: Partial<LivreInsert>): Promise<void> {
-  const { error } = await supabase.from('livres').update(data).eq('id', id)
-  if (error) throw error
+export async function updateLivre(_id: string, _data: Partial<LivreInsert>): Promise<void> {
+  noBackend('mise à jour d\'un livre')
 }
 
-export async function deleteLivre(id: string): Promise<void> {
-  const { error } = await supabase.from('livres').delete().eq('id', id)
-  if (error) throw error
+export async function deleteLivre(_id: string): Promise<void> {
+  noBackend('suppression d\'un livre')
 }
 
 export async function countLivres(): Promise<number> {
-  const { count, error } = await supabase.from('livres').select('*', { count: 'exact', head: true })
-  if (error) throw error
-  return count ?? 0
+  noBackend('comptage des livres')
 }

@@ -27,11 +27,11 @@ export function AdminLoginPage() {
         <Form onSubmit={handleSubmit}>
           <Field>
             <Label>Email</Label>
-            <Input name="email" type="email" defaultValue="admin@flowdiff.com" autoComplete="username" />
+            <Input name="email" type="email" autoComplete="username" />
           </Field>
           <Field>
             <Label>Mot de passe</Label>
-            <Input name="password" type="password" defaultValue="FlowDiff2024!" autoComplete="current-password" />
+            <Input name="password" type="password" autoComplete="current-password" />
           </Field>
           {error && <ErrorMsg>{error}</ErrorMsg>}
           <SubmitBtn type="submit">Se connecter</SubmitBtn>

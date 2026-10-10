@@ -2,9 +2,7 @@
  * Télécharge les couvertures manquantes dans public/covers/{isbn}.jpg
  * à partir du manifeste local scripts/covers-found.json.
  *
- * Remplace download-covers.mjs, qui lisait les cover_url depuis Supabase :
- * le projet Supabase n'existe plus (son host ne résout plus), et l'app
- * retombe donc sur MOCK_BOOKS, dont les ISBN n'avaient aucune couverture.
+ * Le manifeste est commité, donc le script tourne sans réseau vers une base.
  *
  * Usage : node scripts/download-covers-from-manifest.mjs
  */

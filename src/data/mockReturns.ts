@@ -1,5 +1,3 @@
-// DEV ONLY — remplacé par Supabase en Phase 12
-
 export type ReturnStatus = 'pending' | 'in_transit' | 'avoir_emis' | 'refused'
 
 export type ReturnReason =

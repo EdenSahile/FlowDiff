@@ -243,7 +243,7 @@ import { describe, it, expect, beforeEach } from 'vitest'
 const SESSION_KEY = 'flowdiff_admin_session'
 
 function fakeLogin(email: string, password: string): boolean {
-  const ok = email === 'admin@flowdiff.com' && password === 'FlowDiff2024!'
+  const ok = email === 'admin@flowdiff.com' && password === '<MOT-DE-PASSE-RETIRE>'
   if (ok) localStorage.setItem(SESSION_KEY, JSON.stringify({ email, role: 'admin', exp: Date.now() + 8 * 3600 * 1000 }))
   return ok
 }
@@ -268,7 +268,7 @@ describe('admin auth logic', () => {
   })
 
   it('accepts correct credentials and sets session', () => {
-    expect(fakeLogin('admin@flowdiff.com', 'FlowDiff2024!')).toBe(true)
+    expect(fakeLogin('admin@flowdiff.com', '<MOT-DE-PASSE-RETIRE>')).toBe(true)
     expect(fakeIsAuthenticated()).toBe(true)
   })
 
@@ -294,7 +294,7 @@ import { createContext, useCallback, useMemo, useState } from 'react'
 
 const SESSION_KEY = 'flowdiff_admin_session'
 const ADMIN_EMAIL = 'admin@flowdiff.com'
-const ADMIN_PASSWORD = 'FlowDiff2024!'
+const ADMIN_PASSWORD = '<MOT-DE-PASSE-RETIRE>'
 
 interface AdminSession {
   email: string
@@ -607,7 +607,7 @@ export function AdminLoginPage() {
           </Field>
           <Field>
             <Label>Mot de passe</Label>
-            <Input name="password" type="password" defaultValue="FlowDiff2024!" autoComplete="current-password" />
+            <Input name="password" type="password" defaultValue="<MOT-DE-PASSE-RETIRE>" autoComplete="current-password" />
           </Field>
           {error && <ErrorMsg>{error}</ErrorMsg>}
           <SubmitBtn type="submit">Se connecter</SubmitBtn>

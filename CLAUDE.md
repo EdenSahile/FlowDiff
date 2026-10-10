@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-## ⚠️ RÈGLES ABSOLUES — LIRE EN PREMIER
+## ⚠️ RÈGLES ABSOLUES, À LIRE EN PREMIER
 
 ## Règles de travail en session
 
@@ -58,7 +58,7 @@ L'app permet également :
 
 ## Charte graphique
 
-> Palette actuelle — source de vérité : `src/lib/theme.ts` - 
+> Palette actuelle, source de vérité : `src/lib/theme.ts`
 
 | Rôle | Token | Valeur | Usage |
 |------|-------|--------|-------|
@@ -76,7 +76,7 @@ L'app permet également :
 | Erreur | `error` | `#C0392B` | Messages d'erreur, actions destructrices |
 | Blanc | `white` | `#FFFFFF` | Surfaces cards, fond inputs |
 
-**Règle** : ne jamais hardcoder les couleurs dans les composants — toujours passer par `theme.colors.*`.
+**Règle** : ne jamais hardcoder les couleurs dans les composants : toujours passer par `theme.colors.*`.
 
 ---
 
@@ -92,7 +92,7 @@ L'app permet également :
 
 ## Navigation principale
 
-**Bottom bar (mobile) / barre latérale ou top nav (desktop)** — 5 sections :
+**Bottom bar (mobile) / barre latérale ou top nav (desktop)**, 5 sections :
 
 | Onglet | Contenu |
 |--------|---------|
@@ -171,7 +171,7 @@ En permanence : **Panier** (droite, avec badge quantité) +  à gauche du panier
 
 ## Stack technique
 
-> **Stratégie** : **Vite 5 + React 18**, stack définitif. Pas de migration Next.js prévue. L'application est une SPA, avec une authentification mock.
+> **Stratégie** : **démo front sur données mock, sans backend.** Vite 5 + React 18, stack définitive. Pas de migration Next.js prévue. Le projet ne gagne pas de fonctionnalités, il se maintient au propre.
 
 | Couche | Stack |
 |--------|-------|
@@ -180,36 +180,49 @@ En permanence : **Panier** (droite, avec badge quantité) +  à gauche du panier
 | Langage | **TypeScript** (strict) |
 | Style | **Styled-components v6** |
 | Auth | **Mock JWT** (localStorage, bcrypt cost 12) |
-| BDD | **Supabase** câblé mais hors service, voir ci-dessous. Migration **Neon** prévue |
-| ORM | **Prisma** (`provider = "postgresql"`), pour les migrations SQL et le seed |
-| API serveur | **Vercel Functions** dans `api/` (`aidenia.ts`, `feedback.ts`) |
+| Données | **Fichiers mock** dans `src/data/`, en mémoire, aucun appel réseau |
+| Persistance | **localStorage**, isolé par `codeClient` |
+| Base de données | **aucune.** Prisma reste installé, son schéma n'est branché sur rien |
+| API serveur | **aucune.** Pas de dossier `api/`, rien à déployer côté serveur |
 | Validation | **Zod** (tous les inputs) |
 | Tests | **Vitest** (jsdom) |
 | Déploiement | **Vercel**, https://flowdiff-omega.vercel.app |
 
-### État réel de la base de données
+### Il n'y a pas de backend
 
-Supabase a été câblé le 16 mai 2026 : table `livres` pour le catalogue, puis `libraires` et `commandes` pour l'admin. **Le projet Supabase n'existe plus**, son host ne résout plus (`ERR_NAME_NOT_RESOLVED`). Le plan gratuit met un projet en pause après 7 jours sans activité, puis le supprime au bout de 90 jours.
+**Aucune base de données, aucune fonction serverless, aucun endpoint.** L'application est un front statique pur : tout ce qu'elle affiche vient de fichiers embarqués dans le bundle, et tout ce qu'elle retient vit dans le `localStorage` du navigateur.
 
-Ce que ça donne aujourd'hui :
+C'est la propriété la plus importante du projet, et la source des erreurs passées quand elle n'était pas écrite ici.
 
-- **Catalogue libraire** : `src/services/books.ts` ne fait plus aucun appel réseau et lit `MOCK_BOOKS`. État assumé, pas une panne.
-- **Espace admin** : `src/admin/services/adminServices.ts` appelle encore Supabase sur `commandes`, `libraires` et `livres`. Ces écrans sont cassés.
-- **Couvertures** : fichiers servis par l'app depuis `public/covers/{isbn}.jpg`, sans dépendance réseau. 40 titres sur 44 en ont une, les 4 autres affichent le placeholder dessiné.
+Supabase a été câblé le 16 mai 2026, puis le projet a été supprimé côté Supabase : le plan gratuit met en pause après 7 jours d'inactivité, puis supprime au bout de 90 jours. Tout a été retiré du repo depuis.
 
-**Migration Neon prévue.** Neon est du Postgres nu, sans l'API REST auto-générée qu'offrait Supabase. Les appels base devront donc passer par `api/`, jamais depuis le navigateur : les identifiants de connexion finiraient sinon en clair dans le bundle Vite, qui est public.
+- **Catalogue** : `src/services/books.ts` lit `MOCK_BOOKS`. Chemin unique, aucun appel réseau, aucun repli.
+- **Panier, commandes, comptes** : `localStorage`.
+- **Couvertures** : fichiers servis depuis `public/covers/{isbn}.jpg`. 40 titres sur 44 en ont une, les 4 autres affichent le placeholder dessiné.
+
+### Code conservé mais hors du build
+
+Deux ensembles existent dans le repo sans être compilés ni atteignables. Ne pas les rebrancher sans décision explicite.
+
+| Quoi | Où | Pourquoi |
+|---|---|---|
+| Back-office `/admin/*` | `src/admin/`, non routé | dépendait d'un backend. Ses services échouent si on les appelle, et ses identifiants ont été retirés de la source |
+| Chatbot Aidénia | `parked/aidenia/` | sa recherche de livres passait par Supabase. Voir son README pour le réveiller |
+| Formulaire d'avis | `parked/feedback/` | dernier endpoint public, envoi d'email sans limite de débit. Voir son README, qui liste les 4 points à corriger avant tout redéploiement |
 
 ---
 
-## Sécurité — règles non négociables
+## Sécurité, règles non négociables
 
+- **Jamais d'identifiant ni de secret dans `src/`.** Tout ce qui est importé par l'app finit en clair dans le bundle, qui est public. Vaut aussi pour un `defaultValue` de formulaire et pour les variables `VITE_*`, inlinées à la compilation.
+- **Un contrôle d'accès fait dans le navigateur ne protège rien.** Il cache un écran, il ne garde pas une donnée : l'endpoint reste appelable directement. Toute vraie protection se fait côté serveur.
 - Mots de passe hashés avec **bcrypt** (cost factor 12 en prod, 4 en dev pour performance)
-- Mock JWT avec expiration 8h — token en localStorage (acceptable pour projet test)
+- Mock JWT avec expiration 8h, token en localStorage, acceptable pour un projet de démonstration
 - Toute donnée entrante validée avec **Zod** avant traitement
-- **Un compte par librairie** — le panier et l'historique sont partagés entre tous les utilisateurs d'un même `codeClient` et persistent après déconnexion
-- Les données sont isolées par `codeClient` (clés localStorage suffixées, y compris `NAME_KEY` wishlist username depuis Phase 4) — deux librairies différentes ne se voient pas
-- Variables d'environnement dans `.env` — jamais dans le code, `.env` dans `.gitignore`
-- **Prisma** exclusivement si BDD branchée — jamais de SQL brut avec interpolations
+- **Un compte par librairie** : le panier et l'historique sont partagés entre tous les utilisateurs d'un même `codeClient` et persistent après déconnexion
+- Les données sont isolées par `codeClient`, via des clés localStorage suffixées, donc deux librairies ne se voient pas
+- Variables d'environnement dans `.env`, jamais dans le code, `.env` dans `.gitignore`
+- **Prisma** exclusivement si une base est un jour branchée, jamais de SQL brut avec interpolations
 
 ---
 
@@ -218,7 +231,7 @@ Ce que ça donne aujourd'hui :
 | Phase | Contenu | Statut |
 |-------|---------|--------|
 | 1 | Setup projet + structure + `.env` + Prisma schema | ✅ Fait |
-| 1bis | **Migration React/Vite** — remplacement Next.js par Vite + React Router | ✅ Fait |
+| 1bis | **Migration React/Vite** : remplacement Next.js par Vite + React Router | ✅ Fait |
 | 2 | Layout global (nav bottom mobile / sidebar desktop) + design system | ✅ Fait |
 | 3 | Authentification mock (inscription + connexion + mot de passe oublié) | ✅ Fait |
 | 4 | Accueil (recherche) | ✅ Fait |
@@ -226,27 +239,27 @@ Ce que ça donne aujourd'hui :
 | 6 | Panier + commande | ✅ Fait |
 | 7 | Flash Infos | ✅ Fait |
 | 8 | Menu Burger + Mon compte + Historique | ✅ Fait |
-| 9 | ~~Scanner caméra (lecture code-barres réelle)~~ — **supprimé** | 🚫 Annulé |
-| 10 | ~~PWA — vite-plugin-pwa (manifest + service worker + icônes)~~ — **annulé** | 🚫 Annulé |
-| 11 | Tests + recette fonctionnelle | ✅ Fait (Vitest — computeTotals + isOrderable) |
-| 12 | ~~Migration Next.js 14~~ — **annulé**, projet reste sur Vite (test Vercel) | 🚫 Annulé |
+| 9 | ~~Scanner caméra (lecture code-barres réelle)~~, **supprimé** | 🚫 Annulé |
+| 10 | ~~PWA avec vite-plugin-pwa (manifest, service worker, icônes)~~, **annulé** | 🚫 Annulé |
+| 11 | Tests + recette fonctionnelle | ✅ Fait (Vitest) |
+| 12 | ~~Migration Next.js 14~~, **annulé**, le projet reste sur Vite | 🚫 Annulé |
 | 13 | Déploiement Vercel | ✅ Fait (https://flowdiff-omega.vercel.app) |
 
 
 ---
 
-## Sous-agents — règle obligatoire
+## Sous-agents, règle obligatoire
 
 Les sous-agents démarrent à froid : ils ne lisent pas CLAUDE.md, ni CONTEXT.md, ni les hooks.
 Ils ne savent **que** ce qui est dans leur `prompt`.
 
 ### Ce que le prompt de chaque sous-agent doit toujours contenir
 
-1. **Stack technique** — Vite 5 + React 18 + TypeScript strict + styled-components v6 + React Router v6
-2. **Règles de style** — jamais hardcoder les couleurs, toujours `theme.colors.*` via `src/lib/theme.ts`
-3. **Règles de travail** — cocher `[x]` dans CONTEXT.md dès qu'une tâche est terminée, s'arrêter et remonter le résultat
-4. **Section "Session en cours"** de CONTEXT.md — tâches + statut actuel
-5. **Sa mission précise** — fichiers concernés, chemins exacts, ce qu'il doit faire et ne pas faire
+1. **Stack technique** : Vite 5 + React 18 + TypeScript strict + styled-components v6 + React Router v6
+2. **Règles de style** : jamais hardcoder les couleurs, toujours `theme.colors.*` via `src/lib/theme.ts`
+3. **Règles de travail** : cocher `[x]` dans CONTEXT.md dès qu'une tâche est terminée, s'arrêter et remonter le résultat
+4. **Section "Session en cours"** de CONTEXT.md : tâches et statut actuel
+5. **Sa mission précise** : fichiers concernés, chemins exacts, ce qu'il doit faire et ne pas faire
 6. **Contraintes spécifiques** à sa tâche (ex: ne pas toucher au design, TS doit rester clean)
 
 ### Règle
@@ -254,7 +267,7 @@ Ne jamais spawner un sous-agent avec un prompt vague. Un sous-agent mal briefé 
 
 ---
 
-## Skills actifs — invocation automatique
+## Skills actifs, invocation automatique
 
 Les skills suivants sont installés via les plugins `superpowers` et `code-review`.
 Claude doit les invoquer automatiquement selon le contexte, sans attendre une demande explicite.

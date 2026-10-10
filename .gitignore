@@ -69,6 +69,13 @@ docs/dev/COMPTES_TEST.md
 .claude/skills/
 .worktrees/
 
+# Lockfiles d'autres gestionnaires : le projet est en npm (PROJECT_CONTEXT.md).
+# Un pnpm-lock.yaml commité fait basculer Vercel sur pnpm, qui échoue ensuite
+# en frozen-lockfile dès que package.json évolue côté npm.
+pnpm-lock.yaml
+yarn.lock
+bun.lockb
+
 # Superpowers — fichiers générés localement, non versionnés
 .superpowers/
 *.skill
