@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { searchBooksLocal } from '../books'
+import { describe, it, expect } from 'vitest'
+import { searchBooksLocal, getAllBooksAsync, getBooksByTypeAsync, getBookByIdAsync } from '../books'
 import type { Book } from '@/data/mockBooks'
 import { MOCK_BOOKS } from '@/data/mockBooks'
 
@@ -86,89 +86,49 @@ describe('searchBooksLocal', () => {
   })
 })
 
-const supabaseRow = {
-  id: 'sup-1',
-  isbn: '9999999999999',
-  title: 'Livre Supabase',
-  authors: ['Auteur Supa'],
-  publisher: 'SupaEditions',
-  universe: 'Litterature',
-  type: 'fonds',
-  price: 12,
-  priceTTC: 12.66,
-  format: '130 x 200 mm',
-  publicationDate: '2026-06-01',
-  description: 'Depuis Supabase',
-}
+describe('getAllBooksAsync', () => {
+  it('retourne le catalogue mock complet', async () => {
+    const allBooks = await getAllBooksAsync()
 
-describe('getAllBooksAsync (fallback Supabase)', () => {
-  beforeEach(() => {
-    vi.resetModules()
+    expect(allBooks).toEqual(MOCK_BOOKS)
+  })
+})
+
+describe('getBooksByTypeAsync', () => {
+  it('ne retourne que les titres du type demandé', async () => {
+    const fondsBooks = await getBooksByTypeAsync('fonds')
+
+    expect(fondsBooks.length).toBeGreaterThan(0)
+    expect(fondsBooks.every(book => book.type === 'fonds')).toBe(true)
   })
 
-  it('utilise les donnees Supabase quand elles sont disponibles', async () => {
-    const mockSelect = vi.fn().mockResolvedValue({ data: [supabaseRow], error: null })
-    const mockFrom = vi.fn().mockReturnValue({ select: mockSelect })
+  it('restreint aussi à l\'univers quand il est fourni', async () => {
+    const jeunesseFondsBooks = await getBooksByTypeAsync('fonds', 'Jeunesse')
 
-    vi.doMock('@/lib/supabase', () => ({
-      supabase: { from: mockFrom },
-    }))
-
-    const { getAllBooksAsync } = await import('../books')
-    const booksFromSupabase = await getAllBooksAsync()
-
-    expect(booksFromSupabase).toHaveLength(1)
-    expect(booksFromSupabase[0].id).toBe('sup-1')
-    expect(booksFromSupabase[0].title).toBe('Livre Supabase')
+    expect(jeunesseFondsBooks.length).toBeGreaterThan(0)
+    expect(jeunesseFondsBooks.every(book => book.type === 'fonds' && book.universe === 'Jeunesse')).toBe(true)
   })
 
-  it('fallback vers MOCK_BOOKS quand Supabase retourne une erreur', async () => {
-    const mockSelect = vi.fn().mockResolvedValue({
-      data: null,
-      error: { message: 'DB connection failed' },
-    })
-    const mockFrom = vi.fn().mockReturnValue({ select: mockSelect })
+  it('filtrer sur un univers réduit le nombre de titres du type', async () => {
+    const fondsBooks = await getBooksByTypeAsync('fonds')
+    const jeunesseFondsBooks = await getBooksByTypeAsync('fonds', 'Jeunesse')
 
-    vi.doMock('@/lib/supabase', () => ({
-      supabase: { from: mockFrom },
-    }))
+    expect(jeunesseFondsBooks.length).toBeLessThan(fondsBooks.length)
+  })
+})
 
-    const { getAllBooksAsync } = await import('../books')
-    const fallbackBooks = await getAllBooksAsync()
+describe('getBookByIdAsync', () => {
+  it('retrouve un livre du catalogue par son id', async () => {
+    const expectedBook = MOCK_BOOKS[0]
 
-    expect(fallbackBooks).toHaveLength(MOCK_BOOKS.length)
-    expect(fallbackBooks[0].id).toBe(MOCK_BOOKS[0].id)
+    const foundBook = await getBookByIdAsync(expectedBook.id)
+
+    expect(foundBook).toEqual(expectedBook)
   })
 
-  it('fallback vers MOCK_BOOKS quand Supabase retourne un tableau vide', async () => {
-    const mockSelect = vi.fn().mockResolvedValue({ data: [], error: null })
-    const mockFrom = vi.fn().mockReturnValue({ select: mockSelect })
+  it('retourne null pour un id inconnu', async () => {
+    const missingBook = await getBookByIdAsync('id-absent-du-catalogue')
 
-    vi.doMock('@/lib/supabase', () => ({
-      supabase: { from: mockFrom },
-    }))
-
-    const { getAllBooksAsync } = await import('../books')
-    const fallbackBooks = await getAllBooksAsync()
-
-    expect(fallbackBooks).toHaveLength(MOCK_BOOKS.length)
-    expect(fallbackBooks[0].id).toBe(MOCK_BOOKS[0].id)
-  })
-
-  it('utilise le cache module-level au 2e appel sans refetch', async () => {
-    const mockSelect = vi.fn().mockResolvedValue({ data: [supabaseRow], error: null })
-    const mockFrom = vi.fn().mockReturnValue({ select: mockSelect })
-
-    vi.doMock('@/lib/supabase', () => ({
-      supabase: { from: mockFrom },
-    }))
-
-    const { getAllBooksAsync } = await import('../books')
-
-    await getAllBooksAsync()
-    const booksSecondCall = await getAllBooksAsync()
-
-    expect(mockFrom).toHaveBeenCalledTimes(1)
-    expect(booksSecondCall[0].id).toBe('sup-1')
+    expect(missingBook).toBeNull()
   })
 })
