@@ -1,8 +1,6 @@
 import { createContext, useCallback, useMemo, useState } from 'react'
 
 const SESSION_KEY = 'flowdiff_admin_session'
-const ADMIN_EMAIL = 'admin@flowdiff.com'
-const ADMIN_PASSWORD = 'FlowDiff2024!'
 
 interface AdminSession {
   email: string
@@ -32,13 +30,11 @@ export const AdminAuthContext = createContext<AdminAuthContextValue | null>(null
 export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<AdminSession | null>(readSession)
 
-  const login = useCallback((email: string, password: string): boolean => {
-    if (email.trim() !== ADMIN_EMAIL || password !== ADMIN_PASSWORD) return false
-    const s: AdminSession = { email: ADMIN_EMAIL, role: 'admin', exp: Date.now() + 8 * 3600 * 1000 }
-    localStorage.setItem(SESSION_KEY, JSON.stringify(s))
-    setSession(s)
-    return true
-  }, [])
+  // Le back-office n'est plus routé et le projet n'a pas de backend.
+  // Les identifiants ont été retirés de la source : comparés ici, ils
+  // auraient été lisibles en clair dans le bundle public.
+  // Une reprise devra valider la connexion côté serveur.
+  const login = useCallback((_email: string, _password: string): boolean => false, [])
 
   const logout = useCallback(() => {
     localStorage.removeItem(SESSION_KEY)
