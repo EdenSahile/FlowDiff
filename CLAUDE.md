@@ -171,7 +171,7 @@ En permanence : **Panier** (droite, avec badge quantité) +  à gauche du panier
 
 ## Stack technique
 
-> **Stratégie** : **Vite 5 + React 18** — stack définitif pour le projet test Vercel. Pas de migration Next.js prévue. L'application reste en SPA avec mock auth et données locales.
+> **Stratégie** : **Vite 5 + React 18**, stack définitif. Pas de migration Next.js prévue. L'application est une SPA, avec une authentification mock.
 
 | Couche | Stack |
 |--------|-------|
@@ -180,10 +180,25 @@ En permanence : **Panier** (droite, avec badge quantité) +  à gauche du panier
 | Langage | **TypeScript** (strict) |
 | Style | **Styled-components v6** |
 | Auth | **Mock JWT** (localStorage, bcrypt cost 12) |
-| BDD | **Prisma ORM** installé (non branché — données mock) |
+| BDD | **Supabase** câblé mais hors service, voir ci-dessous. Migration **Neon** prévue |
+| ORM | **Prisma** (`provider = "postgresql"`), pour les migrations SQL et le seed |
+| API serveur | **Vercel Functions** dans `api/` (`aidenia.ts`, `feedback.ts`) |
 | Validation | **Zod** (tous les inputs) |
 | Tests | **Vitest** (jsdom) |
-| Déploiement | **Vercel** (build Vite, projet test) |
+| Déploiement | **Vercel**, https://flowdiff-omega.vercel.app |
+
+### État réel de la base de données
+
+Supabase a été câblé le 16 mai 2026 : table `livres` pour le catalogue, puis `libraires` et `commandes` pour l'admin. **Le projet Supabase n'existe plus**, son host ne résout plus (`ERR_NAME_NOT_RESOLVED`). Le plan gratuit met un projet en pause après 7 jours sans activité, puis le supprime au bout de 90 jours.
+
+Ce que ça donne aujourd'hui :
+
+- **Catalogue libraire** : `src/services/books.ts` ne fait plus aucun appel réseau et lit `MOCK_BOOKS`. État assumé, pas une panne.
+- **Espace admin** : `src/admin/services/adminServices.ts` appelle encore Supabase sur `commandes`, `libraires` et `livres`. Ces écrans sont cassés.
+- **Couvertures** : fichiers servis par l'app depuis `public/covers/{isbn}.jpg`, sans dépendance réseau. 40 titres sur 44 en ont une, les 4 autres affichent le placeholder dessiné.
+
+**Migration Neon prévue.** Neon est du Postgres nu, sans l'API REST auto-générée qu'offrait Supabase. Les appels base devront donc passer par `api/`, jamais depuis le navigateur : les identifiants de connexion finiraient sinon en clair dans le bundle Vite, qui est public.
+
 ---
 
 ## Sécurité — règles non négociables
@@ -215,7 +230,7 @@ En permanence : **Panier** (droite, avec badge quantité) +  à gauche du panier
 | 10 | ~~PWA — vite-plugin-pwa (manifest + service worker + icônes)~~ — **annulé** | 🚫 Annulé |
 | 11 | Tests + recette fonctionnelle | ✅ Fait (Vitest — computeTotals + isOrderable) |
 | 12 | ~~Migration Next.js 14~~ — **annulé**, projet reste sur Vite (test Vercel) | 🚫 Annulé |
-| 13 | ~~Recette finale + déploiement Vercel~~ — **annulé** | 🚫 Annulé |
+| 13 | Déploiement Vercel | ✅ Fait (https://flowdiff-omega.vercel.app) |
 
 
 ---
