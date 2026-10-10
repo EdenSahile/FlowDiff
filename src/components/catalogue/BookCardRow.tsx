@@ -800,7 +800,7 @@ export function BookCardRow({ book, selected, onToggle }: Props) {
 
   const isAParaitre = book.type === 'a-paraitre'
   const isEpuise    = book.statut === 'epuise' || book.statut === 'rupture'
-  const isOrderable = !isAParaitre && !isEpuise
+  const isOrderable = !isEpuise
   const badge       = TYPE_META[book.type] ?? TYPE_META['fonds']
   const classif     = CLASSIF[book.universe] ?? []
   const awards      = AWARDS[book.universe] ?? []

@@ -16,10 +16,10 @@ export const registerSchema = z
   .object({
     codeClient: z
       .string()
-      .min(3, 'Code client invalide')
-      .max(20, 'Code client invalide')
       .trim()
-      .toUpperCase(),
+      .toUpperCase()
+      .min(3, 'Code client invalide')
+      .max(20, 'Code client invalide'),
     email: z
       .string()
       .email('Adresse email invalide')

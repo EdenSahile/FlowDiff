@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import type { Book, StockStatut, Universe } from '@/data/mockBooks'
 import { useAuthContext } from '@/contexts/AuthContext'
 import { useToast } from '@/contexts/ToastContext'
@@ -92,16 +92,20 @@ function cartKey(codeClient: string | undefined) {
   return `bookflow_cart_${codeClient ?? 'guest'}`
 }
 
-function transmissionKey(codeClient: string | undefined) {
+export function transmissionKey(codeClient: string | undefined) {
   return `bookflow_transmission_${codeClient ?? 'guest'}`
 }
 
-function loadTransmissionMode(codeClient: string | undefined): TransmissionMode {
+export function loadTransmissionMode(codeClient: string | undefined): TransmissionMode {
   try {
     const stored = localStorage.getItem(transmissionKey(codeClient))
     if (stored === 'FLOWDIFF' || stored === 'EDI') return stored
   } catch { /* ignore */ }
   return 'FLOWDIFF'
+}
+
+export function hasReliquatInItems(items: Pick<CartItem, 'enReliquat'>[]): boolean {
+  return items.some(i => i.enReliquat)
 }
 
 function loadCart(key: string): StoredCart {
@@ -159,6 +163,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [transmissionMode, setTransmissionModeState] = useState<TransmissionMode>(() =>
     loadTransmissionMode(user?.codeClient)
   )
+  const toastGuardRef = useRef(false)
 
   /* Re-charger le panier et la préférence quand l'utilisateur change */
   useEffect(() => {
@@ -194,7 +199,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     sum + op.books.reduce((s, { quantity }) => s + quantity, 0), 0)
   const totalItems    = itemsTotal + opBooksTotal
 
-  const hasReliquatItems = items.some(i => i.enReliquat)
+  const hasReliquatItems = hasReliquatInItems(items)
 
   /* ── Titres individuels ── */
   const removeFromCart = useCallback((itemKey: string) =>
@@ -203,21 +208,45 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const updateQty = useCallback((itemKey: string, qty: number) => {
     if (qty < 1) { removeFromCart(itemKey); return }
-    setItems(prev => prev.map(i => getItemKey(i) === itemKey ? { ...i, quantity: qty } : i))
-  }, [removeFromCart, setItems])
-
-  const addToCart = useCallback((book: Book, qty = 1, opts: AddToCartOptions = {}) => {
-    const { ebookOption, enReliquat } = opts
+    toastGuardRef.current = false
     setCart(prev => {
       const currentTotal =
         prev.items.reduce((s, i) => s + i.quantity, 0) +
         prev.opGroups.reduce((s, op) =>
           s + op.books.reduce((ss, b) => ss + b.quantity, 0), 0)
-      if (currentTotal >= CART_LIMIT) {
-        showToast(
-          `Limite de démonstration atteinte (${CART_LIMIT} articles max). Veuillez vider votre panier pour continuer.`,
-          'error'
-        )
+      const item = prev.items.find(i => getItemKey(i) === itemKey)
+      if (!item) return prev
+      const delta = qty - item.quantity
+      if (delta > 0 && currentTotal + delta > CART_LIMIT) {
+        if (!toastGuardRef.current) {
+          toastGuardRef.current = true
+          showToast(
+            `Limite de démonstration atteinte (${CART_LIMIT} articles max). Veuillez vider votre panier pour continuer.`,
+            'error'
+          )
+        }
+        return prev
+      }
+      return { ...prev, items: prev.items.map(i => getItemKey(i) === itemKey ? { ...i, quantity: qty } : i) }
+    })
+  }, [removeFromCart, showToast])
+
+  const addToCart = useCallback((book: Book, qty = 1, opts: AddToCartOptions = {}) => {
+    const { ebookOption, enReliquat } = opts
+    toastGuardRef.current = false
+    setCart(prev => {
+      const currentTotal =
+        prev.items.reduce((s, i) => s + i.quantity, 0) +
+        prev.opGroups.reduce((s, op) =>
+          s + op.books.reduce((ss, b) => ss + b.quantity, 0), 0)
+      if (currentTotal + qty > CART_LIMIT) {
+        if (!toastGuardRef.current) {
+          toastGuardRef.current = true
+          showToast(
+            `Limite de démonstration atteinte (${CART_LIMIT} articles max). Veuillez vider votre panier pour continuer.`,
+            'error'
+          )
+        }
         return prev
       }
       const itemKey = ebookOption ? `${book.id}::${ebookOption.isbnEbook}` : book.id
@@ -249,16 +278,20 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const addOPToCart = useCallback((group: Omit<OPCartGroup, 'id'>) => {
     const opCount = group.books.reduce((s, { quantity }) => s + quantity, 0)
+    toastGuardRef.current = false
     setCart(prev => {
       const currentTotal =
         prev.items.reduce((s, i) => s + i.quantity, 0) +
         prev.opGroups.reduce((s, op) =>
           s + op.books.reduce((ss, b) => ss + b.quantity, 0), 0)
       if (currentTotal + opCount > CART_LIMIT) {
-        showToast(
-          `Limite de démonstration atteinte (${CART_LIMIT} articles max). Veuillez vider votre panier pour continuer.`,
-          'error'
-        )
+        if (!toastGuardRef.current) {
+          toastGuardRef.current = true
+          showToast(
+            `Limite de démonstration atteinte (${CART_LIMIT} articles max). Veuillez vider votre panier pour continuer.`,
+            'error'
+          )
+        }
         return prev
       }
       const id = `op-${group.serieId}-${Date.now()}`
