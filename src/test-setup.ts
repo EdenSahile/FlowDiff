@@ -15,3 +15,11 @@ if (typeof globalThis.localStorage === 'undefined') {
   }
   Object.defineProperty(globalThis, 'localStorage', { value: localStoragePolyfill, writable: true })
 }
+
+// jsdom n'implémente pas createObjectURL/revokeObjectURL. Les tests qui les
+// espionnent via vi.spyOn échouent sans ces stubs, spyOn exigeant que la
+// propriété existe déjà.
+if (typeof URL.createObjectURL === 'undefined') {
+  URL.createObjectURL = () => 'blob:jsdom'
+  URL.revokeObjectURL = () => {}
+}
