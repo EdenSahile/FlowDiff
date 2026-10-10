@@ -1,4 +1,3 @@
-// DEV ONLY — remplacé par Supabase en Phase 12
 // Toutes les données sont fictives à des fins de démonstration.
 
 /* ── Vendeur (mentions légales obligatoires art. L.441-9 C.com.) ── */

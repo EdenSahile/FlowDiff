@@ -19,7 +19,6 @@
     "@anthropic-ai/sdk": "^0.104.1",
     "@pinecone-database/pinecone": "^7.2.0",
     "@prisma/client": "^7.7.0",
-    "@supabase/supabase-js": "^2.105.4",
     "bcryptjs": "^3.0.3",
     "driver.js": "^1.4.0",
     "html2canvas": "^1.4.1",

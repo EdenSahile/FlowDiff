@@ -1,11 +1,6 @@
 import bcrypt from 'bcryptjs'
 
-if (import.meta.env.PROD) {
-  // Phase 12 : remplacer par Prisma/Supabase — mock toujours actif en attendant
-  console.warn('[FlowDiff] mockUsers chargé en production — migrer vers Prisma/Supabase (Phase 12).')
-}
-
-// DEV ONLY — remplacé par Prisma/Supabase en Phase 12
+// Coût bcrypt abaissé en dev : à 12, chaque connexion ajoute ~1 s d'attente.
 const DEV_COST = 4
 
 export interface MockUser {

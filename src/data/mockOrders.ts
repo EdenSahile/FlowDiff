@@ -1,5 +1,3 @@
-// DEV ONLY — remplacé par Prisma/Supabase en Phase 12
-
 import type { StockStatut } from './mockBooks'
 
 export type TrackingEventStatus =

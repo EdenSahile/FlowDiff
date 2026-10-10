@@ -175,8 +175,7 @@ function BookCoverBase({
   fill = false,
   coverUrl,
 }: Props) {
-  // Source unique et fiable : coverUrl (Supabase → /covers/…) sinon l'image
-  // auto-hébergée par ISBN. Le placeholder reste en dessous comme secours.
+  // Le placeholder dessiné reste en dessous, visible tant que l'image ne charge pas.
   const src = coverUrl || `/covers/${isbn}.jpg`
   const [loadedSrc, setLoadedSrc] = useState<string | null>(null)
   const loaded = loadedSrc === src
