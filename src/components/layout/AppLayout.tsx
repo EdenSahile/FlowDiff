@@ -7,7 +7,6 @@ import { Sidebar } from './Sidebar'
 import { BurgerMenu } from './BurgerMenu'
 import { DemoBanner } from '@/components/ui/DemoBanner'
 import { FeedbackWidget } from '@/components/ui/FeedbackWidget'
-import { AideniaChat } from '@/components/AideniaChat/AideniaChat'
 import { AppFooter } from './AppFooter'
 import { useCart } from '@/contexts/CartContext'
 import { OnboardingTour } from '@/components/onboarding/OnboardingTour'
@@ -73,7 +72,6 @@ export function AppLayout({ children }: AppLayoutProps) {
       </MainColumn>
       <BottomNav />
       <FeedbackWidget isOpen={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
-      <AideniaChat />
       <OnboardingTour />
     </LayoutRoot>
   )
