@@ -140,7 +140,7 @@
 
 | ID | Règle métier | Preuve dans le projet | Emplacement | Tests existants | Couverture apparente | Ambiguïté |
 | -- | ------------ | --------------------- | ----------- | --------------- | -------------------- | --------- |
-| FLOW-RM-092 | Credentials admin hardcodés (admin@flowdiff.com / FlowDiff2024!) | Vérification directe dans login | `src/admin/contexts/AdminAuthContext.tsx` | `adminAuth.test.ts` : tests login | Complète | Non |
+| FLOW-RM-092 | ~~Credentials admin hardcodés~~ **corrigé le 2026-10-10** : retirés de la source, y compris le `defaultValue` qui les pré-remplissait dans le formulaire. Back-office déroté, `login` renvoie `false`. Vérifié absents du bundle produit. | n/a | `src/admin/contexts/AdminAuthContext.tsx`, `src/admin/pages/AdminLoginPage.tsx` | `adminAuth.test.ts` supprimé, il testait ses propres réimplémentations | Résolu | Non |
 | FLOW-RM-093 | Session admin expire après 8h | exp dans le token admin | `src/admin/contexts/AdminAuthContext.tsx` | `adminAuth.test.ts` : 1 test | Complète | Non |
 | FLOW-RM-094 | Session admin requiert role='admin' | Vérification du rôle dans le token | `src/admin/contexts/AdminAuthContext.tsx` | `adminAuth.test.ts` : 1 test | Complète | Non |
 | FLOW-RM-095 | AdminRoute redirige vers /admin/login si non authentifié | Guard route | `src/admin/AdminRoute.tsx` | Aucun | Absente | Non |

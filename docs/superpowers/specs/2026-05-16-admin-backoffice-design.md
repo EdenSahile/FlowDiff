@@ -59,7 +59,7 @@ React Router v6 : `<Routes>` racine avec `<Route path="/admin/*" element={<Admin
 
 ### Identifiants
 - Email : `admin@flowdiff.com`
-- Mot de passe : `FlowDiff2024!` (pré-rempli, masqué — type `password`)
+- Mot de passe : `<MOT-DE-PASSE-RETIRE>` (pré-rempli, masqué — type `password`)
 
 ### Mécanisme
 - localStorage key : `flowdiff_admin_session` (valeur : `{ email, role: 'admin', exp: timestamp+8h }`)
