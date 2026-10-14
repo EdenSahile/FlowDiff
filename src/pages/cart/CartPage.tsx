@@ -1220,8 +1220,11 @@ export function CartPage() {
             <EmptySubtext style={{ marginBottom: '8px' }}>
               Commande transmise via Dilicom (EDI). Vous recevrez un accusé de réception automatique.
             </EmptySubtext>
-            <EmptySubtext style={{ marginBottom: '24px' }}>
+            <EmptySubtext style={{ marginBottom: '8px' }}>
               Statut EDI initial : <strong>En attente d'envoi</strong>
+            </EmptySubtext>
+            <EmptySubtext style={{ marginBottom: '24px', fontStyle: 'italic', opacity: 0.7 }}>
+              Ceci est une démonstration. Aucune commande réelle n'a été passée.
             </EmptySubtext>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'center' }}>
               <Button variant="primary" size="lg" onClick={() => navigate('/historique')}>
@@ -1234,8 +1237,11 @@ export function CartPage() {
           </>
         ) : (
           <>
-            <EmptySubtext style={{ marginBottom: '24px' }}>
+            <EmptySubtext style={{ marginBottom: '8px' }}>
               Votre commande a bien été transmise via FlowDiff. Un récapitulatif vous sera envoyé par email.
+            </EmptySubtext>
+            <EmptySubtext style={{ marginBottom: '24px', fontStyle: 'italic', opacity: 0.7 }}>
+              Ceci est une démonstration. Aucune commande réelle n'a été passée.
             </EmptySubtext>
             <Button variant="primary" size="lg" onClick={() => navigate('/')}>
               Retour à l'accueil

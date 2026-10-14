@@ -83,7 +83,7 @@ export function ForgotPasswordPage() {
                 id="email"
                 label="Email professionnel"
                 type="email"
-                placeholder="contact@malibrairie.fr"
+                placeholder="Votre email professionnel"
                 value={email}
                 onChange={(e) => {
                   setEmail(e.target.value)
