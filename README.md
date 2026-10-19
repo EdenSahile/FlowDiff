@@ -12,7 +12,7 @@
 </p>
 
 **🔗 Démo live :**`https://flowdiff-demo-app.vercel.app/login`
-**🔑 Connexion :** les identifiants de démo sont **déjà pré-remplis** — il suffit de cliquer sur **Se connecter**.
+**🔑 Connexion :** cliquer directement sur **Se connecter**.
  
  📸  ![Aperçu FlowDiff](docs/screenshots/dashboard.png)
 
@@ -87,7 +87,7 @@ Concrètement, mon rôle sur ce produit :
 
 ## ▶️ Tester en 30 secondes
 
-**En ligne :** ouvre la démo → les identifiants sont déjà pré-remplis → clique sur *Se connecter*.
+**En ligne :** ouvre la démo → clique sur *Se connecter*.
 
 **En local :**
 
