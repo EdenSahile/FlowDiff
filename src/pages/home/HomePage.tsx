@@ -16,7 +16,7 @@ import { theme } from '@/lib/theme'
 import { ComparaisonToggle } from '@/components/dashboard/ComparaisonToggle'
 import { useDashboardConfig, type DashboardZone } from '@/hooks/useDashboardConfig'
 import { CustomizerDrawer } from '@/components/dashboard/CustomizerDrawer'
-import { computeKPIs, computeChartData, computeDonutData, computeTopPublishers, orderToDashboardOrders, fmtEur, type ChartPoint, type DonutSegment } from '@/data/mockDashboard'
+import { computeKPIs, computeChartData, computeDonutData, computeTopPublishers, orderToDashboardOrders, summarizeDashboardOrders, fmtEur, type ChartPoint, type DonutSegment } from '@/data/mockDashboard'
 import {
   exportDashboardCSV,
   exportKPIOnlyCSV,
@@ -45,6 +45,16 @@ function IconChevron({ dir }: { dir: 'left' | 'right' }) {
       {dir === 'left'
         ? <polyline points="15 18 9 12 15 6" />
         : <polyline points="9 18 15 12 9 6" />}
+    </svg>
+  )
+}
+
+function IconDetailChevron({ open }: { open: boolean }) {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"
+      style={{ transform: open ? 'rotate(180deg)' : undefined }}>
+      <polyline points="6 9 12 15 18 9" />
     </svg>
   )
 }
@@ -628,6 +638,206 @@ const KPILink = styled.button`
   text-align: left;
   margin-top: 2px;
   &:hover { text-decoration: underline; }
+`
+
+const KPIDetailPanel = styled.section`
+  margin-top: 16px;
+  background: ${({ theme }) => theme.colors.white};
+  border: 1px solid ${({ theme }) => theme.colors.gray[200]};
+  border-radius: ${({ theme }) => theme.radii.md};
+  padding: 16px;
+`
+
+const KPIDetailHeader = styled.div`
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+`
+
+const KPIDetailTitle = styled.h3`
+  margin: 0;
+  color: ${({ theme }) => theme.colors.gray[800]};
+  font-size: 15px;
+`
+
+const KPIDetailSubtitle = styled.p`
+  margin: 4px 0 0;
+  color: ${({ theme }) => theme.colors.gray[600]};
+  font-size: 12px;
+`
+
+const KPIDetailClose = styled.button`
+  min-width: 44px;
+  min-height: 44px;
+  border: 1px solid ${({ theme }) => theme.colors.gray[200]};
+  border-radius: ${({ theme }) => theme.radii.sm};
+  background: ${({ theme }) => theme.colors.white};
+  color: ${({ theme }) => theme.colors.gray[600]};
+  cursor: pointer;
+  font-size: 12px;
+
+  &:hover {
+    border-color: ${({ theme }) => theme.colors.navy};
+    color: ${({ theme }) => theme.colors.navy};
+  }
+`
+
+const KPIDetailTotals = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  border-radius: ${({ theme }) => theme.radii.sm};
+  background: ${({ theme }) => theme.colors.gray[50]};
+  color: ${({ theme }) => theme.colors.gray[600]};
+  font-size: 12px;
+
+  strong { color: ${({ theme }) => theme.colors.navy}; }
+`
+
+const KPIDetailList = styled.div`
+  display: grid;
+  gap: 8px;
+`
+
+const KPIDetailRow = styled.article<{ $cancelled: boolean }>`
+  display: grid;
+  grid-template-columns: 100px minmax(160px, 1fr) 78px 104px 96px 44px;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 12px;
+  border: 1px solid ${({ theme }) => theme.colors.gray[200]};
+  border-radius: ${({ theme }) => theme.radii.sm};
+  color: ${({ theme }) => theme.colors.gray[600]};
+  font-size: 12px;
+  opacity: ${({ $cancelled }) => $cancelled ? 0.72 : 1};
+
+  ${mq.belowMd} {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 12px;
+  }
+`
+
+const KPIDetailExpand = styled.button`
+  width: 36px;
+  height: 36px;
+  border: 1px solid ${({ theme }) => theme.colors.gray[200]};
+  border-radius: ${({ theme }) => theme.radii.sm};
+  background: ${({ theme }) => theme.colors.white};
+  color: ${({ theme }) => theme.colors.navy};
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    background: ${({ theme }) => theme.colors.gray[100]};
+    border-color: ${({ theme }) => theme.colors.navy};
+  }
+`
+
+const KPIDetailCell = styled.div`
+  min-width: 0;
+
+  span {
+    display: block;
+    margin-bottom: 2px;
+    color: ${({ theme }) => theme.colors.gray[400]};
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  strong {
+    color: ${({ theme }) => theme.colors.gray[800]};
+    font-variant-numeric: tabular-nums;
+  }
+`
+
+const KPIDetailFooter = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid ${({ theme }) => theme.colors.gray[200]};
+  color: ${({ theme }) => theme.colors.gray[600]};
+  font-size: 13px;
+
+  strong {
+    color: ${({ theme }) => theme.colors.navy};
+    font-size: 15px;
+    font-variant-numeric: tabular-nums;
+  }
+`
+
+const KPIDetailItems = styled.section`
+  margin: -2px 0 2px;
+  padding: 10px 12px;
+  border: 1px solid ${({ theme }) => theme.colors.gray[200]};
+  border-radius: ${({ theme }) => theme.radii.sm};
+  background: ${({ theme }) => theme.colors.gray[50]};
+
+`
+
+const KPIDetailItemsTitle = styled.h4`
+  margin: 0 0 8px;
+  color: ${({ theme }) => theme.colors.gray[800]};
+  font-size: 12px;
+`
+
+const KPIDetailItemRow = styled.div`
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) 130px 56px 104px 104px;
+  gap: 12px;
+  align-items: center;
+  padding: 8px 0;
+  border-top: 1px solid ${({ theme }) => theme.colors.gray[200]};
+  font-size: 12px;
+
+  &:first-of-type { border-top: none; }
+
+  ${mq.belowMd} {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 12px;
+  }
+`
+
+const KPIDetailItemTitle = styled.div`
+  min-width: 0;
+  color: ${({ theme }) => theme.colors.gray[800]};
+  font-weight: 600;
+
+  span {
+    display: block;
+    margin-top: 2px;
+    color: ${({ theme }) => theme.colors.gray[400]};
+    font-size: 11px;
+    font-weight: 400;
+  }
+`
+
+const KPIDetailItemValue = styled.div`
+  color: ${({ theme }) => theme.colors.gray[600]};
+
+  span {
+    display: block;
+    margin-bottom: 2px;
+    color: ${({ theme }) => theme.colors.gray[400]};
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  strong {
+    color: ${({ theme }) => theme.colors.gray[800]};
+    font-variant-numeric: tabular-nums;
+  }
 `
 
 /* ── Ligne 3 colonnes (étapes 4-5-6 et 7-8-9) ── */
@@ -1545,6 +1755,8 @@ export function HomePage() {
 
   const [customizerOpen, setCustomizerOpen] = useState(false)
   const [exportDropdownOpen, setExportDropdownOpen] = useState(false)
+  const [kpiDetailsOpen, setKpiDetailsOpen] = useState(false)
+  const [expandedKpiOrderId, setExpandedKpiOrderId] = useState<string | null>(null)
   const dashConfig = useDashboardConfig()
   const cardDragRef = useRef<{ zone: DashboardZone; id: string } | null>(null)
   const [cardDrag, setCardDrag] = useState<{ zone: DashboardZone; id: string } | null>(null)
@@ -1564,6 +1776,10 @@ export function HomePage() {
   const periodFilter = usePeriodFilter(extraDashboardOrders)
 
   const kpi        = useMemo(() => computeKPIs(periodFilter.orders),        [periodFilter.orders])
+  const kpiDetails = useMemo(
+    () => summarizeDashboardOrders(periodFilter.orders),
+    [periodFilter.orders],
+  )
   const compareKpi = useMemo(
     () => periodFilter.compareOrders.length > 0 ? computeKPIs(periodFilter.compareOrders) : null,
     [periodFilter.compareOrders],
@@ -1725,7 +1941,7 @@ export function HomePage() {
       trend: compareKpi
         ? <KpiTrendLine current={kpi.nbActive} compare={compareKpi.nbActive} mode={periodFilter.compareMode} />
         : undefined,
-      link: <KPILink onClick={() => navigate('/historique')}>Voir le détail →</KPILink>,
+      link: <KPILink onClick={() => setKpiDetailsOpen(true)}>Voir les commandes →</KPILink>,
     },
     'kpi-montant': {
       icon: '€',
@@ -1735,7 +1951,7 @@ export function HomePage() {
       trend: compareKpi
         ? <KpiTrendLine current={kpi.montantTotal} compare={compareKpi.montantTotal} mode={periodFilter.compareMode} />
         : undefined,
-      link: <KPILink onClick={() => navigate('/historique')}>Voir le détail →</KPILink>,
+      link: <KPILink onClick={() => setKpiDetailsOpen(true)}>Voir les commandes →</KPILink>,
     },
     'kpi-exemplaires': {
       icon: '📦',
@@ -1745,7 +1961,7 @@ export function HomePage() {
       trend: compareKpi
         ? <KpiTrendLine current={kpi.nbExemplaires} compare={compareKpi.nbExemplaires} mode={periodFilter.compareMode} />
         : undefined,
-      link: <KPILink onClick={() => navigate('/historique')}>Voir le détail →</KPILink>,
+      link: <KPILink onClick={() => setKpiDetailsOpen(true)}>Voir les commandes →</KPILink>,
     },
     'kpi-panier-moyen': {
       icon: '📊',
@@ -1756,7 +1972,7 @@ export function HomePage() {
       trend: compareKpi
         ? <KpiTrendLine current={kpi.panierMoyen} compare={compareKpi.panierMoyen} mode={periodFilter.compareMode} />
         : undefined,
-      link: <KPILink onClick={() => navigate('/historique')}>Voir le détail →</KPILink>,
+      link: <KPILink onClick={() => setKpiDetailsOpen(true)}>Voir les commandes →</KPILink>,
     },
     'kpi-delai': {
       icon: '⏱',
@@ -1770,11 +1986,11 @@ export function HomePage() {
     'kpi-rupture': {
       icon: '✕',
       iconBg: '#FDECEA', iconColor: '#C0392B',
-      label: 'Taux de rupture',
-      tooltip: 'Pourcentage de références commandées non livrées par le distributeur.',
-      value: `${(kpi.tauxRupture * 100).toFixed(1).replace('.', ',')} %`,
+      label: 'Taux d’annulation',
+      tooltip: 'Pourcentage de commandes annulées sur la période.',
+      value: `${(kpi.tauxAnnulation * 100).toFixed(1).replace('.', ',')} %`,
       trend: compareKpi
-        ? <KpiTrendLine current={kpi.tauxRupture} compare={compareKpi.tauxRupture} mode={periodFilter.compareMode} invert />
+        ? <KpiTrendLine current={kpi.tauxAnnulation} compare={compareKpi.tauxAnnulation} mode={periodFilter.compareMode} invert />
         : undefined,
     },
     'kpi-references': {
@@ -2060,6 +2276,99 @@ export function HomePage() {
               })
             }
           </KPIGrid>
+          {kpiDetailsOpen && (
+            <KPIDetailPanel aria-labelledby="kpi-details-title">
+              <KPIDetailHeader>
+                <div>
+                  <KPIDetailTitle id="kpi-details-title">Détail des commandes de la période</KPIDetailTitle>
+                  <KPIDetailSubtitle>
+                    {rangeLabel(periodFilter.period)} · ces lignes correspondent exactement aux indicateurs affichés ci-dessus.
+                  </KPIDetailSubtitle>
+                </div>
+                <KPIDetailClose type="button" onClick={() => setKpiDetailsOpen(false)} aria-label="Fermer le détail des commandes">
+                  Fermer
+                </KPIDetailClose>
+              </KPIDetailHeader>
+              <KPIDetailTotals>
+                <span><strong>{kpi.nbActive}</strong> commande{kpi.nbActive > 1 ? 's' : ''} confirmée{kpi.nbActive > 1 ? 's' : ''}</span>
+                {kpi.nbCancelled > 0 && <span><strong>{kpi.nbCancelled}</strong> annulée{kpi.nbCancelled > 1 ? 's' : ''} · hors montant total</span>}
+                <span>Montant confirmé : <strong>{fmtEur(kpi.montantTotal)}</strong></span>
+              </KPIDetailTotals>
+              <KPIDetailList aria-label="Commandes prises en compte dans les indicateurs">
+                {kpiDetails.map(order => {
+                  const isExpanded = expandedKpiOrderId === order.orderId
+                  return (
+                    <React.Fragment key={order.orderId}>
+                      <KPIDetailRow $cancelled={order.cancelled}>
+                        <KPIDetailCell>
+                          <span>Date</span>
+                          <strong>{new Date(`${order.date}T12:00:00`).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}</strong>
+                        </KPIDetailCell>
+                        <KPIDetailCell>
+                          <span>Éditeur · univers</span>
+                          <strong>{order.publishers.join(', ')} · {order.universes.join(', ')}</strong>
+                        </KPIDetailCell>
+                        <KPIDetailCell>
+                          <span>Exemplaires</span>
+                          <strong>{order.nbExemplaires}</strong>
+                        </KPIDetailCell>
+                        <KPIDetailCell>
+                          <span>Total commande TTC</span>
+                          <strong>{fmtEur(order.montantTTC)}</strong>
+                        </KPIDetailCell>
+                        <KPIDetailCell>
+                          <span>Statut</span>
+                          <strong>{order.cancelled ? 'Annulée' : 'Confirmée'}</strong>
+                        </KPIDetailCell>
+                        <KPIDetailExpand
+                          type="button"
+                          aria-expanded={isExpanded}
+                          aria-controls={`kpi-order-${order.orderId}`}
+                          aria-label={`${isExpanded ? 'Masquer' : 'Afficher'} les titres de la commande du ${new Date(`${order.date}T12:00:00`).toLocaleDateString('fr-FR')}`}
+                          onClick={() => setExpandedKpiOrderId(isExpanded ? null : order.orderId)}
+                        >
+                          <IconDetailChevron open={isExpanded} />
+                        </KPIDetailExpand>
+                      </KPIDetailRow>
+                      {isExpanded && (
+                        <KPIDetailItems id={`kpi-order-${order.orderId}`} aria-label={`Titres de la commande du ${new Date(`${order.date}T12:00:00`).toLocaleDateString('fr-FR')}`}>
+                          <KPIDetailItemsTitle>{order.items.length} titre{order.items.length > 1 ? 's' : ''} commandé{order.items.length > 1 ? 's' : ''}</KPIDetailItemsTitle>
+                          {order.items.map(item => (
+                            <KPIDetailItemRow key={`${item.isbn}-${item.title}`}>
+                              <KPIDetailItemTitle>
+                                {item.title}
+                                <span>ISBN {item.isbn}</span>
+                              </KPIDetailItemTitle>
+                              <KPIDetailItemValue>
+                                <span>Éditeur</span>
+                                <strong>{item.publisher}</strong>
+                              </KPIDetailItemValue>
+                              <KPIDetailItemValue>
+                                <span>Qté</span>
+                                <strong>{item.quantity}</strong>
+                              </KPIDetailItemValue>
+                              <KPIDetailItemValue>
+                                <span>Prix unitaire TTC</span>
+                                <strong>{fmtEur(item.unitPriceTTC)}</strong>
+                              </KPIDetailItemValue>
+                              <KPIDetailItemValue>
+                                <span>Total ligne TTC</span>
+                                <strong>{fmtEur(item.montantTTC)}</strong>
+                              </KPIDetailItemValue>
+                            </KPIDetailItemRow>
+                          ))}
+                        </KPIDetailItems>
+                      )}
+                    </React.Fragment>
+                  )
+                })}
+              </KPIDetailList>
+              <KPIDetailFooter>
+                <span>Total des commandes confirmées</span>
+                <strong>{fmtEur(kpi.montantTotal)}</strong>
+              </KPIDetailFooter>
+            </KPIDetailPanel>
+          )}
         </BilanSection>
         </SectionWrap>
           )
@@ -2146,11 +2455,11 @@ export function HomePage() {
                         <ChartStatLabel>Taux d'annulation</ChartStatLabel>
                         <ChartStatValueRow>
                           <ChartStatIcon $bg="#FDECEA" $color="#C0392B">%</ChartStatIcon>
-                          <ChartStatNum>{(kpi.tauxRupture * 100).toFixed(1).replace('.', ',')} %</ChartStatNum>
+                          <ChartStatNum>{(kpi.tauxAnnulation * 100).toFixed(1).replace('.', ',')} %</ChartStatNum>
                           {compareKpi && (
-                            <ChartStatDelta $up={kpi.tauxRupture <= compareKpi.tauxRupture}>
-                              {kpi.tauxRupture <= compareKpi.tauxRupture ? '▼' : '▲'}
-                              {' '}{Math.abs(Math.round((kpi.tauxRupture - compareKpi.tauxRupture) * 1000) / 10).toFixed(1)} pts
+                            <ChartStatDelta $up={kpi.tauxAnnulation <= compareKpi.tauxAnnulation}>
+                              {kpi.tauxAnnulation <= compareKpi.tauxAnnulation ? '▼' : '▲'}
+                              {' '}{Math.abs(Math.round((kpi.tauxAnnulation - compareKpi.tauxAnnulation) * 1000) / 10).toFixed(1)} pts
                             </ChartStatDelta>
                           )}
                         </ChartStatValueRow>

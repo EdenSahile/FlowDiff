@@ -1,6 +1,20 @@
 import { act, renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { usePeriodFilter } from '@/hooks/usePeriodFilter'
+import type { DashboardOrder } from '@/data/mockDashboard'
+
+const januaryOrders: DashboardOrder[] = [
+  {
+    id: 'jan-2026', orderId: 'jan-2026', date: '2026-01-12', montantTTC: 42,
+    nbExemplaires: 2, publisher: 'Gallimard', universe: 'Littérature',
+    cancelled: false, deliveryDays: 2, references: ['9780000000001'], items: [],
+  },
+  {
+    id: 'jan-2025', orderId: 'jan-2025', date: '2025-01-12', montantTTC: 36,
+    nbExemplaires: 2, publisher: 'Gallimard', universe: 'Littérature',
+    cancelled: false, deliveryDays: 2, references: ['9780000000002'], items: [],
+  },
+]
 
 describe('usePeriodFilter', () => {
   beforeEach(() => {
@@ -8,7 +22,7 @@ describe('usePeriodFilter', () => {
   })
 
   it('applique une période personnalisée et compare la même période à N-1', () => {
-    const { result } = renderHook(() => usePeriodFilter())
+    const { result } = renderHook(() => usePeriodFilter(januaryOrders))
 
     act(() => {
       result.current.setPreset('custom')

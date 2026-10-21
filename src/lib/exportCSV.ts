@@ -1,12 +1,13 @@
 import type { PeriodKPI, DashboardOrder, ChartPoint, DonutSegment, TopPublisher } from '@/data/mockDashboard'
 import type { Book } from '@/data/mockBooks'
+import { formatPrice } from '@/lib/format'
 
 function isoDate(d: Date): string {
   return d.toISOString().slice(0, 10)
 }
 
 function fmtNum2(n: number): string {
-  return n.toFixed(2).replace('.', ',')
+  return formatPrice(n)
 }
 
 function fmtNum1(n: number): string {
@@ -29,7 +30,7 @@ export function buildDashboardCSV(
   const lines: string[] = []
 
   lines.push('=== Résumé KPIs ===')
-  lines.push('Période;Du;Au;Commandes passées;Montant total TTC (€);Exemplaires commandés;Panier moyen (€);Délai moyen (j);Taux de rupture (%);Références distinctes commandées')
+  lines.push('Période;Du;Au;Commandes passées;Montant total TTC (€);Exemplaires commandés;Panier moyen (€);Délai moyen (j);Taux d’annulation (%);Références distinctes commandées')
   lines.push([
     cell(preset),
     isoDate(period.start),
@@ -39,7 +40,7 @@ export function buildDashboardCSV(
     kpi.nbExemplaires,
     fmtNum2(kpi.panierMoyen),
     fmtNum1(kpi.delaiMoyen),
-    fmtNum1(kpi.tauxRupture * 100),
+    fmtNum1(kpi.tauxAnnulation * 100),
     kpi.nbReferences,
   ].join(';'))
 
@@ -68,7 +69,7 @@ export function buildKPIOnlyCSV(
 ): string {
   const lines: string[] = []
   lines.push('=== Résumé KPIs ===')
-  lines.push('Période;Du;Au;Commandes passées;Montant total TTC (€);Exemplaires commandés;Panier moyen (€);Délai moyen (j);Taux de rupture (%);Références distinctes commandées')
+  lines.push('Période;Du;Au;Commandes passées;Montant total TTC (€);Exemplaires commandés;Panier moyen (€);Délai moyen (j);Taux d’annulation (%);Références distinctes commandées')
   lines.push([
     cell(preset),
     isoDate(period.start),
@@ -78,7 +79,7 @@ export function buildKPIOnlyCSV(
     kpi.nbExemplaires,
     fmtNum2(kpi.panierMoyen),
     fmtNum1(kpi.delaiMoyen),
-    fmtNum1(kpi.tauxRupture * 100),
+    fmtNum1(kpi.tauxAnnulation * 100),
     kpi.nbReferences,
   ].join(';'))
   return '﻿' + lines.join('\n')

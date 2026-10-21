@@ -11,6 +11,7 @@ import { DatePicker } from '@/components/ui/DatePicker'
 import { useToast } from '@/contexts/ToastContext'
 import { theme } from '@/lib/theme'
 import { mq } from '@/lib/responsive'
+import { formatPrice } from '@/lib/format'
 import { CHECKOUT_STEPS, type CheckoutStep, getNextStep, getPrevStep, getStepIndex, getStepLabel } from './checkoutSteps'
 import { addressSchema, parseAddressString, type AddressData, type TransmissionMode } from './checkoutSchemas'
 import { OrderTransmissionStep } from './OrderTransmissionStep'
@@ -998,7 +999,7 @@ type Page = 'cart' | CheckoutStep | 'success'
 type DeliveryMode = 'standard' | 'specific'
 type FormErrors = Partial<Record<keyof AddressData, string>>
 
-const fmt = (n: number) => n.toFixed(2).replace('.', ',') + ' €'
+const fmt = (n: number) => `${formatPrice(n)} €`
 const today = new Date().toISOString().split('T')[0]
 
 function fmtAddress(a: AddressData) {

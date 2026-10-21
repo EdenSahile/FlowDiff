@@ -10,13 +10,14 @@ const kpi: PeriodKPI = {
   nbExemplaires: 12,
   panierMoyen:   234.50,
   delaiMoyen:    2.3,
-  tauxRupture:   0.5,
+  tauxAnnulation: 0.5,
   nbReferences:  3,
 }
 
 const orders: DashboardOrder[] = [
   {
     id: 'ord-0',
+    orderId: 'ord-0',
     date: '2026-04-01',
     montantTTC: 234.50,
     nbExemplaires: 12,
@@ -25,9 +26,11 @@ const orders: DashboardOrder[] = [
     cancelled: false,
     deliveryDays: 2,
     references: ['978001', '978002', '978003'],
+    items: [],
   },
   {
     id: 'ord-1',
+    orderId: 'ord-1',
     date: '2026-04-15',
     montantTTC: 189.30,
     nbExemplaires: 8,
@@ -36,6 +39,7 @@ const orders: DashboardOrder[] = [
     cancelled: true,
     deliveryDays: 0,
     references: ['978004'],
+    items: [],
   },
 ]
 

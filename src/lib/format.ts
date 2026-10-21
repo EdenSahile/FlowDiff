@@ -1,2 +1,5 @@
+export const roundCurrency = (n: number): number =>
+  Math.round((n + Number.EPSILON) * 100) / 100
+
 export const formatPrice = (n: number): string =>
-  n.toFixed(2).replace('.', ',')
+  roundCurrency(n).toFixed(2).replace('.', ',')

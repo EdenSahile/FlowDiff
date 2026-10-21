@@ -335,7 +335,7 @@ const AuthorLinkBtn = styled.button`
   margin-top: 5px;
   margin-bottom: 12px;
   font-family: ${({ theme }) => theme.typography.fontFamily};
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   color: ${({ theme }) => theme.colors.navy};
   cursor: pointer;
