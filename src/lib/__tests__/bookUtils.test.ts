@@ -1,6 +1,22 @@
 import { describe, it, expect } from 'vitest'
 import { MOCK_BOOKS } from '@/data/mockBooks'
 import type { BookType, Universe, StockStatut } from '@/data/mockBooks'
+import { getPurchaseAvailability } from '@/lib/bookUtils'
+
+describe('getPurchaseAvailability', () => {
+  it('autorise l’ajout direct d’un titre à paraître par son unique bouton', () => {
+    const availability = getPurchaseAvailability('a-paraitre')
+
+    expect(availability.isAParaitre).toBe(true)
+    expect(availability.canAddToCart).toBe(true)
+    expect(availability.showStandardOrder).toBe(false)
+    expect(availability.isEpuise).toBe(false)
+  })
+
+  it('maintient le bouton standard pour un titre disponible', () => {
+    expect(getPurchaseAvailability('fonds', 'disponible').showStandardOrder).toBe(true)
+  })
+})
 
 /* ══════════════════════════════════════════════════════
    FLOW-RM-022 : 3 types de titres

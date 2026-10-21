@@ -5,11 +5,12 @@ import styled from 'styled-components'
 import { useNavigate, Link } from 'react-router-dom'
 import { Wordmark } from '@/components/brand/Wordmark'
 import {
-  MOCK_BOOKS,
   GENRE_BY_UNIVERSE,
   PRICE_RANGES,
   LANGUAGES,
+  getCatalogueBooks,
   searchBooks,
+  type Book,
   type Universe,
 } from '@/data/mockBooks'
 import { useWishlist } from '@/contexts/WishlistContext'
@@ -1008,12 +1009,12 @@ export function Header({ cartCount = 0, onBurgerClick, onCartClick }: HeaderProp
 
   /* ── Base books (by search query) ── */
   const baseBooks = useMemo(() =>
-    search.trim() ? searchBooks(search) : [...MOCK_BOOKS],
+    search.trim() ? searchBooks(search) : getCatalogueBooks(),
     [search]
   )
 
   /* ── Helper: apply price range filter (multi) ── */
-  function applyPrix(books: typeof MOCK_BOOKS, labels: string[]) {
+  function applyPrix(books: Book[], labels: string[]) {
     if (!labels.length) return books
     return books.filter(b => labels.some(label => {
       const r = PRICE_RANGES.find(r => r.label === label)
@@ -1153,7 +1154,7 @@ export function Header({ cartCount = 0, onBurgerClick, onCartClick }: HeaderProp
     const trimmed = search.trim()
     if (!trimmed && activeCount === 0) return
 
-    const byIsbn = MOCK_BOOKS.find(b => b.isbn === trimmed)
+    const byIsbn = getCatalogueBooks().find(b => b.isbn === trimmed)
     if (byIsbn) {
       navigate(`/livre/${byIsbn.id}`)
       setSearch('')

@@ -940,7 +940,7 @@ export function BookCard({ book, showType = false, coverFirst = false }: Props) 
           <NotesPopinBox onClick={e => e.stopPropagation()}>
             <span style={{ fontSize: 28 }}>📅</span>
             <NotesPopinTitle>Titre à paraître</NotesPopinTitle>
-            <NotesPopinText>Le titre sera enregistré en noté</NotesPopinText>
+            <NotesPopinText>Le titre sera enregistré comme « noté » et conservé indéfiniment.</NotesPopinText>
             <NotesPopinBtn onClick={() => { setNotesPopinOpen(false); confirmAdd(false) }}>OK</NotesPopinBtn>
           </NotesPopinBox>
         </NotesPopinOverlay>,

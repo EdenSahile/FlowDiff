@@ -1,3 +1,5 @@
+import { getCatalogueType, getParisDate } from './catalogueType'
+
 export type Universe = 'BD/Mangas' | 'Jeunesse' | 'Littérature' | 'Adulte-pratique'
 export type BookType = 'nouveaute' | 'a-paraitre' | 'fonds'
 
@@ -290,6 +292,71 @@ const _RAW_MOCK_BOOKS: Book[] = [
     publicationDate: '2026-10-14',
     description: "Un voyage fascinant à travers le corps humain : comment fonctionne-t-il, pourquoi tombe-t-il malade, et pourquoi est-il si extraordinaire ?",
     programme: 'Automne 2026',
+  },
+  {
+    id: 'ap-lit-03',
+    isbn: '9789990001001',
+    title: 'Les Jours de verre',
+    authors: ['Élise Martin'],
+    publisher: 'Éditions du Rivage',
+    universe: 'Littérature', type: 'a-paraitre',
+    genre: 'Roman contemporain', language: 'Français',
+    price: 14.00, priceTTC: 20.90, format: '155 x 235 mm', pages: 296,
+    publicationDate: '2026-11-05',
+    description: 'Dans une ville portuaire en transformation, une restauratrice de vitraux recompose l’histoire de sa famille à travers des lettres oubliées.',
+    programme: 'Automne 2026', fictif: true,
+  },
+  {
+    id: 'ap-bd-02',
+    isbn: '9789990001002',
+    title: 'L’Atelier des nuages T.1',
+    authors: ['Mina Kuroda'],
+    publisher: 'Atelier Mistral', collection: 'Horizons',
+    universe: 'BD/Mangas', type: 'a-paraitre',
+    genre: 'Roman graphique', language: 'Français',
+    price: 13.50, priceTTC: 18.90, format: '210 x 280 mm', pages: 144,
+    publicationDate: '2026-11-19',
+    description: 'Une jeune dessinatrice hérite d’un atelier perché au-dessus de la ville et découvre un carnet capable de faire apparaître les souvenirs dessinés.',
+    programme: 'Automne 2026', fictif: true,
+  },
+  {
+    id: 'ap-jes-02',
+    isbn: '9789990001003',
+    title: 'La Carte des lucioles',
+    authors: ['Nora Bellamy'],
+    publisher: 'Éditions des Petits Mondes',
+    universe: 'Jeunesse', type: 'a-paraitre',
+    genre: 'Aventure', language: 'Français',
+    price: 10.00, priceTTC: 14.90, format: '145 x 215 mm', pages: 224,
+    publicationDate: '2026-12-03',
+    description: 'Pour sauver le jardin de son grand-père, Lina suit une carte qui ne s’illumine qu’à la tombée de la nuit.',
+    programme: 'Noël 2026', fictif: true,
+  },
+  {
+    id: 'ap-pra-02',
+    isbn: '9789990001004',
+    title: 'Le Potager de balcon, saison après saison',
+    authors: ['Camille Renard'],
+    publisher: 'Maison Sereine',
+    universe: 'Adulte-pratique', type: 'a-paraitre',
+    genre: 'Jardinage & Nature', language: 'Français',
+    price: 15.00, priceTTC: 22.50, format: '190 x 240 mm', pages: 208,
+    publicationDate: '2027-01-07',
+    description: 'Un guide illustré pour récolter herbes, légumes et fleurs comestibles toute l’année, même avec quelques mètres carrés.',
+    programme: 'Hiver 2027', fictif: true,
+  },
+  {
+    id: 'ap-bd-03',
+    isbn: '9789990001005',
+    title: 'La Brigade des archives T.1',
+    authors: ['Paul Dumas', 'Sara Nguyen'],
+    publisher: 'Éditions Phare', collection: 'Enquêtes graphiques',
+    universe: 'BD/Mangas', type: 'a-paraitre',
+    genre: 'BD franco-belge', language: 'Français',
+    price: 12.00, priceTTC: 17.90, format: '220 x 290 mm', pages: 96,
+    publicationDate: '2027-01-21',
+    description: 'Deux archivistes débutants découvrent qu’un dossier disparu peut modifier les souvenirs de toute une ville.',
+    programme: 'Hiver 2027', fictif: true,
   },
 
   /* ══════════════════════════════════════════════════════
@@ -756,16 +823,106 @@ export const MOCK_BOOKS: Book[] = _RAW_MOCK_BOOKS.map(b =>
     : { ...b, statut: resolveStatut(b) }
 )
 
+/* Programme de relève : il est présenté uniquement lorsqu'aucun titre daté
+   dans les fixtures n'est encore à paraître. Les dates restent donc toujours
+   à venir dans cette démo statique, sans service externe. */
+const ROTATING_FUTURE_TEMPLATES: Omit<Book, 'publicationDate' | 'type'>[] = [
+  {
+    id: 'rolling-ap-lit-01', isbn: '9789990002001',
+    title: 'Le Bruit des marées', authors: ['Anne Lesage'],
+    publisher: 'Éditions du Large', universe: 'Littérature',
+    genre: 'Roman contemporain', language: 'Français',
+    price: 14.00, priceTTC: 20.90, format: '155 x 235 mm', pages: 304,
+    description: 'Après des années d’absence, Jeanne revient dans son village côtier et retrouve un carnet qui éclaire un silence familial.',
+    programme: 'Programme printemps', fictif: true,
+  },
+  {
+    id: 'rolling-ap-bd-01', isbn: '9789990002002',
+    title: 'La Cité des heures perdues T.1', authors: ['Émile Garin', 'Noa Vial'],
+    publisher: 'Éditions Minuit Bleu', collection: 'Passages', universe: 'BD/Mangas',
+    genre: 'BD franco-belge', language: 'Français',
+    price: 13.00, priceTTC: 18.90, format: '220 x 290 mm', pages: 96,
+    description: 'Dans une métropole où les heures perdues s’accumulent sous terre, 2 coursiers découvrent une porte vers le temps volé.',
+    programme: 'Programme printemps', fictif: true,
+  },
+  {
+    id: 'rolling-ap-jes-01', isbn: '9789990002003',
+    title: 'Le Secret du phare bleu', authors: ['Maëlle Rose'],
+    publisher: 'Les Petites Étoiles', universe: 'Jeunesse',
+    genre: 'Aventure', language: 'Français',
+    price: 9.50, priceTTC: 14.50, format: '145 x 215 mm', pages: 192,
+    description: 'Pendant les vacances, Tom et Inès trouvent au pied d’un phare une clef qui ouvre chaque nuit une nouvelle énigme.',
+    programme: 'Programme été', fictif: true,
+  },
+  {
+    id: 'rolling-ap-pra-01', isbn: '9789990002004',
+    title: 'Cuisiner les saisons à 2', authors: ['Léa Fournier'],
+    publisher: 'Atelier du Goût', universe: 'Adulte-pratique',
+    genre: 'Cuisine & Gastronomie', language: 'Français',
+    price: 16.00, priceTTC: 23.90, format: '190 x 240 mm', pages: 216,
+    description: '80 recettes simples et généreuses, organisées par saison, pour cuisiner local sans gaspiller et recevoir facilement.',
+    programme: 'Programme été', fictif: true,
+  },
+  {
+    id: 'rolling-ap-lit-02', isbn: '9789990002005',
+    title: 'Une saison à contre-jour', authors: ['Julien Carrel'],
+    publisher: 'Maison Aster', universe: 'Littérature',
+    genre: 'Roman contemporain', language: 'Français',
+    price: 15.00, priceTTC: 22.50, format: '155 x 235 mm', pages: 336,
+    description: 'Un photographe revient dans la vallée de son enfance pour documenter un été qui bouleverse les certitudes des habitants.',
+    programme: 'Rentrée littéraire', fictif: true,
+  },
+]
+
+const ROTATING_FUTURE_DELAYS = [21, 35, 49, 70, 84]
+
+function formatDate(date: Date): string {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+function getRotatingForthcomingBooks(referenceDate: Date): Book[] {
+  return ROTATING_FUTURE_TEMPLATES.map((template, index) => {
+    const publicationDate = new Date(referenceDate)
+    publicationDate.setDate(publicationDate.getDate() + ROTATING_FUTURE_DELAYS[index])
+    return {
+      ...template,
+      publicationDate: formatDate(publicationDate),
+      type: 'a-paraitre',
+    }
+  })
+}
+
 export function getBookById(id: string): Book | undefined {
   return MOCK_BOOKS.find(b => b.id === id)
 }
 
+/** Données de démonstration enrichies de leur catégorie calculée à la date donnée. */
+export function getCatalogueBooks(referenceDate?: Date): Book[] {
+  const reference = referenceDate ?? getParisDate()
+  const books = MOCK_BOOKS.map(book => ({
+    ...book,
+    type: getCatalogueType(book.publicationDate, reference),
+  }))
+
+  return books.some(book => book.type === 'a-paraitre')
+    ? books
+    : [...books, ...getRotatingForthcomingBooks(reference)]
+}
+
+export function getCatalogueBookById(id: string, referenceDate?: Date): Book | undefined {
+  return getCatalogueBooks(referenceDate).find(book => book.id === id)
+}
+
 export const UNIVERSES: Universe[] = ['Littérature', 'BD/Mangas', 'Jeunesse', 'Adulte-pratique']
 
-export function searchBooks(query: string): Book[] {
+export function searchBooks(query: string, referenceDate?: Date): Book[] {
   const q = query.toLowerCase().trim()
-  if (!q) return MOCK_BOOKS
-  return MOCK_BOOKS.filter(b =>
+  const books = getCatalogueBooks(referenceDate)
+  if (!q) return books
+  return books.filter(b =>
     b.title.toLowerCase().includes(q) ||
     b.authors.some(a => a.toLowerCase().includes(q)) ||
     b.publisher.toLowerCase().includes(q) ||

@@ -14,6 +14,7 @@ import { StockAlertModal } from '@/components/ui/StockAlertModal'
 import { slugifyAuthor } from '@/lib/slugify'
 import { theme } from '@/lib/theme'
 import { formatPrice } from '@/lib/format'
+import { getPurchaseAvailability } from '@/lib/bookUtils'
 import { mq } from '@/lib/responsive'
 import { useRefetchOnFocus } from '@/hooks/useRefetchOnFocus'
 
@@ -334,7 +335,7 @@ const AuthorLinkBtn = styled.button`
   margin-top: 5px;
   margin-bottom: 12px;
   font-family: ${({ theme }) => theme.typography.fontFamily};
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   color: ${({ theme }) => theme.colors.navy};
   cursor: pointer;
@@ -579,51 +580,6 @@ const EpuiseNoticeEl = styled.p`
   margin: 8px 0 0;
 `
 
-const NotesPopinContentEl = styled.div`
-  background: #fff;
-  border-radius: 14px;
-  padding: 32px 28px;
-  max-width: 380px;
-  width: 100%;
-  box-shadow: 0 24px 64px rgba(10,18,35,0.30);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  text-align: center;
-  animation: ${modalIn} 0.22s ease;
-`
-
-const NotesPopinTitleEl = styled.p`
-  font-family: ${({ theme }) => theme.typography.fontFamily};
-  font-size: 16px;
-  font-weight: 700;
-  color: ${({ theme }) => theme.colors.navy};
-  margin: 0;
-`
-
-const NotesPopinTextEl = styled.p`
-  font-family: ${({ theme }) => theme.typography.fontFamily};
-  font-size: 14px;
-  color: ${({ theme }) => theme.colors.gray[600]};
-  line-height: 1.5;
-  margin: 0;
-`
-
-const NotesPopinBtnEl = styled.button`
-  padding: 11px 32px;
-  border: none;
-  border-radius: 8px;
-  background: ${({ theme }) => theme.colors.navy};
-  color: #fff;
-  font-family: ${({ theme }) => theme.typography.fontFamily};
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background .15s;
-  &:hover { background: ${({ theme }) => theme.colors.primaryHover}; }
-`
-
 /* ── Actions secondaires horizontales ── */
 const SecondaryActionsHoriz = styled.div`
   display: flex;
@@ -856,6 +812,47 @@ const ModalBox = styled.div`
   animation: ${modalIn} 0.22s ease;
   max-height: 90vh;
   overflow: hidden;
+`
+
+const NotesPopinContentEl = styled(ModalBox)`
+  width: min(100%, 380px);
+  padding: 32px 28px;
+  align-items: center;
+  gap: 16px;
+  text-align: center;
+`
+
+const NotesPopinTitleEl = styled.p`
+  margin: 0;
+  color: ${({ theme }) => theme.colors.navy};
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 18px;
+  font-weight: 700;
+`
+
+const NotesPopinTextEl = styled.p`
+  margin: -6px 0 0;
+  color: ${({ theme }) => theme.colors.gray[600]};
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 14px;
+  line-height: 1.5;
+`
+
+const NotesPopinBtnEl = styled.button`
+  min-width: 112px;
+  min-height: 42px;
+  padding: 0 20px;
+  border: none;
+  border-radius: 7px;
+  background: ${({ theme }) => theme.colors.navy};
+  color: ${({ theme }) => theme.colors.white};
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .15s;
+
+  &:hover { background: ${({ theme }) => theme.colors.primaryHover}; }
 `
 
 const PdfModal = styled(ModalBox)`
@@ -1382,14 +1379,11 @@ export function FicheProduitPage() {
   ]
 
   const selectedFormat = formats.find(f => f.id === formatId)!
-  const isAParaitre    = book.type === 'a-paraitre'
-  const isEpuise       = book.statut === 'epuise' || book.statut === 'rupture'
-  const needsConfirm   = book.statut === 'sur_commande' || book.statut === 'en_reimp'
-  const isOrderable    = !isEpuise
+  const { isAParaitre, isEpuise, needsConfirm, showStandardOrder } = getPurchaseAvailability(book.type, book.statut)
 
-  const formattedDate = new Date(book.publicationDate).toLocaleDateString('fr-FR', {
-    year: 'numeric', month: 'long', day: 'numeric',
-  })
+  const formattedDate = new Intl.DateTimeFormat('fr-FR', {
+    timeZone: 'Europe/Paris', year: 'numeric', month: 'long', day: 'numeric',
+  }).format(new Date(`${book.publicationDate}T00:00:00Z`))
 
   const performAdd = (enReliquat: boolean) => {
     const ratio = selectedFormat.priceTTC / book.priceTTC
@@ -1623,7 +1617,7 @@ export function FicheProduitPage() {
             {' · '}{new Date(book.publicationDate).getFullYear()}
           </BookEditorMain>
 
-          {isOrderable && (
+          {showStandardOrder && (
             <FormatSelectorWrap>
               <FormatLabelEl>Format</FormatLabelEl>
               <FormatOptionsRow>
@@ -1643,9 +1637,9 @@ export function FicheProduitPage() {
               <PricePublicLabelEl>TTC</PricePublicLabelEl>
             </PriceRowEl>
 
-            {(isOrderable || isEpuise || isAParaitre) && <PriceDividerEl />}
+            {(showStandardOrder || isEpuise || isAParaitre) && <PriceDividerEl />}
 
-            {isOrderable && (
+            {showStandardOrder && (
               <>
                 <StockZoneEl>
                   <StockIndicatorEl $statut={book.statut}>{stockLabel}</StockIndicatorEl>
@@ -1687,30 +1681,36 @@ export function FicheProduitPage() {
             )}
 
             {isAParaitre && (
-              <OrderZoneEl>
-                <QtyStepperLg>
-                  <QtyBtnLg onClick={() => setQty(q => Math.max(1, q - 1))} disabled={qty <= 1} aria-label="Diminuer">−</QtyBtnLg>
-                  <QtyInputLg
-                    type="number"
-                    value={qty}
-                    min={1}
-                    onChange={e => { const n = parseInt(e.target.value); if (n >= 1) setQty(n) }}
-                    aria-label="Quantité"
-                  />
-                  <QtyBtnLg onClick={() => setQty(q => q + 1)} aria-label="Augmenter">+</QtyBtnLg>
-                </QtyStepperLg>
-                <AddBtnMain
-                  $added={false}
-                  onClick={() => setNotesPopinOpen(true)}
-                  aria-label="Ajouter au panier"
-                >
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
-                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-                  </svg>
-                  Ajouter au panier
-                </AddBtnMain>
-              </OrderZoneEl>
+              <>
+                <StockZoneEl>
+                  <StockIndicatorEl>À paraître</StockIndicatorEl>
+                  <StockDispoDetailEl>· Disponible à partir du {formattedDate}</StockDispoDetailEl>
+                </StockZoneEl>
+                <OrderZoneEl>
+                  <QtyStepperLg>
+                    <QtyBtnLg onClick={() => setQty(q => Math.max(1, q - 1))} disabled={qty <= 1} aria-label="Diminuer">−</QtyBtnLg>
+                    <QtyInputLg
+                      type="number"
+                      value={qty}
+                      min={1}
+                      onChange={e => { const n = parseInt(e.target.value); if (n >= 1) setQty(n) }}
+                      aria-label="Quantité"
+                    />
+                    <QtyBtnLg onClick={() => setQty(q => q + 1)} aria-label="Augmenter">+</QtyBtnLg>
+                  </QtyStepperLg>
+                  <AddBtnMain
+                    $added={added}
+                    onClick={() => setNotesPopinOpen(true)}
+                    aria-label="Ajouter au panier"
+                  >
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+                      <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                    </svg>
+                    {added ? '✓ Ajouté au panier !' : `Ajouter${qty > 1 ? ` ${qty} ex.` : ''} au panier`}
+                  </AddBtnMain>
+                </OrderZoneEl>
+              </>
             )}
           </PriceZone>
 
@@ -1834,6 +1834,27 @@ export function FicheProduitPage() {
         />
       )}
 
+      {notesPopinOpen && createPortal(
+        <ModalOverlay onClick={() => setNotesPopinOpen(false)}>
+          <NotesPopinContentEl
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="notes-popin-title"
+            onClick={e => e.stopPropagation()}
+          >
+            <span aria-hidden="true" style={{ fontSize: 32 }}>📅</span>
+            <NotesPopinTitleEl id="notes-popin-title">Titre à paraître</NotesPopinTitleEl>
+            <NotesPopinTextEl>
+              Ce titre sera enregistré comme « noté » et conservé indéfiniment.
+            </NotesPopinTextEl>
+            <NotesPopinBtnEl onClick={() => { setNotesPopinOpen(false); performAdd(false) }}>
+              OK
+            </NotesPopinBtnEl>
+          </NotesPopinContentEl>
+        </ModalOverlay>,
+        document.body
+      )}
+
       {/* ══════════════════════════════════════════════════════
           MODAL — PAGES INTÉRIEURES
       ══════════════════════════════════════════════════════ */}
@@ -1929,17 +1950,6 @@ export function FicheProduitPage() {
         />
       )}
 
-      {notesPopinOpen && createPortal(
-        <ModalOverlay onClick={() => setNotesPopinOpen(false)}>
-          <NotesPopinContentEl onClick={e => e.stopPropagation()}>
-            <span style={{ fontSize: 32 }}>📅</span>
-            <NotesPopinTitleEl>Titre à paraître</NotesPopinTitleEl>
-            <NotesPopinTextEl>Le titre sera enregistré en noté et conservé indéfiniment</NotesPopinTextEl>
-            <NotesPopinBtnEl onClick={() => { setNotesPopinOpen(false); performAdd(false) }}>OK</NotesPopinBtnEl>
-          </NotesPopinContentEl>
-        </ModalOverlay>,
-        document.body
-      )}
     </Page>
   )
 }

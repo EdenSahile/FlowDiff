@@ -87,43 +87,46 @@ describe('searchBooksLocal', () => {
 })
 
 describe('getAllBooksAsync', () => {
-  it('retourne le catalogue mock complet', async () => {
-    const allBooks = await getAllBooksAsync()
+  it('retourne le catalogue mock complet avec les catégories calculées', async () => {
+    const allBooks = await getAllBooksAsync(new Date('2026-10-21T12:00:00'))
 
-    expect(allBooks).toEqual(MOCK_BOOKS)
+    expect(allBooks).toHaveLength(MOCK_BOOKS.length)
+    expect(allBooks.find(book => book.id === 'n-lit-01')?.type).toBe('fonds')
+    expect(allBooks.find(book => book.id === 'ap-lit-01')?.type).toBe('nouveaute')
   })
 })
 
 describe('getBooksByTypeAsync', () => {
   it('ne retourne que les titres du type demandé', async () => {
-    const fondsBooks = await getBooksByTypeAsync('fonds')
+    const fondsBooks = await getBooksByTypeAsync('fonds', undefined, new Date('2026-10-21T12:00:00'))
 
     expect(fondsBooks.length).toBeGreaterThan(0)
     expect(fondsBooks.every(book => book.type === 'fonds')).toBe(true)
   })
 
   it('restreint aussi à l\'univers quand il est fourni', async () => {
-    const jeunesseFondsBooks = await getBooksByTypeAsync('fonds', 'Jeunesse')
+    const jeunesseFondsBooks = await getBooksByTypeAsync('fonds', 'Jeunesse', new Date('2026-10-21T12:00:00'))
 
     expect(jeunesseFondsBooks.length).toBeGreaterThan(0)
     expect(jeunesseFondsBooks.every(book => book.type === 'fonds' && book.universe === 'Jeunesse')).toBe(true)
   })
 
   it('filtrer sur un univers réduit le nombre de titres du type', async () => {
-    const fondsBooks = await getBooksByTypeAsync('fonds')
-    const jeunesseFondsBooks = await getBooksByTypeAsync('fonds', 'Jeunesse')
+    const referenceDate = new Date('2026-10-21T12:00:00')
+    const fondsBooks = await getBooksByTypeAsync('fonds', undefined, referenceDate)
+    const jeunesseFondsBooks = await getBooksByTypeAsync('fonds', 'Jeunesse', referenceDate)
 
     expect(jeunesseFondsBooks.length).toBeLessThan(fondsBooks.length)
   })
 })
 
 describe('getBookByIdAsync', () => {
-  it('retrouve un livre du catalogue par son id', async () => {
-    const expectedBook = MOCK_BOOKS[0]
+  it('retrouve un livre du catalogue avec sa catégorie calculée', async () => {
+    const mockBook = MOCK_BOOKS[0]
 
-    const foundBook = await getBookByIdAsync(expectedBook.id)
+    const foundBook = await getBookByIdAsync(mockBook.id, new Date('2026-10-21T12:00:00'))
 
-    expect(foundBook).toEqual(expectedBook)
+    expect(foundBook).toMatchObject({ ...mockBook, type: 'fonds' })
   })
 
   it('retourne null pour un id inconnu', async () => {

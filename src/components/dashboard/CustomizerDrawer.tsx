@@ -15,7 +15,7 @@ const LABEL: Record<string, string> = {
   'kpi-exemplaires':    'Exemplaires commandés',
   'kpi-panier-moyen':   'Panier moyen',
   'kpi-delai':          'Délai moyen de livraison',
-  'kpi-rupture':        'Taux de rupture',
+  'kpi-rupture':        'Taux d’annulation',
   'kpi-references':     'Références distinctes commandées',
   'panel-evolution':    'Évolution des commandes',
   'panel-donut':        'Répartition des achats',

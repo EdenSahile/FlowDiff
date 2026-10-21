@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { renderHook } from '@testing-library/react'
+import { act, renderHook } from '@testing-library/react'
 import type { ReactNode } from 'react'
 
 vi.mock('@/contexts/AuthContext', () => ({
@@ -146,6 +146,25 @@ describe('FLOW-RM-020 : isolation par codeClient', () => {
 
       expect(result.current.lists).toHaveLength(1)
       expect(result.current.lists[0].name).toBe('Liste LIB001')
+    })
+
+    it('conserve un titre ajouté à une liste après recréation du contexte', () => {
+      mockAuth.mockReturnValue(authUser('LIB001'))
+      const first = renderHook(() => useWishlist(), { wrapper: Wrapper })
+
+      let listId = ''
+      act(() => {
+        listId = first.result.current.createList('Coups de cœur').id
+      })
+      act(() => {
+        first.result.current.addToList(listId, { id: 'book-persisted' } as never)
+      })
+      first.unmount()
+
+      const second = renderHook(() => useWishlist(), { wrapper: Wrapper })
+
+      expect(second.result.current.getListsContaining('book-persisted')).toHaveLength(1)
+      expect(second.result.current.lists[0]).toMatchObject({ name: 'Coups de cœur' })
     })
   })
 

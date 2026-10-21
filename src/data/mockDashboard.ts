@@ -1,6 +1,7 @@
 import type { Universe } from './mockBooks'
 import { MOCK_BOOKS } from './mockBooks'
 import type { Order } from './mockOrders'
+import { formatPrice, roundCurrency } from '@/lib/format'
 
 /* ─────────────────────────────────────────
    Types
@@ -8,6 +9,8 @@ import type { Order } from './mockOrders'
 
 export interface DashboardOrder {
   id: string
+  /** Identifiant logique de commande : plusieurs lignes peuvent la ventiler par éditeur. */
+  orderId: string
   date: string          // YYYY-MM-DD
   montantTTC: number
   nbExemplaires: number
@@ -16,6 +19,33 @@ export interface DashboardOrder {
   cancelled: boolean
   deliveryDays: number
   references: string[]
+  items: DashboardOrderItem[]
+}
+
+export interface DashboardOrderItem {
+  isbn: string
+  title: string
+  publisher: string
+  quantity: number
+  /** Prix public TTC avant la remise appliquée à cette ligne. */
+  unitPriceTTC: number
+  /** Taux de remise appliqué au prix public, entre 0 et 1. */
+  discountRate?: number
+  /** Total net TTC de la ligne, après remise. */
+  montantTTC: number
+}
+
+export interface DashboardOrderDetail {
+  orderId: string
+  date: string
+  montantTTC: number
+  nbExemplaires: number
+  publishers: string[]
+  universes: Universe[]
+  cancelled: boolean
+  deliveryDays: number
+  references: string[]
+  items: DashboardOrderItem[]
 }
 
 export interface PeriodKPI {
@@ -26,7 +56,7 @@ export interface PeriodKPI {
   nbExemplaires: number
   panierMoyen: number
   delaiMoyen: number
-  tauxRupture: number   // 0–1
+  tauxAnnulation: number   // 0–1
   nbReferences: number
 }
 
@@ -48,25 +78,6 @@ export interface DonutSegment {
   montant: number
 }
 
-/* ─────────────────────────────────────────
-   Données de référence
-───────────────────────────────────────── */
-
-const PUBLISHERS: { name: string; universe: Universe }[] = [
-  { name: 'Gallimard',         universe: 'Littérature'     },
-  { name: 'Actes Sud',         universe: 'Littérature'     },
-  { name: 'Le Seuil',          universe: 'Littérature'     },
-  { name: 'P.O.L',             universe: 'Littérature'     },
-  { name: 'Pika Édition',      universe: 'BD/Mangas'       },
-  { name: 'Glénat',            universe: 'BD/Mangas'       },
-  { name: 'Dargaud',           universe: 'BD/Mangas'       },
-  { name: 'Kana',              universe: 'BD/Mangas'       },
-  { name: 'Gallimard Jeunesse',universe: 'Jeunesse'        },
-  { name: 'Bayard',            universe: 'Jeunesse'        },
-  { name: 'La Martinière',     universe: 'Adulte-pratique' },
-  { name: 'Larousse',          universe: 'Adulte-pratique' },
-]
-
 const UNIVERSE_COLORS: Record<Universe, string> = {
   'BD/Mangas':       '#3B82F6',
   'Littérature':     '#22C55E',
@@ -75,20 +86,65 @@ const UNIVERSE_COLORS: Record<Universe, string> = {
 }
 
 /* ─────────────────────────────────────────
-   Générateur déterministe
-   Produit ~320 commandes sur 2024-01-01 → aujourd'hui
+   Historique de démonstration
+
+   Les commandes sont volontairement peu nombreuses et de montants modestes :
+   une commande passée pendant une démonstration fait ainsi évoluer visiblement
+   chaque indicateur. Les dates sont relatives au jour d'ouverture, ce qui garde
+   des données dans les périodes 7/30 jours, 3/6/12 mois et N-1.
 ───────────────────────────────────────── */
 
-function lcg(seed: number): () => number {
-  let s = seed
-  return () => {
-    s = (1664525 * s + 1013904223) & 0xffffffff
-    return (s >>> 0) / 0xffffffff
-  }
+type DemoOrderSeed = Omit<DashboardOrder, 'id' | 'orderId' | 'date' | 'references' | 'items'> & {
+  daysAgo: number
+  discountRate?: number
 }
 
+const DEMO_ORDER_SEEDS: DemoOrderSeed[] = [
+  // 7 derniers jours — comparaison immédiatement lisible.
+  { daysAgo: 0,   montantTTC: 42.00, nbExemplaires: 3, publisher: 'Gallimard',          universe: 'Littérature',     cancelled: false, deliveryDays: 2 },
+  { daysAgo: 3,   montantTTC: 31.50, nbExemplaires: 2, publisher: 'Dargaud',            universe: 'BD/Mangas',       cancelled: false, deliveryDays: 1 },
+  { daysAgo: 6,   montantTTC: 18.90, nbExemplaires: 1, publisher: 'Bayard',             universe: 'Jeunesse',        cancelled: true,  deliveryDays: 0 },
+  // 30 derniers jours.
+  { daysAgo: 10,  montantTTC: 64.80, nbExemplaires: 5, publisher: 'Glénat',             universe: 'BD/Mangas',       cancelled: false, deliveryDays: 3 },
+  { daysAgo: 17,  montantTTC: 27.30, nbExemplaires: 2, publisher: 'Larousse',           universe: 'Adulte-pratique', cancelled: false, deliveryDays: 2 },
+  { daysAgo: 25,  montantTTC: 51.60, nbExemplaires: 4, publisher: 'Le Seuil',           universe: 'Littérature',     cancelled: false, deliveryDays: 2 },
+  { daysAgo: 29,  montantTTC: 22.05, nbExemplaires: 1, publisher: 'Pika Édition',       universe: 'BD/Mangas',       cancelled: false, deliveryDays: 4, discountRate: 0.30 },
+  // Période précédente et trois derniers mois.
+  { daysAgo: 35,  montantTTC: 38.40, nbExemplaires: 3, publisher: 'Actes Sud',          universe: 'Littérature',     cancelled: false, deliveryDays: 2 },
+  { daysAgo: 44,  montantTTC: 46.20, nbExemplaires: 4, publisher: 'Gallimard Jeunesse', universe: 'Jeunesse',        cancelled: false, deliveryDays: 3 },
+  { daysAgo: 59,  montantTTC: 24.60, nbExemplaires: 2, publisher: 'La Martinière',      universe: 'Adulte-pratique', cancelled: true,  deliveryDays: 0 },
+  { daysAgo: 66,  montantTTC: 57.75, nbExemplaires: 4, publisher: 'Kana',               universe: 'BD/Mangas',       cancelled: false, deliveryDays: 2 },
+  { daysAgo: 78,  montantTTC: 33.60, nbExemplaires: 3, publisher: 'P.O.L',              universe: 'Littérature',     cancelled: false, deliveryDays: 1 },
+  { daysAgo: 89,  montantTTC: 28.35, nbExemplaires: 2, publisher: 'Bayard',             universe: 'Jeunesse',        cancelled: false, deliveryDays: 3 },
+  // Six puis douze mois.
+  { daysAgo: 102, montantTTC: 61.20, nbExemplaires: 5, publisher: 'Glénat',             universe: 'BD/Mangas',       cancelled: false, deliveryDays: 2 },
+  { daysAgo: 123, montantTTC: 44.10, nbExemplaires: 3, publisher: 'Actes Sud',          universe: 'Littérature',     cancelled: false, deliveryDays: 2 },
+  { daysAgo: 150, montantTTC: 29.40, nbExemplaires: 2, publisher: 'Larousse',           universe: 'Adulte-pratique', cancelled: false, deliveryDays: 4 },
+  { daysAgo: 176, montantTTC: 36.75, nbExemplaires: 3, publisher: 'Dargaud',            universe: 'BD/Mangas',       cancelled: false, deliveryDays: 2 },
+  { daysAgo: 210, montantTTC: 52.50, nbExemplaires: 4, publisher: 'Gallimard',          universe: 'Littérature',     cancelled: false, deliveryDays: 3 },
+  { daysAgo: 250, montantTTC: 31.20, nbExemplaires: 2, publisher: 'Gallimard Jeunesse', universe: 'Jeunesse',        cancelled: false, deliveryDays: 2 },
+  { daysAgo: 300, montantTTC: 47.25, nbExemplaires: 4, publisher: 'La Martinière',      universe: 'Adulte-pratique', cancelled: false, deliveryDays: 3 },
+  { daysAgo: 355, montantTTC: 39.90, nbExemplaires: 3, publisher: 'Le Seuil',           universe: 'Littérature',     cancelled: true,  deliveryDays: 0 },
+  // Même profondeur historique pour le comparatif N-1.
+  { daysAgo: 366, montantTTC: 35.70, nbExemplaires: 3, publisher: 'Gallimard',          universe: 'Littérature',     cancelled: false, deliveryDays: 2 },
+  { daysAgo: 369, montantTTC: 28.35, nbExemplaires: 2, publisher: 'Dargaud',            universe: 'BD/Mangas',       cancelled: false, deliveryDays: 2 },
+  { daysAgo: 372, montantTTC: 16.80, nbExemplaires: 1, publisher: 'Bayard',             universe: 'Jeunesse',        cancelled: true,  deliveryDays: 0 },
+  { daysAgo: 380, montantTTC: 49.35, nbExemplaires: 4, publisher: 'Glénat',             universe: 'BD/Mangas',       cancelled: false, deliveryDays: 3 },
+  { daysAgo: 395, montantTTC: 23.10, nbExemplaires: 2, publisher: 'Larousse',           universe: 'Adulte-pratique', cancelled: false, deliveryDays: 2 },
+  { daysAgo: 420, montantTTC: 43.05, nbExemplaires: 3, publisher: 'Le Seuil',           universe: 'Littérature',     cancelled: false, deliveryDays: 2 },
+  { daysAgo: 455, montantTTC: 34.65, nbExemplaires: 3, publisher: 'Actes Sud',          universe: 'Littérature',     cancelled: false, deliveryDays: 2 },
+  { daysAgo: 500, montantTTC: 41.00, nbExemplaires: 3, publisher: 'Gallimard Jeunesse', universe: 'Jeunesse',        cancelled: false, deliveryDays: 3 },
+  { daysAgo: 550, montantTTC: 21.00, nbExemplaires: 2, publisher: 'La Martinière',      universe: 'Adulte-pratique', cancelled: true,  deliveryDays: 0 },
+  { daysAgo: 600, montantTTC: 49.35, nbExemplaires: 4, publisher: 'Kana',               universe: 'BD/Mangas',       cancelled: false, deliveryDays: 2 },
+  { daysAgo: 650, montantTTC: 29.40, nbExemplaires: 2, publisher: 'P.O.L',              universe: 'Littérature',     cancelled: false, deliveryDays: 1 },
+  { daysAgo: 700, montantTTC: 24.15, nbExemplaires: 2, publisher: 'Bayard',             universe: 'Jeunesse',        cancelled: false, deliveryDays: 3 },
+]
+
 function isoDate(d: Date): string {
-  return d.toISOString().slice(0, 10)
+  const year = d.getFullYear()
+  const month = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
 }
 
 function addDays(d: Date, n: number): Date {
@@ -97,51 +153,63 @@ function addDays(d: Date, n: number): Date {
   return r
 }
 
-function generateOrders(): DashboardOrder[] {
-  const rand = lcg(42)
-  const orders: DashboardOrder[] = []
-  const start = new Date('2024-01-01')
-  const end   = new Date('2026-04-28')
+const DEMO_TITLES: Record<Universe, string[]> = {
+  'Littérature': ['Les heures silencieuses', 'Une saison sur le quai', 'La carte des absences'],
+  'BD/Mangas': ['Les Chroniques du passage', 'Le Club des étoiles', 'Les Jardins d’acier'],
+  'Jeunesse': ['Le Secret de la cabane bleue', 'La Brigade des lucioles', 'Le Voyage de Nino'],
+  'Adulte-pratique': ['Cuisiner simplement chaque jour', 'Le Guide des petits espaces', 'Respirer au quotidien'],
+}
 
-  let day = new Date(start)
-  let idx = 0
+function buildDemoItems(seed: DemoOrderSeed, index: number): DashboardOrderItem[] {
+  const quantities = seed.nbExemplaires > 1
+    ? [1, seed.nbExemplaires - 1]
+    : [1]
+  const titles = DEMO_TITLES[seed.universe]
+  const totalCents = Math.round(seed.montantTTC * 100)
+  const secondQuantity = quantities[1]
+  const secondUnitCents = secondQuantity
+    ? Math.round((totalCents * 0.45) / secondQuantity)
+    : 0
+  const amountsInCents = secondQuantity
+    ? [totalCents - secondUnitCents * secondQuantity, secondUnitCents * secondQuantity]
+    : [totalCents]
 
-  while (day <= end) {
-    // 0–3 commandes par jour (poids ~1.2/jour en moyenne)
-    const dailyCount = rand() < 0.35 ? 0 : rand() < 0.55 ? 1 : rand() < 0.8 ? 2 : 3
-
-    for (let i = 0; i < dailyCount; i++) {
-      const pubIdx   = Math.floor(rand() * PUBLISHERS.length)
-      const pub      = PUBLISHERS[pubIdx]
-      const qty      = 5 + Math.floor(rand() * 30)           // 5–34 exemplaires
-      const unitHT   = 8 + rand() * 22                       // 8–30 € HT/ex
-      const montant  = Math.round(qty * unitHT * 1.055 * 100) / 100  // TTC (TVA 5,5%)
-      const cancelled = rand() < 0.062                        // ~6 % annulées
-      const delivDays = cancelled ? 0 : 1 + Math.floor(rand() * 5)
-
-      // 3–6 références distinctes
-      const nbRef = 3 + Math.floor(rand() * 4)
-      const refs  = Array.from({ length: nbRef }, (_, r) =>
-        `978${String(Math.floor(rand() * 1e10)).padStart(10, '0').slice(0, 10)}_${idx}_${r}`
-      )
-
-      orders.push({
-        id: `ord-${idx++}`,
-        date: isoDate(day),
-        montantTTC: montant,
-        nbExemplaires: qty,
-        publisher: pub.name,
-        universe: pub.universe,
-        cancelled,
-        deliveryDays: delivDays,
-        references: refs,
-      })
+  return quantities.map((quantity, itemIndex) => {
+    const montantTTC = amountsInCents[itemIndex] / 100
+    const discountRate = seed.discountRate ?? 0
+    return {
+      isbn: `978-${String(260000000 + index * 10 + itemIndex).padStart(9, '0')}`,
+      title: titles[(index + itemIndex) % titles.length],
+      publisher: seed.publisher,
+      quantity,
+      unitPriceTTC: discountRate > 0
+        ? roundCurrency(montantTTC / quantity / (1 - discountRate))
+        : montantTTC / quantity,
+      discountRate: discountRate || undefined,
+      montantTTC,
     }
+  })
+}
 
-    day = addDays(day, 1)
-  }
-
-  return orders
+function generateOrders(): DashboardOrder[] {
+  const today = new Date()
+  return DEMO_ORDER_SEEDS.map((seed, index) => {
+    const id = `demo-order-${index + 1}`
+    const items = buildDemoItems(seed, index)
+    return {
+      id,
+      orderId: id,
+      date: isoDate(addDays(today, -seed.daysAgo)),
+      montantTTC: seed.montantTTC,
+      nbExemplaires: seed.nbExemplaires,
+      publisher: seed.publisher,
+      universe: seed.universe,
+      cancelled: seed.cancelled,
+      deliveryDays: seed.deliveryDays,
+      references: items.map(item => item.isbn),
+      items,
+    }
+  })
 }
 
 export const MOCK_DASHBOARD_ORDERS: DashboardOrder[] = generateOrders()
@@ -163,30 +231,54 @@ export function filterDataByPeriod(
   })
 }
 
-export function computeKPIs(orders: DashboardOrder[]): PeriodKPI {
-  const active    = orders.filter(o => !o.cancelled)
-  const cancelled = orders.filter(o =>  o.cancelled)
+export function summarizeDashboardOrders(orders: DashboardOrder[]): DashboardOrderDetail[] {
+  const groups = new Map<string, DashboardOrder[]>()
+  for (const order of orders) {
+    const key = order.orderId || order.id
+    groups.set(key, [...(groups.get(key) ?? []), order])
+  }
 
-  const nbCommandes   = orders.length
+  return [...groups.entries()]
+    .map(([orderId, rows]) => ({
+      orderId,
+      date: rows[0].date,
+      montantTTC: roundCurrency(rows.reduce((sum, row) => sum + row.montantTTC, 0)),
+      nbExemplaires: rows.reduce((sum, row) => sum + row.nbExemplaires, 0),
+      publishers: [...new Set(rows.map(row => row.publisher))],
+      universes: [...new Set(rows.map(row => row.universe))],
+      cancelled: rows[0].cancelled,
+      deliveryDays: rows[0].deliveryDays,
+      references: [...new Set(rows.flatMap(row => row.references))],
+      items: rows.flatMap(row => row.items),
+    }))
+    .sort((a, b) => b.date.localeCompare(a.date))
+}
+
+export function computeKPIs(orders: DashboardOrder[]): PeriodKPI {
+  const logicalOrders = summarizeDashboardOrders(orders)
+  const active    = logicalOrders.filter(order => !order.cancelled)
+  const cancelled = logicalOrders.filter(order =>  order.cancelled)
+
+  const nbCommandes   = logicalOrders.length
   const montantTotal  = active.reduce((s, o) => s + o.montantTTC, 0)
   const nbExemplaires = active.reduce((s, o) => s + o.nbExemplaires, 0)
   const panierMoyen   = active.length > 0 ? montantTotal / active.length : 0
   const delaiMoyen    = active.length > 0
-    ? active.reduce((s, o) => s + o.deliveryDays, 0) / active.length
+    ? active.reduce((s, order) => s + order.deliveryDays, 0) / active.length
     : 0
-  const tauxRupture   = nbCommandes > 0 ? cancelled.length / nbCommandes : 0
-  const allRefs       = new Set(active.flatMap(o => o.references))
+  const tauxAnnulation = nbCommandes > 0 ? cancelled.length / nbCommandes : 0
+  const allRefs       = new Set(active.flatMap(order => order.references))
   const nbReferences  = allRefs.size
 
   return {
     nbCommandes,
     nbActive:      active.length,
     nbCancelled:   cancelled.length,
-    montantTotal:  Math.round(montantTotal * 100) / 100,
+    montantTotal:  roundCurrency(montantTotal),
     nbExemplaires,
-    panierMoyen:   Math.round(panierMoyen * 100) / 100,
+    panierMoyen:   roundCurrency(panierMoyen),
     delaiMoyen:    Math.round(delaiMoyen * 10)   / 10,
-    tauxRupture:   Math.round(tauxRupture * 1000) / 1000,
+    tauxAnnulation: Math.round(tauxAnnulation * 1000) / 1000,
     nbReferences,
   }
 }
@@ -215,21 +307,21 @@ export function computeChartData(
   endDate: Date,
 ): ChartPoint[] {
   const active = orders.filter(o => !o.cancelled)
-  const map = new Map<string, number>()
+  const map = new Map<string, Set<string>>()
 
   let day = new Date(startDate)
   while (day <= endDate) {
-    map.set(isoDate(day), 0)
+    map.set(isoDate(day), new Set())
     day = addDays(day, 1)
   }
 
   for (const o of active) {
     if (map.has(o.date)) {
-      map.set(o.date, (map.get(o.date) ?? 0) + 1)
+      map.get(o.date)?.add(o.orderId || o.id)
     }
   }
 
-  return [...map.entries()].map(([date, count]) => ({ date, count }))
+  return [...map.entries()].map(([date, orderIds]) => ({ date, count: orderIds.size }))
 }
 
 export function computeDonutData(orders: DashboardOrder[]): DonutSegment[] {
@@ -282,14 +374,42 @@ export function orderToDashboardOrders(order: Order): DashboardOrder[] {
 
   const orderGrossTTC = order.items.reduce((s, it) => s + itemPriceTTC(it) * it.quantity, 0)
 
-  return [...groups.entries()].map(([key, items], i) => {
+  const entries = [...groups.entries()]
+  let allocatedTTC = 0
+
+  return entries.map(([key, items], i) => {
     const [publisher, universe] = key.split('||')
     const groupGrossTTC = items.reduce((s, it) => s + itemPriceTTC(it) * it.quantity, 0)
-    const montantTTC = orderGrossTTC > 0
-      ? Math.round((groupGrossTTC / orderGrossTTC) * order.totalTTC * 100) / 100
-      : 0
+    const montantTTC = i === entries.length - 1
+      ? roundCurrency(order.totalTTC - allocatedTTC)
+      : orderGrossTTC > 0
+        ? roundCurrency((groupGrossTTC / orderGrossTTC) * order.totalTTC)
+        : 0
+    allocatedTTC += montantTTC
+    let allocatedLineTTC = 0
+    const dashboardItems = items.map((item, itemIndex) => {
+      const itemGrossTTC = itemPriceTTC(item) * item.quantity
+      const itemMontantTTC = itemIndex === items.length - 1
+        ? roundCurrency(montantTTC - allocatedLineTTC)
+        : groupGrossTTC > 0
+          ? roundCurrency((itemGrossTTC / groupGrossTTC) * montantTTC)
+          : 0
+      allocatedLineTTC += itemMontantTTC
+      return {
+        isbn: item.isbn,
+        title: item.title,
+        publisher: item.publisher,
+        quantity: item.quantity,
+        unitPriceTTC: itemPriceTTC(item),
+        discountRate: itemGrossTTC > 0
+          ? Math.max(0, 1 - itemMontantTTC / itemGrossTTC)
+          : undefined,
+        montantTTC: itemMontantTTC,
+      }
+    })
     return {
       id:            `${order.id}-grp${i}`,
+      orderId:       order.id,
       date:          order.date,
       montantTTC,
       nbExemplaires: items.reduce((s, it) => s + it.quantity, 0),
@@ -298,6 +418,7 @@ export function orderToDashboardOrders(order: Order): DashboardOrder[] {
       cancelled:     false,
       deliveryDays:  2,
       references:    items.map(it => it.isbn),
+      items:         dashboardItems,
     }
   })
 }
@@ -308,7 +429,7 @@ export function orderToDashboardOrders(order: Order): DashboardOrder[] {
 
 export function fmtEur(v: number): string {
   if (v >= 1000) {
-    return `${(v / 1000).toFixed(1).replace('.', ',')} k€`
+    return `${(Math.round((v / 100 + Number.EPSILON)) / 10).toFixed(1).replace('.', ',')} k€`
   }
-  return `${v.toFixed(2).replace('.', ',')} €`
+  return `${formatPrice(v)} €`
 }

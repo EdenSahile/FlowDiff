@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import styled, { keyframes } from 'styled-components'
-import { MOCK_BOOKS } from '@/data/mockBooks'
+import { getCatalogueBooks } from '@/data/mockBooks'
 import { BookCard } from '@/components/catalogue/BookCard'
 import { slugifyAuthor } from '@/lib/slugify'
 
@@ -138,7 +138,7 @@ export function AuteurPage() {
   /* Trouver le nom réel depuis le slug */
   const authorName = useMemo(() => {
     if (!auteurSlug) return null
-    for (const book of MOCK_BOOKS) {
+    for (const book of getCatalogueBooks()) {
       for (const a of book.authors) {
         if (slugifyAuthor(a) === auteurSlug) return a
       }
@@ -149,7 +149,7 @@ export function AuteurPage() {
   /* Livres de cet auteur — triés du plus récent au plus ancien */
   const books = useMemo(() => {
     if (!authorName) return []
-    return MOCK_BOOKS
+    return getCatalogueBooks()
       .filter(b => b.authors.some(a => slugifyAuthor(a) === auteurSlug))
       .sort((a, b) => b.publicationDate.localeCompare(a.publicationDate))
   }, [authorName, auteurSlug])

@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 
 interface InputWrapperProps {
-  hasError?: boolean
+  $hasError?: boolean
 }
 
 export const InputWrapper = styled.div`
@@ -26,8 +26,8 @@ export const StyledInput = styled.input<InputWrapperProps>`
   color: ${({ theme }) => theme.colors.navy};
   background-color: ${({ theme }) => theme.colors.white};
   border: 2px solid
-    ${({ theme, hasError }) =>
-      hasError ? theme.colors.error : theme.colors.gray[200]};
+    ${({ theme, $hasError }) =>
+      $hasError ? theme.colors.error : theme.colors.gray[200]};
   border-radius: ${({ theme }) => theme.radii.md};
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
   outline: none;
@@ -37,11 +37,11 @@ export const StyledInput = styled.input<InputWrapperProps>`
   }
 
   &:focus {
-    border-color: ${({ theme, hasError }) =>
-      hasError ? theme.colors.error : theme.colors.primary};
+    border-color: ${({ theme, $hasError }) =>
+      $hasError ? theme.colors.error : theme.colors.primary};
     box-shadow: 0 0 0 3px
-      ${({ hasError }) =>
-        hasError
+      ${({ $hasError }) =>
+        $hasError
           ? 'rgba(211, 47, 47, 0.15)'
           : 'rgba(255, 192, 0, 0.25)'};
   }
@@ -68,7 +68,7 @@ export function Input({ label, error, id, ...props }: InputFieldProps) {
   return (
     <InputWrapper>
       {label && <InputLabel htmlFor={id}>{label}</InputLabel>}
-      <StyledInput id={id} hasError={!!error} {...props} />
+      <StyledInput id={id} $hasError={!!error} {...props} />
       {error && <InputError role="alert">{error}</InputError>}
     </InputWrapper>
   )

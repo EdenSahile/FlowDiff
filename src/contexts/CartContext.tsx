@@ -7,6 +7,10 @@ import type { TransmissionMode } from '@/pages/cart/checkoutSchemas'
 
 export const CART_LIMIT = 30
 
+function isValidQuantity(quantity: number): boolean {
+  return Number.isSafeInteger(quantity) && quantity >= 1
+}
+
 /* ── Remises mock par univers (en attendant AS400/CRM) ── */
 export const REMISE_RATES: Record<Universe, number> = {
   'BD/Mangas':       0.30,
@@ -207,6 +211,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   , [setItems])
 
   const updateQty = useCallback((itemKey: string, qty: number) => {
+    if (!Number.isSafeInteger(qty)) return
     if (qty < 1) { removeFromCart(itemKey); return }
     toastGuardRef.current = false
     setCart(prev => {
@@ -232,6 +237,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, [removeFromCart, showToast])
 
   const addToCart = useCallback((book: Book, qty = 1, opts: AddToCartOptions = {}) => {
+    if (!isValidQuantity(qty)) return
     const { ebookOption, enReliquat } = opts
     toastGuardRef.current = false
     setCart(prev => {

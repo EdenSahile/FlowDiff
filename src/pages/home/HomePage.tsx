@@ -7,7 +7,7 @@ import { useCart } from '@/contexts/CartContext'
 import { useOrders } from '@/contexts/OrdersContext'
 import { useEDI } from '@/contexts/EDIContext'
 import { getFluxCounts } from '@/lib/ediUtils'
-import { MOCK_BOOKS } from '@/data/mockBooks'
+import { getCatalogueBooks } from '@/data/mockBooks'
 import { BookCover } from '@/components/catalogue/BookCover'
 import { usePeriodFilter, type CompareMode } from '@/hooks/usePeriodFilter'
 import { PeriodSelector, rangeLabel } from '@/components/dashboard/PeriodSelector'
@@ -16,7 +16,7 @@ import { theme } from '@/lib/theme'
 import { ComparaisonToggle } from '@/components/dashboard/ComparaisonToggle'
 import { useDashboardConfig, type DashboardZone } from '@/hooks/useDashboardConfig'
 import { CustomizerDrawer } from '@/components/dashboard/CustomizerDrawer'
-import { computeKPIs, computeChartData, computeDonutData, computeTopPublishers, orderToDashboardOrders, fmtEur, type ChartPoint, type DonutSegment } from '@/data/mockDashboard'
+import { computeKPIs, computeChartData, computeDonutData, computeTopPublishers, orderToDashboardOrders, summarizeDashboardOrders, fmtEur, type ChartPoint, type DonutSegment } from '@/data/mockDashboard'
 import {
   exportDashboardCSV,
   exportKPIOnlyCSV,
@@ -29,10 +29,12 @@ import {
 } from '@/lib/exportCSV'
 import { mq } from '@/lib/responsive'
 
-const nouveautes = MOCK_BOOKS
+const nouveautes = getCatalogueBooks()
   .filter(b => b.type === 'nouveaute')
   .sort((a, b) => b.publicationDate.localeCompare(a.publicationDate))
   .slice(0, 4)
+
+const aParaitreCount = getCatalogueBooks().filter(b => b.type === 'a-paraitre').length
 
 
 /* ── SVG Icons ── */
@@ -43,6 +45,16 @@ function IconChevron({ dir }: { dir: 'left' | 'right' }) {
       {dir === 'left'
         ? <polyline points="15 18 9 12 15 6" />
         : <polyline points="9 18 15 12 9 6" />}
+    </svg>
+  )
+}
+
+function IconDetailChevron({ open }: { open: boolean }) {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"
+      style={{ transform: open ? 'rotate(180deg)' : undefined }}>
+      <polyline points="6 9 12 15 18 9" />
     </svg>
   )
 }
@@ -628,6 +640,224 @@ const KPILink = styled.button`
   &:hover { text-decoration: underline; }
 `
 
+const KPIDetailPanel = styled.section`
+  margin-top: 16px;
+  background: ${({ theme }) => theme.colors.white};
+  border: 1px solid ${({ theme }) => theme.colors.gray[200]};
+  border-radius: ${({ theme }) => theme.radii.md};
+  padding: 16px;
+`
+
+const KPIDetailHeader = styled.div`
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+`
+
+const KPIDetailTitle = styled.h3`
+  margin: 0;
+  color: ${({ theme }) => theme.colors.gray[800]};
+  font-size: 15px;
+`
+
+const KPIDetailSubtitle = styled.p`
+  margin: 4px 0 0;
+  color: ${({ theme }) => theme.colors.gray[600]};
+  font-size: 12px;
+`
+
+const KPIDetailClose = styled.button`
+  min-width: 44px;
+  min-height: 44px;
+  border: 1px solid ${({ theme }) => theme.colors.gray[200]};
+  border-radius: ${({ theme }) => theme.radii.sm};
+  background: ${({ theme }) => theme.colors.white};
+  color: ${({ theme }) => theme.colors.gray[600]};
+  cursor: pointer;
+  font-size: 12px;
+
+  &:hover {
+    border-color: ${({ theme }) => theme.colors.navy};
+    color: ${({ theme }) => theme.colors.navy};
+  }
+`
+
+const KPIDetailTotals = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  border-radius: ${({ theme }) => theme.radii.sm};
+  background: ${({ theme }) => theme.colors.gray[50]};
+  color: ${({ theme }) => theme.colors.gray[600]};
+  font-size: 12px;
+
+  strong { color: ${({ theme }) => theme.colors.navy}; }
+`
+
+const KPIDetailList = styled.div`
+  display: grid;
+  gap: 8px;
+`
+
+const KPIDetailRow = styled.article<{ $cancelled: boolean }>`
+  display: grid;
+  grid-template-columns: 100px minmax(160px, 1fr) 78px 104px 96px 44px;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 12px;
+  border: 1px solid ${({ theme }) => theme.colors.gray[200]};
+  border-radius: ${({ theme }) => theme.radii.sm};
+  color: ${({ theme }) => theme.colors.gray[600]};
+  font-size: 12px;
+  opacity: ${({ $cancelled }) => $cancelled ? 0.72 : 1};
+
+  ${mq.belowMd} {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 12px;
+  }
+`
+
+const KPIDetailExpand = styled.button`
+  width: 36px;
+  height: 36px;
+  border: 1px solid ${({ theme }) => theme.colors.gray[200]};
+  border-radius: ${({ theme }) => theme.radii.sm};
+  background: ${({ theme }) => theme.colors.white};
+  color: ${({ theme }) => theme.colors.navy};
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    background: ${({ theme }) => theme.colors.gray[100]};
+    border-color: ${({ theme }) => theme.colors.navy};
+  }
+`
+
+const KPIDetailCell = styled.div`
+  min-width: 0;
+
+  span {
+    display: block;
+    margin-bottom: 2px;
+    color: ${({ theme }) => theme.colors.gray[400]};
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  strong {
+    color: ${({ theme }) => theme.colors.gray[800]};
+    font-variant-numeric: tabular-nums;
+  }
+`
+
+const KPIDetailFooter = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid ${({ theme }) => theme.colors.gray[200]};
+  color: ${({ theme }) => theme.colors.gray[600]};
+  font-size: 13px;
+
+  strong {
+    color: ${({ theme }) => theme.colors.navy};
+    font-size: 15px;
+    font-variant-numeric: tabular-nums;
+  }
+`
+
+const KPIDetailItems = styled.section`
+  margin: -2px 0 2px;
+  padding: 10px 12px;
+  border: 1px solid ${({ theme }) => theme.colors.gray[200]};
+  border-radius: ${({ theme }) => theme.radii.sm};
+  background: ${({ theme }) => theme.colors.gray[50]};
+
+`
+
+const KPIDetailItemsTitle = styled.h4`
+  margin: 0 0 8px;
+  color: ${({ theme }) => theme.colors.gray[800]};
+  font-size: 12px;
+`
+
+const KPIDetailItemRow = styled.div`
+  display: grid;
+  grid-template-columns:
+    minmax(150px, 0.75fr)
+    minmax(110px, 0.65fr)
+    48px
+    minmax(150px, 0.85fr)
+    minmax(150px, 0.85fr);
+  gap: 12px;
+  align-items: center;
+  padding: 8px 0;
+  border-top: 1px solid ${({ theme }) => theme.colors.gray[200]};
+  font-size: 12px;
+
+  &:first-of-type { border-top: none; }
+
+  ${mq.belowMd} {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 12px;
+  }
+`
+
+const KPIDetailItemTitle = styled.div`
+  min-width: 0;
+  color: ${({ theme }) => theme.colors.gray[800]};
+  font-weight: 600;
+
+  span {
+    display: block;
+    margin-top: 2px;
+    color: ${({ theme }) => theme.colors.gray[400]};
+    font-size: 11px;
+    font-weight: 400;
+  }
+`
+
+const KPIDetailItemValue = styled.div`
+  color: ${({ theme }) => theme.colors.gray[600]};
+
+  span {
+    display: block;
+    margin-bottom: 2px;
+    color: ${({ theme }) => theme.colors.gray[400]};
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  strong {
+    color: ${({ theme }) => theme.colors.gray[800]};
+    font-variant-numeric: tabular-nums;
+  }
+`
+
+const KPIDetailDiscount = styled.em`
+  display: inline-flex;
+  margin: 4px 0 0;
+  padding: 2px 5px;
+  border-radius: ${({ theme }) => theme.radii.sm};
+  background: ${({ theme }) => theme.colors.primaryLight};
+  color: ${({ theme }) => theme.colors.primary};
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.2;
+`
+
 /* ── Ligne 3 colonnes (étapes 4-5-6 et 7-8-9) ── */
 const ThreeColRow = styled.div<{ $count: number }>`
   display: grid;
@@ -644,15 +874,38 @@ const ThreeColRow = styled.div<{ $count: number }>`
   }
 `
 
-const PanelCard = styled.div<{ $dragging?: boolean; $dropTarget?: boolean }>`
+const AnalysisPanelsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  align-items: start;
+
+  ${mq.belowLg} {
+    grid-template-columns: 1fr;
+  }
+`
+
+const PanelCard = styled.div<{
+  $dragging?: boolean
+  $dropTarget?: boolean
+  $fullWidth?: boolean
+}>`
   background: white;
   border: 1px solid ${({ $dropTarget, theme }) =>
     $dropTarget ? theme.colors.navy : theme.colors.gray[200]};
   border-radius: ${({ theme }) => theme.radii.md};
   padding: 16px;
   position: relative;
+  grid-column: ${({ $fullWidth }) => $fullWidth ? '1 / -1' : 'auto'};
+  order: ${({ $fullWidth }) => $fullWidth ? -1 : 'initial'};
+  width: ${({ $fullWidth }) => $fullWidth ? 'clamp(720px, 60%, 1100px)' : 'auto'};
+  justify-self: ${({ $fullWidth }) => $fullWidth ? 'center' : 'stretch'};
   opacity: ${({ $dragging }) => $dragging ? 0.4 : 1};
   transition: opacity 0.1s, border-color 0.1s, box-shadow 0.15s;
+
+  ${mq.belowLg} {
+    width: 100%;
+  }
 
   &:hover {
     box-shadow: 0 1px 4px rgba(0,0,0,.07), 0 4px 12px rgba(0,0,0,.05);
@@ -747,9 +1000,9 @@ function toCumulative(pts: ChartPoint[]): ChartPoint[] {
 
 function toPolyline(pts: ChartPoint[], yMax: number): string {
   if (pts.length < 2) return ''
-  return pts.map((p, i) => {
-    const x = COX + (i / (pts.length - 1)) * CW
-    const y = COY - (p.count / yMax) * CH
+  return pts.map((point, index) => {
+    const x = COX + (index / (pts.length - 1)) * CW
+    const y = COY - (point.count / yMax) * CH
     return `${x.toFixed(1)},${y.toFixed(1)}`
   }).join(' ')
 }
@@ -757,6 +1010,11 @@ function toPolyline(pts: ChartPoint[], yMax: number): string {
 function xLabel(iso: string): string {
   if (!iso) return ''
   return `${iso.slice(8)}/${iso.slice(5, 7)}`
+}
+
+function shortDate(iso: string): string {
+  if (!iso) return ''
+  return `${iso.slice(8)}/${iso.slice(5, 7)}/${iso.slice(2, 4)}`
 }
 
 function ChartEvolution({
@@ -804,7 +1062,7 @@ function ChartEvolution({
   const hoverCmpY = hoverCmpPt ? COY - (hoverCmpPt.count / yMax) * CH : null
 
   // tooltip bubble: keep it inside the viewBox
-  const tipW = 90, tipH = compareCum ? 44 : 32, tipR = 4
+  const tipW = 104, tipH = compareCum ? 36 : 22, tipR = 4
   const tipX = hoverX !== null
     ? Math.min(Math.max(hoverX - tipW / 2, COX), COX + CW - tipW)
     : 0
@@ -815,7 +1073,7 @@ function ChartEvolution({
       ref={svgRef}
       viewBox="0 0 260 105"
       width="100%"
-      aria-label="Évolution des commandes"
+      aria-label="Évolution cumulée des commandes confirmées"
       style={{ cursor: 'crosshair' }}
       onMouseMove={handleMouseMove}
       onMouseLeave={() => setHoverIdx(null)}
@@ -853,7 +1111,7 @@ function ChartEvolution({
           </text>
         )
       })}
-      <text x={COX} y="6" fontSize="7" fill="#9CA3AF">Commandes cumulées</text>
+      <text x={COX} y="6" fontSize="7" fill="#9CA3AF">Commandes confirmées cumulées</text>
 
       {/* Hover overlay */}
       {hoverX !== null && hoverPt && hoverY !== null && (
@@ -872,18 +1130,14 @@ function ChartEvolution({
           {/* tooltip bubble */}
           <rect x={tipX} y={tipY} width={tipW} height={tipH} rx={tipR} ry={tipR}
             fill={theme.colors.navy} opacity="0.92" />
-          <text x={tipX + tipW / 2} y={tipY + 12} textAnchor="middle"
-            fontSize="8.5" fill="#9CA3AF">
-            {xLabel(hoverPt.date)}
-          </text>
-          <text x={tipX + tipW / 2} y={tipY + 25} textAnchor="middle" fontSize="9">
-            <tspan fontWeight="700" fill="#16a34a">{hoverPt.count}</tspan>
-            <tspan fill="#fff" fontSize="8"> cmd cumulées</tspan>
+          <text x={tipX + tipW / 2} y={tipY + 11} textAnchor="middle" fontSize="6.25">
+            <tspan fill="#9CA3AF">Période </tspan>
+            <tspan fontWeight="700" fill="#16a34a">{shortDate(hoverPt.date)} : {hoverPt.count}</tspan>
           </text>
           {hoverCmpPt && (
-            <text x={tipX + tipW / 2} y={tipY + 37} textAnchor="middle"
-              fontSize="8.5" fill={theme.colors.accent}>
-              N-1 : {hoverCmpPt.count}
+            <text x={tipX + tipW / 2} y={tipY + 23} textAnchor="middle" fontSize="6.25">
+              <tspan fill="#9CA3AF">Même jour N-1 </tspan>
+              <tspan fontWeight="700" fill={theme.colors.accent}>{shortDate(hoverCmpPt.date)} : {hoverCmpPt.count}</tspan>
             </text>
           )}
         </g>
@@ -899,8 +1153,14 @@ const ChartInner = styled.div`
 `
 
 const ChartSvgWrap = styled.div`
-  flex: 1;
+  flex: 0 1 720px;
+  max-width: 720px;
   min-width: 0;
+
+  ${mq.belowLg} {
+    flex: 1;
+    max-width: none;
+  }
 `
 
 const ChartLegend = styled.div`
@@ -908,6 +1168,13 @@ const ChartLegend = styled.div`
   gap: 12px;
   margin-bottom: 6px;
   flex-wrap: wrap;
+`
+
+const ChartExplanation = styled.p`
+  margin: 0 0 10px;
+  color: ${({ theme }) => theme.colors.gray[400]};
+  font-size: 11px;
+  line-height: 1.4;
 `
 
 const ChartLegendItem = styled.div`
@@ -1094,7 +1361,7 @@ const TopEdList = styled.div`
 
 const TopEdRow = styled.div`
   display: grid;
-  grid-template-columns: 16px 1fr 34px 56px;
+  grid-template-columns: 16px 1fr 34px 100px;
   align-items: center;
   gap: 8px;
   padding: 7px 0;
@@ -1130,20 +1397,36 @@ const TopEdAmount = styled.span`
   text-align: right;
 `
 
-const TopEdFooter = styled.div`
-  display: grid;
-  grid-template-columns: 16px 1fr 34px 56px;
-  gap: 8px;
-  margin-top: 8px;
-  padding-top: 6px;
-  border-top: 1px solid ${({ theme }) => theme.colors.gray[200]};
+const TopEdOtherRow = styled(TopEdRow)`
+  margin-top: 2px;
+  border-top: 1px dashed ${({ theme }) => theme.colors.gray[200]};
+  border-bottom: none;
 `
 
-const TopEdFooterLabel = styled.span`
+const TopEdTotal = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid ${({ theme }) => theme.colors.gray[200]};
   font-size: 10px;
   color: ${({ theme }) => theme.colors.gray[400]};
-  text-align: right;
-  line-height: 1.3;
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+  }
+
+  strong {
+    min-width: 100px;
+    color: ${({ theme }) => theme.colors.gray[800]};
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
 `
 
 /* ── Nouveautés du mois (panel) ── */
@@ -1543,6 +1826,8 @@ export function HomePage() {
 
   const [customizerOpen, setCustomizerOpen] = useState(false)
   const [exportDropdownOpen, setExportDropdownOpen] = useState(false)
+  const [kpiDetailsOpen, setKpiDetailsOpen] = useState(false)
+  const [expandedKpiOrderId, setExpandedKpiOrderId] = useState<string | null>(null)
   const dashConfig = useDashboardConfig()
   const cardDragRef = useRef<{ zone: DashboardZone; id: string } | null>(null)
   const [cardDrag, setCardDrag] = useState<{ zone: DashboardZone; id: string } | null>(null)
@@ -1562,6 +1847,10 @@ export function HomePage() {
   const periodFilter = usePeriodFilter(extraDashboardOrders)
 
   const kpi        = useMemo(() => computeKPIs(periodFilter.orders),        [periodFilter.orders])
+  const kpiDetails = useMemo(
+    () => summarizeDashboardOrders(periodFilter.orders),
+    [periodFilter.orders],
+  )
   const compareKpi = useMemo(
     () => periodFilter.compareOrders.length > 0 ? computeKPIs(periodFilter.compareOrders) : null,
     [periodFilter.compareOrders],
@@ -1591,6 +1880,17 @@ export function HomePage() {
     () => computeTopPublishers(periodFilter.orders),
     [periodFilter.orders],
   )
+
+  const otherPublishers = useMemo(() => {
+    const activeOrders = periodFilter.orders.filter(order => !order.cancelled)
+    const displayedTotal = topPublishers.reduce((sum, publisher) => sum + publisher.montant, 0)
+    const montant = Math.round((kpi.montantTotal - displayedTotal) * 100) / 100
+    const count = new Set(activeOrders.map(order => order.publisher)).size - topPublishers.length
+
+    return montant > 0
+      ? { count, montant, pct: Math.round((montant / kpi.montantTotal) * 100) }
+      : null
+  }, [kpi.montantTotal, periodFilter.orders, topPublishers])
 
   const nbEnvoyees  = kpi.nbActive
   const nbAnnulees  = kpi.nbCancelled
@@ -1673,7 +1973,7 @@ export function HomePage() {
       iconBg: '#E6F2EC', iconColor: '#226241',
       count: 1,
       label: 'office à valider',
-      deadline: 'Limite : 13 mai',
+      deadline: 'Limite : 13 mai 2027',
       route: '/offices',
     },
     'action-panier': {
@@ -1723,17 +2023,18 @@ export function HomePage() {
       trend: compareKpi
         ? <KpiTrendLine current={kpi.nbActive} compare={compareKpi.nbActive} mode={periodFilter.compareMode} />
         : undefined,
-      link: <KPILink onClick={() => navigate('/historique')}>Voir le détail →</KPILink>,
+      link: <KPILink onClick={() => setKpiDetailsOpen(true)}>Voir les commandes →</KPILink>,
     },
     'kpi-montant': {
       icon: '€',
       iconBg: '#E6F2EC', iconColor: '#226241',
-      label: 'Montant total commandé (TTC)',
+      label: 'Montant total net commandé (TTC)',
+      tooltip: 'Montant net TTC des commandes confirmées : les remises sont déjà déduites et les annulations exclues.',
       value: fmtEur(kpi.montantTotal),
       trend: compareKpi
         ? <KpiTrendLine current={kpi.montantTotal} compare={compareKpi.montantTotal} mode={periodFilter.compareMode} />
         : undefined,
-      link: <KPILink onClick={() => navigate('/historique')}>Voir le détail →</KPILink>,
+      link: <KPILink onClick={() => setKpiDetailsOpen(true)}>Voir les commandes →</KPILink>,
     },
     'kpi-exemplaires': {
       icon: '📦',
@@ -1743,18 +2044,18 @@ export function HomePage() {
       trend: compareKpi
         ? <KpiTrendLine current={kpi.nbExemplaires} compare={compareKpi.nbExemplaires} mode={periodFilter.compareMode} />
         : undefined,
-      link: <KPILink onClick={() => navigate('/historique')}>Voir le détail →</KPILink>,
+      link: <KPILink onClick={() => setKpiDetailsOpen(true)}>Voir les commandes →</KPILink>,
     },
     'kpi-panier-moyen': {
       icon: '📊',
       iconBg: '#EDE9FE', iconColor: '#7C3AED',
-      label: 'Panier moyen (hors annulées)',
-      tooltip: 'Montant moyen par commande sur la période, hors commandes annulées.',
+      label: 'Panier moyen net TTC (hors annulées)',
+      tooltip: 'Montant total net TTC des commandes confirmées, divisé par leur nombre. Les remises sont déjà déduites.',
       value: fmtEur(kpi.panierMoyen),
       trend: compareKpi
         ? <KpiTrendLine current={kpi.panierMoyen} compare={compareKpi.panierMoyen} mode={periodFilter.compareMode} />
         : undefined,
-      link: <KPILink onClick={() => navigate('/historique')}>Voir le détail →</KPILink>,
+      link: <KPILink onClick={() => setKpiDetailsOpen(true)}>Voir les commandes →</KPILink>,
     },
     'kpi-delai': {
       icon: '⏱',
@@ -1768,11 +2069,11 @@ export function HomePage() {
     'kpi-rupture': {
       icon: '✕',
       iconBg: '#FDECEA', iconColor: '#C0392B',
-      label: 'Taux de rupture',
-      tooltip: 'Pourcentage de références commandées non livrées par le distributeur.',
-      value: `${(kpi.tauxRupture * 100).toFixed(1).replace('.', ',')} %`,
+      label: 'Taux d’annulation',
+      tooltip: 'Pourcentage de commandes annulées sur la période.',
+      value: `${(kpi.tauxAnnulation * 100).toFixed(1).replace('.', ',')} %`,
       trend: compareKpi
-        ? <KpiTrendLine current={kpi.tauxRupture} compare={compareKpi.tauxRupture} mode={periodFilter.compareMode} invert />
+        ? <KpiTrendLine current={kpi.tauxAnnulation} compare={compareKpi.tauxAnnulation} mode={periodFilter.compareMode} invert />
         : undefined,
     },
     'kpi-references': {
@@ -2058,6 +2359,104 @@ export function HomePage() {
               })
             }
           </KPIGrid>
+          {kpiDetailsOpen && (
+            <KPIDetailPanel aria-labelledby="kpi-details-title">
+              <KPIDetailHeader>
+                <div>
+                  <KPIDetailTitle id="kpi-details-title">Détail des commandes de la période</KPIDetailTitle>
+                  <KPIDetailSubtitle>
+                    {rangeLabel(periodFilter.period)} · ces lignes correspondent exactement aux indicateurs affichés ci-dessus.
+                  </KPIDetailSubtitle>
+                </div>
+                <KPIDetailClose type="button" onClick={() => setKpiDetailsOpen(false)} aria-label="Fermer le détail des commandes">
+                  Fermer
+                </KPIDetailClose>
+              </KPIDetailHeader>
+              <KPIDetailTotals>
+                <span><strong>{kpi.nbActive}</strong> commande{kpi.nbActive > 1 ? 's' : ''} confirmée{kpi.nbActive > 1 ? 's' : ''}</span>
+                {kpi.nbCancelled > 0 && <span><strong>{kpi.nbCancelled}</strong> annulée{kpi.nbCancelled > 1 ? 's' : ''} · hors montant total</span>}
+                <span>Montant confirmé : <strong>{fmtEur(kpi.montantTotal)}</strong></span>
+              </KPIDetailTotals>
+              <KPIDetailList aria-label="Commandes prises en compte dans les indicateurs">
+                {kpiDetails.map(order => {
+                  const isExpanded = expandedKpiOrderId === order.orderId
+                  return (
+                    <React.Fragment key={order.orderId}>
+                      <KPIDetailRow $cancelled={order.cancelled}>
+                        <KPIDetailCell>
+                          <span>Date</span>
+                          <strong>{new Date(`${order.date}T12:00:00`).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}</strong>
+                        </KPIDetailCell>
+                        <KPIDetailCell>
+                          <span>Éditeur · univers</span>
+                          <strong>{order.publishers.join(', ')} · {order.universes.join(', ')}</strong>
+                        </KPIDetailCell>
+                        <KPIDetailCell>
+                          <span>Exemplaires</span>
+                          <strong>{order.nbExemplaires}</strong>
+                        </KPIDetailCell>
+                        <KPIDetailCell>
+                          <span>Montant total net TTC</span>
+                          <strong>{fmtEur(order.montantTTC)}</strong>
+                        </KPIDetailCell>
+                        <KPIDetailCell>
+                          <span>Statut</span>
+                          <strong>{order.cancelled ? 'Annulée' : 'Confirmée'}</strong>
+                        </KPIDetailCell>
+                        <KPIDetailExpand
+                          type="button"
+                          aria-expanded={isExpanded}
+                          aria-controls={`kpi-order-${order.orderId}`}
+                          aria-label={`${isExpanded ? 'Masquer' : 'Afficher'} les titres de la commande du ${new Date(`${order.date}T12:00:00`).toLocaleDateString('fr-FR')}`}
+                          onClick={() => setExpandedKpiOrderId(isExpanded ? null : order.orderId)}
+                        >
+                          <IconDetailChevron open={isExpanded} />
+                        </KPIDetailExpand>
+                      </KPIDetailRow>
+                      {isExpanded && (
+                        <KPIDetailItems id={`kpi-order-${order.orderId}`} aria-label={`Titres de la commande du ${new Date(`${order.date}T12:00:00`).toLocaleDateString('fr-FR')}`}>
+                          <KPIDetailItemsTitle>{order.items.length} titre{order.items.length > 1 ? 's' : ''} commandé{order.items.length > 1 ? 's' : ''}</KPIDetailItemsTitle>
+                          {order.items.map(item => (
+                            <KPIDetailItemRow key={`${item.isbn}-${item.title}`}>
+                              <KPIDetailItemTitle>
+                                {item.title}
+                                <span>ISBN {item.isbn}</span>
+                              </KPIDetailItemTitle>
+                              <KPIDetailItemValue>
+                                <span>Éditeur</span>
+                                <strong>{item.publisher}</strong>
+                              </KPIDetailItemValue>
+                              <KPIDetailItemValue>
+                                <span>Qté</span>
+                                <strong>{item.quantity}</strong>
+                              </KPIDetailItemValue>
+                              <KPIDetailItemValue>
+                                <span>Prix unitaire TTC avant remise</span>
+                                <strong>{fmtEur(item.unitPriceTTC)}</strong>
+                              </KPIDetailItemValue>
+                              <KPIDetailItemValue>
+                                <span>Total ligne TTC après remise</span>
+                                <strong>{fmtEur(item.montantTTC)}</strong>
+                                {item.discountRate && item.discountRate > 0 && (
+                                  <KPIDetailDiscount>
+                                    Remise {Math.round(item.discountRate * 100)} %
+                                  </KPIDetailDiscount>
+                                )}
+                              </KPIDetailItemValue>
+                            </KPIDetailItemRow>
+                          ))}
+                        </KPIDetailItems>
+                      )}
+                    </React.Fragment>
+                  )
+                })}
+              </KPIDetailList>
+              <KPIDetailFooter>
+                <span>Total des commandes confirmées</span>
+                <strong>{fmtEur(kpi.montantTotal)}</strong>
+              </KPIDetailFooter>
+            </KPIDetailPanel>
+          )}
         </BilanSection>
         </SectionWrap>
           )
@@ -2066,13 +2465,14 @@ export function HomePage() {
         <SectionWrap key="mainPanels">
           {sectionControls}
           <SectionLabel>Analyse détaillée</SectionLabel>
-        <ThreeColRow $count={dashConfig.config.mainPanels.filter(c => c.visible).length}>
+        <AnalysisPanelsGrid>
           {dashConfig.config.mainPanels
             .filter(c => c.visible)
             .map(c => {
               if (c.id === 'panel-evolution') return (
                 <PanelCard
                   key={c.id}
+                  $fullWidth
                   $dragging={cardDrag?.id === c.id}
                   $dropTarget={cardDrop?.id === c.id}
                   draggable
@@ -2101,10 +2501,13 @@ export function HomePage() {
                       </ChartLegendItem>
                       <ChartLegendItem>
                         <ChartLegendLine $color={theme.colors.accent} $dashed />
-                        {compareModeShort(periodFilter.compareMode)}
+                        Même période {compareModeShort(periodFilter.compareMode)}
                       </ChartLegendItem>
                     </ChartLegend>
                   )}
+                  <ChartExplanation>
+                    La courbe indique le cumul des commandes confirmées depuis le début de la période. Les annulations sont comptées à part et ne font pas monter la courbe.
+                  </ChartExplanation>
                   <ChartInner>
                     <ChartSvgWrap>
                       <ChartEvolution main={mainChartData} compare={compareChartData} />
@@ -2144,11 +2547,11 @@ export function HomePage() {
                         <ChartStatLabel>Taux d'annulation</ChartStatLabel>
                         <ChartStatValueRow>
                           <ChartStatIcon $bg="#FDECEA" $color="#C0392B">%</ChartStatIcon>
-                          <ChartStatNum>{(kpi.tauxRupture * 100).toFixed(1).replace('.', ',')} %</ChartStatNum>
+                          <ChartStatNum>{(kpi.tauxAnnulation * 100).toFixed(1).replace('.', ',')} %</ChartStatNum>
                           {compareKpi && (
-                            <ChartStatDelta $up={kpi.tauxRupture <= compareKpi.tauxRupture}>
-                              {kpi.tauxRupture <= compareKpi.tauxRupture ? '▼' : '▲'}
-                              {' '}{Math.abs(Math.round((kpi.tauxRupture - compareKpi.tauxRupture) * 1000) / 10).toFixed(1)} pts
+                            <ChartStatDelta $up={kpi.tauxAnnulation <= compareKpi.tauxAnnulation}>
+                              {kpi.tauxAnnulation <= compareKpi.tauxAnnulation ? '▼' : '▲'}
+                              {' '}{Math.abs(Math.round((kpi.tauxAnnulation - compareKpi.tauxAnnulation) * 1000) / 10).toFixed(1)} pts
                             </ChartStatDelta>
                           )}
                         </ChartStatValueRow>
@@ -2224,27 +2627,36 @@ export function HomePage() {
                     </PanelExportBtn>
                   </PanelHeader>
                   <TopEdList>
-                    {topPublishers.map(({ pct, montant }, i) => (
-                      <TopEdRow key={i}>
+                    {topPublishers.map(({ name, pct, montant }, i) => (
+                      <TopEdRow key={name}>
                         <TopEdRank>{i + 1}</TopEdRank>
-                        <TopEdName>Éditeur {i + 1}</TopEdName>
+                        <TopEdName>{name}</TopEdName>
                         <TopEdPct>{pct}%</TopEdPct>
                         <TopEdAmount>{fmtEur(montant)}</TopEdAmount>
                       </TopEdRow>
                     ))}
+                    {otherPublishers && (
+                      <TopEdOtherRow>
+                        <TopEdRank>—</TopEdRank>
+                        <TopEdName>Autres éditeurs ({otherPublishers.count})</TopEdName>
+                        <TopEdPct>{otherPublishers.pct}%</TopEdPct>
+                        <TopEdAmount>{fmtEur(otherPublishers.montant)}</TopEdAmount>
+                      </TopEdOtherRow>
+                    )}
                   </TopEdList>
-                  <TopEdFooter>
-                    <span />
-                    <span />
-                    <TopEdFooterLabel>Part montant</TopEdFooterLabel>
-                    <TopEdFooterLabel>Montant commandé</TopEdFooterLabel>
-                  </TopEdFooter>
+                  <TopEdTotal>
+                    <span>
+                      Montant net TTC
+                      <TooltipInfo text="Montants TTC après remises appliquées." />
+                    </span>
+                    <strong>{fmtEur(kpi.montantTotal)}</strong>
+                  </TopEdTotal>
                 </PanelCard>
               )
               return null
             })
           }
-        </ThreeColRow>
+        </AnalysisPanelsGrid>
         </SectionWrap>
           )
 
@@ -2399,8 +2811,11 @@ export function HomePage() {
         <ReminderCard>
           <ReminderIcon>📅</ReminderIcon>
           <ReminderText>
-            <strong>Catalogue À paraître — Été 2026 disponible</strong>
-            <p>Consultez les 127 nouveaux titres prévus pour juin–août 2026. Commandes auprès de votre représentant.</p>
+            <strong>Catalogue À paraître disponible</strong>
+            <p>
+              Consultez les {aParaitreCount} titre{aParaitreCount > 1 ? 's' : ''} actuellement à paraître.
+              Commandes auprès de votre représentant.
+            </p>
           </ReminderText>
           <ReminderBtn onClick={() => navigate('/a-paraitre')}>
             Voir le catalogue

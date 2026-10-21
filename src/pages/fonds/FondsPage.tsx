@@ -2,6 +2,7 @@ import { useState, useDeferredValue, useMemo, useEffect, useCallback } from 'rea
 import styled from 'styled-components'
 import { mq } from '@/lib/responsive'
 import { BookCard } from '@/components/catalogue/BookCard'
+import { CatalogueLoadState } from '@/components/catalogue/CatalogueLoadState'
 import { UniverseFilter } from '@/components/catalogue/UniverseFilter'
 import { getBooksByTypeAsync, searchBooksLocal } from '@/services/books'
 import type { Universe, StockStatut, Book } from '@/data/mockBooks'
@@ -235,16 +236,28 @@ export function FondsPage() {
   const [statut, setStatut]     = useState<StockStatut | null>(null)
   const [sort, setSort]         = useState<SortKey>('pertinence')
   const [allFonds, setAllFonds] = useState<Book[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [hasError, setHasError] = useState(false)
   const deferred = useDeferredValue(query)
 
+  const loadFonds = useCallback(async () => {
+    setIsLoading(true)
+    setHasError(false)
+    try {
+      setAllFonds(await getBooksByTypeAsync('fonds'))
+    } catch {
+      setHasError(true)
+    } finally {
+      setIsLoading(false)
+    }
+  }, [])
   useEffect(() => {
-    getBooksByTypeAsync('fonds').then(setAllFonds).catch(console.error)
+    getBooksByTypeAsync('fonds')
+      .then(setAllFonds)
+      .catch(() => setHasError(true))
+      .finally(() => setIsLoading(false))
   }, [])
-
-  const refetch = useCallback(() => {
-    getBooksByTypeAsync('fonds').then(setAllFonds).catch(console.error)
-  }, [])
-  useRefetchOnFocus(refetch)
+  useRefetchOnFocus(loadFonds)
 
   const sorted = useMemo(() => {
     let books = deferred.trim()
@@ -310,7 +323,7 @@ export function FondsPage() {
         </FilterGroup>
       </Controls>
 
-      <ResultsBar>
+      {!isLoading && !hasError && <ResultsBar>
         <ResultsCount>
           <strong>{sorted.length}</strong> titre{sorted.length > 1 ? 's' : ''}
           <span>{contextLabel}</span>
@@ -328,9 +341,11 @@ export function FondsPage() {
             <option value="prix_desc">Prix décroissant</option>
           </SortSelect>
         </SortWrap>
-      </ResultsBar>
+      </ResultsBar>}
 
-      {sorted.length > 0 ? (
+      <CatalogueLoadState isLoading={isLoading} hasError={hasError} onRetry={loadFonds} />
+
+      {!isLoading && !hasError && (sorted.length > 0 ? (
         <Grid>
           {sorted.map(book => (
             <BookCard key={book.id} book={book} showType coverFirst />
@@ -342,7 +357,7 @@ export function FondsPage() {
             ? `Aucun résultat pour « ${deferred} »`
             : 'Aucun titre avec ces filtres.'}
         </EmptyState>
-      )}
+      ))}
     </Page>
   )
 }
