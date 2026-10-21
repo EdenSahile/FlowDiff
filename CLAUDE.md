@@ -186,7 +186,7 @@ En permanence : **Panier** (droite, avec badge quantité) +  à gauche du panier
 | API serveur | **aucune.** Pas de dossier `api/`, rien à déployer côté serveur |
 | Validation | **Zod** (tous les inputs) |
 | Tests | **Vitest** (jsdom) |
-| Déploiement | **Vercel**, https://flowdiff-omega.vercel.app |
+| Déploiement | **Vercel**, https://flowdiff-demo-app.vercel.app |
 
 ### Il n'y a pas de backend
 

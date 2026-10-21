@@ -7,12 +7,11 @@
   <img alt="React" src="https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white">
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white">
   <img alt="Vite" src="https://img.shields.io/badge/Vite-5-646CFF?logo=vite&logoColor=white">
-  <img alt="Supabase" src="https://img.shields.io/badge/Supabase-catalogue-3FCF8E?logo=supabase&logoColor=white">
   <img alt="Vercel" src="https://img.shields.io/badge/Vercel-deployed-000000?logo=vercel&logoColor=white">
   <img alt="Tests" src="https://img.shields.io/badge/tests-180%2B%20passing-success">
 </p>
 
-**🔗 Démo live :**`https://flowdiff-omega.vercel.app/login`
+**🔗 Démo live :**`https://flowdiff-demo-app.vercel.app/login`
 **🔑 Connexion :** les identifiants de démo sont **déjà pré-remplis** — il suffit de cliquer sur **Se connecter**.
  
  📸  ![Aperçu FlowDiff](docs/screenshots/dashboard.png)
