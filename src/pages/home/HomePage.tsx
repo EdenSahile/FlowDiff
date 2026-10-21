@@ -34,6 +34,8 @@ const nouveautes = getCatalogueBooks()
   .sort((a, b) => b.publicationDate.localeCompare(a.publicationDate))
   .slice(0, 4)
 
+const aParaitreCount = getCatalogueBooks().filter(b => b.type === 'a-paraitre').length
+
 
 /* ── SVG Icons ── */
 function IconChevron({ dir }: { dir: 'left' | 'right' }) {
@@ -2399,8 +2401,11 @@ export function HomePage() {
         <ReminderCard>
           <ReminderIcon>📅</ReminderIcon>
           <ReminderText>
-            <strong>Catalogue À paraître — Été 2026 disponible</strong>
-            <p>Consultez les 127 nouveaux titres prévus pour juin–août 2026. Commandes auprès de votre représentant.</p>
+            <strong>Catalogue À paraître disponible</strong>
+            <p>
+              Consultez les {aParaitreCount} titre{aParaitreCount > 1 ? 's' : ''} actuellement à paraître.
+              Commandes auprès de votre représentant.
+            </p>
           </ReminderText>
           <ReminderBtn onClick={() => navigate('/a-paraitre')}>
             Voir le catalogue

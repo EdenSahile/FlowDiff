@@ -1,4 +1,5 @@
 import { useState, type JSX } from 'react'
+import { createPortal } from 'react-dom'
 import { theme } from '@/lib/theme'
 import styled, { keyframes } from 'styled-components'
 import { mq } from '@/lib/responsive'
@@ -175,13 +176,21 @@ const MediaArea = styled.div`
 const CardImage = styled.img`
   width: 100%;
   height: 200px;
-  object-fit: cover;
+  object-fit: contain;
+  background: ${({ theme }) => theme.colors.gray[100]};
   display: block;
 
   ${mq.md} {
-    height: 100%;
-    min-height: 200px;
+    height: 200px;
   }
+`
+
+const CoverPreviewButton = styled.button`
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: zoom-in;
 `
 
 const VideoWrapper = styled.div`
@@ -261,6 +270,60 @@ const CategoryBadge = styled.span<{ $bg: string; $color: string }>`
   font-weight: ${({ theme }) => theme.typography.weights.bold};
   text-transform: uppercase;
   letter-spacing: 0.04em;
+`
+
+const FictionalBadge = styled.span`
+  display: inline-block;
+  padding: 2px 8px;
+  border: 1px solid ${({ theme }) => theme.colors.gray[200]};
+  border-radius: ${({ theme }) => theme.radii.full};
+  color: ${({ theme }) => theme.colors.gray[600]};
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: ${({ theme }) => theme.typography.sizes.xs};
+  font-weight: ${({ theme }) => theme.typography.weights.semibold};
+`
+
+const CoverModalOverlay = styled.div`
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(10, 18, 35, 0.72);
+`
+
+const CoverModal = styled.div`
+  position: relative;
+  width: min(100%, 420px);
+  max-height: calc(100vh - 48px);
+  padding: 12px;
+  border-radius: ${({ theme }) => theme.radii.lg};
+  background: ${({ theme }) => theme.colors.white};
+  box-shadow: 0 24px 64px rgba(10, 18, 35, 0.3);
+`
+
+const CoverModalImage = styled.img`
+  display: block;
+  width: 100%;
+  max-height: calc(100vh - 140px);
+  object-fit: contain;
+`
+
+const CoverModalClose = styled.button`
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(10, 18, 35, 0.82);
+  color: ${({ theme }) => theme.colors.white};
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 1;
 `
 
 const CardDate = styled.span`
@@ -345,6 +408,36 @@ const MediaPlaceholder = styled.div<{ $bg: string }>`
     height: 100%;
     min-height: 200px;
   }
+`
+
+const FlowDiffMedia = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 200px;
+  background: ${({ theme }) => theme.colors.gray[100]};
+
+  ${mq.md} {
+    width: 280px;
+  }
+`
+
+const FlowDiffStamp = styled.span`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 136px;
+  height: 136px;
+  border: 2px solid ${({ theme }) => theme.colors.error};
+  border-radius: ${({ theme }) => theme.radii.sm};
+  background: ${({ theme }) => theme.colors.white};
+  color: ${({ theme }) => theme.colors.error};
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: ${({ theme }) => theme.typography.sizes.xl};
+  font-weight: ${({ theme }) => theme.typography.weights.bold};
+  letter-spacing: 0.05em;
+  transform: rotate(-12deg);
 `
 
 const PlaceholderIcon = styled.div<{ $color: string }>`
@@ -475,6 +568,7 @@ export function FlashInfosPage() {
   const [universe, setUniverse] = useState<Universe | null>(null)
   const [category, setCategory] = useState<FlashCategory | null>(null)
   const [qtys, setQtys] = useState<Record<string, number>>({})
+  const [selectedCover, setSelectedCover] = useState<{ src: string; title: string } | null>(null)
   const { addToCart } = useCart()
   const { showToast } = useToast()
 
@@ -555,7 +649,11 @@ export function FlashInfosPage() {
             >
               <CardInner>
                 {/* Média : vidéo, image, ou placeholder */}
-                {fi.videoUrl ? (
+                {fi.category === 'FlowDiff' ? (
+                  <FlowDiffMedia aria-label="Information FlowDiff">
+                    <FlowDiffStamp>FlowDiff</FlowDiffStamp>
+                  </FlowDiffMedia>
+                ) : fi.videoUrl ? (
                   <MediaArea>
                     <VideoWrapper>
                       <VideoIframe
@@ -568,7 +666,16 @@ export function FlashInfosPage() {
                   </MediaArea>
                 ) : fi.imageUrl ? (
                   <MediaArea>
-                    <CardImage src={fi.imageUrl} alt={fi.title} loading="lazy" />
+                    <CoverPreviewButton
+                      type="button"
+                      aria-label={`Agrandir la couverture de ${fi.title}`}
+                      onClick={(event) => {
+                        event.stopPropagation()
+                        setSelectedCover({ src: fi.imageUrl!, title: fi.title })
+                      }}
+                    >
+                      <CardImage src={fi.imageUrl} alt={fi.title} loading="lazy" />
+                    </CoverPreviewButton>
                   </MediaArea>
                 ) : (
                   <MediaPlaceholder $bg={UNIVERSE_BG[fi.universe]}>
@@ -593,6 +700,7 @@ export function FlashInfosPage() {
                       >
                         {fi.category}
                       </CategoryBadge>
+                      {fi.isFictionalEvent && <FictionalBadge>Événement fictif</FictionalBadge>}
                     </CardMetaBadges>
                     <CardDate>{formatDate(fi.date)}</CardDate>
                   </CardMeta>
@@ -636,6 +744,21 @@ export function FlashInfosPage() {
             </Card>
           ))}
         </List>
+      )}
+
+      {selectedCover && createPortal(
+        <CoverModalOverlay onClick={() => setSelectedCover(null)}>
+          <CoverModal
+            role="dialog"
+            aria-modal="true"
+            aria-label={`Couverture agrandie : ${selectedCover.title}`}
+            onClick={(event) => event.stopPropagation()}
+          >
+            <CoverModalClose type="button" onClick={() => setSelectedCover(null)} aria-label="Fermer l’aperçu">×</CoverModalClose>
+            <CoverModalImage src={selectedCover.src} alt={selectedCover.title} />
+          </CoverModal>
+        </CoverModalOverlay>,
+        document.body
       )}
     </Page>
   )
