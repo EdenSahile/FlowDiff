@@ -27,7 +27,11 @@ export interface DashboardOrderItem {
   title: string
   publisher: string
   quantity: number
+  /** Prix public TTC avant la remise appliquée à cette ligne. */
   unitPriceTTC: number
+  /** Taux de remise appliqué au prix public, entre 0 et 1. */
+  discountRate?: number
+  /** Total net TTC de la ligne, après remise. */
   montantTTC: number
 }
 
@@ -92,6 +96,7 @@ const UNIVERSE_COLORS: Record<Universe, string> = {
 
 type DemoOrderSeed = Omit<DashboardOrder, 'id' | 'orderId' | 'date' | 'references' | 'items'> & {
   daysAgo: number
+  discountRate?: number
 }
 
 const DEMO_ORDER_SEEDS: DemoOrderSeed[] = [
@@ -103,7 +108,7 @@ const DEMO_ORDER_SEEDS: DemoOrderSeed[] = [
   { daysAgo: 10,  montantTTC: 64.80, nbExemplaires: 5, publisher: 'Glénat',             universe: 'BD/Mangas',       cancelled: false, deliveryDays: 3 },
   { daysAgo: 17,  montantTTC: 27.30, nbExemplaires: 2, publisher: 'Larousse',           universe: 'Adulte-pratique', cancelled: false, deliveryDays: 2 },
   { daysAgo: 25,  montantTTC: 51.60, nbExemplaires: 4, publisher: 'Le Seuil',           universe: 'Littérature',     cancelled: false, deliveryDays: 2 },
-  { daysAgo: 29,  montantTTC: 22.05, nbExemplaires: 1, publisher: 'Pika Édition',       universe: 'BD/Mangas',       cancelled: false, deliveryDays: 4 },
+  { daysAgo: 29,  montantTTC: 22.05, nbExemplaires: 1, publisher: 'Pika Édition',       universe: 'BD/Mangas',       cancelled: false, deliveryDays: 4, discountRate: 0.30 },
   // Période précédente et trois derniers mois.
   { daysAgo: 35,  montantTTC: 38.40, nbExemplaires: 3, publisher: 'Actes Sud',          universe: 'Littérature',     cancelled: false, deliveryDays: 2 },
   { daysAgo: 44,  montantTTC: 46.20, nbExemplaires: 4, publisher: 'Gallimard Jeunesse', universe: 'Jeunesse',        cancelled: false, deliveryDays: 3 },
@@ -136,7 +141,10 @@ const DEMO_ORDER_SEEDS: DemoOrderSeed[] = [
 ]
 
 function isoDate(d: Date): string {
-  return d.toISOString().slice(0, 10)
+  const year = d.getFullYear()
+  const month = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
 }
 
 function addDays(d: Date, n: number): Date {
@@ -168,12 +176,16 @@ function buildDemoItems(seed: DemoOrderSeed, index: number): DashboardOrderItem[
 
   return quantities.map((quantity, itemIndex) => {
     const montantTTC = amountsInCents[itemIndex] / 100
+    const discountRate = seed.discountRate ?? 0
     return {
       isbn: `978-${String(260000000 + index * 10 + itemIndex).padStart(9, '0')}`,
       title: titles[(index + itemIndex) % titles.length],
       publisher: seed.publisher,
       quantity,
-      unitPriceTTC: montantTTC / quantity,
+      unitPriceTTC: discountRate > 0
+        ? roundCurrency(montantTTC / quantity / (1 - discountRate))
+        : montantTTC / quantity,
+      discountRate: discountRate || undefined,
       montantTTC,
     }
   })
@@ -389,6 +401,9 @@ export function orderToDashboardOrders(order: Order): DashboardOrder[] {
         publisher: item.publisher,
         quantity: item.quantity,
         unitPriceTTC: itemPriceTTC(item),
+        discountRate: itemGrossTTC > 0
+          ? Math.max(0, 1 - itemMontantTTC / itemGrossTTC)
+          : undefined,
         montantTTC: itemMontantTTC,
       }
     })

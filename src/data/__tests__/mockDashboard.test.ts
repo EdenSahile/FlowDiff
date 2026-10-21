@@ -41,6 +41,30 @@ describe('données de tableau de bord', () => {
     expect(filterDataByPeriod(MOCK_DASHBOARD_ORDERS, yearAgoSevenDays, yearAgo)).not.toHaveLength(0)
   })
 
+  it('inclut un exemple de titre remisé sans modifier le total net de démonstration', () => {
+    const pikaOrder = MOCK_DASHBOARD_ORDERS.find(order => order.publisher === 'Pika Édition')
+
+    expect(pikaOrder?.montantTTC).toBe(22.05)
+    expect(pikaOrder?.items).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        unitPriceTTC: 31.50,
+        discountRate: 0.30,
+        montantTTC: 22.05,
+      }),
+    ]))
+  })
+
+  it('conserve les dates locales de début et de fin dans la courbe', () => {
+    const points = computeChartData([
+      dashboardOrder({ id: 'first-day', orderId: 'first-day', date: '2026-10-15' }),
+      dashboardOrder({ id: 'last-day', orderId: 'last-day', date: '2026-10-21' }),
+    ], new Date(2026, 9, 15), new Date(2026, 9, 21, 23, 59, 59, 999))
+
+    expect(points[0]).toEqual({ date: '2026-10-15', count: 1 })
+    expect(points.at(-1)).toEqual({ date: '2026-10-21', count: 1 })
+    expect(points).toHaveLength(7)
+  })
+
   it('compte une commande ventilée sur plusieurs éditeurs une seule fois dans les KPI et la courbe', () => {
     const orders = [
       dashboardOrder({ id: 'line-1', publisher: 'Gallimard', montantTTC: 40, nbExemplaires: 2 }),
