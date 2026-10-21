@@ -56,7 +56,7 @@
 | FLOW-RM-030 | Un titre sur_commande ou en_reimp déclenche une modale de confirmation avant ajout | Logique conditionnelle dans BookCard | `src/components/catalogue/BookCard.tsx:597,623` | Aucun | Absente | Non |
 | FLOW-RM-031 | Recherche locale multi-champs : titre, auteurs, éditeur, ISBN (nettoyé), collection, genre | searchBooksLocal avec normalisation | `src/services/books.ts:76-87` | `books.test.ts` : 4 tests (titre, auteur, vide, aucun résultat) | Partielle (ISBN, collection, genre non testés) | Non |
 | FLOW-RM-032 | Recherche ISBN directe : correspondance exacte, trim des espaces | Logique de matching ISBN | `src/components/layout/__tests__/isbnSearch.test.ts` | `isbnSearch.test.ts` : 3 tests | Complète | Non |
-| FLOW-RM-033 | Fallback Supabase vers données mock si Supabase échoue ou 0 résultat | try/catch dans loadAllBooks | `src/services/books.ts:46-58` | Aucun | Absente | Non |
+| FLOW-RM-033 | ~~Fallback Supabase vers données mock~~ **Hors périmètre** : Supabase supprimé, l'app charge uniquement les mocks | n/a | `src/services/books.ts` | n/a | n/a | Non |
 | FLOW-RM-034 | Filtrage livres par prix TTC : borne inf incluse, borne sup exclue | `>= min` et `< max` | `src/data/mockBooks.ts:89-92` | Aucun | Absente | Non |
 | FLOW-RM-035 | Filtrage cumulatif univers + statut sur la page Fonds | Logique de filtrage enchaînée | `src/pages/fonds/FondsPage.tsx` | `fondsFilter.test.ts` : 5 tests | Complète | Non |
 | FLOW-RM-036 | Calcul du prix net remisé : priceTTC * (1 - rate) | Formule dans BookCard | `src/components/catalogue/BookCard.tsx:582-585` | `priceNet.test.ts` : 3 tests (formule seule) | Complète (formule), pas l'intégration taux utilisateur | Non |
@@ -240,7 +240,7 @@
 | FLOW-RM-028 | BookCard permet ajout à paraître au panier | Catalogue | Haute (incohérence) |
 | FLOW-RM-029 | BookCardRow bloque ajout à paraître | Catalogue | Haute (incohérence) |
 | FLOW-RM-030 | Modale confirmation sur_commande/en_reimp | Catalogue | Moyenne |
-| FLOW-RM-033 | Fallback Supabase vers données mock | Catalogue | Moyenne |
+| ~~FLOW-RM-033~~ | ~~Fallback Supabase vers données mock~~ | ~~Catalogue~~ | Hors périmètre (Supabase supprimé) |
 | FLOW-RM-034 | Filtrage par prix (borne sup exclue) | Catalogue | Basse |
 | FLOW-RM-037 | Genres par univers (GENRE_BY_UNIVERSE) | Catalogue | Basse |
 | FLOW-RM-039 | Ajout panier : même livre = incrémentation | Panier | Haute |

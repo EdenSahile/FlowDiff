@@ -130,7 +130,7 @@ Couvrir la recherche locale multi-champs (titre, auteur, ISBN, collection, genre
 | -- | ----- | ----------- | --------------- |
 | FLOW-RM-031 | Recherche locale multi-champs | `src/services/books.ts:76-87` | `books.test.ts` : 4 tests (titre, auteur seulement) |
 | FLOW-RM-032 | Recherche ISBN directe : correspondance exacte, trim | `isbnSearch.test.ts` | `isbnSearch.test.ts` : 3 tests |
-| FLOW-RM-033 | Fallback Supabase vers données mock | `src/services/books.ts:46-58` | Aucun |
+| FLOW-RM-033 | ~~Fallback Supabase vers données mock~~ **Hors périmètre** : Supabase supprimé, l'app charge uniquement les mocks | `src/services/books.ts` | n/a |
 | FLOW-RM-034 | Filtrage par prix TTC : borne inf incluse, borne sup exclue | `src/data/mockBooks.ts:89-92` | Aucun |
 | FLOW-RM-035 | Filtrage cumulatif univers + statut (page Fonds) | `src/pages/fonds/FondsPage.tsx` | `fondsFilter.test.ts` : 5 tests |
 | FLOW-RM-036 | Calcul prix net remisé : priceTTC * (1 - rate) | `src/components/catalogue/BookCard.tsx:582-585` | `priceNet.test.ts` : 3 tests |
@@ -326,31 +326,21 @@ Aucun.
 
 ---
 
-## LOT-12 — Admin
+## LOT-12 — Admin — ⛔ CADUC
 
-### Objectif
+> **Caduc depuis le 2026-10-10.** Le back-office (`src/admin/`) est dérouté : les routes ne sont plus enregistrées, les identifiants ont été retirés de la source, et `login` renvoie `false`. Les 7 règles de ce lot (FLOW-RM-092 à 098) ne sont plus testables ni pertinentes. Les 2 tests existants (`adminServices.test.ts`) restent dans la suite pour éviter une régression si le code admin est un jour réactivé, mais aucun nouveau test n'est prévu.
 
-Couvrir l'authentification admin (credentials, session, rôle), la protection des routes admin, et les services admin (CA mensuel, top 5 ventes).
+### Règles (hors périmètre)
 
-### Règles couvertes
-
-| ID | Règle | Emplacement | Tests existants |
-| -- | ----- | ----------- | --------------- |
-| FLOW-RM-092 | Credentials admin hardcodés | `src/admin/contexts/AdminAuthContext.tsx` | `adminAuth.test.ts` |
-| FLOW-RM-093 | Session admin expire après 8h | `src/admin/contexts/AdminAuthContext.tsx` | `adminAuth.test.ts` : 1 test |
-| FLOW-RM-094 | Session admin requiert role='admin' | `src/admin/contexts/AdminAuthContext.tsx` | `adminAuth.test.ts` : 1 test |
-| FLOW-RM-095 | AdminRoute redirige vers /admin/login si non authentifié | `src/admin/AdminRoute.tsx` | Aucun |
-| FLOW-RM-096 | computeCAMois : exclut commandes annulées, somme TTC mois courant | `src/admin/services/adminServices.ts` | `adminServices.test.ts` : 1 test |
-| FLOW-RM-097 | computeTop5 : agrège quantités par ISBN, tri descendant | `src/admin/services/adminServices.ts` | `adminServices.test.ts` : 1 test |
-| FLOW-RM-098 | StatutCommande admin inclut « annule » (absent côté libraire) | `src/admin/types.ts` | Implicite via services |
-
-### Hors périmètre
-
-Auth libraire (LOT-01/02/03), commandes libraire (LOT-09).
-
-### Points à clarifier
-
-**Divergence FLOW-RM-098** : le côté admin définit 4 statuts de commande (incluant `annule`), le côté libraire n'en autorise que 3 dans storedOrdersSchema. Si une commande est marquée « annulée » côté admin, la validation Zod côté libraire la rejetterait au chargement.
+| ID | Règle | Statut |
+| -- | ----- | ------ |
+| FLOW-RM-092 | Credentials admin | Corrigé puis dérouté |
+| FLOW-RM-093 | Session admin 8h | Dérouté |
+| FLOW-RM-094 | Session admin role='admin' | Dérouté |
+| FLOW-RM-095 | AdminRoute redirige | Dérouté |
+| FLOW-RM-096 | computeCAMois | Dérouté |
+| FLOW-RM-097 | computeTop5 | Dérouté |
+| FLOW-RM-098 | StatutCommande admin inclut « annule » | Dérouté |
 
 ---
 
