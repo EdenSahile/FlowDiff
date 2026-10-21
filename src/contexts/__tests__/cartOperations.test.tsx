@@ -338,6 +338,28 @@ describe('FLOW-RM-047 : updateQty < 1 supprime l\'article', () => {
     expect(result.current.totalItems).toBe(30)
   })
 
+  it('ignore les quantités invalides ajoutées ou appliquées au panier', () => {
+    const { result } = renderHook(() => useCart(), { wrapper: Wrapper })
+    const book = makeBook({ id: 'quantite-valide' })
+
+    act(() => {
+      result.current.addToCart(book, 0)
+      result.current.addToCart(book, -1)
+      result.current.addToCart(book, 1.5)
+      result.current.addToCart(book, Number.NaN)
+    })
+    expect(result.current.items).toHaveLength(0)
+
+    act(() => { result.current.addToCart(book, 2) })
+    const itemKey = result.current.items[0].book.id
+
+    act(() => {
+      result.current.updateQty(itemKey, 2.5)
+      result.current.updateQty(itemKey, Number.NaN)
+    })
+    expect(result.current.items[0].quantity).toBe(2)
+  })
+
   it('accepte updateQty qui diminue la quantité même au-dessus de la limite initiale', () => {
     prefillCart([{ id: 'livre-a', quantity: 5 }])
 
