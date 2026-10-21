@@ -67,7 +67,7 @@ const CLIENT_LIB001 = {
   ville:        'Paris',
 }
 
-export const MOCK_FACTURES: Record<string, Facture[]> = {
+const RAW_MOCK_FACTURES: Record<string, Facture[]> = {
   LIB001: [
     /* ════════════════════════════════════════════════════════
        1. FAC202602144739 — Remise 9 % — 4 ouvrages
@@ -335,3 +335,36 @@ export const MOCK_FACTURES: Record<string, Facture[]> = {
     },
   ],
 }
+
+const PUBLISHER_BY_REFERENCE: Record<string, string> = {
+  'f-lit-01': 'Gallimard',
+  'f-lit-02': 'Gallimard',
+  'f-lit-03': 'Le Livre de Poche',
+  'f-lit-sapiens': 'Albin Michel',
+  'f-bd-01': 'Casterman',
+  'f-bd-02': 'Hachette Livre',
+  'f-jes-01': 'Gallimard Jeunesse',
+  'f-jes-charlie': 'Gallimard Jeunesse',
+  'n-lit-01': 'Gallimard',
+  'n-lit-02': 'Flammarion',
+  'n-lit-03': 'Buchet-Chastel',
+  'n-bd-01': 'Pika Édition',
+  'n-bd-02': 'Ki-oon',
+  'n-bd-03': 'Éditions du Sillage',
+  'n-pra-01': 'Larousse',
+  'n-pra-02': 'Larousse',
+  'n-jes-02': 'Gallimard Jeunesse',
+}
+
+export const MOCK_FACTURES: Record<string, Facture[]> = Object.fromEntries(
+  Object.entries(RAW_MOCK_FACTURES).map(([codeClient, factures]) => [
+    codeClient,
+    factures.map(facture => ({
+      ...facture,
+      lignes: facture.lignes.map(ligne => ({
+        ...ligne,
+        editeur: PUBLISHER_BY_REFERENCE[ligne.ref] ?? ligne.editeur,
+      })),
+    })),
+  ]),
+)

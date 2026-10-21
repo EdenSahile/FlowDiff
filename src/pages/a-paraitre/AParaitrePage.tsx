@@ -219,7 +219,7 @@ export function AParaitrePage() {
         <BackButton />
         <PageEyebrow>Catalogue</PageEyebrow>
         <PageTitle>À paraître</PageTitle>
-        <PageSubtitle>Les titres seront enregistrés en notés</PageSubtitle>
+        <PageSubtitle>Les titres ajoutés au panier seront enregistrés comme « notés » et conservés indéfiniment.</PageSubtitle>
       </PageHeader>
 
       <Controls>

@@ -1,4 +1,4 @@
-import { useState, type JSX } from 'react'
+import { useEffect, useState, type JSX } from 'react'
 import { createPortal } from 'react-dom'
 import { theme } from '@/lib/theme'
 import styled, { keyframes } from 'styled-components'
@@ -6,10 +6,12 @@ import { mq } from '@/lib/responsive'
 import { MOCK_FLASH_INFOS, FLASH_CATEGORIES } from '@/data/mockFlashInfos'
 import type { FlashCategory } from '@/data/mockFlashInfos'
 import { getCatalogueBookById, UNIVERSES } from '@/data/mockBooks'
-import type { Universe } from '@/data/mockBooks'
+import type { Book, Universe } from '@/data/mockBooks'
 import { useCart } from '@/contexts/CartContext'
 import { useToast } from '@/contexts/ToastContext'
 import { BackButton } from '@/components/ui/BackButton'
+import { StockAlertModal } from '@/components/ui/StockAlertModal'
+import { getPurchaseAvailability } from '@/lib/bookUtils'
 
 /* ── Layout ── */
 const fadeIn = keyframes`from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}`
@@ -393,6 +395,68 @@ const AddBtn = styled.button`
   &:hover { background: ${({ theme }) => theme.colors.primaryHover}; }
 `
 
+const UnavailableNotice = styled.span`
+  color: ${({ theme }) => theme.colors.gray[600]};
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: ${({ theme }) => theme.typography.sizes.sm};
+  font-weight: ${({ theme }) => theme.typography.weights.semibold};
+`
+
+const PreorderOverlay = styled.div`
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: ${({ theme }) => theme.spacing.lg};
+  background: rgba(17, 17, 17, 0.45);
+`
+
+const PreorderDialog = styled.div`
+  width: min(100%, 420px);
+  padding: ${({ theme }) => theme.spacing.lg};
+  border-radius: ${({ theme }) => theme.radii.lg};
+  background: ${({ theme }) => theme.colors.white};
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+`
+
+const PreorderTitle = styled.h2`
+  margin: 0 0 ${({ theme }) => theme.spacing.sm};
+  color: ${({ theme }) => theme.colors.navy};
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: ${({ theme }) => theme.typography.sizes.lg};
+`
+
+const PreorderText = styled.p`
+  margin: 0 0 ${({ theme }) => theme.spacing.md};
+  color: ${({ theme }) => theme.colors.gray[600]};
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: ${({ theme }) => theme.typography.sizes.sm};
+  line-height: ${({ theme }) => theme.typography.lineHeights.relaxed};
+`
+
+const PreorderActions = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  gap: ${({ theme }) => theme.spacing.sm};
+`
+
+const PreorderButton = styled.button<{ $primary?: boolean }>`
+  min-height: 44px;
+  padding: 0 ${({ theme }) => theme.spacing.md};
+  border: 1px solid ${({ theme, $primary }) => $primary ? theme.colors.primary : theme.colors.gray[200]};
+  border-radius: ${({ theme }) => theme.radii.md};
+  background: ${({ theme, $primary }) => $primary ? theme.colors.primary : theme.colors.white};
+  color: ${({ theme, $primary }) => $primary ? theme.colors.white : theme.colors.gray[600]};
+  cursor: pointer;
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: ${({ theme }) => theme.typography.sizes.sm};
+  font-weight: ${({ theme }) => theme.typography.weights.semibold};
+
+  &:hover { background: ${({ theme, $primary }) => $primary ? theme.colors.primaryHover : theme.colors.gray[100]}; }
+`
+
 /* ── Placeholder média ── */
 const MediaPlaceholder = styled.div<{ $bg: string }>`
   flex-shrink: 0;
@@ -569,8 +633,19 @@ export function FlashInfosPage() {
   const [category, setCategory] = useState<FlashCategory | null>(null)
   const [qtys, setQtys] = useState<Record<string, number>>({})
   const [selectedCover, setSelectedCover] = useState<{ src: string; title: string } | null>(null)
+  const [pendingPreorder, setPendingPreorder] = useState<{ fiId: string; book: Book } | null>(null)
+  const [pendingStockOrder, setPendingStockOrder] = useState<{ fiId: string; book: Book } | null>(null)
   const { addToCart } = useCart()
   const { showToast } = useToast()
+
+  useEffect(() => {
+    if (!pendingPreorder) return
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setPendingPreorder(null)
+    }
+    document.addEventListener('keydown', closeOnEscape)
+    return () => document.removeEventListener('keydown', closeOnEscape)
+  }, [pendingPreorder])
 
   const getQty = (id: string) => qtys[id] ?? 1
   const changeQty = (id: string, delta: number) =>
@@ -582,12 +657,30 @@ export function FlashInfosPage() {
     return true
   })
 
+  const addBookToCart = (fiId: string, book: Book, enReliquat = false) => {
+    addToCart(book, getQty(fiId), { enReliquat })
+    showToast('Ouvrage ajouté au panier')
+    setQtys(prev => ({ ...prev, [fiId]: 1 }))
+  }
+
   const handleAdd = (fiId: string, bookId: string) => {
     const book = getCatalogueBookById(bookId)
     if (!book) return
-    addToCart(book, getQty(fiId))
-    showToast('Ouvrage ajouté au panier')
-    setQtys(prev => ({ ...prev, [fiId]: 1 }))
+
+    const availability = getPurchaseAvailability(book.type, book.statut)
+    if (!availability.canAddToCart) {
+      showToast('Cet ouvrage est actuellement indisponible.', 'error')
+      return
+    }
+    if (availability.isAParaitre) {
+      setPendingPreorder({ fiId, book })
+      return
+    }
+    if (availability.needsConfirm) {
+      setPendingStockOrder({ fiId, book })
+      return
+    }
+    addBookToCart(fiId, book)
   }
 
   return (
@@ -641,8 +734,13 @@ export function FlashInfosPage() {
         <EmptyState>Aucune info flash pour cette sélection.</EmptyState>
       ) : (
         <List>
-          {filtered.map(fi => (
-            <Card
+          {filtered.map(fi => {
+            const associatedBook = fi.bookId ? getCatalogueBookById(fi.bookId) : null
+            const availability = associatedBook
+              ? getPurchaseAvailability(associatedBook.type, associatedBook.statut)
+              : null
+
+            return <Card
               key={fi.id}
               $clickable={!!fi.link}
               onClick={() => fi.link && window.open(fi.link, '_blank', 'noopener,noreferrer')}
@@ -719,7 +817,7 @@ export function FlashInfosPage() {
                         {fi.linkLabel ?? 'En savoir plus'} <IconArrow />
                       </LinkBtn>
                     )}
-                    {fi.bookId && (
+                    {fi.bookId && associatedBook && availability?.canAddToCart && (
                       <>
                         <QtyControl onClick={(e) => e.stopPropagation()}>
                           <QtyBtn
@@ -738,11 +836,14 @@ export function FlashInfosPage() {
                         </AddBtn>
                       </>
                     )}
+                    {fi.bookId && associatedBook && !availability?.canAddToCart && (
+                      <UnavailableNotice>Ouvrage indisponible</UnavailableNotice>
+                    )}
                   </CardActions>
                 </CardBody>
               </CardInner>
             </Card>
-          ))}
+          })}
         </List>
       )}
 
@@ -759,6 +860,46 @@ export function FlashInfosPage() {
           </CoverModal>
         </CoverModalOverlay>,
         document.body
+      )}
+
+      {pendingPreorder && createPortal(
+        <PreorderOverlay onClick={() => setPendingPreorder(null)}>
+          <PreorderDialog role="dialog" aria-modal="true" aria-labelledby="preorder-title" onClick={(event) => event.stopPropagation()}>
+            <PreorderTitle id="preorder-title">Titre à paraître</PreorderTitle>
+            <PreorderText>Ce titre sera enregistré comme « noté » et conservé indéfiniment.</PreorderText>
+            <PreorderActions>
+              <PreorderButton type="button" onClick={() => setPendingPreorder(null)}>Annuler</PreorderButton>
+              <PreorderButton
+                type="button"
+                $primary
+                autoFocus
+                onClick={() => {
+                  addBookToCart(pendingPreorder.fiId, pendingPreorder.book)
+                  setPendingPreorder(null)
+                }}
+              >
+                OK
+              </PreorderButton>
+            </PreorderActions>
+          </PreorderDialog>
+        </PreorderOverlay>,
+        document.body
+      )}
+
+      {pendingStockOrder && (
+        <StockAlertModal
+          open
+          statut={pendingStockOrder.book.statut!}
+          onCancel={() => setPendingStockOrder(null)}
+          onConfirm={() => {
+            addBookToCart(
+              pendingStockOrder.fiId,
+              pendingStockOrder.book,
+              pendingStockOrder.book.statut === 'en_reimp',
+            )
+            setPendingStockOrder(null)
+          }}
+        />
       )}
     </Page>
   )

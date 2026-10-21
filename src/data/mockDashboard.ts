@@ -76,7 +76,7 @@ const UNIVERSE_COLORS: Record<Universe, string> = {
 
 /* ─────────────────────────────────────────
    Générateur déterministe
-   Produit ~320 commandes sur 2024-01-01 → aujourd'hui
+   Produit des commandes sur 2024-01-01 → aujourd'hui
 ───────────────────────────────────────── */
 
 function lcg(seed: number): () => number {
@@ -101,7 +101,7 @@ function generateOrders(): DashboardOrder[] {
   const rand = lcg(42)
   const orders: DashboardOrder[] = []
   const start = new Date('2024-01-01')
-  const end   = new Date('2026-04-28')
+  const end   = new Date()
 
   let day = new Date(start)
   let idx = 0

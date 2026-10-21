@@ -1675,7 +1675,7 @@ export function HomePage() {
       iconBg: '#E6F2EC', iconColor: '#226241',
       count: 1,
       label: 'office à valider',
-      deadline: 'Limite : 13 mai',
+      deadline: 'Limite : 13 mai 2027',
       route: '/offices',
     },
     'action-panier': {
@@ -2226,10 +2226,10 @@ export function HomePage() {
                     </PanelExportBtn>
                   </PanelHeader>
                   <TopEdList>
-                    {topPublishers.map(({ pct, montant }, i) => (
-                      <TopEdRow key={i}>
+                    {topPublishers.map(({ name, pct, montant }, i) => (
+                      <TopEdRow key={name}>
                         <TopEdRank>{i + 1}</TopEdRank>
-                        <TopEdName>Éditeur {i + 1}</TopEdName>
+                        <TopEdName>{name}</TopEdName>
                         <TopEdPct>{pct}%</TopEdPct>
                         <TopEdAmount>{fmtEur(montant)}</TopEdAmount>
                       </TopEdRow>
