@@ -7,6 +7,7 @@ import {
   getBusinessStatus,
   generateEdifactPlaceholder,
   messageContainsISBN,
+  groupDESADVByOrder,
   type EDIMessage,
 } from '@/lib/ediUtils'
 
@@ -31,6 +32,18 @@ describe('filterEDIMessages', () => {
   it('DESADV returns only DESADV', () => {
     expect(filterEDIMessages(BASE, 'DESADV')).toHaveLength(1)
   })
+  it('ORDRSP returns only ORDRSP', () => {
+    const ordrspMessages = filterEDIMessages(BASE, 'ORDRSP')
+
+    expect(ordrspMessages).toHaveLength(1)
+    expect(ordrspMessages[0].type).toBe('ORDRSP')
+  })
+  it('INVOIC returns only INVOIC', () => {
+    const invoicMessages = filterEDIMessages(BASE, 'INVOIC')
+
+    expect(invoicMessages).toHaveLength(1)
+    expect(invoicMessages[0].type).toBe('INVOIC')
+  })
 })
 
 describe('getFluxCounts', () => {
@@ -45,6 +58,11 @@ describe('getFluxCounts', () => {
   })
   it('counts ERROR status correctly', () => {
     expect(getFluxCounts(BASE).errors).toBe(1)
+  })
+  it('returns 0 for all counters on empty array', () => {
+    const countsFromEmpty = getFluxCounts([])
+
+    expect(countsFromEmpty).toEqual({ orders: 0, expeditions: 0, factures: 0, errors: 0 })
   })
 })
 
@@ -138,6 +156,21 @@ describe('messageContainsISBN', () => {
   it('retourne true si la recherche est vide (pas de filtre)', () => {
     expect(messageContainsISBN(orders, '')).toBe(true)
     expect(messageContainsISBN(invoic, '')).toBe(true)
+  })
+  it('retourne true si EAN correspond dans les lignes INVOIC', () => {
+    const invoicWithLines: EDIMessage = {
+      id: 'i2', type: 'INVOIC', status: 'RECEIVED', documentRef: 'INV-002',
+      diffuseur: 'D1', detail: '-', createdAt: '2026-04-25T09:00:00.000Z',
+      payload: {
+        invoiceRef: 'INV-002', amountTTC: 200, currency: 'EUR',
+        orderIds: ['CMD-050'],
+        lines: [
+          { ean: '9782070360024', title: 'Le Petit Prince', qty: 2, unitPriceTTC: 8.50 },
+        ],
+      },
+    }
+
+    expect(messageContainsISBN(invoicWithLines, '9782070360024')).toBe(true)
   })
 })
 
@@ -307,5 +340,167 @@ describe('generateEdifactPlaceholder', () => {
     const result = generateEdifactPlaceholder(msg)
     expect(result).toContain("CNT+1:2'")
     expect(result).toContain("CNT+2:5'")
+  })
+
+  it('ORDERS ne split pas un titre de 35 chars exactement', () => {
+    const title35 = 'A'.repeat(35)
+    const msg = {
+      ...base,
+      type: 'ORDERS' as const,
+      status: 'SENT' as const,
+      payload: {
+        orderId: 'CMD-001', diffuseur: 'D1',
+        lines: [{ lineNumber: 1, ean: '9782070360024', title: title35, qtyRequested: 1 }],
+      },
+    }
+
+    const edifact = generateEdifactPlaceholder(msg)
+
+    expect(edifact).toContain(`IMD+L+050+:::${title35}'`)
+  })
+
+  it('ORDERS met 70 chars dans un seul segment desc:cont', () => {
+    const title70 = 'B'.repeat(70)
+    const msg = {
+      ...base,
+      type: 'ORDERS' as const,
+      status: 'SENT' as const,
+      payload: {
+        orderId: 'CMD-001', diffuseur: 'D1',
+        lines: [{ lineNumber: 1, ean: '9782070360024', title: title70, qtyRequested: 1 }],
+      },
+    }
+
+    const edifact = generateEdifactPlaceholder(msg)
+
+    expect(edifact).toContain(`IMD+L+050+:::${'B'.repeat(35)}:${'B'.repeat(35)}'`)
+  })
+
+  it('ORDERS split 71 chars en 2 segments IMD+L+050', () => {
+    const title71 = 'C'.repeat(71)
+    const msg = {
+      ...base,
+      type: 'ORDERS' as const,
+      status: 'SENT' as const,
+      payload: {
+        orderId: 'CMD-001', diffuseur: 'D1',
+        lines: [{ lineNumber: 1, ean: '9782070360024', title: title71, qtyRequested: 1 }],
+      },
+    }
+
+    const edifact = generateEdifactPlaceholder(msg)
+
+    expect(edifact).toContain(`IMD+L+050+:::${'C'.repeat(35)}:${'C'.repeat(35)}'`)
+    expect(edifact).toContain(`IMD+L+050+:::C'`)
+  })
+
+  it('ORDERS gère un titre vide sans erreur', () => {
+    const msg = {
+      ...base,
+      type: 'ORDERS' as const,
+      status: 'SENT' as const,
+      payload: {
+        orderId: 'CMD-001', diffuseur: 'D1',
+        lines: [{ lineNumber: 1, ean: '9782070360024', title: '', qtyRequested: 1 }],
+      },
+    }
+
+    const edifact = generateEdifactPlaceholder(msg)
+
+    expect(edifact).toContain("IMD+L+050+:::'")
+  })
+
+  it('ORDERS avec auteur à 1 seul mot ne produit pas de segment IMD+L+011', () => {
+    const msg = {
+      ...base,
+      type: 'ORDERS' as const,
+      status: 'SENT' as const,
+      payload: {
+        orderId: 'CMD-001', diffuseur: 'D1',
+        lines: [{
+          lineNumber: 1, ean: '9782070360024', title: 'Titre', qtyRequested: 1,
+          authors: ['Molière'],
+        }],
+      },
+    }
+
+    const edifact = generateEdifactPlaceholder(msg)
+
+    expect(edifact).toContain("IMD+L+009+:::Molière.'")
+    expect(edifact).toContain("IMD+L+010+:::Molière'")
+    expect(edifact).not.toContain('IMD+L+011')
+  })
+})
+
+describe('groupDESADVByOrder', () => {
+  it('statut EN_COURS quand quantité livrée < quantité confirmée', () => {
+    const messages: EDIMessage[] = [
+      {
+        id: 'ordrsp-1', type: 'ORDRSP', status: 'RECEIVED', documentRef: 'ACK-001',
+        diffuseur: 'Interforum', detail: 'Acceptée', createdAt: '2026-04-25T11:00:00.000Z',
+        payload: {
+          orderId: 'CMD-001', orderResponseId: 'ACK-001', responseDate: '2026-04-25',
+          globalStatus: 'ACCEPTED',
+          lines: [{ lineNumber: 1, ean: '9782070360024', title: 'Le Petit Prince', qtyRequested: 5, qtyConfirmed: 5, status: 'ACCEPTED' }],
+        },
+      },
+      {
+        id: 'desadv-1', type: 'DESADV', status: 'RECEIVED', documentRef: 'DES-001',
+        diffuseur: 'Interforum', detail: '3 ex.', createdAt: '2026-04-26T09:00:00.000Z',
+        payload: { desadvRef: 'DES-001', orderId: 'CMD-001', lines: [{ isbn: '9782070360024', qtyShipped: 3 }] },
+      },
+    ]
+
+    const { grouped, ungrouped } = groupDESADVByOrder(messages)
+
+    expect(ungrouped).toHaveLength(0)
+    expect(grouped).toHaveLength(1)
+    expect(grouped[0].orderId).toBe('CMD-001')
+    expect(grouped[0].globalStatus).toBe('EN_COURS')
+    expect(grouped[0].lines[0].qtyShippedTotal).toBe(3)
+    expect(grouped[0].lines[0].qtyConfirmed).toBe(5)
+    expect(grouped[0].lines[0].status).toBe('EN_COURS')
+  })
+
+  it('statut SOLDE quand quantité livrée >= quantité confirmée', () => {
+    const messages: EDIMessage[] = [
+      {
+        id: 'ordrsp-2', type: 'ORDRSP', status: 'RECEIVED', documentRef: 'ACK-002',
+        diffuseur: 'Hachette', detail: 'Acceptée', createdAt: '2026-04-25T11:00:00.000Z',
+        payload: {
+          orderId: 'CMD-002', orderResponseId: 'ACK-002', responseDate: '2026-04-25',
+          globalStatus: 'ACCEPTED',
+          lines: [{ lineNumber: 1, ean: '9782075017346', title: 'Titre B', qtyRequested: 3, qtyConfirmed: 3, status: 'ACCEPTED' }],
+        },
+      },
+      {
+        id: 'desadv-2', type: 'DESADV', status: 'RECEIVED', documentRef: 'DES-002',
+        diffuseur: 'Hachette', detail: '3 ex.', createdAt: '2026-04-26T10:00:00.000Z',
+        payload: { desadvRef: 'DES-002', orderId: 'CMD-002', lines: [{ isbn: '9782075017346', qtyShipped: 3 }] },
+      },
+    ]
+
+    const { grouped, ungrouped } = groupDESADVByOrder(messages)
+
+    expect(ungrouped).toHaveLength(0)
+    expect(grouped).toHaveLength(1)
+    expect(grouped[0].globalStatus).toBe('SOLDE')
+    expect(grouped[0].lines[0].status).toBe('SOLDE')
+  })
+
+  it('DESADV sans orderId atterrit dans ungrouped', () => {
+    const messages: EDIMessage[] = [
+      {
+        id: 'desadv-3', type: 'DESADV', status: 'RECEIVED', documentRef: 'DES-003',
+        diffuseur: 'Autodiff', detail: '2 ex.', createdAt: '2026-04-27T08:00:00.000Z',
+        payload: { desadvRef: 'DES-003', lines: [{ isbn: '9782070360024', qtyShipped: 2 }] },
+      },
+    ]
+
+    const { grouped, ungrouped } = groupDESADVByOrder(messages)
+
+    expect(grouped).toHaveLength(0)
+    expect(ungrouped).toHaveLength(1)
+    expect(ungrouped[0].id).toBe('desadv-3')
   })
 })

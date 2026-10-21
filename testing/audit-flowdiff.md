@@ -132,7 +132,7 @@
 | FLOW-RM-086 | groupDESADVByOrder : statut EN_COURS si qté livrée < commandée, SOLDE sinon | Logique de comparaison dans ediUtils | `src/lib/ediUtils.ts` | Aucun | Absente | Non |
 | FLOW-RM-087 | filterEDIMessages filtre par type ou ALL | Fonction utilitaire | `src/lib/ediUtils.ts` | `ediUtils.test.ts` : tests existants | Complète | Non |
 | FLOW-RM-088 | getFluxCounts : orders=ORDERS+PENDING, expeditions=tous DESADV, factures=INVOIC+PENDING, errors=tout ERROR | Comptage par catégorie | `src/lib/ediUtils.ts` | `ediUtils.test.ts` : tests existants | Complète | Non |
-| FLOW-RM-089 | messageContainsISBN : recherche partielle (préfixe), chaîne vide = pas de filtre, INVOIC toujours false | Logique de matching ISBN dans messages | `src/lib/ediUtils.ts` | `ediUtils.test.ts` : tests existants | Complète | Non |
+| FLOW-RM-089 | messageContainsISBN : recherche partielle (préfixe), chaîne vide = pas de filtre, INVOIC inclus dans la recherche | Logique de matching ISBN dans messages | `src/lib/ediUtils.ts` | `ediUtils.test.ts` : tests existants | Complète | Non |
 | FLOW-RM-090 | EDIFACT ORDERS : split titres longs en chunks de 35 chars dans IMD+L+050 | Découpage dans generateEdifactPlaceholder | `src/lib/ediUtils.ts` | `ediUtils.test.ts` : tests existants | Complète | Non |
 | FLOW-RM-091 | EDIFACT ORDERS : IMD auteur avec inversion nom/prénom (009/010/011) | Transformation dans generateEdifactPlaceholder | `src/lib/ediUtils.ts` | `ediUtils.test.ts` : tests existants | Complète | Non |
 

@@ -312,7 +312,7 @@ Couvrir la génération automatique de réponses EDI (ORDRSP, DESADV), l'isolati
 | FLOW-RM-086 | groupDESADVByOrder : EN_COURS si qté livrée < commandée, SOLDE sinon | `src/lib/ediUtils.ts` | Aucun |
 | FLOW-RM-087 | filterEDIMessages filtre par type ou ALL | `src/lib/ediUtils.ts` | `ediUtils.test.ts` |
 | FLOW-RM-088 | getFluxCounts : comptage par catégorie | `src/lib/ediUtils.ts` | `ediUtils.test.ts` |
-| FLOW-RM-089 | messageContainsISBN : recherche partielle, INVOIC toujours false | `src/lib/ediUtils.ts` | `ediUtils.test.ts` |
+| FLOW-RM-089 | messageContainsISBN : recherche partielle, INVOIC inclus dans la recherche | `src/lib/ediUtils.ts` | `ediUtils.test.ts` |
 | FLOW-RM-090 | EDIFACT ORDERS : split titres longs en chunks de 35 chars | `src/lib/ediUtils.ts` | `ediUtils.test.ts` |
 | FLOW-RM-091 | EDIFACT ORDERS : IMD auteur avec inversion nom/prénom | `src/lib/ediUtils.ts` | `ediUtils.test.ts` |
 
