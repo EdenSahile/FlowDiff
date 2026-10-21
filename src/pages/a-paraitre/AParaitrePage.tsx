@@ -1,11 +1,13 @@
-import { useState, useDeferredValue, useEffect, useMemo } from 'react'
+import { useState, useDeferredValue, useEffect, useMemo, useCallback } from 'react'
 import styled, { keyframes } from 'styled-components'
 import { BookCard } from '@/components/catalogue/BookCard'
+import { CatalogueLoadState } from '@/components/catalogue/CatalogueLoadState'
 import { UniverseFilter } from '@/components/catalogue/UniverseFilter'
 import { getBooksByTypeAsync, searchBooksLocal } from '@/services/books'
 import type { Universe, Book } from '@/data/mockBooks'
 import { Input } from '@/components/ui/Input'
 import { BackButton } from '@/components/ui/BackButton'
+import { useRefetchOnFocus } from '@/hooks/useRefetchOnFocus'
 
 const fadeIn = keyframes`from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}`
 
@@ -177,11 +179,29 @@ export function AParaitrePage() {
   const [universe, setUniverse]         = useState<Universe | null>(null)
   const [query, setQuery]               = useState('')
   const [allAParaitre, setAllAParaitre] = useState<Book[]>([])
+  const [isLoading, setIsLoading]       = useState(true)
+  const [hasError, setHasError]         = useState(false)
   const deferred = useDeferredValue(query)
 
-  useEffect(() => {
-    getBooksByTypeAsync('a-paraitre').then(setAllAParaitre).catch(console.error)
+  const loadAParaitre = useCallback(async () => {
+    setIsLoading(true)
+    setHasError(false)
+    try {
+      setAllAParaitre(await getBooksByTypeAsync('a-paraitre'))
+    } catch {
+      setHasError(true)
+    } finally {
+      setIsLoading(false)
+    }
   }, [])
+
+  useEffect(() => {
+    getBooksByTypeAsync('a-paraitre')
+      .then(setAllAParaitre)
+      .catch(() => setHasError(true))
+      .finally(() => setIsLoading(false))
+  }, [])
+  useRefetchOnFocus(loadAParaitre)
 
   const aParaitre = useMemo(() => {
     let books = deferred.trim()
@@ -223,7 +243,9 @@ export function AParaitrePage() {
         </FilterGroup>
       </Controls>
 
-      {programmes.length === 0 && (
+      <CatalogueLoadState isLoading={isLoading} hasError={hasError} onRetry={loadAParaitre} />
+
+      {!isLoading && !hasError && programmes.length === 0 && (
         <EmptyState>
           <IconEmpty />
           {deferred.trim()
@@ -232,7 +254,7 @@ export function AParaitrePage() {
         </EmptyState>
       )}
 
-      {programmes.map(prog => {
+      {!isLoading && !hasError && programmes.map(prog => {
         const books = aParaitre.filter(b => (b.programme ?? 'Autres') === prog)
         return (
           <ProgrammeSection key={prog}>

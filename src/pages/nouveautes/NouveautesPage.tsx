@@ -2,6 +2,7 @@ import { useState, useDeferredValue, useMemo, useEffect, useCallback } from 'rea
 import { useNotifications } from '@/contexts/NotificationsContext'
 import styled, { keyframes } from 'styled-components'
 import { BookCard } from '@/components/catalogue/BookCard'
+import { CatalogueLoadState } from '@/components/catalogue/CatalogueLoadState'
 import { UniverseFilter } from '@/components/catalogue/UniverseFilter'
 import { getBooksByTypeAsync, searchBooksLocal } from '@/services/books'
 import type { Universe, Book } from '@/data/mockBooks'
@@ -207,16 +208,28 @@ export function NouveautesPage() {
   const [query, setQuery]             = useState('')
   const [sort, setSort]               = useState<SortKey>('pertinence')
   const [allNouveautes, setAllNouveautes] = useState<Book[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [hasError, setHasError] = useState(false)
   const deferred = useDeferredValue(query)
 
+  const loadNouveautes = useCallback(async () => {
+    setIsLoading(true)
+    setHasError(false)
+    try {
+      setAllNouveautes(await getBooksByTypeAsync('nouveaute'))
+    } catch {
+      setHasError(true)
+    } finally {
+      setIsLoading(false)
+    }
+  }, [])
   useEffect(() => {
-    getBooksByTypeAsync('nouveaute').then(setAllNouveautes).catch(console.error)
+    getBooksByTypeAsync('nouveaute')
+      .then(setAllNouveautes)
+      .catch(() => setHasError(true))
+      .finally(() => setIsLoading(false))
   }, [])
-
-  const refetch = useCallback(() => {
-    getBooksByTypeAsync('nouveaute').then(setAllNouveautes).catch(console.error)
-  }, [])
-  useRefetchOnFocus(refetch)
+  useRefetchOnFocus(loadNouveautes)
 
   const nouveautes = useMemo(() => {
     let books = deferred.trim()
@@ -263,7 +276,7 @@ export function NouveautesPage() {
         </FilterGroup>
       </Controls>
 
-      <ResultsBar>
+      {!isLoading && !hasError && <ResultsBar>
         <ResultsCount>
           <strong>{nouveautes.length}</strong> titre{nouveautes.length > 1 ? 's' : ''}
           <span>{contextLabel}</span>
@@ -281,9 +294,11 @@ export function NouveautesPage() {
             <option value="prix_desc">Prix décroissant</option>
           </SortSelect>
         </SortWrap>
-      </ResultsBar>
+      </ResultsBar>}
 
-      {nouveautes.length > 0 ? (
+      <CatalogueLoadState isLoading={isLoading} hasError={hasError} onRetry={loadNouveautes} />
+
+      {!isLoading && !hasError && (nouveautes.length > 0 ? (
         <Grid>
           {nouveautes.map(book => <BookCard key={book.id} book={book} showType coverFirst />)}
         </Grid>
@@ -294,7 +309,7 @@ export function NouveautesPage() {
             ? `Aucun résultat pour « ${deferred} »`
             : 'Aucun titre pour cet univers ce mois-ci.'}
         </EmptyState>
-      )}
+      ))}
     </Page>
   )
 }
