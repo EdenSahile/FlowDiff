@@ -98,7 +98,7 @@ export function RegisterPage() {
             id="codeClient"
             label="Code client"
             type="text"
-            placeholder="LIB001"
+            placeholder="Votre code client"
             value={form.codeClient}
             onChange={handleChange('codeClient')}
             error={fieldErrors.codeClient}
@@ -111,7 +111,7 @@ export function RegisterPage() {
               id="email"
               label="Email professionnel"
               type="email"
-              placeholder="contact@malibrairie.fr"
+              placeholder="Votre email professionnel"
               value={form.email}
               onChange={handleChange('email')}
               error={fieldErrors.email}

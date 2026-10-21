@@ -195,20 +195,6 @@ const CoverFrame = styled.div`
   }
 `
 
-const CoverBadgeDetail = styled.span`
-  position: absolute;
-  top: 12px;
-  left: 12px;
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: .04em;
-  padding: 3px 9px;
-  border-radius: 10px;
-  background: rgba(212,168,67,.15);
-  color: ${({ theme }) => theme.colors.accent};
-  border: 1px solid rgba(212,168,67,.4);
-  z-index: 1;
-`
 
 const CoverActionsRow = styled.div`
   display: flex;
@@ -1500,9 +1486,6 @@ export function FicheProduitPage() {
   const uvStyle        = UNIVERSE_STYLES[book.universe] ?? { bg: '#E8EDF3', color: '#1C3252' }
   const sectionLabel   = book.type === 'a-paraitre' ? 'À paraître' : book.type === 'nouveaute' ? 'Nouveautés' : 'Fonds'
   const sectionPath    = book.type === 'fonds' ? '/fonds' : '/nouveautes'
-  const showCoverBadge = book.selection || book.type === 'nouveaute' || book.type === 'a-paraitre'
-  const coverBadgeLabel =
-    book.selection ? 'SÉLECTION' : book.type === 'nouveaute' ? 'NOUVEAUTÉ' : 'À PARAÎTRE'
   const stockLabel =
     book.statut === 'disponible'   ? 'Disponible' :
     book.statut === 'sur_commande' ? 'Sur commande' :
@@ -1538,7 +1521,6 @@ export function FicheProduitPage() {
               publisher={book.publisher}
               coverUrl={book.coverUrl}
             />
-            {showCoverBadge && <CoverBadgeDetail>{coverBadgeLabel}</CoverBadgeDetail>}
           </CoverFrame>
 
           <CoverActionsRow>

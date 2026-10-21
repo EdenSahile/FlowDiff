@@ -231,7 +231,7 @@ export function LoginPage() {
               id="identifier"
               label="Code client ou email"
               type="password"
-              placeholder="LIB001 ou contact@malib.fr"
+              placeholder="Votre code client ou email"
               value={form.identifier}
               onChange={handleChange('identifier')}
               error={fieldErrors.identifier}

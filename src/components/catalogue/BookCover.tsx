@@ -89,23 +89,6 @@ const Spine = styled.div<{ $accent: string }>`
   opacity: 0.7;
 `
 
-const PubBadge = styled.div`
-  position: absolute;
-  top: 6px;
-  left: 6px;
-  background: rgba(255, 255, 255, 0.15);
-  color: #fff;
-  font-family: 'DM Mono', 'Courier New', monospace;
-  font-size: 9px;
-  padding: 2px 7px;
-  border-radius: ${({ theme }) => theme.radii.sm};
-  letter-spacing: 0.05em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: calc(100% - 18px);
-  z-index: 1;
-`
 
 const TitleArea = styled.div<{ $pad: number }>`
   position: absolute;
@@ -183,8 +166,6 @@ function BookCoverBase({
   const titleFs  = Math.max(8,  Math.round(height * 0.10))
   const authorFs = Math.max(7,  Math.round(height * 0.08))
   const pad      = Math.max(4,  Math.round(width  * 0.07))
-  const pubLabel = [publisher || null, collection || null].filter(Boolean).join(' · ')
-
   const fallbackBg     = '#232f3e'
   const fallbackAccent = '#C9A84C'
 
@@ -193,7 +174,6 @@ function BookCoverBase({
       {/* Placeholder toujours en dessous */}
       <Bg $bg={fallbackBg} />
       <Spine $accent={fallbackAccent} />
-      {pubLabel && !fill && <PubBadge>{pubLabel}</PubBadge>}
       <Deco universe={universe} accent={fallbackAccent} w={width} h={height} />
       {!fill && (
         <TitleArea $pad={pad}>
