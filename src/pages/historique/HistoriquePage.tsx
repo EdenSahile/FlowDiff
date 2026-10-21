@@ -7,7 +7,7 @@ import { useAuthContext } from '@/contexts/AuthContext'
 import { useCart, REMISE_RATES } from '@/contexts/CartContext'
 import { useClientOrders } from '@/contexts/OrdersContext'
 import { ORDER_STATUSES, ORDER_STATUS_LABELS, type OrderStatus, type Order, type OrderItem } from '@/data/mockOrders'
-import { MOCK_BOOKS } from '@/data/mockBooks'
+import { getCatalogueBookById, MOCK_BOOKS } from '@/data/mockBooks'
 import { TrackingModal } from '@/components/historique/TrackingModal'
 import type { Shipment } from '@/data/mockOrders'
 import { useReturns } from '@/contexts/ReturnsContext'
@@ -616,7 +616,7 @@ function addDaysToDate(isoDate: string, days: number): string {
 }
 
 function getBookType(bookId: string) {
-  return MOCK_BOOKS.find(b => b.id === bookId)?.type ?? 'fonds'
+  return getCatalogueBookById(bookId)?.type ?? 'fonds'
 }
 
 function isOrderMixed(order: Order): boolean {
@@ -880,7 +880,7 @@ export function HistoriquePage() {
                         <ItemIsbnRow>
                           <ItemIsbn>ISBN {item.isbn}</ItemIsbn>
                           {(() => {
-                            const book = MOCK_BOOKS.find(b => b.id === item.bookId)
+                            const book = getCatalogueBookById(item.bookId)
                             if (!book || book.type === 'a-paraitre') return null
                             return (
                               <>

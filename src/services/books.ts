@@ -1,25 +1,24 @@
-import { MOCK_BOOKS, getBookById as getBookByIdLocal } from '@/data/mockBooks'
+import { getCatalogueBookById, getCatalogueBooks } from '@/data/mockBooks'
 import type { Book, BookType, Universe } from '@/data/mockBooks'
 
 /* Le catalogue vient de MOCK_BOOKS, en mémoire. Ces fonctions restent async
    parce que les pages les consomment en await/then. */
-async function loadAllBooks(): Promise<Book[]> {
-  return MOCK_BOOKS
+async function loadAllBooks(referenceDate?: Date): Promise<Book[]> {
+  return getCatalogueBooks(referenceDate)
 }
 
-export async function getAllBooksAsync(): Promise<Book[]> {
-  return loadAllBooks()
+export async function getAllBooksAsync(referenceDate?: Date): Promise<Book[]> {
+  return loadAllBooks(referenceDate)
 }
 
-export async function getBooksByTypeAsync(type: BookType, universe?: Universe): Promise<Book[]> {
-  const all = await loadAllBooks()
+export async function getBooksByTypeAsync(type: BookType, universe?: Universe, referenceDate?: Date): Promise<Book[]> {
+  const all = await loadAllBooks(referenceDate)
   const byType = all.filter(b => b.type === type)
   return universe ? byType.filter(b => b.universe === universe) : byType
 }
 
-export async function getBookByIdAsync(id: string): Promise<Book | null> {
-  const all = await loadAllBooks()
-  return all.find(b => b.id === id) ?? getBookByIdLocal(id) ?? null
+export async function getBookByIdAsync(id: string, referenceDate?: Date): Promise<Book | null> {
+  return getCatalogueBookById(id, referenceDate) ?? null
 }
 
 export function searchBooksLocal(books: Book[], query: string): Book[] {

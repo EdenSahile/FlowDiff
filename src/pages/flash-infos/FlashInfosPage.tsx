@@ -4,7 +4,7 @@ import styled, { keyframes } from 'styled-components'
 import { mq } from '@/lib/responsive'
 import { MOCK_FLASH_INFOS, FLASH_CATEGORIES } from '@/data/mockFlashInfos'
 import type { FlashCategory } from '@/data/mockFlashInfos'
-import { getBookById, UNIVERSES } from '@/data/mockBooks'
+import { getCatalogueBookById, UNIVERSES } from '@/data/mockBooks'
 import type { Universe } from '@/data/mockBooks'
 import { useCart } from '@/contexts/CartContext'
 import { useToast } from '@/contexts/ToastContext'
@@ -489,7 +489,7 @@ export function FlashInfosPage() {
   })
 
   const handleAdd = (fiId: string, bookId: string) => {
-    const book = getBookById(bookId)
+    const book = getCatalogueBookById(bookId)
     if (!book) return
     addToCart(book, getQty(fiId))
     showToast('Ouvrage ajouté au panier')

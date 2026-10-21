@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
-import { MOCK_BOOKS } from '@/data/mockBooks'
+import { getCatalogueBooks } from '@/data/mockBooks'
 import { useCart } from '@/contexts/CartContext'
 
 export type NotifId = 'panier' | 'nouveautes' | 'topventes'
@@ -52,7 +52,7 @@ function buildNotifications(totalItems: number): Notification[] {
   }
 
   /* Nouveautés — livres de type nouveaute publiés dans les 60 derniers jours */
-  const recentNouveautes = MOCK_BOOKS.filter(b =>
+  const recentNouveautes = getCatalogueBooks().filter(b =>
     b.type === 'nouveaute' &&
     new Date(b.publicationDate) <= now &&
     now.getTime() - new Date(b.publicationDate).getTime() < WINDOW_MS

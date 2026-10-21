@@ -7,7 +7,7 @@ import { useCart } from '@/contexts/CartContext'
 import { useOrders } from '@/contexts/OrdersContext'
 import { useEDI } from '@/contexts/EDIContext'
 import { getFluxCounts } from '@/lib/ediUtils'
-import { MOCK_BOOKS } from '@/data/mockBooks'
+import { getCatalogueBooks } from '@/data/mockBooks'
 import { BookCover } from '@/components/catalogue/BookCover'
 import { usePeriodFilter, type CompareMode } from '@/hooks/usePeriodFilter'
 import { PeriodSelector, rangeLabel } from '@/components/dashboard/PeriodSelector'
@@ -29,7 +29,7 @@ import {
 } from '@/lib/exportCSV'
 import { mq } from '@/lib/responsive'
 
-const nouveautes = MOCK_BOOKS
+const nouveautes = getCatalogueBooks()
   .filter(b => b.type === 'nouveaute')
   .sort((a, b) => b.publicationDate.localeCompare(a.publicationDate))
   .slice(0, 4)
