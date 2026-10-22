@@ -10,7 +10,7 @@ export default defineConfig({
     // parked/ contient du code mis de côté, hors application. Sans cette
     // exclusion, Vitest y ramasse des tests dont les imports pointent vers
     // les emplacements d'origine, et qui échouent au chargement.
-    exclude: ['**/node_modules/**', '**/dist/**', 'parked/**'],
+    exclude: ['**/node_modules/**', '**/dist/**', 'parked/**', 'e2e/**'],
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
@@ -27,14 +27,7 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
-  server: {
-    proxy: {
-      '/api': {
-        target: 'http://localhost:4000',
-        changeOrigin: true,
-      },
-    },
-  },
+  server: {},
   build: {
     rollupOptions: {
       output: {

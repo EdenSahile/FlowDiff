@@ -358,13 +358,10 @@ Couvrir les wishlists (listes multiples, pas de doublons, validation Zod, nommag
 | FLOW-RM-100 | Pas de doublons de livres dans une même liste | `src/contexts/WishlistContext.tsx` | Aucun |
 | FLOW-RM-101 | Validation Zod au chargement (storedWishlistsSchema) | `src/contexts/WishlistContext.tsx` | `storageSchemas.test.ts` (schéma) |
 | FLOW-RM-102 | Nom de liste : 1-50 chars, non vide après trim | `src/lib/formSchemas.ts:14-18` | `formSchemas.test.ts` : 5 tests |
-| FLOW-RM-120 | Items RDV isolés par codeClient | `src/contexts/RdvContext.tsx` | Aucun |
-| FLOW-RM-121 | addToRdv incrémente la quantité si le livre existe déjà | `src/contexts/RdvContext.tsx` | Aucun |
-| FLOW-RM-122 | updateQty RDV supprime l'item si qty < 1 | `src/contexts/RdvContext.tsx` | Aucun |
-
 ### Hors périmètre
 
-storedWishlistsSchema unitaire (LOT-18), wishlistNameSchema unitaire (LOT-18).
+- FLOW-RM-120, 121, 122 (RDV) : le module RDV a été supprimé du code, ces règles n'ont plus d'emplacement à tester.
+- storedWishlistsSchema unitaire (LOT-18), wishlistNameSchema unitaire (LOT-18).
 
 ### Points à clarifier
 
@@ -629,9 +626,9 @@ Aucun.
 | FLOW-RM-117 | LOT-17 |
 | FLOW-RM-118 | LOT-17 |
 | FLOW-RM-119 | LOT-17 |
-| FLOW-RM-120 | LOT-13 |
-| FLOW-RM-121 | LOT-13 |
-| FLOW-RM-122 | LOT-13 |
+| FLOW-RM-120 | ~~LOT-13~~ hors périmètre (RDV supprimé) |
+| FLOW-RM-121 | ~~LOT-13~~ hors périmètre (RDV supprimé) |
+| FLOW-RM-122 | ~~LOT-13~~ hors périmètre (RDV supprimé) |
 | FLOW-RM-123 | LOT-18 |
 | FLOW-RM-124 | LOT-18 |
 | FLOW-RM-125 | LOT-18 |
