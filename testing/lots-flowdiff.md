@@ -406,9 +406,9 @@ Couvrir la configuration du dashboard (zones, toggle, reorder), le filtrage par 
 | -- | ----- | ----------- | --------------- |
 | FLOW-RM-107 | 4 zones configurables (actionCards, kpiCards, mainPanels, bottomPanels) | `src/hooks/useDashboardConfig.ts` | `useDashboardConfig.test.ts` |
 | FLOW-RM-108 | toggleItem empêche de masquer le dernier item visible | `src/hooks/useDashboardConfig.ts` | `useDashboardConfig.test.ts` : 1 test |
-| FLOW-RM-109 | Filtrage par période : presets + modes comparaison | `src/hooks/usePeriodFilter.ts` | Aucun |
-| FLOW-RM-110 | computeKPIs exclut les commandes annulées | `src/data/mockDashboard.ts` | Aucun |
-| FLOW-RM-111 | computeDonutData : méthode des plus grands restes | `src/data/mockDashboard.ts` | Aucun |
+| FLOW-RM-109 | Filtrage par période : presets + modes comparaison | `src/hooks/usePeriodFilter.ts` | `usePeriodFilter.test.tsx` : 7 tests (4 presets + 3 modes comparaison) |
+| FLOW-RM-110 | computeKPIs exclut les commandes annulées | `src/data/mockDashboard.ts` | `mockDashboard.test.ts` : 4 tests (montant, taux annulation, panier/délai moyen, références) |
+| FLOW-RM-111 | computeDonutData : méthode des plus grands restes | `src/data/mockDashboard.ts` | `mockDashboard.test.ts` : 5 tests (somme 100 %, plus grands restes, cas vide, univers unique, couleurs) |
 
 ### Hors périmètre
 
