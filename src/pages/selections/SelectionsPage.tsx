@@ -1,6 +1,6 @@
 import { useState, useMemo, useRef, useEffect } from 'react'
 import styled, { keyframes } from 'styled-components'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useCart } from '@/contexts/CartContext'
 import { getAllBooksAsync } from '@/services/books'
 import { UNIVERSES, type Universe, type Book } from '@/data/mockBooks'
@@ -1136,6 +1136,21 @@ function HeroTile({ serie, coverBook, onClick }: { serie: Serie; coverBook?: Boo
 ══════════════════════════════════════════════ */
 function SerieShelf({ series, allBooks, onSelect }: { series: Serie[]; allBooks: Book[]; onSelect: (s: Serie) => void }) {
   const shelfRef = useRef<HTMLDivElement>(null)
+  /* Les flèches ne s'affichent que s'il y a vraiment de quoi défiler : un rayon
+     de 3 sélections tient en entier sur un écran large. */
+  const [canScroll, setCanScroll] = useState(false)
+
+  useEffect(() => {
+    const el = shelfRef.current
+    if (!el) return
+
+    const update = () => setCanScroll(el.scrollWidth > el.clientWidth + 1)
+    update()
+
+    const observer = new ResizeObserver(update)
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [series])
 
   function scroll(dir: 'left' | 'right') {
     const el = shelfRef.current
@@ -1145,9 +1160,11 @@ function SerieShelf({ series, allBooks, onSelect }: { series: Serie[]; allBooks:
 
   return (
     <ShelfOuter>
-      <ChevronBtn $side="left" onClick={() => scroll('left')} aria-label="Défiler à gauche">
-        <IconChevronLeft />
-      </ChevronBtn>
+      {canScroll && (
+        <ChevronBtn $side="left" onClick={() => scroll('left')} aria-label="Défiler à gauche">
+          <IconChevronLeft />
+        </ChevronBtn>
+      )}
       <HorizontalShelf ref={shelfRef}>
         {series.map(serie => {
           const coverBook = resolveSerieCoverBook(serie, allBooks)
@@ -1161,9 +1178,11 @@ function SerieShelf({ series, allBooks, onSelect }: { series: Serie[]; allBooks:
           )
         })}
       </HorizontalShelf>
-      <ChevronBtn $side="right" onClick={() => scroll('right')} aria-label="Défiler à droite">
-        <IconChevronRight />
-      </ChevronBtn>
+      {canScroll && (
+        <ChevronBtn $side="right" onClick={() => scroll('right')} aria-label="Défiler à droite">
+          <IconChevronRight />
+        </ChevronBtn>
+      )}
     </ShelfOuter>
   )
 }
@@ -1187,7 +1206,13 @@ export function SelectionsPage() {
   }, [])
 
   /* État détail */
-  const [selectedSerie, setSelectedSerie] = useState<Serie | null>(null)
+  /* La sélection ouverte vient de l'URL, pas d'un état local : le bouton retour
+     du navigateur revient ainsi à la liste, et une sélection est partageable. */
+  const { serieId } = useParams()
+  const selectedSerie = useMemo(
+    () => MOCK_SERIES.find(s => s.id === serieId) ?? null,
+    [serieId],
+  )
   const [detailSearch, setDetailSearch] = useState('')
   const [addedMap, setAddedMap] = useState<Record<string, boolean>>({})
   const [qtys, setQtys] = useState<Record<string, number>>({})   // séries sans OP
@@ -1325,7 +1350,7 @@ export function SelectionsPage() {
   }
 
   function handleBack() {
-    setSelectedSerie(null)
+    navigate('/selections')
     setDetailSearch('')
   }
 
@@ -1651,7 +1676,7 @@ export function SelectionsPage() {
               <SectionTitle>{categorie}</SectionTitle>
               <SectionCount>{series.length} sélection{series.length > 1 ? 's' : ''}</SectionCount>
             </SectionHeader>
-            <SerieShelf series={series} allBooks={allBooks} onSelect={setSelectedSerie} />
+            <SerieShelf series={series} allBooks={allBooks} onSelect={s => navigate(`/selections/${s.id}`)} />
           </Section>
         ))
       )}

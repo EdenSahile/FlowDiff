@@ -119,6 +119,7 @@ export default function App() {
                     <Route path="/panier" element={<CartPage />} />
                     <Route path="/top-ventes" element={<TopVentesPage />} />
                     <Route path="/selections" element={<SelectionsPage />} />
+                    <Route path="/selections/:serieId" element={<SelectionsPage />} />
                     <Route path="/auteur/:auteurSlug" element={<AuteurPage />} />
                     <Route path="/flash-infos" element={<FlashInfosPage />} />
                     <Route path="/compte" element={<MonComptePage />} />
