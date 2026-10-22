@@ -455,14 +455,15 @@ Couvrir le calcul de remise sur les factures, la TVA 5,5% facturation, et les m�
 
 | ID | Règle | Emplacement | Tests existants |
 | -- | ----- | ----------- | --------------- |
-| FLOW-RM-116 | Calcul remise facture : ppHT * (1 - remisePct/100) | `src/data/mockFactures.ts` | Aucun |
-| FLOW-RM-117 | TVA 5,5% sur les factures | `src/data/mockFactures.ts` | Aucun |
-| FLOW-RM-118 | Quantités proposées par office | `src/data/mockOffices.ts` | Aucun |
-| FLOW-RM-119 | Date limite de validation par office | `src/data/mockOffices.ts` | Aucun |
+| FLOW-RM-116 | Calcul remise facture : ppHT * (1 - remisePct/100) | `src/data/mockFactures.ts` | `mockFactures.test.ts` : 3 tests (puHT avec remise, puHT sans remise, montantHT) |
+| FLOW-RM-117 | TVA 5,5% sur les factures | `src/data/mockFactures.ts` | `mockFactures.test.ts` : 3 tests (taux, montantTVA, totalTTC) |
+| FLOW-RM-118 | Quantités proposées par office | `src/data/mockOffices.ts` | Reporté : la page offices n'existe pas encore |
+| FLOW-RM-119 | Date limite de validation par office | `src/data/mockOffices.ts` | Reporté : la page offices n'existe pas encore |
 
 ### Hors périmètre
 
-Validation des offices dans DemoStateContext (comportement technique lié à la démo).
+- Validation des offices dans DemoStateContext (comportement technique lié à la démo).
+- FLOW-RM-118 et 119 reportés : la page offices n'existe pas encore et sera probablement retravaillée, écrire les tests maintenant serait du travail perdu.
 
 ### Points à clarifier
 
@@ -490,12 +491,13 @@ Couvrir les utilitaires partagés (export CSV, schémas de validation Zod pour s
 | FLOW-RM-130 | contactSchema : sujet 2-200, message 10-2000, trimmed | `src/lib/formSchemas.ts:4-7` | `formSchemas.test.ts` : 6 tests |
 | FLOW-RM-131 | newsletterSchema : email valide, >= 1 newsletter | `src/lib/formSchemas.ts:9-12` | `formSchemas.test.ts` : 4 tests |
 | FLOW-RM-132 | cartQtySchema : entier entre 1 et 30 | `src/lib/formSchemas.ts:20-24` | `formSchemas.test.ts` : 6 tests |
-| FLOW-RM-133 | Feedback widget : limite 500 caractères | `src/components/ui/FeedbackWidget.tsx` | `FeedbackWidget.test.ts` : 1 test |
-| FLOW-RM-134 | Feedback widget : détection automatique du nom de page | `src/components/ui/FeedbackWidget.tsx` | `FeedbackWidget.test.ts` |
+| FLOW-RM-133 | Feedback widget : limite 500 caractères | `parked/feedback/` | Reporté : composant parqué, plus dans `src/` |
+| FLOW-RM-134 | Feedback widget : détection automatique du nom de page | `parked/feedback/` | Reporté : composant parqué, plus dans `src/` |
 
 ### Hors périmètre
 
-Logique de purge des contexts qui utilisent ces schémas (chaque lot couvre son propre context).
+- Logique de purge des contexts qui utilisent ces schémas (chaque lot couvre son propre context).
+- FLOW-RM-133 et 134 reportés : le FeedbackWidget a été déplacé dans `parked/feedback/` et n'est plus dans le build actif.
 
 ### Points à clarifier
 
