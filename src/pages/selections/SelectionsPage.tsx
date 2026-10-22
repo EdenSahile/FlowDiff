@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { useCart } from '@/contexts/CartContext'
 import { getAllBooksAsync } from '@/services/books'
 import { UNIVERSES, type Universe, type Book } from '@/data/mockBooks'
-import { MOCK_SERIES, type Serie, type OffreCommerciale } from '@/data/mockSeries'
+import { MOCK_SERIES, MENTION_PRIME, type Serie, type OffreCommerciale } from '@/data/mockSeries'
 import { BookCover } from '@/components/catalogue/BookCover'
 import { mq } from '@/lib/responsive'
 import { BackButton as BackNavButton } from '@/components/ui/BackButton'
@@ -525,6 +525,13 @@ const OPInfoTitle = styled.div`
   font-weight: 900;
   color: ${({ theme }) => theme.colors.navy};
   line-height: 1.25;
+`
+
+const OPInfoMention = styled.div`
+  margin-top: 6px;
+  font-size: 10px;
+  line-height: 1.35;
+  color: ${({ theme }) => theme.colors.gray[600]};
 `
 
 /* ══════════════════════════════════════════════
@@ -1076,26 +1083,38 @@ function PLVSection({ offre, nom }: { offre: OffreCommerciale; nom: string }) {
           {offre.validUntil && <OPInfoValidity>jusqu'au {offre.validUntil}</OPInfoValidity>}
         </OPInfoTopRow>
         <OPInfoTitle>{offre.description}</OPInfoTitle>
+        <OPInfoMention>* {MENTION_PRIME}</OPInfoMention>
       </OPInfoCard>
 
     </PLVSectionWrapper>
   )
 }
 
+// La vignette d'une série montre la couverture d'un de ses titres. On vise
+// coverBookId, puis on se rabat sur le premier titre de la série, car un
+// coverBookId peut désigner un livre qui n'est plus au catalogue.
+function resolveSerieCoverBook(serie: Serie, books: Book[]): Book | undefined {
+  for (const id of [serie.coverBookId, ...serie.bookIds]) {
+    const book = books.find(b => b.id === id)
+    if (book) return book
+  }
+  return undefined
+}
+
 /* ══════════════════════════════════════════════
    COMPOSANT TUILE
 ══════════════════════════════════════════════ */
-function HeroTile({ serie, resolvedCoverUrl, onClick }: { serie: Serie; resolvedCoverUrl?: string; onClick: () => void }) {
+function HeroTile({ serie, coverBook, onClick }: { serie: Serie; coverBook?: Book; onClick: () => void }) {
   return (
-    <Tile onClick={onClick} aria-label={`Voir la série ${serie.nom}`}>
+    <Tile onClick={onClick} aria-label={`Voir la sélection ${serie.nom}`}>
       <CoverWrapper>
         <BookCover
-          isbn={serie.coverBookId}
+          isbn={coverBook?.isbn ?? ''}
           alt={serie.nom}
           width={150}
           height={225}
           universe={serie.univers}
-          coverUrl={resolvedCoverUrl}
+          coverUrl={coverBook?.coverUrl}
         />
       </CoverWrapper>
       <TileGradient />
@@ -1131,12 +1150,12 @@ function SerieShelf({ series, allBooks, onSelect }: { series: Serie[]; allBooks:
       </ChevronBtn>
       <HorizontalShelf ref={shelfRef}>
         {series.map(serie => {
-          const coverBook = allBooks.find(b => b.id === serie.coverBookId)
+          const coverBook = resolveSerieCoverBook(serie, allBooks)
           return (
             <HeroTile
               key={serie.id}
               serie={serie}
-              resolvedCoverUrl={coverBook?.coverUrl}
+              coverBook={coverBook}
               onClick={() => onSelect(serie)}
             />
           )
@@ -1222,6 +1241,11 @@ export function SelectionsPage() {
       .filter(Boolean)
       .sort((a, b) => b!.publicationDate.localeCompare(a!.publicationDate)) as Book[]
   }, [allBooks, selectedSerie])
+
+  const selectedSerieCover = useMemo(
+    () => (selectedSerie ? resolveSerieCoverBook(selectedSerie, allBooks) : undefined),
+    [allBooks, selectedSerie],
+  )
 
   const filteredDetailBooks = useMemo(() => {
     const q = detailSearch.trim().toLowerCase()
@@ -1333,12 +1357,12 @@ export function SelectionsPage() {
         <SerieHeader>
           <SerieHeaderCover>
             <BookCover
-              isbn={selectedSerie.coverBookId}
+              isbn={selectedSerieCover?.isbn ?? ''}
               alt={selectedSerie.nom}
               width={80}
               height={120}
               universe={selectedSerie.univers}
-              coverUrl={serieBooks[0]?.coverUrl}
+              coverUrl={selectedSerieCover?.coverUrl}
             />
           </SerieHeaderCover>
 
@@ -1618,14 +1642,14 @@ export function SelectionsPage() {
       {groupedSections.length === 0 ? (
         <EmptyState>
           <div style={{ fontSize: '2.5rem', marginBottom: '12px' }}>📚</div>
-          <p style={{ margin: 0 }}>Aucune série pour cette sélection.</p>
+          <p style={{ margin: 0 }}>Aucune sélection pour ce filtre.</p>
         </EmptyState>
       ) : (
         groupedSections.map(([categorie, series]) => (
           <Section key={categorie}>
             <SectionHeader>
               <SectionTitle>{categorie}</SectionTitle>
-              <SectionCount>{series.length} série{series.length > 1 ? 's' : ''}</SectionCount>
+              <SectionCount>{series.length} sélection{series.length > 1 ? 's' : ''}</SectionCount>
             </SectionHeader>
             <SerieShelf series={series} allBooks={allBooks} onSelect={setSelectedSerie} />
           </Section>
