@@ -24,11 +24,9 @@ function buildHtml(f: Facture): string {
       <td>${l.editeur}</td>
       <td class="center">${l.quantite}</td>
       <td class="right gray">${fmtEur(ppTTC)}</td>
-      <td class="right gray">${fmtEur(l.ppHT)}</td>
       <td class="center remise-pct">${fmtPct(l.remisePct)}</td>
       <td class="right bold">${fmtEur(l.puHT)}</td>
       <td class="right bold">${fmtEur(l.montantHT)}</td>
-      <td class="right">${fmtEur(l.montantTTC)}</td>
     </tr>`
   }).join('')
 
@@ -357,11 +355,9 @@ function buildHtml(f: Facture): string {
           <th style="width:72px">Éditeur</th>
           <th style="width:28px" class="center">Qté</th>
           <th style="width:56px" class="right">PP T.T.C.</th>
-          <th style="width:54px" class="right">PP H.T.</th>
           <th style="width:44px" class="center">Rem %</th>
           <th style="width:58px" class="right">PU H.T.</th>
           <th style="width:66px" class="right">Mnt H.T.</th>
-          <th style="width:68px" class="right">Mnt T.T.C.</th>
         </tr>
       </thead>
       <tbody>
@@ -380,7 +376,7 @@ function buildHtml(f: Facture): string {
           <td>${fmtEur(f.netHT)}</td>
         </tr>
         <tr>
-          <td>TVA ${f.tauxTVA}&nbsp;% (livres)</td>
+          <td>TVA ${f.tauxTVA.toLocaleString('fr-FR')}&nbsp;% (livres)</td>
           <td>${fmtEur(f.montantTVA)}</td>
         </tr>
         <tr class="totals-total-row">
@@ -416,7 +412,7 @@ function buildHtml(f: Facture): string {
   <div class="legal">
     <p><strong>Pénalités de retard</strong>&nbsp;: En cas de non-paiement à l'échéance, des pénalités de retard au taux de 3&nbsp;fois le taux d'intérêt légal en vigueur seront exigibles de plein droit, sans mise en demeure préalable (art.&nbsp;L.441-10 C.com.). Le taux d'intérêt légal applicable est celui fixé par décret semestriel.</p>
     <p><strong>Indemnité forfaitaire pour frais de recouvrement</strong>&nbsp;: Tout retard de paiement entraîne de plein droit le versement d'une indemnité forfaitaire de <strong>40&nbsp;€</strong> pour frais de recouvrement (décret&nbsp;n°&nbsp;2012-1115 du 02/10/2012). Lorsque les frais de recouvrement exposés sont supérieurs à ce montant, une indemnité complémentaire pourra être réclamée sur justificatif.</p>
-    <p><strong>Pas d'escompte</strong> pour paiement anticipé. Facture soumise à la TVA au taux de ${f.tauxTVA}&nbsp;% (taux réduit applicable aux livres — art.&nbsp;278-0 bis CGI). TVA collectée sur les débits.</p>
+    <p><strong>Pas d'escompte</strong> pour paiement anticipé. Facture soumise à la TVA au taux de ${f.tauxTVA.toLocaleString('fr-FR')}&nbsp;% (taux réduit applicable aux livres — art.&nbsp;278-0 bis CGI). TVA collectée sur les débits.</p>
   </div>
 
   <!-- Pied de page -->
