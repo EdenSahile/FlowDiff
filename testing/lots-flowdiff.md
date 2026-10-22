@@ -432,8 +432,8 @@ Couvrir l'affichage des statuts de stock (tooltips sur_commande/en_reimp), la mo
 | -- | ----- | ----------- | --------------- |
 | FLOW-RM-112 | Tooltip sur_commande : « 7-15 jours ouvrés » | `src/components/ui/StockStatus.tsx` | `StockStatus.test.tsx` : 1 test |
 | FLOW-RM-113 | Tooltip en_reimp : délai si fourni, sinon « Délai non communiqué » | `src/components/ui/StockStatus.tsx` | `StockStatus.test.tsx` : 2 tests |
-| FLOW-RM-114 | Modale confirmation pour sur_commande et en_reimp avant ajout | `src/components/ui/StockAlertModal.tsx` | Aucun |
-| FLOW-RM-115 | en_reimp : ajouté comme reliquat au panier | `src/components/ui/StockAlertModal.tsx` | Aucun |
+| FLOW-RM-114 | Modale confirmation pour sur_commande et en_reimp avant ajout | `src/components/ui/StockAlertModal.tsx` | `StockAlertModal.test.tsx` : 6 tests (contenu, rendu conditionnel, callbacks) |
+| FLOW-RM-115 | en_reimp : ajouté comme reliquat au panier | `src/components/ui/StockAlertModal.tsx` | `StockAlertModal.test.tsx` : 2 tests (message reliquat, bouton libellé) |
 
 ### Hors périmètre
 
