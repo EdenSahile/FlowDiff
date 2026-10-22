@@ -8,7 +8,6 @@ import type { Book } from '@/data/mockBooks'
 import { BookCover } from '@/components/catalogue/BookCover'
 import { useCart } from '@/contexts/CartContext'
 import { useToast } from '@/contexts/ToastContext'
-import { useRdv } from '@/contexts/RdvContext'
 import { ListPickerPopover } from '@/components/catalogue/ListPickerPopover'
 import { StockAlertModal } from '@/components/ui/StockAlertModal'
 import { slugifyAuthor } from '@/lib/slugify'
@@ -994,68 +993,7 @@ const ArgMetaValue = styled.span`
   font-family: ${({ theme }) => theme.typography.fontFamily};
 `
 
-const PdfCartZone = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
-`
 
-const PdfAddBtn = styled.button<{ $added: boolean }>`
-  height: 40px;
-  padding: 0 14px;
-  border: 1.5px solid ${({ $added, theme }) => $added ? theme.colors.primaryHover : theme.colors.accent};
-  border-radius: ${({ theme }) => theme.radii.lg};
-  background: ${({ $added, theme }) => $added ? theme.colors.primaryLight : 'transparent'};
-  color: ${({ theme }) => theme.colors.navy};
-  font-family: ${({ theme }) => theme.typography.fontFamily};
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  white-space: nowrap;
-  transition: background .2s, border-color .2s;
-  &:hover:not(:disabled) {
-    background: ${({ theme }) => theme.colors.accent};
-    color: #3d2f00;
-  }
-`
-
-const QtyControlModal = styled.div`
-  display: flex;
-  align-items: center;
-  border: 2px solid ${({ theme }) => theme.colors.gray[200]};
-  border-radius: ${({ theme }) => theme.radii.lg};
-  overflow: hidden;
-  background: ${({ theme }) => theme.colors.gray[50]};
-`
-
-const QtyBtnModal = styled.button`
-  width: 40px; height: 44px;
-  background: none;
-  border: none;
-  font-size: 18px;
-  font-weight: 700;
-  color: ${({ theme }) => theme.colors.navy};
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background .1s;
-  &:hover   { background: ${({ theme }) => theme.colors.gray[200]}; }
-  &:disabled{ opacity: .3; cursor: not-allowed; }
-`
-
-const QtyValueModal = styled.span`
-  min-width: 48px;
-  text-align: center;
-  font-family: ${({ theme }) => theme.typography.fontFamily};
-  font-size: 17px;
-  font-weight: 800;
-  color: ${({ theme }) => theme.colors.navy};
-`
 
 const InteriorPageNum = styled.p`
   text-align: center;
@@ -1287,12 +1225,8 @@ export function FicheProduitPage() {
   const navigate      = useNavigate()
   const { addToCart } = useCart()
   const { showToast } = useToast()
-  const { addToRdv, isInRdv } = useRdv()
-
   const [qty, setQty]           = useState(1)
   const [added, setAdded]       = useState(false)
-  const [pdfQty, setPdfQty]     = useState(1)
-  const [pdfAdded, setPdfAdded] = useState(false)
   const [formatId, setFormatId] = useState<FormatId>('broche')
   const [listAnchor, setListAnchor] = useState<DOMRect | null>(null)
   const [alertOpen, setAlertOpen]   = useState(false)
@@ -1387,12 +1321,6 @@ export function FicheProduitPage() {
     if (isEpuise) return
     if (needsConfirm) { setAlertOpen(true); return }
     performAdd(false)
-  }
-
-  const handlePdfRdv = () => {
-    addToRdv(book, pdfQty)
-    setPdfAdded(true)
-    setTimeout(() => setPdfAdded(false), 2000)
   }
 
   const handleContactRep = () => {
@@ -1725,14 +1653,16 @@ export function FicheProduitPage() {
                 Bande annonce
               </SecBtnHoriz>
             )}
-            <SecBtnHoriz onClick={handleContactRep}>
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
-                <polyline points="16 6 12 2 8 6"/>
-                <line x1="12" y1="2" x2="12" y2="15"/>
-              </svg>
-              Contacter le représentant
-            </SecBtnHoriz>
+            {!isAParaitre && (
+              <SecBtnHoriz onClick={handleContactRep}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+                  <polyline points="16 6 12 2 8 6"/>
+                  <line x1="12" y1="2" x2="12" y2="15"/>
+                </svg>
+                Contacter le représentant
+              </SecBtnHoriz>
+            )}
           </SecondaryActionsHoriz>
 
           <SynopsisBlock>
@@ -1865,24 +1795,7 @@ export function FicheProduitPage() {
                 </PageDots>
                 <NavArrow $disabled={pageIdx === TOTAL_PAGES - 1} disabled={pageIdx === TOTAL_PAGES - 1} onClick={() => setPageIdx(i => Math.min(TOTAL_PAGES - 1, i + 1))} aria-label="Page suivante">›</NavArrow>
               </div>
-              <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
-                {isAParaitre && (
-                  <PdfCartZone>
-                    <QtyControlModal>
-                      <QtyBtnModal onClick={() => setPdfQty(q => Math.max(1, q - 1))} disabled={pdfQty <= 1} aria-label="Diminuer">−</QtyBtnModal>
-                      <QtyValueModal style={{ minWidth: 36, fontSize: 15 }}>{pdfQty}</QtyValueModal>
-                      <QtyBtnModal onClick={() => setPdfQty(q => q + 1)} aria-label="Augmenter">+</QtyBtnModal>
-                    </QtyControlModal>
-                    <PdfAddBtn
-                      $added={pdfAdded || isInRdv(book.id)}
-                      onClick={handlePdfRdv}
-                      aria-label="Ajouter à ma sélection RDV"
-                    >
-                      {pdfAdded ? '✓ Ajouté !' : isInRdv(book.id) ? '✓ Dans ma sélection' : 'Sélectionner pour RDV'}
-                    </PdfAddBtn>
-                  </PdfCartZone>
-                )}
-              </div>
+              <div style={{ flex: 1 }} />
             </PdfNav>
           </PdfModal>
         </ModalOverlay>,

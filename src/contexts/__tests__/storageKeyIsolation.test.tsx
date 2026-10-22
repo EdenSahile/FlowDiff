@@ -13,7 +13,6 @@ vi.mock('@/contexts/ToastContext', () => ({
 import { useAuthContext } from '@/contexts/AuthContext'
 import { CartProvider, useCart } from '@/contexts/CartContext'
 import { WishlistProvider, useWishlist } from '@/contexts/WishlistContext'
-import { RdvProvider, useRdv } from '@/contexts/RdvContext'
 import { OrdersProvider, useOrders } from '@/contexts/OrdersContext'
 
 const mockAuth = vi.mocked(useAuthContext)
@@ -168,53 +167,6 @@ describe('FLOW-RM-020 : isolation par codeClient', () => {
     })
   })
 
-  describe('RDVContext (bookflow_rdv_*)', () => {
-    function Wrapper({ children }: { children: ReactNode }) {
-      return <RdvProvider>{children}</RdvProvider>
-    }
-
-    it('charge les RDV depuis bookflow_rdv_{codeClient}', () => {
-      localStorage.setItem('bookflow_rdv_LIB001', JSON.stringify([
-        { book: { id: 'b1' }, quantity: 3 },
-      ]))
-
-      mockAuth.mockReturnValue(authUser('LIB001'))
-
-      const { result } = renderHook(() => useRdv(), { wrapper: Wrapper })
-
-      expect(result.current.items).toHaveLength(1)
-      expect(result.current.items[0].quantity).toBe(3)
-    })
-
-    it('utilise le suffixe guest quand aucun user n\'est connecté', () => {
-      localStorage.setItem('bookflow_rdv_guest', JSON.stringify([
-        { book: { id: 'guest-rdv' }, quantity: 1 },
-      ]))
-
-      mockAuth.mockReturnValue(authGuest())
-
-      const { result } = renderHook(() => useRdv(), { wrapper: Wrapper })
-
-      expect(result.current.items).toHaveLength(1)
-      expect(result.current.items[0].book.id).toBe('guest-rdv')
-    })
-
-    it('isole les données entre deux codeClients', () => {
-      localStorage.setItem('bookflow_rdv_LIB001', JSON.stringify([
-        { book: { id: 'rdv-001' }, quantity: 2 },
-      ]))
-      localStorage.setItem('bookflow_rdv_LIB002', JSON.stringify([
-        { book: { id: 'rdv-002' }, quantity: 7 },
-      ]))
-
-      mockAuth.mockReturnValue(authUser('LIB001'))
-
-      const { result } = renderHook(() => useRdv(), { wrapper: Wrapper })
-
-      expect(result.current.items).toHaveLength(1)
-      expect(result.current.items[0].book.id).toBe('rdv-001')
-    })
-  })
 
   describe('OrdersContext (bookflow_orders_*)', () => {
     function Wrapper({ children }: { children: ReactNode }) {

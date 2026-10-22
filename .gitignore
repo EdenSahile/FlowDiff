@@ -81,3 +81,4 @@ bun.lockb
 *.skill
 CONTEXT.md
 handoffs/
+test-results/
