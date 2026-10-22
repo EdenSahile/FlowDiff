@@ -379,10 +379,10 @@ Couvrir les 3 types de notifications, les conditions de déclenchement (panier n
 
 | ID | Règle | Emplacement | Tests existants |
 | -- | ----- | ----------- | --------------- |
-| FLOW-RM-103 | 3 types : panier, nouveautes, topventes | `src/contexts/NotificationsContext.tsx` | Aucun |
-| FLOW-RM-104 | Notification panier si panier non vide | `src/contexts/NotificationsContext.tsx` | Aucun |
-| FLOW-RM-105 | Notification nouveautés basée sur livres publiés dans les 60 derniers jours | `src/contexts/NotificationsContext.tsx` | Aucun |
-| FLOW-RM-106 | État « lu » non persisté (mémoire uniquement) | `src/contexts/NotificationsContext.tsx` | Aucun |
+| FLOW-RM-103 | 3 types : panier, nouveautes, topventes | `src/contexts/NotificationsContext.tsx` | `notifications.test.tsx` : 1 test |
+| FLOW-RM-104 | Notification panier si panier non vide | `src/contexts/NotificationsContext.tsx` | `notifications.test.tsx` : 2 tests |
+| FLOW-RM-105 | Notification nouveautés basée sur livres publiés dans les 60 derniers jours | `src/contexts/NotificationsContext.tsx` | `notifications.test.tsx` : 3 tests |
+| FLOW-RM-106 | État « lu » non persisté (mémoire uniquement) | `src/contexts/NotificationsContext.tsx` | `notifications.test.tsx` : 1 test |
 
 ### Hors périmètre
 

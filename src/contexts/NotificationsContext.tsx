@@ -35,7 +35,7 @@ function relativeTime(date: Date): string {
   return 'ce mois-ci'
 }
 
-function buildNotifications(totalItems: number): Notification[] {
+export function buildNotifications(totalItems: number): Notification[] {
   const now = new Date()
   const notifs: Notification[] = []
 
