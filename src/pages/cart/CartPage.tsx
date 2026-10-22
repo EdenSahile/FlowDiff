@@ -1155,6 +1155,10 @@ export function CartPage() {
   const universeRates = [...new Set(allUniverses)].map(u => getUserRate(u) * 100)
   const hasMultiRates = new Set(universeRates).size > 1
 
+  /* La PLV est au taux normal : le récapitulatif doit annoncer les 2 taux. */
+  const hasPLV = opGroups.some(op => op.plv.quantity > 0)
+  const tvaLabel = hasPLV ? 'TVA 5,5% et 20%' : 'TVA 5,5%'
+
   const deliveryLabel = delivery === 'standard'
     ? 'Délai habituel (1–3 jours ouvrés)'
     : specificDate || 'Date à préciser'
@@ -1315,7 +1319,7 @@ export function CartPage() {
           <RecapRow><span>Montant HT</span><span>{fmt(montantHT)}</span></RecapRow>
           <RecapRow><span>Remise</span><span>− {fmt(remiseAmount / 1.055)}</span></RecapRow>
           <RecapRow><span>Net HT</span><span>{fmt(netHT)}</span></RecapRow>
-          <RecapRow><span>TVA 5,5%</span><span>{fmt(tva)}</span></RecapRow>
+          <RecapRow><span>{tvaLabel}</span><span>{fmt(tva)}</span></RecapRow>
           <RecapRow style={{ fontWeight: 700, fontSize: '1rem', color: theme.colors.success, paddingTop: '8px' }}>
             <span>Total TTC</span><span>{fmt(totalTTC)}</span>
           </RecapRow>
@@ -1795,7 +1799,7 @@ export function CartPage() {
                 <span>{fmt(netHT)}</span>
               </RecapSideRow>
               <RecapSideRow>
-                <span>TVA 5,5%</span>
+                <span>{tvaLabel}</span>
                 <span>{fmt(tva)}</span>
               </RecapSideRow>
               <RecapSideDivider />
