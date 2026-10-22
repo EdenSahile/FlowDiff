@@ -8,7 +8,6 @@ import { OrdersProvider } from '@/contexts/OrdersContext'
 import { ReturnsProvider } from '@/contexts/ReturnsContext'
 import { EDIProvider } from '@/contexts/EDIContext'
 import { WishlistProvider } from '@/contexts/WishlistContext'
-import { RdvProvider } from '@/contexts/RdvContext'
 import { ToastProvider } from '@/contexts/ToastContext'
 import { OnboardingProvider } from '@/contexts/OnboardingContext'
 import { NotificationsProvider } from '@/contexts/NotificationsContext'
@@ -37,7 +36,6 @@ const SelectionsPage   = lazy(() => import('@/pages/selections/SelectionsPage').
 const TopVentesPage    = lazy(() => import('@/pages/top-ventes/TopVentesPage').then(m => ({ default: m.TopVentesPage })))
 const AuteurPage       = lazy(() => import('@/pages/auteur/AuteurPage').then(m => ({ default: m.AuteurPage })))
 const FacturationPage  = lazy(() => import('@/pages/facturation/FacturationPage').then(m => ({ default: m.FacturationPage })))
-const RdvPage          = lazy(() => import('@/pages/rdv/RdvPage').then(m => ({ default: m.RdvPage })))
 const EDIPage          = lazy(() => import('@/pages/edi/EDIPage').then(m => ({ default: m.EDIPage })))
 const OfficesPage      = lazy(() => import('@/pages/offices/OfficesPage').then(m => ({ default: m.OfficesPage })))
 const AParaitrePage    = lazy(() => import('@/pages/a-paraitre/AParaitrePage').then(m => ({ default: m.AParaitrePage })))
@@ -72,7 +70,6 @@ function usePrefetchPages() {
       import('@/pages/aide/AidePage')
       import('@/pages/cgv/CGVPage')
       import('@/pages/newsletter/NewsletterPage')
-      import('@/pages/rdv/RdvPage')
     }, 100)
     return () => clearTimeout(t)
   }, [])
@@ -98,7 +95,6 @@ export default function App() {
             <CartProvider>
               <NotificationsProvider>
               <WishlistProvider>
-              <RdvProvider>
               <OrdersProvider>
               <EDIProvider>
               <DemoStateProvider>
@@ -133,7 +129,6 @@ export default function App() {
                     <Route path="/cgv" element={<CGVPage />} />
                     <Route path="/newsletter" element={<NewsletterPage />} />
                     <Route path="/facturation" element={<FacturationPage />} />
-                    <Route path="/rdv-representant" element={<RdvPage />} />
                     <Route path="/edi" element={<EDIPage />} />
                     <Route path="/offices" element={<OfficesPage />} />
                     <Route path="*" element={<Navigate to="/" replace />} />
@@ -146,7 +141,6 @@ export default function App() {
               </DemoStateProvider>
               </EDIProvider>
               </OrdersProvider>
-              </RdvProvider>
               </WishlistProvider>
               </NotificationsProvider>
             </CartProvider>

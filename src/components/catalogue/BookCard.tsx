@@ -13,7 +13,6 @@ import { StockStatus } from '@/components/ui/StockStatus'
 import { StockAlertModal } from '@/components/ui/StockAlertModal'
 import { theme } from '@/lib/theme'
 import { formatPrice } from '@/lib/format'
-import { RdvPopup } from '@/components/catalogue/RdvPopup'
 
 const CATEGORY_COLORS: Record<string, { bg: string; text: string }> = {
   'Littérature':     { bg: '#E8EDF3', text: '#1C3252' },
@@ -587,7 +586,6 @@ export function BookCard({ book, showType = false, coverFirst = false }: Props) 
   const [added, setAdded] = useState(false)
   const [popoverAnchor, setPopoverAnchor] = useState<DOMRect | null>(null)
   const [alertOpen, setAlertOpen] = useState(false)
-  const [rdvAnchor, setRdvAnchor] = useState<DOMRect | null>(null)
   const [notesPopinOpen, setNotesPopinOpen] = useState(false)
   const starRef = useRef<HTMLDivElement>(null)
 
@@ -924,14 +922,6 @@ export function BookCard({ book, showType = false, coverFirst = false }: Props) 
           statut={book.statut}
           onConfirm={() => { setAlertOpen(false); confirmAdd(book.statut === 'en_reimp') }}
           onCancel={() => setAlertOpen(false)}
-        />
-      )}
-
-      {rdvAnchor && (
-        <RdvPopup
-          book={book}
-          anchorRect={rdvAnchor}
-          onClose={() => setRdvAnchor(null)}
         />
       )}
 
