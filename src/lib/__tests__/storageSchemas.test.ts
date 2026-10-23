@@ -41,6 +41,34 @@ describe('storedCartSchema', () => {
     const data = { items: [], opGroups: [], extra: 'ignored' }
     expect(storedCartSchema.safeParse(data).success).toBe(true)
   })
+
+  /* FLOW-RM-127 : un panier relu d'un ancien localStorage peut n'avoir aucune des 2 clés */
+  it('défaut à [] si opGroups est absent', () => {
+    const cartWithoutOpGroups = { items: [] }
+
+    const parsedCart = storedCartSchema.safeParse(cartWithoutOpGroups)
+
+    expect(parsedCart.success).toBe(true)
+    if (parsedCart.success) expect(parsedCart.data.opGroups).toEqual([])
+  })
+
+  it('défaut à [] pour les 2 clés si le panier stocké est vide', () => {
+    const emptyCart = {}
+
+    const parsedCart = storedCartSchema.safeParse(emptyCart)
+
+    expect(parsedCart.success).toBe(true)
+    if (parsedCart.success) expect(parsedCart.data).toEqual({ items: [], opGroups: [] })
+  })
+
+  it('conserve les champs du livre autres que son id', () => {
+    const cartWithFullBook = { items: [{ book: { id: 'b1', title: 'Dandadan', isbn: '9782380713384' }, quantity: 2 }], opGroups: [] }
+
+    const parsedCart = storedCartSchema.safeParse(cartWithFullBook)
+
+    expect(parsedCart.success).toBe(true)
+    if (parsedCart.success) expect(parsedCart.data.items[0].book).toEqual({ id: 'b1', title: 'Dandadan', isbn: '9782380713384' })
+  })
 })
 
 /* ── storedOrdersSchema ── */
@@ -88,6 +116,40 @@ describe('storedOrdersSchema', () => {
     expect(storedOrdersSchema.safeParse([{ ...validOrder, status: 'expédié' }]).success).toBe(true)
     expect(storedOrdersSchema.safeParse([{ ...validOrder, status: 'livré' }]).success).toBe(true)
   })
+
+  /* FLOW-RM-128 : transmissionMode et ediStatus sont optionnels mais contraints quand ils sont là */
+  it('accepte les 2 modes de transmission', () => {
+    expect(storedOrdersSchema.safeParse([{ ...validOrder, transmissionMode: 'FLOWDIFF' }]).success).toBe(true)
+    expect(storedOrdersSchema.safeParse([{ ...validOrder, transmissionMode: 'EDI' }]).success).toBe(true)
+  })
+
+  it('refuse un mode de transmission inconnu', () => {
+    const orderWithUnknownTransmission = [{ ...validOrder, transmissionMode: 'FAX' }]
+
+    expect(storedOrdersSchema.safeParse(orderWithUnknownTransmission).success).toBe(false)
+  })
+
+  it('accepte les 4 statuts EDI', () => {
+    for (const ediStatus of ['PENDING', 'SENT', 'ACK', 'ERROR']) {
+      expect(storedOrdersSchema.safeParse([{ ...validOrder, ediStatus }]).success).toBe(true)
+    }
+  })
+
+  it('refuse un statut EDI inconnu', () => {
+    const orderWithUnknownEdiStatus = [{ ...validOrder, ediStatus: 'RECU' }]
+
+    expect(storedOrdersSchema.safeParse(orderWithUnknownEdiStatus).success).toBe(false)
+  })
+
+  it('refuse une commande seule, hors tableau', () => {
+    expect(storedOrdersSchema.safeParse(validOrder).success).toBe(false)
+  })
+
+  it('refuse un montant passé en chaîne de caractères', () => {
+    const orderWithStringTotal = [{ ...validOrder, totalTTC: '94.95' }]
+
+    expect(storedOrdersSchema.safeParse(orderWithStringTotal).success).toBe(false)
+  })
 })
 
 /* ── storedWishlistsSchema ── */
@@ -128,5 +190,35 @@ describe('storedWishlistsSchema', () => {
   it('accepte des items inconnus dans la liste (passthrough)', () => {
     const data = [{ ...validList, items: [{ book: { id: 'b1' }, addedAt: '2024-01-15T10:00:00.000Z' }] }]
     expect(storedWishlistsSchema.safeParse(data).success).toBe(true)
+  })
+
+  /* FLOW-RM-129 : les 4 champs du type Wishlist traversent la relecture sans perte */
+  it('conserve les 4 champs d\'une liste et le détail de ses items', () => {
+    const listWithOneItem = [{
+      ...validList,
+      items: [{ book: { id: 'b1', title: 'Dandadan' }, addedAt: '2024-01-15T10:00:00.000Z' }],
+    }]
+
+    const parsedLists = storedWishlistsSchema.safeParse(listWithOneItem)
+
+    expect(parsedLists.success).toBe(true)
+    if (parsedLists.success) expect(parsedLists.data[0]).toEqual(listWithOneItem[0])
+  })
+
+  it('refuse une liste sans items', () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { items: _items, ...rest } = validList
+
+    expect(storedWishlistsSchema.safeParse([rest]).success).toBe(false)
+  })
+
+  it('refuse une liste seule, hors tableau', () => {
+    expect(storedWishlistsSchema.safeParse(validList).success).toBe(false)
+  })
+
+  it('refuse un nom de liste non textuel', () => {
+    const listWithNumericName = [{ ...validList, name: 42 }]
+
+    expect(storedWishlistsSchema.safeParse(listWithNumericName).success).toBe(false)
   })
 })

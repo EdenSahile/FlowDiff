@@ -7,7 +7,9 @@ export const contactSchema = z.object({
 })
 
 export const newsletterSchema = z.object({
-  email:    z.string().email('Adresse email invalide').trim().toLowerCase(),
+  // trim avant email : Zod applique les étapes dans l'ordre d'écriture, et un email
+  // entouré d'espaces échouait à la validation au lieu d'être nettoyé
+  email:    z.string().trim().toLowerCase().email('Adresse email invalide'),
   selected: z.array(z.string()).min(1, 'Choisissez au moins une newsletter'),
 })
 
