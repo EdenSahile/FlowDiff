@@ -17,6 +17,9 @@ import { useWishlist } from '@/contexts/WishlistContext'
 import { useCart } from '@/contexts/CartContext'
 import { theme } from '@/lib/theme'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
+import { NotedTitleModal } from '@/components/ui/NotedTitleModal'
+import { needsNotedConfirmation, buildNotedMessage, buildAddedToCartMessage, isInCart } from '@/components/layout/listCartActions'
+import { useToast } from '@/contexts/ToastContext'
 import { IconTrash, IconCart, IconSearch } from '@/components/ui/icons'
 import { exportToCSV } from '@/lib/csv'
 
@@ -654,7 +657,20 @@ const ListRowInfo = styled.div`
   min-width: 0;
 `
 
-const ListRowName = styled.p`
+/*
+  Le nom de la liste est le bouton qui ouvre son détail. La ligne entière reste
+  cliquable à la souris, mais c'est ce bouton qui la rend atteignable au
+  clavier : la ligne ne peut pas se déclarer « bouton » elle-même, puisqu'elle
+  contient déjà le bouton de suppression.
+*/
+const ListRowName = styled.button`
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
   font-family: ${({ theme }) => theme.typography.fontFamily};
   font-size: 13px;
   font-weight: 600;
@@ -662,6 +678,12 @@ const ListRowName = styled.p`
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+
+  &:focus-visible {
+    outline: 2px solid ${({ theme }) => theme.colors.navy};
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
 `
 
 const ListRowCount = styled.p`
@@ -756,7 +778,10 @@ const BookRowInfo = styled.div`
   min-width: 0;
 `
 
-const BookRowTitle = styled.p`
+/* Même principe que ListRowName, mais la cible est une URL : c'est un lien. */
+const BookRowTitle = styled(Link)`
+  display: block;
+  text-decoration: none;
   font-family: ${({ theme }) => theme.typography.fontFamily};
   font-size: 12px;
   font-weight: 600;
@@ -764,6 +789,13 @@ const BookRowTitle = styled.p`
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+
+  &:hover { text-decoration: underline; }
+  &:focus-visible {
+    outline: 2px solid ${({ theme }) => theme.colors.navy};
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
 `
 
 const BookRowAuthor = styled.p`
@@ -807,6 +839,20 @@ const BookRowAddedBy = styled.span`
   font-size: 10px;
   color: #3d2f00;
   background: rgba(212,168,67,0.20);
+  border-radius: ${({ theme }) => theme.radii.lg};
+  padding: 1px 7px;
+  margin-top: 2px;
+`
+
+const BookRowInCart = styled.span`
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 10px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.success};
+  background: ${({ theme }) => theme.colors.primaryLight};
   border-radius: ${({ theme }) => theme.radii.lg};
   padding: 1px 7px;
   margin-top: 2px;
@@ -957,8 +1003,23 @@ interface HeaderProps {
 export function Header({ cartCount = 0, onBurgerClick, onCartClick }: HeaderProps) {
   const navigate = useNavigate()
   const { lists, deleteList, removeFromList } = useWishlist()
-  const { addToCart } = useCart()
+  const { addToCart, items: cartItems } = useCart()
+  const { showToast } = useToast()
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
+
+  // Ajout en attente de la confirmation « noté » (DEC-001), un titre ou une liste entière.
+  const [pendingNoted, setPendingNoted] = useState<Book[] | null>(null)
+
+  function addBooksToCart(books: Book[]) {
+    books.forEach(book => addToCart(book, 1))
+    showToast(buildAddedToCartMessage(books))
+  }
+
+  // Dès qu'un titre à paraître est concerné, la pop-in s'affiche avant l'ajout.
+  function requestAddToCart(books: Book[]) {
+    if (needsNotedConfirmation(books)) { setPendingNoted(books); return }
+    addBooksToCart(books)
+  }
 
   const [search, setSearch] = useState('')
   const [showPanel, setShowPanel]           = useState(false)
@@ -1406,20 +1467,25 @@ export function Header({ cartCount = 0, onBurgerClick, onCartClick }: HeaderProp
                           <span style={{ fontSize: 20 }}>📖</span>
                         </BookRowCover>
                         <BookRowInfo>
-                          <BookRowTitle>{book.title}</BookRowTitle>
+                          {/* Le lien navigue, il ferme donc le panneau comme le fait la ligne. */}
+                          <BookRowTitle
+                            to={`/livre/${book.id}`}
+                            onClick={e => { e.stopPropagation(); setShowListsPanel(false); setSelectedListId(null) }}
+                          >{book.title}</BookRowTitle>
                           <BookRowAuthor>{book.authors.join(', ')}</BookRowAuthor>
                           <BookRowIsbn>{book.isbn}</BookRowIsbn>
                           {addedBy && <BookRowAddedBy>{addedBy}</BookRowAddedBy>}
+                          {isInCart(cartItems, book.id) && (
+                            <BookRowInCart>✓ Ajouté au panier</BookRowInCart>
+                          )}
                         </BookRowInfo>
-                        {book.type !== 'a-paraitre' && (
-                          <BookRowCartBtn
-                            onClick={e => { e.stopPropagation(); addToCart(book, 1) }}
-                            aria-label={`Ajouter ${book.title} au panier`}
-                            title="Ajouter au panier"
-                          >
-                            <IconCart size={16} filled={false} />
-                          </BookRowCartBtn>
-                        )}
+                        <BookRowCartBtn
+                          onClick={e => { e.stopPropagation(); requestAddToCart([book]) }}
+                          aria-label={`Ajouter ${book.title} au panier`}
+                          title="Ajouter au panier"
+                        >
+                          <IconCart size={16} filled={false} />
+                        </BookRowCartBtn>
                         <BookRowRemove
                           onClick={e => { e.stopPropagation(); removeFromList(list.id, book.id) }}
                           aria-label={`Retirer ${book.title}`}
@@ -1432,13 +1498,9 @@ export function Header({ cartCount = 0, onBurgerClick, onCartClick }: HeaderProp
                   )}
                 </ListsPanelBody>
                 <DetailFooter>
-                  {list.items.some(i => i.book.type !== 'a-paraitre') && (
+                  {list.items.length > 0 && (
                     <AddAllBtn
-                      onClick={() => {
-                        list.items
-                          .filter(i => i.book.type !== 'a-paraitre')
-                          .forEach(i => addToCart(i.book, 1))
-                      }}
+                      onClick={() => requestAddToCart(list.items.map(i => i.book))}
                     >
                       <IconCart size={16} filled={false} />
                       Tout ajouter au panier
@@ -1480,7 +1542,10 @@ export function Header({ cartCount = 0, onBurgerClick, onCartClick }: HeaderProp
                     <ListRow key={list.id} onClick={() => setSelectedListId(list.id)}>
                       <ListRowIcon><IconStarSmall /></ListRowIcon>
                       <ListRowInfo>
-                        <ListRowName>{list.name}</ListRowName>
+                        <ListRowName
+                          onClick={e => { e.stopPropagation(); setSelectedListId(list.id) }}
+                          aria-label={`Ouvrir la liste ${list.name}`}
+                        >{list.name}</ListRowName>
                         <ListRowCount>{list.items.length} titre{list.items.length !== 1 ? 's' : ''}</ListRowCount>
                       </ListRowInfo>
                       <ListRowDelete
@@ -1514,6 +1579,13 @@ export function Header({ cartCount = 0, onBurgerClick, onCartClick }: HeaderProp
           />
         )
       })()}
+
+      <NotedTitleModal
+        open={!!pendingNoted}
+        message={pendingNoted ? buildNotedMessage(pendingNoted) : undefined}
+        onConfirm={() => { if (pendingNoted) addBooksToCart(pendingNoted); setPendingNoted(null) }}
+        onCancel={() => setPendingNoted(null)}
+      />
     </>
   )
 }

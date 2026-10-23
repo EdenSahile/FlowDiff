@@ -242,16 +242,16 @@ describe('LOT-09 : Commandes et historique', () => {
       expect(ORDER_STATUSES).toEqual(['en préparation', 'expédié', 'livré'])
     })
 
-    it('FLOW-RM-071 : les 3 valeurs MONO, AP, SUITE sont assignables au type TypeCommande', () => {
-      const mono: TypeCommande = 'MONO'
-      const ap: TypeCommande = 'AP'
-      const suite: TypeCommande = 'SUITE'
+    it('FLOW-RM-071 : les 3 types de titres sont assignables au type TypeCommande', () => {
+      const aParaitre: TypeCommande = 'A paraître'
+      const nouveaute: TypeCommande = 'Nouveauté'
+      const fonds: TypeCommande = 'Fonds'
 
-      expect([mono, ap, suite]).toEqual(['MONO', 'AP', 'SUITE'])
+      expect([aParaitre, nouveaute, fonds]).toEqual(['A paraître', 'Nouveauté', 'Fonds'])
     })
 
     it('FLOW-RM-071 : les donnees mock ne contiennent que des typeCommande valides', () => {
-      const validTypes = new Set(['MONO', 'AP', 'SUITE'])
+      const validTypes = new Set(['A paraître', 'Nouveauté', 'Fonds'])
 
       const allTypeCommandes = Object.values(MOCK_ORDERS)
         .flat()
@@ -261,6 +261,84 @@ describe('LOT-09 : Commandes et historique', () => {
 
       expect(invalidTypes).toEqual([])
       expect(allTypeCommandes.length).toBeGreaterThan(0)
+    })
+
+    it('DEC-001 : les donnees mock illustrent le cas des titres notes', () => {
+      const lignesAParaitre = Object.values(MOCK_ORDERS)
+        .flat()
+        .flatMap(o => o.items)
+        .filter(i => i.typeCommande === 'A paraître')
+
+      expect(lignesAParaitre).toHaveLength(2)
+    })
+  })
+
+  /* ── DEC-001 : le type de titre est persisté sur la ligne de commande ── */
+
+  describe('DEC-001 : typeCommande sur la ligne de commande', () => {
+
+    it('enregistre un titre a paraitre comme commande « A paraître »', () => {
+      const { result } = renderHook(() => useOrders(), { wrapper: Wrapper })
+      const aParaitreItem = makeCartItem({ book: makeBook({ type: 'a-paraitre' }) })
+
+      let createdOrder!: Order
+      act(() => {
+        createdOrder = result.current.addOrder({ ...baseOrderParams(), items: [aParaitreItem] })
+      })
+
+      expect(createdOrder.items[0].typeCommande).toBe('A paraître')
+    })
+
+    it('enregistre une nouveaute comme commande « Nouveauté »', () => {
+      const { result } = renderHook(() => useOrders(), { wrapper: Wrapper })
+      const nouveauteItem = makeCartItem({ book: makeBook({ type: 'nouveaute' }) })
+
+      let createdOrder!: Order
+      act(() => {
+        createdOrder = result.current.addOrder({ ...baseOrderParams(), items: [nouveauteItem] })
+      })
+
+      expect(createdOrder.items[0].typeCommande).toBe('Nouveauté')
+    })
+
+    it('enregistre un titre de fonds comme commande « Fonds »', () => {
+      const { result } = renderHook(() => useOrders(), { wrapper: Wrapper })
+      const fondsItem = makeCartItem({ book: makeBook({ type: 'fonds' }) })
+
+      let createdOrder!: Order
+      act(() => {
+        createdOrder = result.current.addOrder({ ...baseOrderParams(), items: [fondsItem] })
+      })
+
+      expect(createdOrder.items[0].typeCommande).toBe('Fonds')
+    })
+
+    it('donne son propre typeCommande a chaque ligne d\'une commande mixte', () => {
+      const { result } = renderHook(() => useOrders(), { wrapper: Wrapper })
+      const mixedItems = [
+        makeCartItem({ book: makeBook({ id: 'b-ap', type: 'a-paraitre' }) }),
+        makeCartItem({ book: makeBook({ id: 'b-nouv', type: 'nouveaute' }) }),
+        makeCartItem({ book: makeBook({ id: 'b-fonds', type: 'fonds' }) }),
+      ]
+
+      let createdOrder!: Order
+      act(() => {
+        createdOrder = result.current.addOrder({ ...baseOrderParams(), items: mixedItems })
+      })
+
+      expect(createdOrder.items.map(i => i.typeCommande)).toEqual(['A paraître', 'Nouveauté', 'Fonds'])
+    })
+
+    it('renseigne typeCommande sur toutes les lignes, aucune ne reste indefinie', () => {
+      const { result } = renderHook(() => useOrders(), { wrapper: Wrapper })
+
+      let createdOrder!: Order
+      act(() => {
+        createdOrder = result.current.addOrder(baseOrderParams())
+      })
+
+      const lignesSansType = createdOrder.items.filter(i => i.typeCommande === undefined)
+      expect(lignesSansType).toEqual([])
     })
   })
 
@@ -274,7 +352,7 @@ describe('LOT-09 : Commandes et historique', () => {
       const nonMatchingOrders = result.current.filter(o => o.codeClient !== 'LIB001')
 
       expect(nonMatchingOrders).toEqual([])
-      expect(result.current.length).toBe(2)
+      expect(result.current.length).toBe(MOCK_ORDERS.LIB001.length)
     })
 
     it('FLOW-RM-069 : retourne un tableau vide pour un codeClient sans commandes', () => {

@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { MOCK_BOOKS } from '@/data/mockBooks'
 import type { BookType, Universe, StockStatut } from '@/data/mockBooks'
-import { getPurchaseAvailability } from '@/lib/bookUtils'
+import { getPurchaseAvailability, getTypeCommande } from '@/lib/bookUtils'
 
 describe('getPurchaseAvailability', () => {
   it('autorise l’ajout direct d’un titre à paraître par son unique bouton', () => {
@@ -15,6 +15,31 @@ describe('getPurchaseAvailability', () => {
 
   it('maintient le bouton standard pour un titre disponible', () => {
     expect(getPurchaseAvailability('fonds', 'disponible').showStandardOrder).toBe(true)
+  })
+})
+
+/* ══════════════════════════════════════════════════════
+   DEC-001 : le type de titre devient le type de commande
+   porté par la ligne de commande
+══════════════════════════════════════════════════════ */
+
+describe('getTypeCommande', () => {
+  it('traduit un titre à paraître en commande « A paraître »', () => {
+    expect(getTypeCommande('a-paraitre')).toBe('A paraître')
+  })
+
+  it('traduit une nouveauté en commande « Nouveauté »', () => {
+    expect(getTypeCommande('nouveaute')).toBe('Nouveauté')
+  })
+
+  it('traduit un titre de fonds en commande « Fonds »', () => {
+    expect(getTypeCommande('fonds')).toBe('Fonds')
+  })
+
+  it('couvre les 3 types de titres du catalogue, sans valeur indéfinie', () => {
+    const typesCommandeDuCatalogue = [...new Set(MOCK_BOOKS.map(b => getTypeCommande(b.type)))]
+
+    expect(typesCommandeDuCatalogue.sort()).toEqual(['A paraître', 'Fonds', 'Nouveauté'])
   })
 })
 

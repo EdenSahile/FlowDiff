@@ -174,10 +174,11 @@ test.describe('Fiche produit', () => {
     await login(page)
   })
 
-  // Une carte livre n'est pas un lien mais un <article role="button"> cliquable.
+  // La carte est cliquable à la souris, mais c'est le lien de son titre qui
+  // porte la navigation et la rend atteignable au clavier.
   test('un livre d\'une liste ouvre sa fiche, et le retour ramène à la liste', async ({ page }) => {
     await sidebarLink(page, 'Fonds').click()
-    await page.locator('article[role="button"]').first().click()
+    await page.locator('article a[href^="/livre/"]').first().click()
 
     await expect(page).toHaveURL(/\/livre\//)
 

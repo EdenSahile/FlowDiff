@@ -43,13 +43,9 @@ async function expectCartCount(page: Page, count: number) {
 
 // On ajoute depuis la fiche produit, où le bouton est seul sur la page.
 //
-// Piège si on voulait le faire depuis une liste : la carte est un
-// article[role=button] (BookCard.tsx:640) dont le nom accessible est calculé
-// sur tout son texte, donc il contient « Ajouter au panier ». Un
-// getByRole('button', { name: 'Ajouter au panier' }) sélectionne alors la
-// carte, pas le bouton, et le clic tombe au centre de la carte, ce qui
-// navigue vers la fiche. Il faut un sélecteur que la carte ne peut pas
-// satisfaire, par exemple locator('button[aria-label="Ajouter au panier"]').
+// Le sélecteur reste ciblé sur un vrai <button> : une carte de liste contient
+// le texte « Ajouter au panier » dans son propre contenu, et une recherche par
+// rôle et par nom moins précise a déjà sélectionné la carte au lieu du bouton.
 async function addBookToCart(page: Page) {
   await page.goto(`/livre/${BOOK_ID}`)
   await page.locator('button[aria-label="Ajouter au panier"]').first().click()

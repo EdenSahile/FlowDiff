@@ -1,6 +1,5 @@
 import { useState, useRef } from 'react'
-import { createPortal } from 'react-dom'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import styled from 'styled-components'
 import type { Book } from '@/data/mockBooks'
 import { BookCover } from './BookCover'
@@ -11,6 +10,7 @@ import { useWishlist } from '@/contexts/WishlistContext'
 import { ListPickerPopover } from './ListPickerPopover'
 import { StockStatus } from '@/components/ui/StockStatus'
 import { StockAlertModal } from '@/components/ui/StockAlertModal'
+import { NotedTitleModal } from '@/components/ui/NotedTitleModal'
 import { theme } from '@/lib/theme'
 import { formatPrice } from '@/lib/format'
 
@@ -93,6 +93,24 @@ const AParaitreBadge = styled.span`
   font-size: 10px;
   font-weight: 500;
   flex-shrink: 0;
+`
+
+/*
+  Le titre porte le lien vers la fiche. La carte entière reste cliquable à la
+  souris, mais ce lien est ce qui rend la fiche atteignable au clavier : la
+  carte ne peut pas se déclarer « bouton », puisqu'elle contient elle-même des
+  boutons (ajout au panier, ajout à une liste).
+*/
+const TitleLink = styled(Link)`
+  color: inherit;
+  text-decoration: none;
+
+  &:hover { text-decoration: underline; }
+  &:focus-visible {
+    outline: 2px solid ${({ theme }) => theme.colors.navy};
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
 `
 
 const Title = styled.h3`
@@ -303,60 +321,10 @@ const AParaitreFooter = styled.div`
   gap: 6px;
 `
 
-const NotesPopinOverlay = styled.div`
-  position: fixed;
-  inset: 0;
-  background: rgba(10, 18, 35, 0.55);
-  z-index: 2000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-`
 
-const NotesPopinBox = styled.div`
-  background: #fff;
-  border-radius: 14px;
-  padding: 28px 24px;
-  max-width: 340px;
-  width: 100%;
-  box-shadow: 0 16px 48px rgba(10,18,35,0.22);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 14px;
-  text-align: center;
-`
 
-const NotesPopinTitle = styled.p`
-  font-family: ${({ theme }) => theme.typography.fontFamily};
-  font-size: 15px;
-  font-weight: 700;
-  color: ${({ theme }) => theme.colors.navy};
-  margin: 0;
-`
 
-const NotesPopinText = styled.p`
-  font-family: ${({ theme }) => theme.typography.fontFamily};
-  font-size: 13px;
-  color: ${({ theme }) => theme.colors.gray[600]};
-  line-height: 1.5;
-  margin: 0;
-`
 
-const NotesPopinBtn = styled.button`
-  padding: 10px 28px;
-  border: none;
-  border-radius: 8px;
-  background: ${({ theme }) => theme.colors.navy};
-  color: #fff;
-  font-family: ${({ theme }) => theme.typography.fontFamily};
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background .15s;
-  &:hover { background: ${({ theme }) => theme.colors.primaryHover}; }
-`
 
 /* ══════════════════════════════════════
    COVER-FIRST LAYOUT
@@ -637,12 +605,7 @@ export function BookCard({ book, showType = false, coverFirst = false }: Props) 
     const isIndispo = isEpuise
     return (
       <>
-        <Card
-          onClick={handleCardClick}
-          role="button"
-          tabIndex={0}
-          onKeyDown={e => e.key === 'Enter' && navigate(`/livre/${book.id}`)}
-        >
+        <Card onClick={handleCardClick}>
           {/* ── Couverture centrée sur fond neutre ── */}
           <CoverZone>
             <Book3D>
@@ -679,7 +642,7 @@ export function BookCard({ book, showType = false, coverFirst = false }: Props) 
               </UniverseBadge>
               {book.selection && <SelectionChip>Sélection</SelectionChip>}
             </CFBadgeGroup>
-            <CF2Title>{book.title}</CF2Title>
+            <CF2Title><TitleLink to={`/livre/${book.id}`} onClick={e => e.stopPropagation()}>{book.title}</TitleLink></CF2Title>
             <CF2Authors>{book.authors.join(', ')}</CF2Authors>
             {(book.publisher || pubYear) && (
               <CF2Publisher>
@@ -759,29 +722,19 @@ export function BookCard({ book, showType = false, coverFirst = false }: Props) 
           />
         )}
 
-        {notesPopinOpen && createPortal(
-          <NotesPopinOverlay onClick={() => setNotesPopinOpen(false)}>
-            <NotesPopinBox onClick={e => e.stopPropagation()}>
-              <span style={{ fontSize: 28 }}>📅</span>
-              <NotesPopinTitle>Titre à paraître</NotesPopinTitle>
-              <NotesPopinText>Le titre sera enregistré en noté et conservé indéfiniment</NotesPopinText>
-              <NotesPopinBtn onClick={() => { setNotesPopinOpen(false); confirmAdd(false) }}>OK</NotesPopinBtn>
-            </NotesPopinBox>
-          </NotesPopinOverlay>,
-          document.body
-        )}
+        <NotedTitleModal
+          open={notesPopinOpen}
+          message="Le titre sera enregistré en noté et conservé indéfiniment"
+          onConfirm={() => { setNotesPopinOpen(false); confirmAdd(false) }}
+          onCancel={() => setNotesPopinOpen(false)}
+        />
       </>
     )
   }
 
   return (
     <>
-      <Card
-        onClick={handleCardClick}
-        role="button"
-        tabIndex={0}
-        onKeyDown={e => e.key === 'Enter' && navigate(`/livre/${book.id}`)}
-      >
+      <Card onClick={handleCardClick}>
         {/* ── Header : contexte textuel ── */}
         <CardHeader>
           <BadgeRow>
@@ -795,7 +748,7 @@ export function BookCard({ book, showType = false, coverFirst = false }: Props) 
               <AParaitreBadge>À paraître</AParaitreBadge>
             )}
           </BadgeRow>
-          <Title>{book.title}</Title>
+          <Title><TitleLink to={`/livre/${book.id}`} onClick={e => e.stopPropagation()}>{book.title}</TitleLink></Title>
           <Authors>{book.authors.join(', ')}</Authors>
           {(book.publisher || book.collection) && (
             <Publisher>
@@ -925,17 +878,12 @@ export function BookCard({ book, showType = false, coverFirst = false }: Props) 
         />
       )}
 
-      {notesPopinOpen && createPortal(
-        <NotesPopinOverlay onClick={() => setNotesPopinOpen(false)}>
-          <NotesPopinBox onClick={e => e.stopPropagation()}>
-            <span style={{ fontSize: 28 }}>📅</span>
-            <NotesPopinTitle>Titre à paraître</NotesPopinTitle>
-            <NotesPopinText>Le titre sera enregistré comme « noté » et conservé indéfiniment.</NotesPopinText>
-            <NotesPopinBtn onClick={() => { setNotesPopinOpen(false); confirmAdd(false) }}>OK</NotesPopinBtn>
-          </NotesPopinBox>
-        </NotesPopinOverlay>,
-        document.body
-      )}
+      <NotedTitleModal
+        open={notesPopinOpen}
+        message="Le titre sera enregistré comme « noté » et conservé indéfiniment."
+        onConfirm={() => { setNotesPopinOpen(false); confirmAdd(false) }}
+        onCancel={() => setNotesPopinOpen(false)}
+      />
     </>
   )
 }

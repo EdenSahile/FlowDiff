@@ -7,7 +7,7 @@ import { BookCover } from './BookCover'
 import { useOrders } from '@/contexts/OrdersContext'
 import { useAuthContext } from '@/contexts/AuthContext'
 import { REMISE_RATES } from '@/contexts/CartContext'
-import { ORDER_STATUS_LABELS } from '@/data/mockOrders'
+import { ORDER_STATUS_LABELS, type TypeCommande } from '@/data/mockOrders'
 import { useWishlist } from '@/contexts/WishlistContext'
 import { ListPickerPopover } from './ListPickerPopover'
 import { StockStatus } from '@/components/ui/StockStatus'
@@ -678,17 +678,17 @@ const AMTd = styled.td<{ $right?: boolean; $bold?: boolean }>`
   white-space: nowrap;
 `
 
-const TypeBadgeAM = styled.span<{ $type: 'MONO' | 'AP' | 'SUITE' }>`
+const TypeBadgeAM = styled.span<{ $type: TypeCommande }>`
   display: inline-block;
   font-size: 10px; font-weight: 700; letter-spacing: 0.06em;
   border-radius: ${({ theme }) => theme.radii.sm}; padding: 2px 7px;
   background: ${({ $type }) =>
-    $type === 'MONO'  ? '#EEF2FF' :
-    $type === 'AP'    ? '#FFF3E0' :
+    $type === 'Nouveauté'  ? '#EEF2FF' :
+    $type === 'A paraître' ? '#FFF3E0' :
     '#E8F5E9'};
   color: ${({ $type }) =>
-    $type === 'MONO'  ? '#3B5FD9' :
-    $type === 'AP'    ? '#B8740A' :
+    $type === 'Nouveauté'  ? '#3B5FD9' :
+    $type === 'A paraître' ? '#B8740A' :
     '#2E7D32'};
 `
 
@@ -822,7 +822,7 @@ export function BookCardRow({ book, selected, onToggle }: Props) {
     .sort((a, b) => b.order.date.localeCompare(a.order.date))
 
   const lastType = bookOrders[0]?.item.typeCommande ?? null
-  const amLabel  = lastType === 'SUITE' ? 'S' : lastType === 'AP' ? 'A' : lastType === 'MONO' ? 'M' : null
+  const amLabel  = lastType === 'A paraître' ? 'A' : lastType === 'Nouveauté' ? 'N' : lastType === 'Fonds' ? 'F' : null
 
   const fmtDate = (d: string) =>
     new Date(d).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: '2-digit' })
@@ -1084,14 +1084,16 @@ export function BookCardRow({ book, selected, onToggle }: Props) {
                 </AMThead>
                 <tbody>
                   {bookOrders.map(({ order, item }) => {
-                    const typeCde     = item.typeCommande ?? 'MONO'
+                    // Une commande passée avant DEC-001 n'a pas de typeCommande.
+                    // On n'en invente pas un, la cellule reste vide.
+                    const typeCde     = item.typeCommande
                     const commandePar = order.commandePar ?? '—'
                     const dateFactStr = order.dateFacturation ? fmtDate(order.dateFacturation) : '—'
                     const refStr      = order.numFacture ?? '—'
                     return (
-                      <AMTr key={`${order.id}-${typeCde}`}>
+                      <AMTr key={`${order.id}-${typeCde ?? 'sans-type'}`}>
                         <AMTd>
-                          <TypeBadgeAM $type={typeCde}>{typeCde}</TypeBadgeAM>
+                          {typeCde && <TypeBadgeAM $type={typeCde}>{typeCde}</TypeBadgeAM>}
                         </AMTd>
                         <AMTd $bold>{order.codeClient}</AMTd>
                         <AMTd>{commandePar}</AMTd>
