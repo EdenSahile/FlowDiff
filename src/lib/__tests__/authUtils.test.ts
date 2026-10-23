@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { getSafeRedirectPath, createMockToken, parseMockToken, registerSchema } from '@/lib/authUtils'
+import { getSafeRedirectPath, createMockToken, parseMockToken, registerSchema, forgotPasswordSchema, loginSchema } from '@/lib/authUtils'
 
 describe('createMockToken', () => {
   beforeEach(() => {
@@ -286,5 +286,68 @@ describe('registerSchema', () => {
 
       expect(parsed.success).toBe(true)
     })
+  })
+
+  describe('validation et transformation de l\'email', () => {
+    it('accepte un email colle avec une espace parasite et le nettoie', () => {
+      const inputWithPaddedEmail = { ...validInput, email: '  Test@Example.COM  ' }
+
+      const parsedInput = registerSchema.safeParse(inputWithPaddedEmail)
+
+      expect(parsedInput.success).toBe(true)
+      if (parsedInput.success) expect(parsedInput.data.email).toBe('test@example.com')
+    })
+
+    it('rejette une adresse qui n\'est pas un email', () => {
+      const inputWithInvalidEmail = { ...validInput, email: 'pas-un-email' }
+
+      const parsedInput = registerSchema.safeParse(inputWithInvalidEmail)
+
+      expect(parsedInput.success).toBe(false)
+      if (!parsedInput.success) {
+        const emailErrors = parsedInput.error.issues.filter(i => i.path[0] === 'email')
+        expect(emailErrors.some(e => e.message === 'Adresse email invalide')).toBe(true)
+      }
+    })
+  })
+})
+
+describe('forgotPasswordSchema', () => {
+  it('accepte un email colle avec une espace parasite et le nettoie', () => {
+    const requestWithPaddedEmail = { email: '  Test@Example.COM  ' }
+
+    const parsedRequest = forgotPasswordSchema.safeParse(requestWithPaddedEmail)
+
+    expect(parsedRequest.success).toBe(true)
+    if (parsedRequest.success) expect(parsedRequest.data.email).toBe('test@example.com')
+  })
+
+  it('rejette une adresse qui n\'est pas un email', () => {
+    const requestWithInvalidEmail = { email: 'pas-un-email' }
+
+    expect(forgotPasswordSchema.safeParse(requestWithInvalidEmail).success).toBe(false)
+  })
+})
+
+describe('loginSchema', () => {
+  it('accepte un identifiant entoure d\'espaces et le nettoie', () => {
+    const credentialsWithPaddedIdentifier = { identifier: '  LIB001  ', password: 'Test1234!' }
+
+    const parsedCredentials = loginSchema.safeParse(credentialsWithPaddedIdentifier)
+
+    expect(parsedCredentials.success).toBe(true)
+    if (parsedCredentials.success) expect(parsedCredentials.data.identifier).toBe('LIB001')
+  })
+
+  it('rejette un identifiant compose uniquement d\'espaces', () => {
+    const credentialsWithBlankIdentifier = { identifier: '   ', password: 'Test1234!' }
+
+    const parsedCredentials = loginSchema.safeParse(credentialsWithBlankIdentifier)
+
+    expect(parsedCredentials.success).toBe(false)
+    if (!parsedCredentials.success) {
+      const identifierErrors = parsedCredentials.error.issues.filter(i => i.path[0] === 'identifier')
+      expect(identifierErrors.some(e => e.message === 'Identifiant requis')).toBe(true)
+    }
   })
 })

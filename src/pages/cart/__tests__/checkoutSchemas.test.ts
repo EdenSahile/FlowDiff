@@ -30,6 +30,34 @@ describe('addressSchema', () => {
     const result = addressSchema.safeParse({ rue: '12 rue de la Paix', codePostal: '75001', ville: '' })
     expect(result.success).toBe(false)
   })
+
+  /* Le trim s'applique avant les contrôles : une adresse d'espaces ne doit pas partir en commande */
+  it('refuse une rue composée uniquement d\'espaces', () => {
+    const addressWithBlankStreet = { rue: '   ', codePostal: '75001', ville: 'Paris' }
+
+    const parsedAddress = addressSchema.safeParse(addressWithBlankStreet)
+
+    expect(parsedAddress.success).toBe(false)
+  })
+
+  it('refuse une ville composée uniquement d\'espaces', () => {
+    const addressWithBlankCity = { rue: '12 rue de la Paix', codePostal: '75001', ville: '   ' }
+
+    const parsedAddress = addressSchema.safeParse(addressWithBlankCity)
+
+    expect(parsedAddress.success).toBe(false)
+  })
+
+  it('accepte une adresse saisie avec des espaces parasites et la nettoie', () => {
+    const addressWithPaddedFields = { rue: '  12 rue de la Paix  ', codePostal: '  75001  ', ville: '  Paris  ' }
+
+    const parsedAddress = addressSchema.safeParse(addressWithPaddedFields)
+
+    expect(parsedAddress.success).toBe(true)
+    if (parsedAddress.success) {
+      expect(parsedAddress.data).toEqual({ rue: '12 rue de la Paix', codePostal: '75001', ville: 'Paris' })
+    }
+  })
 })
 
 describe('parseAddressString', () => {

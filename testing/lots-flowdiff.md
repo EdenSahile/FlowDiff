@@ -493,6 +493,7 @@ Couvrir les utilitaires partagés (export CSV, schémas de validation Zod pour s
 | FLOW-RM-132 | cartQtySchema : entier entre 1 et 30 | `src/lib/formSchemas.ts:20-24` | `formSchemas.test.ts` : 6 tests |
 | FLOW-RM-133 | Feedback widget : limite 500 caractères | `parked/feedback/` | Reporté : composant parqué, plus dans `src/` |
 | FLOW-RM-134 | Feedback widget : détection automatique du nom de page | `parked/feedback/` | Reporté : composant parqué, plus dans `src/` |
+| FLOW-RM-135 | wishlistNameSchema : nom trimé, 1 à 50 caractères | `src/lib/formSchemas.ts:14` | `formSchemas.test.ts` : 5 tests |
 
 ### Hors périmètre
 
@@ -643,5 +644,6 @@ Aucun.
 | FLOW-RM-132 | LOT-18 |
 | FLOW-RM-133 | LOT-18 |
 | FLOW-RM-134 | LOT-18 |
+| FLOW-RM-135 | LOT-18 |
 
 **Vérification** : 134 règles, 134 entrées dans la matrice, 0 orpheline.
