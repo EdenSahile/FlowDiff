@@ -5,8 +5,8 @@ import { z } from 'zod'
 export const loginSchema = z.object({
   identifier: z
     .string()
-    .min(1, 'Identifiant requis')
-    .trim(),
+    .trim()
+    .min(1, 'Identifiant requis'),
   password: z
     .string()
     .min(1, 'Mot de passe requis'),
@@ -20,11 +20,13 @@ export const registerSchema = z
       .toUpperCase()
       .min(3, 'Code client invalide')
       .max(20, 'Code client invalide'),
+    // trim avant email : Zod applique les étapes dans l'ordre d'écriture, et un email
+    // collé avec une espace parasite échouait à la validation au lieu d'être nettoyé
     email: z
       .string()
-      .email('Adresse email invalide')
       .trim()
-      .toLowerCase(),
+      .toLowerCase()
+      .email('Adresse email invalide'),
     password: z
       .string()
       .min(8, 'Minimum 8 caractères')
@@ -43,9 +45,9 @@ export const registerSchema = z
 export const forgotPasswordSchema = z.object({
   email: z
     .string()
-    .email('Adresse email invalide')
     .trim()
-    .toLowerCase(),
+    .toLowerCase()
+    .email('Adresse email invalide'),
 })
 
 /* ── Types inférés ── */
