@@ -35,7 +35,10 @@ export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
   'livré':          'Livré',
 }
 
-export type TypeCommande = 'MONO' | 'AP' | 'SUITE'
+// Le type de titre au moment de la commande, figé sur la ligne (DEC-001).
+// Un livre change de type après sa parution, la commande garde celui d'origine,
+// ce qui permet de retrouver les titres commandés « notés » avant parution.
+export type TypeCommande = 'A paraître' | 'Nouveauté' | 'Fonds'
 
 export interface OrderItem {
   bookId: string
@@ -105,7 +108,7 @@ export const MOCK_ORDERS: Record<string, Order[]> = {
           quantity: 5,
           unitPriceHT: 4.90,
           universe: 'Littérature',
-          typeCommande: 'SUITE',
+          typeCommande: 'Fonds',
         },
         {
           bookId: 'f-bd-demon-01',
@@ -116,7 +119,7 @@ export const MOCK_ORDERS: Record<string, Order[]> = {
           quantity: 3,
           unitPriceHT: 8.70,
           universe: 'BD/Mangas',
-          typeCommande: 'SUITE',
+          typeCommande: 'Fonds',
         },
       ],
       subtotalHT: 50.60,
@@ -162,7 +165,7 @@ export const MOCK_ORDERS: Record<string, Order[]> = {
           unitPriceHT: 18.48,
           unitPriceTTC: 19.50,
           universe: 'Littérature',
-          typeCommande: 'MONO',
+          typeCommande: 'Nouveauté',
         },
         {
           bookId: 'f-lit-perrin',
@@ -174,7 +177,7 @@ export const MOCK_ORDERS: Record<string, Order[]> = {
           unitPriceHT: 5.20,
           unitPriceTTC: 5.49,
           universe: 'Littérature',
-          typeCommande: 'SUITE',
+          typeCommande: 'Fonds',
         },
         {
           bookId: 'f-bd-demon-01',
@@ -186,7 +189,7 @@ export const MOCK_ORDERS: Record<string, Order[]> = {
           unitPriceHT: 6.84,
           unitPriceTTC: 7.22,
           universe: 'BD/Mangas',
-          typeCommande: 'SUITE',
+          typeCommande: 'Fonds',
         },
       ],
       subtotalHT: 218.28,

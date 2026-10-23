@@ -3,6 +3,7 @@ import { MOCK_ORDERS, type Order, type OrderItem } from '@/data/mockOrders'
 import type { CartItem } from '@/contexts/CartContext'
 import { useAuthContext } from '@/contexts/AuthContext'
 import { storedOrdersSchema } from '@/lib/storageSchemas'
+import { getTypeCommande } from '@/lib/bookUtils'
 
 /* Hoisted — MOCK_ORDERS est statique, pas besoin de recalculer à chaque render */
 const MOCK_IDS = new Set(Object.values(MOCK_ORDERS).flat().map(o => o.id))
@@ -131,6 +132,7 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
       unitPriceHT: book.price,
       unitPriceTTC: book.priceTTC,
       universe: book.universe,
+      typeCommande: getTypeCommande(book.type),
       statut,
       enReliquat,
       referenceLigne: params.referencesParLigne
