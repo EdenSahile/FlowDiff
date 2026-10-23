@@ -196,7 +196,27 @@ test.describe('Fiche produit', () => {
 })
 
 /* ────────────────────────────────────────────
-   5. Footer et URL inconnue
+   5. Sélections : entrée et sortie
+──────────────────────────────────────────── */
+test.describe('Sélections', () => {
+  test.beforeEach(async ({ page }) => {
+    await login(page)
+  })
+
+  test('ouvrir une sélection change l\'URL, et le retour navigateur ramène à la liste', async ({ page }) => {
+    await sidebarLink(page, 'Sélections').click()
+    await page.locator('[aria-label^="Voir la sélection"]').first().click()
+
+    await expect(page).toHaveURL(/\/selections\/.+/)
+
+    await page.goBack()
+
+    await expect(page).toHaveURL('/selections')
+  })
+})
+
+/* ────────────────────────────────────────────
+   6. Footer et URL inconnue
 ──────────────────────────────────────────── */
 test.describe('Footer et routes inconnues', () => {
   test.beforeEach(async ({ page }) => {

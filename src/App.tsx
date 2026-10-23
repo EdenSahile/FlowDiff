@@ -31,7 +31,6 @@ const ContactPage      = lazy(() => import('@/pages/contact/ContactPage').then(m
 const ParametresPage   = lazy(() => import('@/pages/parametres/ParametresPage').then(m => ({ default: m.ParametresPage })))
 const AidePage         = lazy(() => import('@/pages/aide/AidePage').then(m => ({ default: m.AidePage })))
 const CGVPage          = lazy(() => import('@/pages/cgv/CGVPage').then(m => ({ default: m.CGVPage })))
-const NewsletterPage   = lazy(() => import('@/pages/newsletter/NewsletterPage').then(m => ({ default: m.NewsletterPage })))
 const SelectionsPage   = lazy(() => import('@/pages/selections/SelectionsPage').then(m => ({ default: m.SelectionsPage })))
 const TopVentesPage    = lazy(() => import('@/pages/top-ventes/TopVentesPage').then(m => ({ default: m.TopVentesPage })))
 const AuteurPage       = lazy(() => import('@/pages/auteur/AuteurPage').then(m => ({ default: m.AuteurPage })))
@@ -69,7 +68,6 @@ function usePrefetchPages() {
       import('@/pages/auth/ForgotPasswordPage')
       import('@/pages/aide/AidePage')
       import('@/pages/cgv/CGVPage')
-      import('@/pages/newsletter/NewsletterPage')
     }, 100)
     return () => clearTimeout(t)
   }, [])
@@ -119,6 +117,7 @@ export default function App() {
                     <Route path="/panier" element={<CartPage />} />
                     <Route path="/top-ventes" element={<TopVentesPage />} />
                     <Route path="/selections" element={<SelectionsPage />} />
+                    <Route path="/selections/:serieId" element={<SelectionsPage />} />
                     <Route path="/auteur/:auteurSlug" element={<AuteurPage />} />
                     <Route path="/flash-infos" element={<FlashInfosPage />} />
                     <Route path="/compte" element={<MonComptePage />} />
@@ -127,7 +126,6 @@ export default function App() {
                     <Route path="/parametres" element={<ParametresPage />} />
                     <Route path="/aide" element={<AidePage />} />
                     <Route path="/cgv" element={<CGVPage />} />
-                    <Route path="/newsletter" element={<NewsletterPage />} />
                     <Route path="/facturation" element={<FacturationPage />} />
                     <Route path="/edi" element={<EDIPage />} />
                     <Route path="/offices" element={<OfficesPage />} />

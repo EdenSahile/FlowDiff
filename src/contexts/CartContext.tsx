@@ -11,6 +11,12 @@ function isValidQuantity(quantity: number): boolean {
   return Number.isSafeInteger(quantity) && quantity >= 1
 }
 
+/* ── Taux de TVA ──
+   Le taux réduit est réservé au livre. Une PLV (présentoir, affiche, kakémono)
+   est un support publicitaire vendu au libraire, donc au taux normal. */
+export const TVA_LIVRE = 0.055
+export const TVA_PLV   = 0.20
+
 /* ── Remises mock par univers (en attendant AS400/CRM) ── */
 export const REMISE_RATES: Record<Universe, number> = {
   'BD/Mangas':       0.30,
@@ -145,11 +151,16 @@ export function computeTotals(items: CartItem[], opGroups: OPCartGroup[], rates:
 
   const subtotalTTC  = booksTTC + opBooksTTC + opPLVTTC
   const remiseAmount = booksRemise + opBooksRemise
-  /* Remise appliquée sur HT : netHT = (subtotalTTC − remiseTTC) / 1,055 */
-  const netTTC       = subtotalTTC - remiseAmount
-  const netHT        = netTTC / 1.055
-  const tva          = netHT * 0.055
-  const totalTTC     = netHT + tva
+
+  /* La TVA se ventile par taux : les ouvrages relèvent du taux réduit du livre,
+     la PLV est un support publicitaire et relève du taux normal. */
+  const livresNetTTC = booksTTC + opBooksTTC - remiseAmount
+  const livresHT     = livresNetTTC / (1 + TVA_LIVRE)
+  const plvHT        = opPLVTTC / (1 + TVA_PLV)
+
+  const netHT    = livresHT + plvHT
+  const tva      = (livresNetTTC - livresHT) + (opPLVTTC - plvHT)
+  const totalTTC = netHT + tva
   return { subtotalTTC, remiseAmount, netHT, tva, totalTTC }
 }
 

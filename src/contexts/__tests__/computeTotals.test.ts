@@ -78,6 +78,40 @@ describe('computeTotals', () => {
     expect(totals.remiseAmount).toBeCloseTo(1)        // 10 × 10% seulement (pas la PLV)
   })
 
+  it('ventile la TVA : taux réduit sur les ouvrages, taux normal sur la PLV', () => {
+    const opAvecPLV: OPCartGroup = {
+      id: 'op1', serieId: 's1', serieName: 'Tintin', opTitle: 'OP Test',
+      opDescription: '', validUntil: undefined,
+      books: [{ book: makeItem(10, 'BD/Mangas').book, quantity: 1 }],
+      cadeau: { label: '', emoji: '', isbn: '', quantity: 0 },
+      plv: { isbn: '', description: '', quantity: 1, pricePerUnit: 5 },
+    }
+
+    const totalsAvecPLV = computeTotals([], [opAvecPLV], rates)
+
+    // Ouvrages : 10 TTC − 10% = 9 net, soit 8,53 HT et 0,47 de TVA à 5,5%.
+    // PLV : 5 TTC non remisée, soit 4,17 HT et 0,83 de TVA à 20%.
+    expect(totalsAvecPLV.netHT).toBeCloseTo(12.70, 2)
+    expect(totalsAvecPLV.tva).toBeCloseTo(1.30, 2)
+    expect(totalsAvecPLV.totalTTC).toBeCloseTo(14, 2)
+  })
+
+  it('garde le seul taux réduit quand le panier ne contient aucune PLV', () => {
+    const opSansPLV: OPCartGroup = {
+      id: 'op2', serieId: 's2', serieName: 'Tintin', opTitle: 'OP Test',
+      opDescription: '', validUntil: undefined,
+      books: [{ book: makeItem(10, 'BD/Mangas').book, quantity: 1 }],
+      cadeau: { label: '', emoji: '', isbn: '', quantity: 0 },
+      plv: { isbn: '', description: '', quantity: 0, pricePerUnit: 5 },
+    }
+
+    const totalsSansPLV = computeTotals([], [opSansPLV], rates)
+
+    // 10 TTC − 10% = 9 net, intégralement au taux du livre.
+    expect(totalsSansPLV.netHT).toBeCloseTo(9 / 1.055, 2)
+    expect(totalsSansPLV.tva).toBeCloseTo(9 - 9 / 1.055, 2)
+  })
+
   it('retourne totalTTC = netTTC (la TVA est extraite, pas ajoutée)', () => {
     const items = [makeItem(20, 'Jeunesse')]
     const totals = computeTotals(items, [], rates)
