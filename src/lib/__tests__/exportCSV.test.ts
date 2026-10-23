@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { buildDashboardCSV } from '@/lib/exportCSV'
+import { buildDashboardCSV, buildKPIOnlyCSV } from '@/lib/exportCSV'
 import type { PeriodKPI, DashboardOrder } from '@/data/mockDashboard'
 
 const kpi: PeriodKPI = {
@@ -88,5 +88,62 @@ describe('buildDashboardCSV', () => {
     }]
     const csv = buildDashboardCSV(kpi, ordersWithSemicolon, period, 'Ce mois-ci')
     expect(csv).toContain('"Ed; Spéciale"')
+  })
+
+  /* FLOW-RM-126 : les 2 autres cas d'échappement, non couverts jusqu'ici */
+  it('double les guillemets d\'une valeur et l\'entoure de guillemets', () => {
+    const ordersWithQuotedPublisher: DashboardOrder[] = [{ ...orders[0], publisher: 'Éditions "Phare"' }]
+
+    const csvWithQuotedPublisher = buildDashboardCSV(kpi, ordersWithQuotedPublisher, period, 'Ce mois-ci')
+
+    expect(csvWithQuotedPublisher).toContain('"Éditions ""Phare"""')
+  })
+
+  it('entoure de guillemets un libellé de période contenant le séparateur', () => {
+    const csvWithSemicolonPreset = buildDashboardCSV(kpi, orders, period, 'Du 1er; au 29')
+
+    expect(csvWithSemicolonPreset).toContain('"Du 1er; au 29"')
+  })
+})
+
+/* FLOW-RM-126 : buildKPIOnlyCSV, 2e fonction pure du module, sans aucun test jusqu'ici */
+describe('buildKPIOnlyCSV', () => {
+  it('commence par le BOM UTF-8', () => {
+    const kpiOnlyCSV = buildKPIOnlyCSV(kpi, period, 'Ce mois-ci')
+
+    expect(kpiOnlyCSV.startsWith('﻿')).toBe(true)
+  })
+
+  it('contient la section KPI et sa ligne de données', () => {
+    const kpiOnlyCSV = buildKPIOnlyCSV(kpi, period, 'Ce mois-ci')
+
+    expect(kpiOnlyCSV).toContain('=== Résumé KPIs ===')
+    expect(kpiOnlyCSV).toContain('Ce mois-ci;2026-04-01;2026-04-29;2;234,50;12;234,50;2,3;50,0;3')
+  })
+
+  it('n\'exporte pas le détail des commandes', () => {
+    const kpiOnlyCSV = buildKPIOnlyCSV(kpi, period, 'Ce mois-ci')
+
+    expect(kpiOnlyCSV).not.toContain('=== Détail des commandes ===')
+  })
+
+  it('tient en 3 lignes : titre de section, en-têtes, données', () => {
+    const kpiOnlyCSV = buildKPIOnlyCSV(kpi, period, 'Ce mois-ci')
+
+    expect(kpiOnlyCSV.split('\n')).toHaveLength(3)
+  })
+
+  it('produit la même ligne KPI que l\'export complet', () => {
+    const kpiLineOfFullExport = buildDashboardCSV(kpi, orders, period, 'Ce mois-ci').split('\n')[2]
+
+    const kpiLineOfKpiOnlyExport = buildKPIOnlyCSV(kpi, period, 'Ce mois-ci').split('\n')[2]
+
+    expect(kpiLineOfKpiOnlyExport).toBe(kpiLineOfFullExport)
+  })
+
+  it('entoure de guillemets un libellé de période contenant le séparateur', () => {
+    const kpiOnlyCSV = buildKPIOnlyCSV(kpi, period, 'Du 1er; au 29')
+
+    expect(kpiOnlyCSV).toContain('"Du 1er; au 29"')
   })
 })
