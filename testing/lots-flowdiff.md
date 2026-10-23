@@ -105,7 +105,7 @@ Couvrir la classification des titres (types, univers, statuts de stock), les rè
 | FLOW-RM-026 | Les titres à paraître n'ont pas de statut de stock | `src/data/mockBooks.ts:753-757` | Aucun |
 | FLOW-RM-027 | Un titre épuisé/rupture affiché « Indisponible » (bouton désactivé) | `src/components/catalogue/BookCard.tsx:596-598` | Aucun |
 | FLOW-RM-028 | BookCard permet l'ajout au panier d'un titre à paraître | `src/components/catalogue/BookCard.tsx:622` | Aucun |
-| FLOW-RM-029 | BookCardRow bloque l'ajout pour a-paraitre ET épuisé | `src/components/catalogue/BookCardRow.tsx:803` | Aucun |
+| ~~FLOW-RM-029~~ | ⛔ **CADUQUE** : portait sur `BookCardRow`, composant supprimé car importé par aucune page | — | — |
 | FLOW-RM-030 | Titre sur_commande/en_reimp : modale de confirmation avant ajout | `src/components/catalogue/BookCard.tsx:597,623` | Aucun |
 
 ### Hors périmètre
@@ -114,7 +114,7 @@ Recherche et filtrage (LOT-05), affichage des tooltips stock (LOT-16), modale St
 
 ### Points à clarifier
 
-**Incohérence majeure** : FLOW-RM-021 (`isOrderable` retourne false pour a-paraitre), FLOW-RM-028 (BookCard permet l'ajout) et FLOW-RM-029 (BookCardRow le bloque) divergent. CLAUDE.md dit « les titres à paraître ne sont PAS commandables ». Avant d'écrire les tests, il faut trancher : quel est le comportement attendu ? Les tests devront refléter la décision.
+**Incohérence tranchée par DEC-001** : FLOW-RM-021, 028 et 029 divergeaient sur la commandabilité des titres à paraître. La décision retenue est qu'ils sont commandables et enregistrés comme « notés ». FLOW-RM-029 est devenue caduque avec la suppression de `BookCardRow`.
 
 ---
 
@@ -538,7 +538,7 @@ Aucun.
 | FLOW-RM-026 | LOT-04 |
 | FLOW-RM-027 | LOT-04 |
 | FLOW-RM-028 | LOT-04 |
-| FLOW-RM-029 | LOT-04 |
+| FLOW-RM-029 | LOT-04, caduque |
 | FLOW-RM-030 | LOT-04 |
 | FLOW-RM-031 | LOT-05 |
 | FLOW-RM-032 | LOT-05 |
