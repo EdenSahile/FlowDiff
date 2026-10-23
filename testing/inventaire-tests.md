@@ -1,136 +1,148 @@
 # Inventaire des tests — FlowDiff
 
-État réel de la couverture de test, module par module, tel que le code se présente aujourd'hui (pas un plan pour du code à venir). Sur le modèle de l'inventaire équivalent de StoryPilot-ai.
+État réel de la couverture de test, module par module, tel que le code se présente aujourd'hui (pas un plan pour du code à venir).
+
+**Ce fichier donne la vue d'ensemble. Le détail règle par règle vit dans les 18 inventaires de lot** (`testing/inventaire-LOT-*.md`), qui sont la source de vérité sur ce que couvre chaque test. Celui-ci répond à une autre question : quel module a des tests, lesquels n'en ont pas, et où est le risque.
 
 ## Légende
 
-- 🟢 **testable en unitaire** — logique pure, déjà extraite ou extractible dans `src/lib/`, `src/hooks/`, ou fonction de contexte appelable via `renderHook`.
-- 🟠 **mixte** — une part unitaire (logique extraite) + une part qui nécessite un vrai rendu (React Testing Library / jsdom).
-- 🔴 **nécessite un vrai navigateur** — parcours utilisateur multi-écrans, résultat observable seulement à l'écran (Playwright). **FlowDiff n'a aucun outillage e2e actuellement** (pas de Playwright, pas de `e2e/`) — voir section dédiée.
+- 🟢 **testable en unitaire** : logique pure, dans `src/lib/`, `src/hooks/`, ou fonction de contexte appelable via `renderHook`.
+- 🟠 **mixte** : une part unitaire (logique extraite) + une part qui exige un vrai rendu (React Testing Library / jsdom).
+- 🔴 **nécessite un vrai navigateur** : parcours multi-écrans, observable seulement à l'écran (Playwright).
 
-Contrairement à StoryPilot (un seul écran, 5 endpoints API), FlowDiff est une application à 23 pages côté libraire + 5 pages admin, avec 13 contexts React. Cet inventaire est donc volontairement priorisé par criticité métier plutôt que traité de façon exhaustive en une passe.
+## Chiffres
+
+| | Fichiers | Tests |
+|---|---|---|
+| Unitaires et rendu (Vitest) | 47 | **504** |
+| End-to-end (Playwright) | 5 | **83** |
+
+Commandes : `npx vitest run` et `npx playwright test --list`. Tous verts au moment de l'écriture.
+
+La campagne de test par lots est terminée. Sur les 135 règles de la matrice de traçabilité de `lots-flowdiff.md` :
+
+- **7 sont caduques** : celles du LOT-12, qui couvrait le back-office, retiré du build.
+- **2 sont reportées** : FLOW-RM-133 et 134, le FeedbackWidget vivant dans `parked/feedback/` hors du build.
+- **Les 126 autres appartiennent à un lot traité.** Attention à la lecture : « lot traité » ne veut pas dire « règle testée automatiquement ». Les règles classées 🔴 dans leur inventaire reposent sur un scénario de smoke manuel, et c'est là que la campagne est inachevée (voir le point 2 de la dernière section).
 
 ## `src/lib/` (fonctions pures)
 
-| Fichier | Classement | Ce qui existe | Ce qui manque |
-|---|---|---|---|
-| `authUtils.ts` | 🟢 fait | `authUtils.test.ts` (12 tests) — `getSafeRedirectPath` (protection open redirect, ajoutée 2026-09-02). | Schémas `loginSchema`/`registerSchema`/`forgotPasswordSchema` et `createMockToken`/`parseMockToken` testés indirectement via `AuthContext.test.tsx`, pas en isolation. Acceptable (pas de duplication utile), à revisiter seulement si ces fonctions deviennent réutilisées ailleurs. |
-| `bookUtils.ts` | 🟢 fait | `bookUtils.test.ts` (3 tests) — `isOrderable`. | Vérifier s'il existe d'autres exports non couverts (à re-scanner si le fichier grossit). |
-| `csv.ts` | 🟢 fait | `csv.test.ts` (4 tests) — export CSV, BOM UTF-8. | — |
-| `exportCSV.ts` | 🟢 fait | `exportCSV.test.ts` (7 tests) — `buildDashboardCSV`. | — |
-| `formSchemas.ts` | 🟢 fait | `formSchemas.test.ts` (21 tests) — `contactSchema` et autres. | — |
-| `storageSchemas.ts` | 🟢 fait | `storageSchemas.test.ts` (19 tests) — schémas de validation localStorage (panier, etc.). | — |
-| `ediUtils.ts` | 🟢 fait | Testé dans `src/pages/edi/__tests__/ediUtils.test.ts` (39 tests) — `filterEDIMessages` et probablement d'autres. | **Emplacement à corriger** : le test d'un fichier `src/lib/ediUtils.ts` vit dans `src/pages/edi/__tests__/`, pas dans `src/lib/__tests__/`. Incohérent avec la convention du reste du projet (test co-localisé avec le module `lib` qu'il teste). Dette technique mineure, à déplacer. |
-| `invoicePdf.ts` | 🔴 non fait | Aucun test. | Génération de PDF (facturation) : logique de mise en page difficile à unit-tester utilement ; à couvrir plutôt via un test de non-régression sur les données injectées (montants, TVA) plutôt que sur le rendu PDF lui-même. **Priorité moyenne** — la facturation est sensible (montants), mais le risque principal est déjà couvert côté schémas/calculs si extraits ailleurs à vérifier. |
-| `mockUsers.ts` | — | Fixture de test, pas du code applicatif à tester en soi. | Rien — c'est une source de données mock, `AuthContext.test.tsx` la consomme déjà. |
-| `responsive.ts` | 🟢 non fait | Aucun test. | À vérifier : si contient des fonctions pures (breakpoints), tests triviaux à ajouter. Priorité basse. |
-| `slugify.ts` | 🟢 non fait | Aucun test. | Fonction pure typique, test trivial à écrire (quelques minutes). Priorité basse mais "quick win". |
-| `supabase.ts` | — | Non testable en unitaire (initialisation de client externe). | Rien à faire ici — la logique métier qui *utilise* le client doit être testée via mocks au niveau des services, pas ce fichier. |
-| `theme.ts` | — | Constantes de charte graphique, pas de logique. | Rien à faire. |
+| Fichier | Lignes | Classement | Ce qui existe | Ce qui manque |
+|---|---|---|---|---|
+| `authUtils.ts` | 128 | 🟢 fait | `authUtils.test.ts` (39 tests) : `getSafeRedirectPath` (protection open redirect), `createMockToken`/`parseMockToken`, et les 3 schémas `loginSchema`, `registerSchema`, `forgotPasswordSchema` testés en isolation. | — |
+| `bookUtils.ts` | 14 | 🟢 fait | `bookUtils.test.ts` (11 tests) : `isOrderable`, dont les titres à paraître commandables. | — |
+| `csv.ts` | 23 | 🟢 fait | `csv.test.ts` (12 tests) : BOM UTF-8, séparateur, les 3 cas d'échappement, nom du fichier téléchargé, CRLF. | — |
+| `ediUtils.ts` | 511 | 🟢 fait | `src/pages/edi/__tests__/ediUtils.test.ts` (51 tests) : filtrage, groupage DESADV, compteurs de flux, recherche ISBN, génération EDIFACT. | **Emplacement incohérent** : le test d'un module de `src/lib/` vit dans `src/pages/edi/__tests__/`. Dette mineure, à déplacer vers `src/lib/__tests__/`. |
+| `exportCSV.ts` | 258 | 🟠 partiel | `exportCSV.test.ts` (15 tests) : `buildDashboardCSV` et `buildKPIOnlyCSV`, les 2 fonctions pures du module. | Les 8 fonctions `export*CSV` qui déclenchent un téléchargement ne sont pas testées. Choix assumé (LOT-18) : elles ne renvoient rien et partagent la coquille DOM déjà couverte par `csv.test.ts`. |
+| `format.ts` | 5 | 🟢 fait | `format.test.ts` (1 test) : `formatPrice`. | — |
+| `formSchemas.ts` | 26 | 🟢 fait | `formSchemas.test.ts` (34 tests) : les 4 schémas, bornes exactes des 2 côtés, trim prouvé sur la valeur de sortie. | — |
+| `invoicePdf.ts` | 442 | 🔴 non fait | Aucun test. Un seul export, `openInvoicePDF`, appelé par `FacturationPage.tsx:6`. | Génération de PDF : le rendu ne se teste pas utilement en unitaire. Les montants injectés, eux, sont couverts côté données par `mockFactures.test.ts` (7 tests). **Priorité basse** une fois ce constat posé. |
+| `mockUsers.ts` | 59 | — | Fixture consommée par `AuthContext.test.tsx`. | Rien, ce sont des données. |
+| `responsive.ts` | 18 | 🟢 non fait | Aucun test. | Constantes de breakpoints. Priorité basse. |
+| `slugify.ts` | 8 | 🟢 non fait | Aucun test. | Fonction pure, test trivial. Priorité basse. |
+| `storageSchemas.ts` | 47 | 🟢 fait | `storageSchemas.test.ts` (32 tests) : les 3 schémas de relecture du localStorage, valeurs par défaut, champs optionnels contraints. | — |
+| `theme.ts` | 88 | — | Constantes de charte graphique. | Rien à faire. |
+
+`supabase.ts` n'existe plus : Supabase a été retiré du frontend, l'application lit `MOCK_BOOKS`.
 
 ## `src/hooks/`
 
 | Fichier | Classement | Ce qui existe | Ce qui manque |
 |---|---|---|---|
-| `useAuth.ts` | — | Ré-export de `useAuthContext` (`AuthContext.tsx`). | Rien — la vraie logique est dans `AuthContext.tsx`, voir section contexts. |
-| `useDashboardConfig.ts` | 🟢 fait | `useDashboardConfig.test.ts` (13 tests) — `reorderItems`, `toggleItem`, forme de `DEFAULT_CONFIG`. Test `bottomPanels` corrigé le 2026-09-02 (attendait 3, la config réelle en a 2 depuis le retrait de `panel-raccourcis`). | `loadConfig`/`saveConfig` (localStorage) non testés directement. Priorité basse (logique simple, déjà protégée par try/catch). |
-| `usePeriodFilter.ts` | 🔴 non fait | Aucun test. | À évaluer — utilisé sur plusieurs pages de filtrage (historique, EDI, dashboard ?). Si la logique de calcul de période est pure, l'extraire et la tester. **Priorité moyenne**, dépend du nombre de pages qui en dépendent. |
-| `useRefetchOnFocus.ts` | 🔴 non fait | Aucun test. | Hook d'effet de bord (event listener sur focus fenêtre) — difficile à unit-tester utilement, candidat plutôt pour une vérification en e2e si le comportement est critique. Priorité basse. |
+| `useAuth.ts` | — | Ré-export de `useAuthContext`. | Rien, la logique est dans `AuthContext.tsx`. |
+| `useDashboardConfig.ts` | 🟢 fait | `useDashboardConfig.test.ts` (13 tests) : `reorderItems`, `toggleItem`, forme de `DEFAULT_CONFIG`. | `loadConfig`/`saveConfig` non testés directement. Priorité basse. |
+| `usePeriodFilter.ts` | 🟢 fait | `usePeriodFilter.test.tsx` (9 tests) : calcul des périodes. | — |
+| `useRefetchOnFocus.ts` | 🔴 non fait | Aucun test. | Hook d'effet de bord (listener sur le focus fenêtre). Ne se teste pas utilement en unitaire. Priorité basse. |
 
 ## `src/services/` et `src/admin/services/`
 
 | Fichier | Classement | Ce qui existe | Ce qui manque |
 |---|---|---|---|
-| `books.ts` | 🟢 fait | `books.test.ts` (4 tests) — `searchBooksLocal`. | Vérifier les autres exports éventuels. |
-| `returnsService.ts` | 🟢 fait | `returnsService.test.ts` (5 tests) — `getReturnsStats`. | — |
-| `ordersService.ts` | 🔴 non fait | Aucun test. | 3 fonctions exportées (`getOrders`, `getOrderById`, `getShipment`), toutes async. **Priorité haute** : les commandes sont le cœur métier de l'app B2B ; aucune fonction de ce fichier n'est couverte. |
-| `adminServices.ts` | 🟢 fait | `adminServices.test.ts` (2 tests) — `computeCAMois`, `computeTop5`. Les 2 fonctions exportées du fichier sont couvertes. | — |
+| `books.ts` | 🟢 fait | `books.test.ts` (15 tests) : recherche multi-champs, recherche ISBN, filtrage. | — |
+| `returnsService.ts` | 🟢 fait | `returnsService.test.ts` (13 tests) : éligibilité au retour, motifs, statistiques. | — |
+| ~~`ordersService.ts`~~ | — | — | **Supprimé** : ses 3 fonctions `getOrders`, `getOrderById` et `getShipment` n'étaient importées par aucun fichier de `src/`. Les commandes passent par `OrdersContext`, couvert séparément. |
+| `adminServices.ts` | 🟢 fait | `adminServices.test.ts` (2 tests) : `computeCAMois`, `computeTop5`, les 2 exports du fichier. | Rattaché au back-office, non routé. |
 
 ## `src/contexts/` et `src/admin/contexts/`
 
 | Fichier | Lignes | Classement | Ce qui existe | Ce qui manque |
 |---|---|---|---|---|
-| `AuthContext.tsx` | 200 | 🟢 fait | `AuthContext.test.tsx` (18 tests, ajouté 2026-09-02) — login (succès/échecs), register (succès/échecs), logout, restauration/nettoyage de session, erreur hors provider. | — |
-| `CartContext.tsx` | 307 | 🟠 partiel | `computeTotals.test.ts` (8 tests) — logique de calcul des totaux/remises extraite et testée. | Le reste du contexte (ajout/suppression d'articles, persistance localStorage, synchronisation) n'est testé qu'indirectement. **Priorité haute** — le panier est un flux critique (commande = revenu). |
-| `OrdersContext.tsx` | 182 | 🔴 non fait | Aucun test direct. | **Priorité haute** — dépend de `ordersService.ts` (également non testé). |
-| `EDIContext.tsx` | 183 | 🟠 partiel | Logique de filtrage testée via `ediUtils.test.ts` (39 tests, mais emplacement incohérent — voir note `src/lib/`). | Le contexte lui-même (état, actions) non testé directement. Priorité moyenne — la logique métier la plus risquée (parsing/filtrage) est déjà couverte. |
-| `WishlistContext.tsx` | 143 | 🔴 non fait | Aucun test. | Priorité basse-moyenne (fonctionnalité secondaire, pas transactionnelle). |
-| `NotificationsContext.tsx` | 120 | 🔴 non fait | Aucun test. | Priorité basse. |
-| `RdvContext.tsx` | 116 | 🔴 non fait | Aucun test. | Priorité basse. |
-| `ReturnsContext.tsx` | 93 | 🟠 partiel | Logique couverte côté service (`returnsService.test.ts`). | Contexte lui-même non testé. Priorité basse (service déjà couvert). |
-| `ToastContext.tsx` | 58 | 🟢 partiel | `toastAction.test.ts` (2 tests) — forme du payload d'action. | Reste du contexte (affichage/dismiss) non testé, priorité basse (UI non critique). |
-| `AdminAuthContext.tsx` | 54 | 🟢 fait | `adminAuth.test.ts` (3 tests) — accepte/rejette les identifiants. | Couverture correcte pour la taille du fichier. |
+| `CartContext.tsx` | 358 | 🟢 fait | `computeTotals.test.ts` (11), `cartOperations.test.tsx` (24), `lot08-cart-ebooks-op.test.tsx` (27), `storageKeyIsolation.test.tsx` (9) : totaux et ventilation de TVA par taux, ajout/modification/suppression, limite de démonstration, ebooks et OP, isolation par `codeClient`. | — |
+| `AuthContext.tsx` | 200 | 🟢 fait | `AuthContext.test.tsx` (21) et `AuthContext.register-bcrypt.test.tsx` (1) : login, register, logout, restauration et nettoyage de session, coût bcrypt. | — |
+| `EDIContext.tsx` | 183 | 🟠 partiel | Logique couverte par `ediUtils.test.ts` (51). | Le provider lui-même (génération automatique d'ORDRSP et DESADV par `setTimeout`, isolation par `codeClient`) relève du smoke manuel, classé 🔴 dans l'inventaire du LOT-11. |
+| `OrdersContext.tsx` | 182 | 🟢 fait | `lot09-orders.test.tsx` (14), `lot09-migration.test.ts` (4), `lot09-migration-noop.test.ts` (3) : création de commande, numérotation, isolation par `codeClient`, migration de storage. | — |
+| `WishlistContext.tsx` | 143 | 🟢 fait | `wishlist.test.tsx` (6), complété par `e2e/wishlist.spec.ts` (2 tests). | — |
+| `NotificationsContext.tsx` | 120 | 🟢 fait | `notifications.test.tsx` (7). | — |
+| `ReturnsContext.tsx` | 103 | 🟠 partiel | Logique couverte côté service (`returnsService.test.ts`, 13 tests). | Le provider lui-même n'est pas testé. Priorité basse. |
+| `ToastContext.tsx` | 58 | 🟠 partiel | `toastAction.test.ts` (2) : forme du payload d'action. | Affichage et fermeture non testés. Priorité basse, UI non critique. |
+| `AdminAuthContext.tsx` | 50 | 🔴 non fait | Aucun test. Le fichier `adminAuth.test.ts` a disparu avec le retrait des identifiants en dur de la source. | Rien à faire tant que le back-office n'est pas routé. |
 | `OnboardingContext.tsx` | 46 | 🔴 non fait | Aucun test. | Priorité basse. |
 | `DemoStateContext.tsx` | 35 | 🔴 non fait | Aucun test. | Priorité basse. |
 | `ThemeContext.tsx` | 10 | — | Aucun test. | Trivial, pas nécessaire. |
 
+`RdvContext.tsx` n'existe plus : la fonctionnalité de rendez-vous a été supprimée pendant le LOT-13.
+
 ## Pages (`src/pages/`, `src/admin/pages/`)
 
-Aucune page n'a de test de rendu complet (React Testing Library). La discipline actuelle du projet consiste à extraire la logique métier pure dans un fichier `xxxUtils.ts`/`xxxFilter.ts` colocalisé et à la tester isolément — approche cohérente avec StoryPilot, mais qui laisse le rendu et les interactions utilisateur non couverts partout.
+La discipline du projet est d'extraire la logique métier dans un module colocalisé et de la tester isolément, puis de couvrir le parcours à l'écran en e2e plutôt qu'en rendu jsdom. 3 pages ont malgré tout un test de rendu, écrit quand le comportement tenait à l'affichage lui-même.
 
 | Page | Lignes | Logique extraite testée | Rendu testé | Priorité si à combler |
 |---|---|---|---|---|
-| `HomePage.tsx` | 2682 | Non | Non | **Haute** — page d'accueil/dashboard, la plus grosse du projet, aucune couverture du tout. |
-| `FicheProduitPage.tsx` | 1951 | Non (via `priceNet.test.ts` côté composant `catalogue`, calcul de prix net remisé) | Non | Haute — fiche produit = déclencheur d'achat. |
-| `CartPage.tsx` | 1854 | Oui — `checkoutSchemas.test.ts` (7), `checkoutSteps.test.ts` (8) | Non | **Haute** — tunnel de commande, flux transactionnel le plus critique de l'app. |
-| `SelectionsPage.tsx` | 1642 | Non | Non | Moyenne. |
-| `OfficesPage.tsx` | 1330 | Non | Non | Moyenne. |
-| `FacturationPage.tsx` | 1328 | Non | Non | **Haute** — montants financiers, contient aussi le bug potentiel de `setState` synchrone dans `useEffect` relevé lors de l'audit lint. |
-| `EDIPage.tsx` | 1055 | Oui — `ediUtils.test.ts` (39, emplacement à corriger) | Non | Moyenne (logique déjà couverte). |
-| `HistoriquePage.tsx` | 1023 | Non | Non | Moyenne. |
-| `TopVentesPage.tsx` | 669 | Non | Non | Basse-moyenne. Note : c'est aussi la page où `tsc` remontait des erreurs de typage avant installation propre des deps (`theme` implicite `any`) — à revérifier une fois l'environnement CI en place. |
-| `FlashInfosPage.tsx` | 642 | Non | Non | Basse. |
-| `RecherchePage.tsx` | 597 | Non | Non | Moyenne (point d'entrée catalogue). |
-| `RdvPage.tsx` | 583 | Non | Non | Basse. |
-| `ParametresPage.tsx` | 440 | Non | Non | Basse. |
-| `MonComptePage.tsx` | 427 | Non | Non | Moyenne (données personnelles/facturation). |
-| `AdminCataloguePage.tsx` | 314 | Non | Non | Moyenne (outil interne, moins de risque utilisateur final). |
-| `ContactPage.tsx` | 328 | Non | Non | Basse. |
-| `FondsPage.tsx` | 348 | Oui — `fondsFilter.test.ts` (5) | Non | Basse (logique couverte). |
-| `NouveautesPage.tsx` | 300 | Non | Non | Basse. |
-| `AdminDashboardPage.tsx` | 248 | Non (`adminServices.ts` couvert séparément) | Non | Basse. |
-| `OrderTransmissionStep.tsx` | 253 | Non | Non | Moyenne (fait partie du tunnel de commande). |
-| `LoginPage.tsx` | 293 | Oui, partiellement — `authUtils.test.ts` couvre `getSafeRedirectPath` ; `AuthContext.test.tsx` couvre la logique métier appelée. | Non (formulaire, modale de blocage, etc.) | Moyenne — logique critique déjà couverte, reste le rendu/interactions. |
-| `AdminLibrairesPage.tsx` | 208 | Non | Non | Basse. |
-| `NewsletterPage.tsx` | 224 | Non | Non | Basse. |
-| `AParaitrePage.tsx` | 251 | Non | Non | Basse. |
+| `HomePage.tsx` | 2838 | Via `mockDashboard.test.ts` (14) et `useDashboardConfig.test.ts` (13) | Non | Moyenne. La plus grosse page du projet, couverte par la navigation e2e mais pas dans son détail. |
+| `FicheProduitPage.tsx` | 1850 | Via `priceNet.test.ts` (3) | Oui, `FicheProduitPage.test.tsx` (1) | Moyenne. |
+| `CartPage.tsx` | 1828 | Oui : `checkoutSchemas.test.ts` (10), `checkoutSteps.test.ts` (8), `checkoutTunnel.test.ts` (14) | Non | Basse, le tunnel est le mieux couvert du projet. |
+| `SelectionsPage.tsx` | 1685 | Non | Non | Moyenne, couverte en navigation e2e seulement. |
+| `FacturationPage.tsx` | 1332 | Via `mockFactures.test.ts` (7) | Non | Basse, complétée par `e2e/facturation.spec.ts` (23 tests). |
+| `OfficesPage.tsx` | 1298 | Non | Non | Moyenne. |
+| `HistoriquePage.tsx` | 1023 | Via `usePeriodFilter.test.tsx` (9) | Non | Basse. |
+| `FlashInfosPage.tsx` | 906 | Via `mockFlashInfos.test.ts` (5) | Oui, `FlashInfosPage.test.tsx` (3) | Basse. |
+| `EDIPage.tsx` | 813 | Oui : `ediUtils.test.ts` (51) | Non | Basse. |
+| `TopVentesPage.tsx` | 669 | Non | Non | Basse. |
+| `RecherchePage.tsx` | 597 | Via `books.test.ts` (15) et `isbnSearch.test.ts` (3) | Non | Basse. |
+| `ParametresPage.tsx` | 440 | Via `formSchemas.test.ts` (34) | Non | Basse. |
+| `MonComptePage.tsx` | 427 | Non | Non | Moyenne, données de la librairie. |
+| `FondsPage.tsx` | 363 | Oui : `fondsFilter.test.ts` (5) | Non | Basse. |
+| `ContactPage.tsx` | 328 | Via `formSchemas.test.ts` | Non | Basse. |
+| `NouveautesPage.tsx` | 315 | Via `catalogueType.test.ts` (5) | Non | Basse. |
+| `LoginPage.tsx` | 293 | Oui : `authUtils.test.ts` (39), `AuthContext.test.tsx` (21) | Non | Basse. Les 2 champs sont désactivés et préremplis en mode démonstration. |
+| `AParaitrePage.tsx` | 273 | Via `catalogueType.test.ts` et `bookUtils.test.ts` | Non | Basse. |
+| `OrderTransmissionStep.tsx` | 253 | Oui : `checkoutTunnel.test.ts` (14) | Non | Basse. |
 | `AuteurPage.tsx` | 198 | Non | Non | Basse. |
-| `AdminCommandesPage.tsx` | 197 | Non | Non | Basse-moyenne. |
-| `RegisterPage.tsx` | 183 | Oui, via `AuthContext.test.tsx` (schéma register). | Non | Basse (logique déjà couverte). |
-| `AidePage.tsx` | 177 | Non | Non — probablement statique. | Basse. |
-| `CGVPage.tsx` | 152 | Non | Non — page statique. | Très basse, pas nécessaire. |
-| `AdminLoginPage.tsx` | 132 | Non (`AdminAuthContext` couvert séparément) | Non | Basse. |
-| `ForgotPasswordPage.tsx` | 110 | Non | Non | Basse. |
+| `RegisterPage.tsx` | 183 | Oui : `authUtils.test.ts` | Non | Basse. |
+| `AidePage.tsx` | 177 | Non | Non | Basse, page statique. |
+| `CGVPage.tsx` | 152 | Non | Non | Très basse, page statique. |
+| `ForgotPasswordPage.tsx` | 110 | Oui : `authUtils.test.ts` | Non | Basse. |
 
-**Composants UI partagés déjà couverts** (hors tableau ci-dessus, dans `src/components/`) : `BackButton` (3 tests, rendu), `StockStatus` (6 tests, logique `getTooltipText`), `FeedbackWidget` (16 tests, `getPageName`), `PriceNet`/catalogue (3 tests), `isbnSearch` layout (3 tests).
+**Back-office, hors du build** : `AdminCataloguePage` (315), `AdminDashboardPage` (248), `AdminLibrairesPage` (210), `AdminCommandesPage` (191), `AdminLoginPage` (132). Non routées, leurs services échouent si on les appelle. Aucun test attendu tant qu'elles ne sont pas rebranchées. Le LOT-12 qui les couvrait a été déclaré caduc pour cette raison.
+
+`NewsletterPage.tsx` et `RdvPage.tsx` ne figurent plus ici : toutes deux supprimées, la première comme code mort, la seconde avec la fonctionnalité de rendez-vous.
+
+**Composants partagés couverts** (`src/components/`) : `BookCard` (7 tests, rendu), `BookCardRow` (4, rendu), `CatalogueLoadState` (3), `CatalogueFilters` (2), `StockAlertModal` (8), `StockStatus` (6), `BackButton` (3), `ProtectedRoute` (4), `priceNet` (3), `isbnSearch` (3). Les 16 tests du `FeedbackWidget` ont disparu avec son déplacement dans `parked/feedback/`.
 
 ## E2E (Playwright)
 
-🔴 **Aucun outillage e2e n'existe actuellement dans FlowDiff.** Ni `playwright.config.ts`, ni dossier `e2e/`, ni dépendance `@playwright/test` dans `package.json`. C'est l'écart le plus net avec StoryPilot, qui a 4 tests e2e couvrant son parcours critique unique.
+Playwright est installé et configuré (`playwright.config.ts`), le dossier `e2e/` contient **83 tests dans 5 fichiers**, tous verts.
 
-Pour FlowDiff, un premier socle e2e raisonnable (pas exhaustif) couvrirait, par ordre de priorité métier :
+| Fichier | Tests | Périmètre |
+|---|---|---|
+| `navigation.spec.ts` | 28 | Desktop : connexion, redirection des routes protégées, les 15 liens de la sidebar, recherche par mot-clé et par ISBN, panier, footer, URL inconnue, déconnexion, retour arrière depuis une sélection. |
+| `navigation-mobile.spec.ts` | 23 | Viewport 390x844 : sidebar masquée, bottom bar, les 5 onglets, les 11 liens du menu burger, logo, recherche, panier, déconnexion. |
+| `facturation.spec.ts` | 23 | Factures et avoirs, filtres, ouverture du PDF. |
+| `tunnel-commande.spec.ts` | 7 | Panier vide en session neuve, ajout d'un titre et badge, les 3 étapes du tunnel, écran de confirmation, panier vidé après envoi, commande retrouvée dans l'historique, absence d'erreur JS sur le parcours complet. |
+| `wishlist.spec.ts` | 2 | Création d'une liste et ajout d'un titre. |
 
-1. **Connexion → panier → commande** (le tunnel transactionnel complet, l'équivalent du parcours "brief → génération → résultats" de StoryPilot).
-2. **Connexion refusée / session expirée** (redirection vers `/login`, y compris non-régression du correctif open redirect du 2026-09-02).
-3. **Navigation complète entre les sections principales** (Accueil, Catalogue, Panier, Historique, EDI) via le menu.
+**Piège relevé en écrivant `tunnel-commande.spec.ts`, vérifié par diagnostic** : `getByRole('button', { name: 'Ajouter au panier' })` ne sélectionne pas le bouton d'une carte de liste, il sélectionne **la carte**. La carte est un `article[role="button"]` (`BookCard.tsx:640`) et le nom accessible d'un élément se calcule sur tout son contenu textuel, qui inclut le libellé du bouton imbriqué. Le clic tombe alors au centre de la carte et navigue vers la fiche produit sans rien ajouter. Deux conséquences :
 
-Non fait à ce stade — proposé comme chantier suivant, pas improvisé dans cet inventaire.
+- **Pour les tests** : viser le bouton avec un sélecteur que la carte ne peut pas satisfaire, par exemple `locator('button[aria-label="Ajouter au panier"]')`.
+- **Pour l'application** : une carte `role="button"` qui contient d'autres boutons est invalide en accessibilité. Un lecteur d'écran annonce « bouton » suivi de tout le texte de la carte, et les contrôles imbriqués sont mal atteignables. Non corrigé, hors périmètre de la campagne de test.
 
-## Résumé chiffré (2026-09-02)
+## Ce qui reste, par ordre suggéré
 
-- **211 tests unitaires**, 24 fichiers de test (`npx vitest run`, tous verts).
-- 0 test de rendu de page complète, 0 test e2e.
-- Modules `lib/` : 10/14 couverts (les 4 restants sont soit non pertinents à tester — `supabase.ts`, `theme.ts`, `mockUsers.ts` — soit priorité basse — `responsive.ts`, `slugify.ts`).
-- Contexts : 3/13 bien couverts (`AuthContext`, `AdminAuthContext`, `CartContext` partiellement), 10 non testés directement.
-- Pages : 5/28 ont de la logique extraite testée ; aucune n'a de test de rendu.
+1. **Les smokes manuels de la campagne.** Seuls 5 lots sur 17 ont un fichier de scénarios (`smokes-LOT-02`, `03`, `04`, `10`, `11`), et rien ne trace si l'un d'eux a été exécuté. Les lots suivants ont été traités sans en écrire. C'est le plus gros reste de la campagne.
+2. **Déplacer `ediUtils.test.ts`** de `src/pages/edi/__tests__/` vers `src/lib/__tests__/`, pour suivre la convention du projet.
+3. `slugify.ts` et `responsive.ts`, 2 modules purs sans test. Gain faible, coût faible.
+4. Les pages sans aucune logique extraite ni rendu testé : `SelectionsPage`, `OfficesPage`, `MonComptePage`, `TopVentesPage`, `AuteurPage`. Couvertes en navigation e2e, pas dans leur détail.
 
-## Priorités (prochains chantiers, par ordre suggéré)
+Fermés depuis la version précédente de ce fichier : l'e2e du tunnel de commande (`tunnel-commande.spec.ts`, 7 tests) et la suppression de `ordersService.ts`.
 
-1. `ordersService.ts` + `OrdersContext.tsx` — cœur métier (commandes), zéro couverture actuelle.
-2. `CartContext.tsx` au-delà de `computeTotals` — flux transactionnel.
-3. Rendu de `CartPage.tsx` / `LoginPage.tsx` (React Testing Library) — les deux pages où une régression a le plus de conséquences directes (revenu, sécurité).
-4. Déplacer `ediUtils.test.ts` de `src/pages/edi/__tests__/` vers `src/lib/__tests__/` (cohérence de convention, pas une urgence).
-5. Nettoyer le `LABEL['panel-raccourcis']` orphelin dans `CustomizerDrawer.tsx` (dette mineure identifiée en corrigeant le test `useDashboardConfig`).
-6. Socle e2e Playwright (voir section dédiée).
-
-*Ce fichier est un état des lieux vivant, à mettre à jour à chaque chantier de test significatif — pas un log daté à conserver tel quel indéfiniment (cf. convention `CLAUDE.md` sur les blocs de session).*
+*Ce fichier est un état des lieux vivant, à mettre à jour à chaque chantier de test significatif, pas un log daté à conserver tel quel.*
