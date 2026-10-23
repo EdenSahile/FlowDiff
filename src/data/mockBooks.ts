@@ -11,6 +11,24 @@ export type StockStatut =
   | 'epuise'
   | 'rupture'
 
+/*
+  Formats d'un ebook. Un titre peut n'exister qu'en PDF, qu'en EPUB, ou dans
+  les deux, auquel cas l'achat donne accès aux deux fichiers.
+*/
+export const EBOOK_FORMATS = ['PDF', 'EPUB', 'PDF+EPUB'] as const
+
+export type EbookFormat = (typeof EBOOK_FORMATS)[number]
+
+/*
+  Une offre ebook est une 2e référence commerciale du même titre : son ISBN
+  et son prix lui sont propres, comme pour une édition poche.
+*/
+export interface EbookOffer {
+  isbn: string
+  format: EbookFormat
+  priceTTC: number
+}
+
 export interface Book {
   id: string
   isbn: string
@@ -35,6 +53,7 @@ export interface Book {
   topVente?: boolean
   selection?: boolean
   coverUrl?: string
+  ebook?: EbookOffer
 }
 
 /* ── Genres par univers ── */
@@ -114,6 +133,7 @@ const _RAW_MOCK_BOOKS: Book[] = [
     price: 14.60, priceTTC: 21.90, format: '155 x 235 mm', pages: 320,
     publicationDate: '2025-01-15',
     description: "Chroniques rassemblées de l'auteur du Prix Goncourt 2024. Kamel Daoud livre un regard lucide et acéré sur le monde contemporain, entre Orient et Occident, sur dix ans d'écriture.",
+    ebook: { isbn: '9782258990011', format: 'PDF+EPUB', priceTTC: 15.99 },
   },
   {
     id: 'n-lit-02',
@@ -207,6 +227,7 @@ const _RAW_MOCK_BOOKS: Book[] = [
     price: 10.00, priceTTC: 14.90, format: '155 x 235 mm', pages: 256,
     publicationDate: '2022-09-14',
     description: "Un guide pratique et bienveillant pour comprendre et améliorer sa santé mentale au quotidien. Exercices, conseils et outils pour retrouver l'équilibre.",
+    ebook: { isbn: '9782501990022', format: 'PDF', priceTTC: 9.99 },
   },
   {
     id: 'n-pra-02',
@@ -375,6 +396,7 @@ const _RAW_MOCK_BOOKS: Book[] = [
     publicationDate: '2018-08-22',
     description: "Prix Goncourt 2018. L'été 1992 dans une vallée lorraine sinistrée. Quatre adolescents, leurs familles et une décennie de mutations sociales. Un roman générationnel puissant.",
     topVente: true,
+    ebook: { isbn: '9782330990033', format: 'EPUB', priceTTC: 12.99 },
   },
   {
     id: 'f-lit-colombani',

@@ -1,4 +1,4 @@
-import type { BookType, StockStatut } from '@/data/mockBooks'
+import type { BookType, StockStatut, EbookFormat } from '@/data/mockBooks'
 import type { TypeCommande } from '@/data/mockOrders'
 
 const TYPE_COMMANDE_BY_BOOK_TYPE: Record<BookType, TypeCommande> = {
@@ -9,6 +9,11 @@ const TYPE_COMMANDE_BY_BOOK_TYPE: Record<BookType, TypeCommande> = {
 
 export function getTypeCommande(type: BookType): TypeCommande {
   return TYPE_COMMANDE_BY_BOOK_TYPE[type]
+}
+
+/* Libellé du choix de format, à côté de « Broché » et « Poche ». */
+export function getEbookLabel(format: EbookFormat): string {
+  return `Ebook (${format})`
 }
 
 export function getPurchaseAvailability(type: BookType, statut?: StockStatut) {

@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { MOCK_BOOKS } from '@/data/mockBooks'
 import type { BookType, Universe, StockStatut } from '@/data/mockBooks'
-import { getPurchaseAvailability, getTypeCommande } from '@/lib/bookUtils'
+import { getPurchaseAvailability, getTypeCommande, getEbookLabel } from '@/lib/bookUtils'
 
 describe('getPurchaseAvailability', () => {
   it('autorise l’ajout direct d’un titre à paraître par son unique bouton', () => {
@@ -137,5 +137,23 @@ describe('MOCK_BOOKS — à paraître sans statut (FLOW-RM-026)', () => {
     )
 
     expect(aParaitreWithStatut).toEqual([])
+  })
+})
+
+/* ══════════════════════════════════════════════════════
+   Offre ebook : libellé du bouton de format
+══════════════════════════════════════════════════════ */
+
+describe('getEbookLabel', () => {
+  it('annonce le format PDF entre parenthèses', () => {
+    expect(getEbookLabel('PDF')).toBe('Ebook (PDF)')
+  })
+
+  it('annonce le format EPUB entre parenthèses', () => {
+    expect(getEbookLabel('EPUB')).toBe('Ebook (EPUB)')
+  })
+
+  it('annonce les 2 formats quand l\'ebook est disponible dans les deux', () => {
+    expect(getEbookLabel('PDF+EPUB')).toBe('Ebook (PDF+EPUB)')
   })
 })
