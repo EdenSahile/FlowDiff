@@ -262,6 +262,15 @@ describe('LOT-09 : Commandes et historique', () => {
       expect(invalidTypes).toEqual([])
       expect(allTypeCommandes.length).toBeGreaterThan(0)
     })
+
+    it('DEC-001 : les donnees mock illustrent le cas des titres notes', () => {
+      const lignesAParaitre = Object.values(MOCK_ORDERS)
+        .flat()
+        .flatMap(o => o.items)
+        .filter(i => i.typeCommande === 'A paraître')
+
+      expect(lignesAParaitre).toHaveLength(2)
+    })
   })
 
   /* ── DEC-001 : le type de titre est persisté sur la ligne de commande ── */
@@ -343,7 +352,7 @@ describe('LOT-09 : Commandes et historique', () => {
       const nonMatchingOrders = result.current.filter(o => o.codeClient !== 'LIB001')
 
       expect(nonMatchingOrders).toEqual([])
-      expect(result.current.length).toBe(2)
+      expect(result.current.length).toBe(MOCK_ORDERS.LIB001.length)
     })
 
     it('FLOW-RM-069 : retourne un tableau vide pour un codeClient sans commandes', () => {

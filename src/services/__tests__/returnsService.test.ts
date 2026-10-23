@@ -5,6 +5,7 @@ import {
   type ReturnStatus,
   type CreateReturnPayload,
 } from '@/data/mockReturns'
+import { MOCK_ORDERS } from '@/data/mockOrders'
 
 type ServiceModule = typeof import('@/services/returnsService')
 
@@ -112,9 +113,12 @@ describe('FLOW-RM-079 : returnRatio', () => {
   })
 
   it('= nb retours / nb commandes pour un client avec des donnees', async () => {
+    const nbRetoursLIB001 = MOCK_RETURNS.filter(r => r.codeClient === 'LIB001').length
+    const nbCommandesLIB001 = MOCK_ORDERS.LIB001.length
+
     const statsLIB001 = await service.getReturnsStats('LIB001')
 
-    expect(statsLIB001.returnRatio).toBe(3 / 2)
+    expect(statsLIB001.returnRatio).toBe(nbRetoursLIB001 / nbCommandesLIB001)
   })
 
   it('vaut 0 quand le client a des retours mais aucune commande', async () => {

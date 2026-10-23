@@ -371,6 +371,20 @@ Les tests `computeTotals.test.ts` utilisent 2 jeux de taux :
 
 ### Incohérences restantes entre les décisions retenues et le code actuel
 
-**DEC-001 :** 9 points à corriger. Le type `TypeCommande` doit passer de `'MONO' | 'AP' | 'SUITE'` à `'A paraître' | 'Nouveauté' | 'Fonds'`. Le mapping `CartItem` → `OrderItem` dans `OrdersContext.tsx:124-139` ne positionne pas `typeCommande`. Les composants BookCardRow, FicheProduitPage et Header bloquent encore les à paraître. Les données mock et les badges dans BookCardRow utilisent les anciennes valeurs.
+**DEC-001 : les 9 points sont réglés.** Le détail, pour mémoire :
 
-**DEC-003 :** 6 points à corriger. Le principal : `addToCart` vérifie `currentTotal >= CART_LIMIT` au lieu de `currentTotal + qty > CART_LIMIT`, et `updateQty` n'a aucun check de limite.
+| # | Point | Réglé par |
+|---|---|---|
+| 1 | `BookCardRow` bloquait les à paraître | passage à `isOrderable = !isEpuise`, avant cette session |
+| 2 | `FicheProduitPage` les bloquait | passage à `getPurchaseAvailability`, avant cette session |
+| 4 | `bookUtils.isOrderable()`, code mort retournant `false` | remplacé par `getPurchaseAvailability`, avant cette session |
+| 5 | `CLAUDE.md` disait les à paraître non commandables | règle corrigée, `CLAUDE.md:166`, avant cette session |
+| 7 | `TypeCommande = 'MONO' \| 'AP' \| 'SUITE'` | remplacé par les 3 types de titres |
+| 6 | `typeCommande` absent du mapping `CartItem` → `OrderItem` | helper `getTypeCommande` dans `bookUtils.ts`, appelé par `OrdersContext` |
+| 8 | données mock sur les anciennes valeurs | 5 valeurs alignées sur le type réel du livre, plus une commande `ord-003` de 2 titres notés, pour illustrer le cas |
+| 9 | badges de `BookCardRow` sur les anciennes valeurs | initiales A / N / F, et plus de badge inventé pour une commande antérieure sans `typeCommande` |
+| 3 | `Header` excluait les à paraître des listes | bouton panier individuel pour tous les titres, et « Tout ajouter » n'en saute plus aucun |
+
+L'information « noté » est désormais persistée : chaque `OrderItem` porte le type du titre au moment de la commande. Un back-office pourra filtrer `typeCommande === 'A paraître'`, sans dépendre de `book.type`, qui change après parution.
+
+**DEC-003 : réglé.** Les 3 fonctions de `CartContext` (`addToCart`, `updateQty`, `addOPToCart`) vérifient `currentTotal + quantité > CART_LIMIT`, et les cas limites sont couverts par `cartOperations.test.tsx`.
