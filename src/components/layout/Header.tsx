@@ -22,7 +22,7 @@ import { needsNotedConfirmation, buildNotedMessage, buildAddedToCartMessage, isI
 import { useToast } from '@/contexts/ToastContext'
 import { IconTrash, IconCart, IconSearch } from '@/components/ui/icons'
 import { exportToCSV } from '@/lib/csv'
-import { hasExactIsbn } from '@/lib/bookUtils'
+import { hasExactIsbn, matchesFormat, getFormatLabel } from '@/lib/bookUtils'
 
 const GOLD = theme.colors.accent
 
@@ -1090,7 +1090,7 @@ export function Header({ cartCount = 0, onBurgerClick, onCartClick }: HeaderProp
     if (selGenre.length)  b = b.filter(x => x.genre  && selGenre.includes(x.genre))
     if (selLangue.length) b = b.filter(x => x.language && selLangue.includes(x.language))
     b = applyPrix(b, selPrix)
-    if (selFormat.length) b = b.filter(x => x.format && selFormat.includes(x.format))
+    if (selFormat.length) b = b.filter(x => matchesFormat(x, selFormat))
     return b
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [baseBooks, selGenre, selLangue, selPrix, selFormat])
@@ -1100,7 +1100,7 @@ export function Header({ cartCount = 0, onBurgerClick, onCartClick }: HeaderProp
     if (selUniverse.length) b = b.filter(x => selUniverse.includes(x.universe))
     if (selLangue.length)   b = b.filter(x => x.language && selLangue.includes(x.language))
     b = applyPrix(b, selPrix)
-    if (selFormat.length)   b = b.filter(x => x.format && selFormat.includes(x.format))
+    if (selFormat.length)   b = b.filter(x => matchesFormat(x, selFormat))
     return b
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [baseBooks, selUniverse, selLangue, selPrix, selFormat])
@@ -1110,7 +1110,7 @@ export function Header({ cartCount = 0, onBurgerClick, onCartClick }: HeaderProp
     if (selUniverse.length) b = b.filter(x => selUniverse.includes(x.universe))
     if (selGenre.length)    b = b.filter(x => x.genre && selGenre.includes(x.genre))
     b = applyPrix(b, selPrix)
-    if (selFormat.length)   b = b.filter(x => x.format && selFormat.includes(x.format))
+    if (selFormat.length)   b = b.filter(x => matchesFormat(x, selFormat))
     return b
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [baseBooks, selUniverse, selGenre, selPrix, selFormat])
@@ -1120,7 +1120,7 @@ export function Header({ cartCount = 0, onBurgerClick, onCartClick }: HeaderProp
     if (selUniverse.length) b = b.filter(x => selUniverse.includes(x.universe))
     if (selGenre.length)    b = b.filter(x => x.genre && selGenre.includes(x.genre))
     if (selLangue.length)   b = b.filter(x => x.language && selLangue.includes(x.language))
-    if (selFormat.length)   b = b.filter(x => x.format && selFormat.includes(x.format))
+    if (selFormat.length)   b = b.filter(x => matchesFormat(x, selFormat))
     return b
   }, [baseBooks, selUniverse, selGenre, selLangue, selFormat])
 
@@ -1145,23 +1145,40 @@ export function Header({ cartCount = 0, onBurgerClick, onCartClick }: HeaderProp
     })
     return s
   }, [booksForPrix])
-  const availableFormats   = useMemo(() => new Set(booksForFormat.map(b => b.format).filter(Boolean) as string[]), [booksForFormat])
+  /* Une pastille n'est cliquable que si au moins un titre y répond. Le format
+     se déduit des dimensions, et « Numérique » de la présence d'une offre ebook. */
+  const availableFormats   = useMemo(() => {
+    const labels = new Set(booksForFormat.map(b => getFormatLabel(b.format)).filter(Boolean) as string[])
+    if (booksForFormat.some(b => b.ebook)) labels.add('Numérique')
+    return labels
+  }, [booksForFormat])
 
   /* ── Auto-clear selections that become unavailable ──
      Note: setState-in-effect est intentionnel ici pour synchroniser
-     les sélections filtrées avec les options disponibles. */
+     les sélections filtrées avec les options disponibles.
+
+     `keepAvailable` doit renvoyer `prev` quand rien ne tombe : un tableau
+     filtré est toujours un nouvel objet, donc le poser dans l'état relance un
+     rendu, qui recalcule les Set d'options, qui redéclenche ces effets. La
+     boucle était infinie dès le premier clic sur une pastille, et bloquait le
+     rendu de la page de résultats. */
+  function keepAvailable(prev: string[], available: Set<string>): string[] {
+    const next = prev.filter(v => available.has(v))
+    return next.length === prev.length ? prev : next
+  }
+
   /* eslint-disable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps */
   useEffect(() => {
-    setSelGenre(prev => prev.filter(g => availableGenres.has(g)))
+    setSelGenre(prev => keepAvailable(prev, availableGenres))
   }, [availableGenres])
   useEffect(() => {
-    setSelLangue(prev => prev.filter(l => availableLangues.has(l)))
+    setSelLangue(prev => keepAvailable(prev, availableLangues))
   }, [availableLangues])
   useEffect(() => {
-    setSelPrix(prev => prev.filter(p => availablePrix.has(p)))
+    setSelPrix(prev => keepAvailable(prev, availablePrix))
   }, [availablePrix])
   useEffect(() => {
-    setSelFormat(prev => prev.filter(f => availableFormats.has(f)))
+    setSelFormat(prev => keepAvailable(prev, availableFormats))
   }, [availableFormats])
   /* eslint-enable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps */
 
@@ -1172,7 +1189,7 @@ export function Header({ cartCount = 0, onBurgerClick, onCartClick }: HeaderProp
     if (selGenre.length)    b = b.filter(x => x.genre && selGenre.includes(x.genre))
     if (selLangue.length)   b = b.filter(x => x.language && selLangue.includes(x.language))
     b = applyPrix(b, selPrix)
-    if (selFormat.length)   b = b.filter(x => x.format && selFormat.includes(x.format))
+    if (selFormat.length)   b = b.filter(x => matchesFormat(x, selFormat))
     return b.length
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [baseBooks, selUniverse, selGenre, selLangue, selPrix, selFormat])

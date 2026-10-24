@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { MOCK_BOOKS } from '@/data/mockBooks'
 import type { BookType, Universe, StockStatut } from '@/data/mockBooks'
-import { getPurchaseAvailability, getTypeCommande, getEbookLabel, hasExactIsbn, matchesIsbn } from '@/lib/bookUtils'
+import { getPurchaseAvailability, getTypeCommande, getEbookLabel, hasExactIsbn, matchesIsbn, matchesFormat } from '@/lib/bookUtils'
 
 describe('getPurchaseAvailability', () => {
   it('autorise l’ajout direct d’un titre à paraître par son unique bouton', () => {
@@ -215,5 +215,49 @@ describe('matchesIsbn', () => {
 
   it('refuse une suite de chiffres absente des deux', () => {
     expect(matchesIsbn(bookWithEbook, '1111111')).toBe(false)
+  })
+})
+
+/* ══════════════════════════════════════════════════════
+   Filtre « Format » de la recherche avancée
+══════════════════════════════════════════════════════ */
+
+describe('matchesFormat', () => {
+  const poche      = { format: '115 x 175 mm' }
+  const broche     = { format: '155 x 235 mm' }
+  const grand      = { format: '220 x 290 mm' }
+  const avecEbook  = { format: '155 x 235 mm', ebook: { isbn: '9789990030011', format: 'PDF' as const, priceTTC: 9.99 } }
+
+  it('ne filtre rien quand aucun format n\'est coché', () => {
+    expect(matchesFormat(poche, [])).toBe(true)
+    expect(matchesFormat(grand, [])).toBe(true)
+  })
+
+  it('reconnaît un poche à ses dimensions', () => {
+    expect(matchesFormat(poche, ['Poche'])).toBe(true)
+    expect(matchesFormat(broche, ['Poche'])).toBe(false)
+  })
+
+  it('reconnaît un broché et un grand format à leurs dimensions', () => {
+    expect(matchesFormat(broche, ['Broché'])).toBe(true)
+    expect(matchesFormat(grand, ['Grand format'])).toBe(true)
+    expect(matchesFormat(grand, ['Broché'])).toBe(false)
+  })
+
+  it('accepte un titre si l\'un des formats cochés correspond', () => {
+    expect(matchesFormat(poche, ['Broché', 'Poche'])).toBe(true)
+  })
+
+  it('ne retient en numérique que les titres ayant une offre ebook', () => {
+    expect(matchesFormat(avecEbook, ['Numérique'])).toBe(true)
+    expect(matchesFormat(broche, ['Numérique'])).toBe(false)
+  })
+
+  it('accepte un titre numérique croisé avec son format papier', () => {
+    expect(matchesFormat(avecEbook, ['Numérique', 'Poche'])).toBe(true)
+  })
+
+  it('refuse un titre dont les dimensions sont inconnues', () => {
+    expect(matchesFormat({ format: '999 x 999 mm' }, ['Poche'])).toBe(false)
   })
 })

@@ -67,3 +67,39 @@ export function getPurchaseAvailability(type: BookType, statut?: StockStatut) {
     showStandardOrder: !isAParaitre && !isEpuise,
   }
 }
+
+/*
+  Filtre « Format » de la recherche avancée.
+
+  Le champ `format` d'un livre contient ses dimensions, pas un nom de format
+  commercial. Les pastilles « Poche », « Broché » et « Grand format » ne
+  pouvaient donc correspondre à aucun titre, et restaient toutes grisées.
+  Le format se déduit des dimensions, seule donnée disponible.
+
+  « Numérique » ne regarde pas les dimensions : il retient les titres qui
+  proposent une offre ebook.
+*/
+const FORMAT_BY_DIMENSIONS: Record<string, string> = {
+  '115 x 175 mm': 'Poche',
+  '145 x 195 mm': 'Broché',
+  '145 x 215 mm': 'Broché',
+  '155 x 235 mm': 'Broché',
+  '190 x 240 mm': 'Grand format',
+  '210 x 280 mm': 'Grand format',
+  '220 x 290 mm': 'Grand format',
+}
+
+const DIGITAL_FORMAT = 'Numérique'
+
+type BookFormat = { format?: string; ebook?: unknown }
+
+export function getFormatLabel(dimensions: string | undefined): string | null {
+  return dimensions ? FORMAT_BY_DIMENSIONS[dimensions] ?? null : null
+}
+
+export function matchesFormat(book: BookFormat, selected: string[]): boolean {
+  if (selected.length === 0) return true
+  if (selected.includes(DIGITAL_FORMAT) && book.ebook) return true
+  const label = getFormatLabel(book.format)
+  return label !== null && selected.includes(label)
+}

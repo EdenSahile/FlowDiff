@@ -69,3 +69,39 @@ test('le papier et l\'ebook du même titre occupent 2 lignes de panier', async (
   await expect(page.getByText(`ISBN ${EBOOK_PDF.isbnPapier}`)).toBeVisible()
   await expect(page.getByRole('button', { name: /^Panier — 2 articles/ })).toBeVisible()
 })
+
+/*
+  Filtre « Format » de la recherche avancée. Les pastilles comparaient le nom
+  du format aux dimensions du livre, donc aucune ne correspondait jamais et
+  toutes restaient grisées.
+*/
+test('le filtre Numérique ne retient que les titres ayant une offre ebook', async ({ page }) => {
+  await login(page)
+
+  await page.goto('/recherche?formats=Num%C3%A9rique')
+
+  // Les 3 titres du catalogue portant une offre, et eux seuls.
+  await expect(page.locator('article')).toHaveCount(3)
+  await expect(page.getByText('Leurs enfants après eux').first()).toBeVisible()
+  await expect(page.getByText('Ikigaï', { exact: false }).first()).toBeVisible()
+})
+
+test('les pastilles de format sont cliquables, sauf celles sans titre correspondant', async ({ page }) => {
+  await login(page)
+
+  await page.getByRole('button', { name: 'Filtres avancés' }).click()
+
+  for (const format of ['Poche', 'Grand format', 'Broché', 'Numérique']) {
+    await expect(page.getByRole('button', { name: format, exact: true })).toBeEnabled()
+  }
+  // Aucun titre du catalogue n'est relié : la pastille reste inactive.
+  await expect(page.getByRole('button', { name: 'Relié', exact: true })).toBeDisabled()
+})
+
+test('le filtre Poche retient les titres aux dimensions de poche', async ({ page }) => {
+  await login(page)
+
+  await page.goto('/recherche?formats=Poche')
+
+  await expect(page.locator('article')).toHaveCount(11)
+})
