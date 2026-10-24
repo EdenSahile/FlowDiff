@@ -16,6 +16,7 @@ export type StockStatut =
   les deux, auquel cas l'achat donne accès aux deux fichiers.
 */
 export const EBOOK_FORMATS = ['PDF', 'EPUB', 'PDF+EPUB'] as const
+import { matchesIsbn } from '@/lib/bookUtils'
 
 export type EbookFormat = (typeof EBOOK_FORMATS)[number]
 
@@ -949,6 +950,6 @@ export function searchBooks(query: string, referenceDate?: Date): Book[] {
     b.authors.some(a => a.toLowerCase().includes(q)) ||
     b.publisher.toLowerCase().includes(q) ||
     (b.collection?.toLowerCase().includes(q) ?? false) ||
-    b.isbn.includes(q)
+    matchesIsbn(b, q)
   )
 }

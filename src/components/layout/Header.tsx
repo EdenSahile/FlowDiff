@@ -22,6 +22,7 @@ import { needsNotedConfirmation, buildNotedMessage, buildAddedToCartMessage, isI
 import { useToast } from '@/contexts/ToastContext'
 import { IconTrash, IconCart, IconSearch } from '@/components/ui/icons'
 import { exportToCSV } from '@/lib/csv'
+import { hasExactIsbn } from '@/lib/bookUtils'
 
 const GOLD = theme.colors.accent
 
@@ -1215,7 +1216,7 @@ export function Header({ cartCount = 0, onBurgerClick, onCartClick }: HeaderProp
     const trimmed = search.trim()
     if (!trimmed && activeCount === 0) return
 
-    const byIsbn = getCatalogueBooks().find(b => b.isbn === trimmed)
+    const byIsbn = getCatalogueBooks().find(b => hasExactIsbn(b, trimmed))
     if (byIsbn) {
       navigate(`/livre/${byIsbn.id}`)
       setSearch('')

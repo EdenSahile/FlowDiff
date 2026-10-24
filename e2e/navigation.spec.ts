@@ -159,6 +159,16 @@ test.describe('Header', () => {
     await expect(page).toHaveURL(`/livre/${BOOK.id}`)
   })
 
+  // Un titre disponible en numérique porte 2 ISBN, papier et ebook, et les
+  // deux désignent le même ouvrage : le libraire doit arriver sur la fiche
+  // quel que soit celui qu'il saisit.
+  test('une recherche par ISBN d\'ebook ouvre la fiche du titre', async ({ page }) => {
+    await page.locator('input[aria-label="Recherche globale"]').fill('9782501990022')
+    await page.locator('input[aria-label="Recherche globale"]').press('Enter')
+
+    await expect(page).toHaveURL('/livre/n-pra-01')
+  })
+
   test('le panier est accessible depuis le header', async ({ page }) => {
     await page.getByRole('button', { name: /^Panier/ }).click()
 

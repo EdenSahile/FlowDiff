@@ -8,6 +8,7 @@ import { MOCK_SERIES, MENTION_PRIME, type Serie, type OffreCommerciale } from '@
 import { BookCover } from '@/components/catalogue/BookCover'
 import { mq } from '@/lib/responsive'
 import { BackButton as BackNavButton } from '@/components/ui/BackButton'
+import { matchesIsbn } from '@/lib/bookUtils'
 
 /* ══════════════════════════════════════════════
    TYPES DE FILTRES
@@ -1239,7 +1240,7 @@ export function SelectionsPage() {
           b =>
             s.bookIds.includes(b.id) &&
             (b.title.toLowerCase().includes(q) ||
-              b.isbn.includes(q) ||
+              matchesIsbn(b, q) ||
               b.authors.some(a => a.toLowerCase().includes(q)))
         )
         if (!inNom && !inAuteur && !inBooks) return false
@@ -1278,7 +1279,7 @@ export function SelectionsPage() {
     return serieBooks.filter(
       b =>
         b.title.toLowerCase().includes(q) ||
-        b.isbn.includes(q) ||
+        matchesIsbn(b, q) ||
         b.authors.some(a => a.toLowerCase().includes(q))
     )
   }, [serieBooks, detailSearch])

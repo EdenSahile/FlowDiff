@@ -6,6 +6,7 @@ import { PRICE_RANGES, type Book, type Universe } from '@/data/mockBooks'
 import { BookCard } from '@/components/catalogue/BookCard'
 import { BackButton } from '@/components/ui/BackButton'
 import { mq } from '@/lib/responsive'
+import { matchesIsbn, hasExactIsbn } from '@/lib/bookUtils'
 
 /* ══════════════════════════════════════════════════════
    UTILS
@@ -27,7 +28,7 @@ function searchCatalog(catalog: Book[], query: string): Book[] {
     b.authors.some(a => normalise(a).includes(q)) ||
     normalise(b.publisher).includes(q) ||
     (b.collection && normalise(b.collection).includes(q)) ||
-    b.isbn.includes(q.replace(/[\s-]/g, ''))
+    matchesIsbn(b, q)
   )
 }
 
@@ -457,7 +458,7 @@ export function RecherchePage() {
     if (!q || allBooks.length === 0) return
     const isbn = q.replace(/[\s-]/g, '')
     if (isIsbn(isbn)) {
-      const found = allBooks.find(b => b.isbn === isbn)
+      const found = allBooks.find(b => hasExactIsbn(b, isbn))
       if (found) navigate(`/livre/${found.id}`, { replace: true })
     }
   }, [q, allBooks, navigate])
@@ -491,7 +492,7 @@ export function RecherchePage() {
 
   /* Cas ISBN hors catalogue */
   const isbnNotFound = q && isIsbn(q.replace(/[\s-]/g, '')) &&
-    !allBooks.find(b => b.isbn === q.replace(/[\s-]/g, ''))
+    !allBooks.find(b => hasExactIsbn(b, q))
 
   /* ── Rendu ── */
   if (!q && !hasAdvancedFilters) {
