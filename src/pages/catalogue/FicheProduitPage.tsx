@@ -1,10 +1,10 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { BackButton as BackNavButton } from '@/components/ui/BackButton'
 import { createPortal } from 'react-dom'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, Link } from 'react-router-dom'
 import styled, { keyframes } from 'styled-components'
-import { getBookByIdAsync, getBooksByTypeAsync } from '@/services/books'
-import type { Book } from '@/data/mockBooks'
+import { getBookByIdAsync, getBooksByTypeAsync, getAllBooksAsync } from '@/services/books'
+import type { Book, EbookOffer } from '@/data/mockBooks'
 import { BookCover } from '@/components/catalogue/BookCover'
 import { useCart } from '@/contexts/CartContext'
 import { useToast } from '@/contexts/ToastContext'
@@ -13,19 +13,32 @@ import { StockAlertModal } from '@/components/ui/StockAlertModal'
 import { slugifyAuthor } from '@/lib/slugify'
 import { theme } from '@/lib/theme'
 import { formatPrice } from '@/lib/format'
-import { getPurchaseAvailability } from '@/lib/bookUtils'
+import {
+  getPurchaseAvailability, getEbookLabel, getFormatLabel,
+  getOtherEditions, getReplacementEdition, getReplacedEdition, getReliureLabel,
+} from '@/lib/bookUtils'
+import { StockStatus } from '@/components/ui/StockStatus'
 import { mq } from '@/lib/responsive'
 import { useRefetchOnFocus } from '@/hooks/useRefetchOnFocus'
 
 /* ── Formats physiques ── */
-type FormatId = 'broche' | 'poche'
+/* 'broche', 'poche', puis un identifiant par offre numerique du titre. */
+type FormatId = string
 
 interface PhysicalFormat {
   id: FormatId
   label: string
   description: string
   priceTTC: number
-  dimensions: string
+  /* Ce que la ligne « Format » affiche : les dimensions pour le papier, le
+     format de fichier pour l'ebook, qui n'a pas de dimensions. */
+  formatDetail: string
+  /* Les dimensions du papier, absentes d'une offre numerique. */
+  dimensions?: string
+  /* Un ebook est une reference commerciale distincte, avec son propre ISBN. */
+  isbn?: string
+  /* Presente seulement sur une offre numerique : ce qui part au panier. */
+  ebookOffer?: EbookOffer
 }
 
 const LOREM_SHORT =
@@ -380,6 +393,51 @@ const FormatPriceEl = styled.span<{ $active: boolean }>`
   font-size: 11.5px;
   color: ${({ $active, theme }) => $active ? theme.colors.navy : theme.colors.gray[400]};
   font-weight: ${({ $active }) => $active ? '500' : '400'};
+  margin-top: 1px;
+`
+
+/* Les dimensions prennent leur propre ligne et ne se coupent jamais en
+   deux : « 210 x 280 mm » restait sinon à cheval sur 2 lignes. */
+const DimensionsLineEl = styled.span`
+  display: block;
+  white-space: nowrap;
+`
+
+/* ── Autres éditions de la même œuvre ── */
+const EditionsWrap = styled.div`
+  margin-bottom: 12px;
+`
+
+const EditionsRow = styled.div`
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+`
+
+const EditionLinkEl = styled(Link)`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 7px 12px;
+  border-radius: 7px;
+  border: 1.5px dashed rgba(42, 42, 40, .18);
+  background: ${({ theme }) => theme.colors.white};
+  text-decoration: none;
+  transition: border-color .15s;
+  &:hover { border-color: ${({ theme }) => theme.colors.navy}; }
+`
+
+const EditionNameEl = styled.span`
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 12.5px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.gray[800]};
+`
+
+const EditionMetaEl = styled.span`
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 11.5px;
+  color: ${({ theme }) => theme.colors.gray[400]};
   margin-top: 1px;
 `
 
@@ -1240,6 +1298,12 @@ export function FicheProduitPage() {
   const [book, setBook]               = useState<Book | null>(null)
   const [bookLoading, setBookLoading] = useState(true)
   const [similar, setSimilar]         = useState<Book[]>([])
+  /* Les autres editions papier de la meme oeuvre : le poche d'un grand
+     format, et reciproquement. Chacune est un titre du catalogue. */
+  const [otherEditions, setOtherEditions] = useState<Book[]>([])
+  /* L'edition qui remplace celle-ci, et celle qu'elle remplace. */
+  const [replacement, setReplacement] = useState<Book | null>(null)
+  const [replaced, setReplaced]       = useState<Book | null>(null)
   const [prevId, setPrevId]           = useState(id)
 
   if (prevId !== id) {
@@ -1250,6 +1314,9 @@ export function FicheProduitPage() {
       setBookLoading(true)
       setBook(null)
       setSimilar([])
+      setOtherEditions([])
+      setReplacement(null)
+      setReplaced(null)
     }
   }
 
@@ -1261,7 +1328,14 @@ export function FicheProduitPage() {
       setBookLoading(false)
       if (b) {
         getBooksByTypeAsync(b.type).then(all => {
-          setSimilar(all.filter(x => x.universe === b.universe && x.id !== b.id).slice(0, 7))
+          setSimilar(all.filter(x =>
+            x.universe === b.universe && x.id !== b.id && !(b.workId && x.workId === b.workId),
+          ).slice(0, 7))
+        }).catch(console.error)
+        getAllBooksAsync().then(all => {
+          setOtherEditions(getOtherEditions(b, all))
+          setReplacement(getReplacementEdition(b, all))
+          setReplaced(getReplacedEdition(b, all))
         }).catch(console.error)
       }
     }).catch(() => setBookLoading(false))
@@ -1294,8 +1368,49 @@ export function FicheProduitPage() {
   }
 
   const formats: PhysicalFormat[] = [
-    { id: 'broche', label: 'Broché', description: 'Format standard', priceTTC: book.priceTTC,                                      dimensions: book.format },
-    { id: 'poche',  label: 'Poche',  description: 'Format poche',    priceTTC: Math.round(book.priceTTC * 0.62 * 100) / 100, dimensions: '108 x 177 mm' },
+    /*
+      L'edition papier de cette fiche. Son libelle vient de ses dimensions,
+      « Poche » pour un 115 x 175 mm, suivi de sa collection quand elle en a
+      une : c'est ce qui dit au libraire quelle edition il regarde.
+    */
+    {
+      id: 'broche',
+      label: [getFormatLabel(book) ?? 'Papier', book.collection].filter(Boolean).join(' · '),
+      description: 'Édition papier',
+      priceTTC: book.priceTTC,
+      /* Les 2 axes d'un cote, les dimensions de l'autre : elles vont sur leur
+         propre ligne, la colonne etant trop etroite pour les garder d'un
+         seul tenant a la suite du reste. */
+      formatDetail: [
+        getFormatLabel(book) ?? 'Papier',
+        getReliureLabel(book)?.toLowerCase(),
+      ].filter(Boolean).join(' · '),
+      dimensions: book.format,
+    },
+    /*
+      Pas d'edition poche ici. Elle etait fabriquee a l'affichage, a 62 % du
+      prix du grand format, sur les 49 titres du catalogue. Deux fautes
+      metier : en France le prix d'un livre est fixe par l'editeur et
+      opposable a tous (loi du 10 aout 1981 pour le papier, loi du 26 mai
+      2011 pour le numerique), donc aucun prix ne se calcule ; et un poche
+      n'existe que s'il a ete publie, ce qui n'est jamais le cas d'un manga
+      au format tankobon 115 x 175 mm ni d'un beau livre 220 x 290 mm.
+      Une edition poche est un produit distinct, avec son ISBN, sa collection
+      et sa parution 12 a 24 mois apres le grand format : elle se declare
+      dans les donnees ou elle ne s'affiche pas.
+    */
+    // Un bouton par offre numerique, aucun si le titre n'en a pas, alors que
+    // les formats papier sont toujours affiches. Un titre vendu en PDF et en
+    // EPUB en propose donc 2, chacun avec son ISBN et son prix.
+    ...(book.ebooks ?? []).map(offer => ({
+      id: `ebook-${offer.format}`,
+      label: getEbookLabel(offer.format),
+      description: 'Version numérique',
+      priceTTC: offer.priceTTC,
+      formatDetail: offer.format,
+      isbn: offer.isbn,
+      ebookOffer: offer,
+    })),
   ]
 
   const selectedFormat = formats.find(f => f.id === formatId)!
@@ -1306,12 +1421,16 @@ export function FicheProduitPage() {
   }).format(new Date(`${book.publicationDate}T00:00:00Z`))
 
   const performAdd = (enReliquat: boolean) => {
-    const ratio = selectedFormat.priceTTC / book.priceTTC
-    addToCart({
-      ...book,
-      priceTTC: selectedFormat.priceTTC,
-      price: Math.round(book.price * ratio * 100) / 100,
-    }, qty, { enReliquat })
+    // Un ebook entre au panier comme sa propre ligne, avec son ISBN et son
+    // prix : c'est une reference distincte du papier, pas une remise dessus.
+    if (selectedFormat.ebookOffer) {
+      addToCart(book, qty, { enReliquat, ebookOption: selectedFormat.ebookOffer })
+      showToast(`${selectedFormat.label} ajouté au panier`)
+      setAdded(true)
+      setTimeout(() => setAdded(false), 2000)
+      return
+    }
+    addToCart(book, qty, { enReliquat })
     showToast('Ouvrage ajouté au panier')
     setAdded(true)
     setTimeout(() => setAdded(false), 2000)
@@ -1372,7 +1491,10 @@ export function FicheProduitPage() {
               </ArgMetaItem>
               <ArgMetaItem>
                 <ArgMetaLabel>Format</ArgMetaLabel>
-                <ArgMetaValue>{selectedFormat.dimensions}</ArgMetaValue>
+                <ArgMetaValue>
+                  {[selectedFormat.formatDetail, selectedFormat.dimensions]
+                    .filter(Boolean).join(' · ')}
+                </ArgMetaValue>
               </ArgMetaItem>
               {book.pages && (
                 <ArgMetaItem>
@@ -1382,7 +1504,7 @@ export function FicheProduitPage() {
               )}
               <ArgMetaItem>
                 <ArgMetaLabel>Prix TTC</ArgMetaLabel>
-                <ArgMetaValue>{formatPrice(book.priceTTC)} €</ArgMetaValue>
+                <ArgMetaValue>{formatPrice(selectedFormat.priceTTC)} €</ArgMetaValue>
               </ArgMetaItem>
             </ArgMeta>
           </ArgBody>
@@ -1414,11 +1536,6 @@ export function FicheProduitPage() {
   const uvStyle        = UNIVERSE_STYLES[book.universe] ?? { bg: '#E8EDF3', color: '#1C3252' }
   const sectionLabel   = book.type === 'a-paraitre' ? 'À paraître' : book.type === 'nouveaute' ? 'Nouveautés' : 'Fonds'
   const sectionPath    = book.type === 'fonds' ? '/fonds' : '/nouveautes'
-  const stockLabel =
-    book.statut === 'disponible'   ? 'Disponible' :
-    book.statut === 'sur_commande' ? 'Sur commande' :
-    book.statut === 'en_reimp'     ? 'En réimpression' :
-    book.statut === 'rupture'      ? 'Rupture de stock' : 'Disponible'
   return (
     <Page>
       <BackNavButton />
@@ -1472,7 +1589,7 @@ export function FicheProduitPage() {
           <MetaBox>
             <MetaRowItem>
               <MetaLabelEl>ISBN</MetaLabelEl>
-              <MetaValueEl style={{ fontSize: 13 }}><strong>{book.isbn}</strong></MetaValueEl>
+              <MetaValueEl style={{ fontSize: 13 }}><strong>{selectedFormat.isbn ?? book.isbn}</strong></MetaValueEl>
             </MetaRowItem>
             <MetaRowItem>
               <MetaLabelEl>Éditeur</MetaLabelEl>
@@ -1490,7 +1607,12 @@ export function FicheProduitPage() {
             )}
             <MetaRowItem>
               <MetaLabelEl>Format</MetaLabelEl>
-              <MetaValueEl>{selectedFormat.dimensions}</MetaValueEl>
+              <MetaValueEl>
+                {selectedFormat.formatDetail}
+                {selectedFormat.dimensions && (
+                  <DimensionsLineEl>{selectedFormat.dimensions}</DimensionsLineEl>
+                )}
+              </MetaValueEl>
             </MetaRowItem>
             {book.collection && (
               <MetaRowItem>
@@ -1527,7 +1649,12 @@ export function FicheProduitPage() {
             {' · '}{new Date(book.publicationDate).getFullYear()}
           </BookEditorMain>
 
-          {showStandardOrder && (
+          {/* Toujours affichee : cette ligne ne sert pas qu'a choisir, elle dit
+              quelle edition on regarde. La masquer, faute de 2e format ou
+              parce que le titre n'est pas commandable, laissait le bloc
+              « Autres editions » seul en haut de la fiche, et son edition se
+              lisait alors comme celle de la page. */}
+          {(
             <FormatSelectorWrap>
               <FormatLabelEl>Format</FormatLabelEl>
               <FormatOptionsRow>
@@ -1541,6 +1668,57 @@ export function FicheProduitPage() {
             </FormatSelectorWrap>
           )}
 
+          {/* Filiation d'une meme reference, a ne pas confondre avec le bloc
+              suivant : « Autres editions » liste les formats de l'oeuvre,
+              celui-ci dit quel ISBN prend la suite d'un ISBN epuise. */}
+          {replacement && (
+            <EditionsWrap>
+              <FormatLabelEl>Remplacé par</FormatLabelEl>
+              <EditionsRow>
+                <EditionLinkEl to={`/livre/${replacement.id}`}>
+                  <EditionNameEl>Nouvelle édition →</EditionNameEl>
+                  <EditionMetaEl>
+                    ISBN {replacement.isbn} · {formatPrice(replacement.priceTTC)} € TTC
+                  </EditionMetaEl>
+                </EditionLinkEl>
+              </EditionsRow>
+            </EditionsWrap>
+          )}
+
+          {replaced && (
+            <EditionsWrap>
+              <FormatLabelEl>Édition précédente</FormatLabelEl>
+              <EditionsRow>
+                <EditionLinkEl to={`/livre/${replaced.id}`}>
+                  <EditionNameEl>Épuisée →</EditionNameEl>
+                  <EditionMetaEl>ISBN {replaced.isbn}</EditionMetaEl>
+                </EditionLinkEl>
+              </EditionsRow>
+            </EditionsWrap>
+          )}
+
+          {/* Chaque edition est un titre du catalogue, donc un lien vers sa
+              propre fiche, pas un bouton qui changerait celle-ci. */}
+          {otherEditions.length > 0 && (
+            <EditionsWrap>
+              <FormatLabelEl>Autres éditions</FormatLabelEl>
+              <EditionsRow>
+                {otherEditions.map(edition => (
+                  <EditionLinkEl key={edition.id} to={`/livre/${edition.id}`}>
+                    <EditionNameEl>
+                      {[getFormatLabel(edition) ?? 'Autre format', edition.collection]
+                        .filter(Boolean).join(' · ')}
+                      {' '}→
+                    </EditionNameEl>
+                    <EditionMetaEl>
+                      {formatPrice(edition.priceTTC)} € TTC · {edition.publisher}
+                    </EditionMetaEl>
+                  </EditionLinkEl>
+                ))}
+              </EditionsRow>
+            </EditionsWrap>
+          )}
+
           <PriceZone>
             <PriceRowEl>
               <PricePublicEl>{formatPrice(selectedFormat.priceTTC)} €</PricePublicEl>
@@ -1549,12 +1727,20 @@ export function FicheProduitPage() {
 
             {(showStandardOrder || isEpuise || isAParaitre) && <PriceDividerEl />}
 
+            {/* La disponibilite ne depend pas du fait de pouvoir commander :
+                elle est affichee pour tous les statuts, epuise et rupture
+                compris, ou elle n'apparaissait nulle part sur cet ecran. */}
+            {book.statut && (
+              <StockZoneEl>
+                <StockStatus statut={book.statut} delaiReimp={book.delaiReimp} />
+                {showStandardOrder && (
+                  <StockDispoDetailEl>· Livraison 1–3 jours ouvrés</StockDispoDetailEl>
+                )}
+              </StockZoneEl>
+            )}
+
             {showStandardOrder && (
               <>
-                <StockZoneEl>
-                  <StockIndicatorEl $statut={book.statut}>{stockLabel}</StockIndicatorEl>
-                  <StockDispoDetailEl>· Livraison 1–3 jours ouvrés</StockDispoDetailEl>
-                </StockZoneEl>
                 <OrderZoneEl>
                   <QtyStepperLg>
                     <QtyBtnLg onClick={() => setQty(q => Math.max(1, q - 1))} disabled={qty <= 1} aria-label="Diminuer">−</QtyBtnLg>

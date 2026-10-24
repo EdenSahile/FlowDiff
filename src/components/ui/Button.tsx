@@ -6,7 +6,10 @@ type Size = 'sm' | 'md' | 'lg'
 interface ButtonProps {
   variant?: Variant
   size?: Size
-  fullWidth?: boolean
+  /* Prefixe $ obligatoire : styled-components v6 transmet a la balise HTML
+     toute prop non prefixee qu'il ne reconnait pas comme attribut valide, et
+     React signale alors un attribut inconnu sur le <button>. */
+  $fullWidth?: boolean
 }
 
 const sizeStyles = {
@@ -67,7 +70,7 @@ export const Button = styled.button<ButtonProps>`
   cursor: pointer;
   transition: background-color 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
   white-space: nowrap;
-  width: ${({ fullWidth }) => (fullWidth ? '100%' : 'auto')};
+  width: ${({ $fullWidth }) => ($fullWidth ? '100%' : 'auto')};
 
   ${({ size = 'md' }) => sizeStyles[size]}
   ${({ variant = 'primary' }) => variantStyles[variant]}

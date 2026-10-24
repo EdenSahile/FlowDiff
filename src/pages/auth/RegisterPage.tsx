@@ -168,7 +168,7 @@ export function RegisterPage() {
             </PasswordToggle>
           </PasswordWrapper>
 
-          <Button type="button" fullWidth disabled={isSubmitting} onClick={handleSubmit}>
+          <Button type="button" $fullWidth disabled={isSubmitting} onClick={handleSubmit}>
             {isSubmitting ? 'Création du compte…' : 'Créer mon accès'}
           </Button>
         </AuthForm>

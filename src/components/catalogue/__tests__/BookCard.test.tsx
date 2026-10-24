@@ -120,6 +120,48 @@ describe('BookCard — titre épuisé (FLOW-RM-027)', () => {
 })
 
 /* ══════════════════════════════════════════════════════
+   Édition épuisée remplacée par une autre : la carte
+   mène au titre commandable, celui que le libraire cherche
+══════════════════════════════════════════════════════ */
+
+describe('BookCard — édition remplacée', () => {
+  it('remplace le bouton désactivé par un lien vers la nouvelle édition', () => {
+    const remplacee = makeBook({ id: 'ed-2021', statut: 'epuise', replacedById: 'ed-2024' })
+
+    wrap(<BookCard book={remplacee} />)
+
+    const lien = screen.getByRole('link', { name: /Voir la nouvelle édition/ })
+    expect(lien).toHaveAttribute('href', '/livre/ed-2024')
+  })
+
+  it('fait de même en mode coverFirst', () => {
+    const remplacee = makeBook({ id: 'ed-2021b', statut: 'epuise', replacedById: 'ed-2024' })
+
+    wrap(<BookCard book={remplacee} coverFirst />)
+
+    const lien = screen.getByRole('link', { name: /Voir la nouvelle édition/ })
+    expect(lien).toHaveAttribute('href', '/livre/ed-2024')
+  })
+
+  it('mène au remplaçant depuis le titre, pas à la fiche épuisée', () => {
+    const remplacee = makeBook({ id: 'ed-2021c', title: 'Titre remplacé', statut: 'epuise', replacedById: 'ed-2024' })
+
+    wrap(<BookCard book={remplacee} />)
+
+    expect(screen.getByRole('link', { name: 'Titre remplacé' })).toHaveAttribute('href', '/livre/ed-2024')
+  })
+
+  it('laisse le bouton désactivé quand aucune édition ne remplace le titre', () => {
+    const epuiseSansSuite = makeBook({ id: 'epuise-03', statut: 'epuise' })
+
+    wrap(<BookCard book={epuiseSansSuite} />)
+
+    expect(screen.queryByRole('link', { name: /Voir la nouvelle édition/ })).toBeNull()
+    expect(screen.getByRole('button', { name: 'Épuisé' })).toBeDisabled()
+  })
+})
+
+/* ══════════════════════════════════════════════════════
    FLOW-RM-028 : BookCard permet l'ajout d'un titre à paraître
 ══════════════════════════════════════════════════════ */
 

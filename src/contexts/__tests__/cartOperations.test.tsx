@@ -173,12 +173,12 @@ describe('FLOW-RM-039 : ajout même livre = incrémentation quantité', () => {
 
     act(() => {
       result.current.addToCart(makeBook({ id: 'livre-a' }), 1, {
-        ebookOption: { hebergeur: 'Eden', format: 'EPUB', price: 5, isbnEbook: 'ebook-001' },
+        ebookOption: { format: 'EPUB', priceTTC: 5, isbn: 'ebook-001' },
       })
     })
     act(() => {
       result.current.addToCart(makeBook({ id: 'livre-a' }), 1, {
-        ebookOption: { hebergeur: 'Eden', format: 'PDF', price: 7, isbnEbook: 'ebook-002' },
+        ebookOption: { format: 'PDF', priceTTC: 7, isbn: 'ebook-002' },
       })
     })
 

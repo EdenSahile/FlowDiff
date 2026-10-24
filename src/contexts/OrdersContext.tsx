@@ -122,21 +122,29 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
     referenceCommande?: string
     referencesParLigne?: Record<string, string>
   }): Order {
+    /*
+      Une ligne numerique porte l'ISBN et le prix de son offre, pas ceux du
+      papier : c'est une reference commerciale distincte. L'offre ne connait
+      que le prix public TTC, le HT s'en deduit par le taux reduit du livre,
+      5,5 %. C'est une conversion de TVA, pas un prix calcule.
+    */
     const orderItems: OrderItem[] = params.items.map(({ book, quantity, statut, enReliquat, ebookOption }) => ({
       bookId: book.id,
       title: book.title,
       author: book.authors.join(', '),
       publisher: book.publisher,
-      isbn: book.isbn,
+      isbn: ebookOption?.isbn ?? book.isbn,
       quantity,
-      unitPriceHT: book.price,
-      unitPriceTTC: book.priceTTC,
+      unitPriceHT: ebookOption
+        ? Math.round((ebookOption.priceTTC / 1.055) * 100) / 100
+        : book.price,
+      unitPriceTTC: ebookOption?.priceTTC ?? book.priceTTC,
       universe: book.universe,
       typeCommande: getTypeCommande(book.type),
       statut,
       enReliquat,
       referenceLigne: params.referencesParLigne
-        ? (params.referencesParLigne[ebookOption ? `${book.id}::${ebookOption.isbnEbook}` : book.id]?.trim() || undefined)
+        ? (params.referencesParLigne[ebookOption ? `${book.id}::${ebookOption.isbn}` : book.id]?.trim() || undefined)
         : undefined,
     }))
 

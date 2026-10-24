@@ -268,7 +268,7 @@ export function LoginPage() {
               </a>
             </div>
 
-            <Button type="button" fullWidth disabled={isSubmitting} onClick={handleSubmit}>
+            <Button type="button" $fullWidth disabled={isSubmitting} onClick={handleSubmit}>
               {isSubmitting ? 'Connexion…' : 'Se connecter'}
             </Button>
           </AuthForm>

@@ -1,7 +1,8 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useMemo } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import styled from 'styled-components'
-import type { Book } from '@/data/mockBooks'
+import { getCatalogueBooks, type Book } from '@/data/mockBooks'
+import { getReplacedEdition } from '@/lib/bookUtils'
 import { BookCover } from './BookCover'
 import { useCart, REMISE_RATES } from '@/contexts/CartContext'
 import { useToast } from '@/contexts/ToastContext'
@@ -199,6 +200,18 @@ const CardFooter = styled.div`
 const StockLine = styled.div`
   display: flex;
   align-items: center;
+`
+
+/* Mention de filiation, a droite de la pastille de stock. */
+const LineageLink = styled(Link)`
+  margin-left: 6px;
+  font-size: 11px;
+  color: ${({ theme }) => theme.colors.gray[600]};
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  &:hover { text-decoration: underline; }
 `
 
 const PriceRow = styled.div`
@@ -595,9 +608,21 @@ export function BookCard({ book, showType = false, coverFirst = false }: Props) 
     setQty(q => Math.max(1, q + delta))
   }
 
+  /*
+    Filiation d'une reference. Une edition epuisee pointe sur celle qui la
+    remplace ; le lien inverse se retrouve en parcourant le catalogue. La
+    carte d'une edition remplacee mene directement au titre commandable,
+    puisque c'est celui que le libraire cherche.
+  */
+  const replacedEdition = useMemo(
+    () => getReplacedEdition(book, getCatalogueBooks()),
+    [book],
+  )
+  const targetId = book.replacedById ?? book.id
+
   const handleCardClick = () => {
     if (window.getSelection()?.toString()) return
-    navigate(`/livre/${book.id}`)
+    navigate(`/livre/${targetId}`)
   }
 
   const pubYear = book.publicationDate ? new Date(book.publicationDate).getFullYear() : null
@@ -642,7 +667,7 @@ export function BookCard({ book, showType = false, coverFirst = false }: Props) 
               </UniverseBadge>
               {book.selection && <SelectionChip>Sélection</SelectionChip>}
             </CFBadgeGroup>
-            <CF2Title><TitleLink to={`/livre/${book.id}`} onClick={e => e.stopPropagation()}>{book.title}</TitleLink></CF2Title>
+            <CF2Title><TitleLink to={`/livre/${targetId}`} onClick={e => e.stopPropagation()}>{book.title}</TitleLink></CF2Title>
             <CF2Authors>{book.authors.join(', ')}</CF2Authors>
             {(book.publisher || pubYear) && (
               <CF2Publisher>
@@ -688,11 +713,20 @@ export function BookCard({ book, showType = false, coverFirst = false }: Props) 
             {book.statut && (
               <CFStockRow>
                 <StockStatus statut={book.statut} delaiReimp={book.delaiReimp} />
+                {replacedEdition && (
+                  <LineageLink to={`/livre/${replacedEdition.id}`} onClick={e => e.stopPropagation()}>
+                    · Remplace l'éd. {new Date(replacedEdition.publicationDate).getFullYear()} →
+                  </LineageLink>
+                )}
               </CFStockRow>
             )}
 
             <CFActionRow>
-              {isIndispo ? (
+              {isIndispo && book.replacedById ? (
+                <AjouterBtn as={Link} to={`/livre/${book.replacedById}`} onClick={e => e.stopPropagation()}>
+                  Voir la nouvelle édition →
+                </AjouterBtn>
+              ) : isIndispo ? (
                 <AjouterBtn $epuise disabled aria-disabled="true" onClick={e => e.stopPropagation()}>
                   Indisponible
                 </AjouterBtn>
@@ -748,7 +782,7 @@ export function BookCard({ book, showType = false, coverFirst = false }: Props) 
               <AParaitreBadge>À paraître</AParaitreBadge>
             )}
           </BadgeRow>
-          <Title><TitleLink to={`/livre/${book.id}`} onClick={e => e.stopPropagation()}>{book.title}</TitleLink></Title>
+          <Title><TitleLink to={`/livre/${targetId}`} onClick={e => e.stopPropagation()}>{book.title}</TitleLink></Title>
           <Authors>{book.authors.join(', ')}</Authors>
           {(book.publisher || book.collection) && (
             <Publisher>
@@ -788,6 +822,11 @@ export function BookCard({ book, showType = false, coverFirst = false }: Props) 
           {book.statut && !isAParaitre && (
             <StockLine>
               <StockStatus statut={book.statut} delaiReimp={book.delaiReimp} />
+              {replacedEdition && (
+                <LineageLink to={`/livre/${replacedEdition.id}`} onClick={e => e.stopPropagation()}>
+                  · Remplace l'éd. {new Date(replacedEdition.publicationDate).getFullYear()} →
+                </LineageLink>
+              )}
             </StockLine>
           )}
 
@@ -844,7 +883,11 @@ export function BookCard({ book, showType = false, coverFirst = false }: Props) 
                 )}
               </PriceRow>
 
-              {isEpuise ? (
+              {isEpuise && book.replacedById ? (
+                <AjouterBtn as={Link} to={`/livre/${book.replacedById}`} onClick={e => e.stopPropagation()}>
+                  Voir la nouvelle édition →
+                </AjouterBtn>
+              ) : isEpuise ? (
                 <>
                   <AjouterBtn $epuise disabled aria-disabled="true" onClick={e => e.stopPropagation()}>
                     <IconCart /> {book.statut === 'rupture' ? 'Rupture' : 'Épuisé'}

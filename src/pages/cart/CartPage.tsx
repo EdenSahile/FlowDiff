@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNotifications } from '@/contexts/NotificationsContext'
 import { useNavigate } from 'react-router-dom'
 import styled, { keyframes } from 'styled-components'
-import { useCart, REMISE_RATES, getItemKey } from '@/contexts/CartContext'
+import { useCart, REMISE_RATES, getItemKey, getItemUnitPriceTTC, REMISE_NUMERIQUE } from '@/contexts/CartContext'
 import { useOrders } from '@/contexts/OrdersContext'
 import { useAuth } from '@/hooks/useAuth'
 import { BookCover } from '@/components/catalogue/BookCover'
@@ -170,19 +170,6 @@ const EbookFormatBadge = styled.span`
   margin-bottom: 3px;
 `
 
-const EbookPlatformTag = styled.span<{ $color: string }>`
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  font-size: 10px;
-  font-weight: 600;
-  color: ${({ $color }) => $color};
-  background: ${({ $color }) => $color}18;
-  border: 1px solid ${({ $color }) => $color}35;
-  border-radius: ${({ theme }) => theme.radii.xl};
-  padding: 2px 8px;
-  margin-left: 6px;
-`
 
 const ItemInfo = styled.div`flex: 1; min-width: 0;`
 
@@ -1144,7 +1131,7 @@ export function CartPage() {
   const montantHT = subtotalTTC / 1.055
 
   /* ── Badge remise % (base livres uniquement, hors PLV) ── */
-  const booksTTCOnly = items.reduce((s, { book, quantity }) => s + book.priceTTC * quantity, 0)
+  const booksTTCOnly = items.reduce((s, item) => s + getItemUnitPriceTTC(item) * item.quantity, 0)
     + opGroups.reduce((s, op) => s + op.books.reduce((ss, { book, quantity }) => ss + book.priceTTC * quantity, 0), 0)
   const remisePct = booksTTCOnly > 0 ? (remiseAmount / booksTTCOnly) * 100 : 0
 
@@ -1153,6 +1140,9 @@ export function CartPage() {
     ...opGroups.flatMap(op => op.books.map(b => b.book.universe)),
   ]
   const universeRates = [...new Set(allUniverses)].map(u => getUserRate(u) * 100)
+  /* Une ligne numerique porte un taux de plus, qui compte dans la detection
+     des taux multiples. */
+  if (items.some(i => i.ebookOption)) universeRates.push(REMISE_NUMERIQUE * 100)
   const hasMultiRates = new Set(universeRates).size > 1
 
   /* La PLV est au taux normal : le récapitulatif doit annoncer les 2 taux. */
@@ -1285,10 +1275,10 @@ export function CartPage() {
       <RecapCard>
         <RecapTitle>Détail de la commande</RecapTitle>
 
-        {items.map(({ book, quantity }) => (
-          <RecapRow key={book.id}>
-            <span>{book.title} × {quantity}</span>
-            <span>{fmt(book.priceTTC * quantity)}</span>
+        {items.map(item => (
+          <RecapRow key={getItemKey(item)}>
+            <span>{item.book.title} × {item.quantity}</span>
+            <span>{fmt(getItemUnitPriceTTC(item) * item.quantity)}</span>
           </RecapRow>
         ))}
 
@@ -1327,10 +1317,10 @@ export function CartPage() {
       </RecapCard>
 
       <NavActions>
-        <Button variant="primary" size="lg" fullWidth onClick={goNext}>
+        <Button variant="primary" size="lg" $fullWidth onClick={goNext}>
           Suivant — Adresses
         </Button>
-        <Button variant="ghost" size="md" fullWidth onClick={goBack}>
+        <Button variant="ghost" size="md" $fullWidth onClick={goBack}>
           <IconChevronLeft /> Modifier le panier
         </Button>
       </NavActions>
@@ -1383,10 +1373,10 @@ export function CartPage() {
       )}
 
       <NavActions>
-        <Button variant="primary" size="lg" fullWidth onClick={goNext}>
+        <Button variant="primary" size="lg" $fullWidth onClick={goNext}>
           Suivant — Mode de transmission
         </Button>
-        <Button variant="ghost" size="md" fullWidth onClick={goBack}>
+        <Button variant="ghost" size="md" $fullWidth onClick={goBack}>
           <IconChevronLeft /> Récapitulatif
         </Button>
       </NavActions>
@@ -1414,10 +1404,10 @@ export function CartPage() {
         <RecapTitle>Récapitulatif de votre commande</RecapTitle>
 
         {/* Titres */}
-        {items.map(({ book, quantity }) => (
-          <RecapRow key={book.id}>
-            <span>{book.title} × {quantity}</span>
-            <span>{fmt(book.priceTTC * quantity)}</span>
+        {items.map(item => (
+          <RecapRow key={getItemKey(item)}>
+            <span>{item.book.title} × {item.quantity}</span>
+            <span>{fmt(getItemUnitPriceTTC(item) * item.quantity)}</span>
           </RecapRow>
         ))}
         {opGroups.map(op => op.books.map(({ book, quantity }) => (
@@ -1447,13 +1437,13 @@ export function CartPage() {
       </RecapCard>
 
       <NavActions>
-        <Button variant="primary" size="lg" fullWidth onClick={() => {
+        <Button variant="primary" size="lg" $fullWidth onClick={() => {
           if (saveAsDefault) setTransmissionMode(localTransmission)
           handleConfirmOrder()
         }}>
           Envoyer la commande
         </Button>
-        <Button variant="ghost" size="md" fullWidth onClick={goBack}>
+        <Button variant="ghost" size="md" $fullWidth onClick={goBack}>
           <IconChevronLeft /> Adresses
         </Button>
       </NavActions>
@@ -1525,16 +1515,9 @@ export function CartPage() {
             const { book, quantity, ebookOption } = item
             const key       = getItemKey(item)
             const isEbook   = !!ebookOption
-            const unitPrice = isEbook ? ebookOption!.price : book.priceTTC
-            const remise    = getUserRate(book.universe)
-
-            const platformColor =
-              ebookOption?.hebergeur === 'OpenEdition' ? '#D4500A' :
-              ebookOption?.hebergeur === 'Cairn'       ? '#1A5E8A' :
-              ebookOption?.hebergeur === 'Izneo'       ? '#6B3FA0' :
-              ebookOption?.hebergeur === 'Numilog'     ? '#2D7A3A' : '#555'
-
-            const showPlatformTag = isEbook && ebookOption!.hebergeur !== 'Amalivre'
+            const unitPrice = getItemUnitPriceTTC(item)
+            /* Le numerique a son propre taux, sans stock ni invendu a couvrir. */
+            const remise    = isEbook ? REMISE_NUMERIQUE : getUserRate(book.universe)
 
             return (
               <ItemCard key={key} $ebook={isEbook}>
@@ -1545,11 +1528,6 @@ export function CartPage() {
                       <EbookFormatBadge>
                         <IconScreen /> EBOOK · {ebookOption!.format}
                       </EbookFormatBadge>
-                      {showPlatformTag && (
-                        <EbookPlatformTag $color={platformColor}>
-                          {ebookOption!.hebergeur}
-                        </EbookPlatformTag>
-                      )}
                     </div>
                   )}
                   <ItemTitle>{book.title}</ItemTitle>
@@ -1563,7 +1541,7 @@ export function CartPage() {
                     </ItemStatutLine>
                   ) : null}
                   <ItemAuthor>{book.authors.join(', ')} — {book.publisher}</ItemAuthor>
-                  <ItemIsbn>ISBN {isEbook ? ebookOption!.isbnEbook : book.isbn} · {isEbook ? ebookOption!.format : book.format}</ItemIsbn>
+                  <ItemIsbn>ISBN {isEbook ? ebookOption!.isbn : book.isbn} · {isEbook ? ebookOption!.format : book.format}</ItemIsbn>
                   <ItemFooter>
                     <div>
                       <PriceStrip>

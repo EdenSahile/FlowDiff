@@ -1,5 +1,6 @@
 import { getCatalogueBookById, getCatalogueBooks } from '@/data/mockBooks'
 import type { Book, BookType, Universe } from '@/data/mockBooks'
+import { matchesIsbn } from '@/lib/bookUtils'
 
 /* Le catalogue vient de MOCK_BOOKS, en mémoire. Ces fonctions restent async
    parce que les pages les consomment en await/then. */
@@ -28,7 +29,7 @@ export function searchBooksLocal(books: Book[], query: string): Book[] {
     b.title.toLowerCase().includes(q) ||
     b.authors.some(a => a.toLowerCase().includes(q)) ||
     b.publisher.toLowerCase().includes(q) ||
-    b.isbn.includes(q.replace(/[\s-]/g, '')) ||
+    matchesIsbn(b, q) ||
     (b.collection?.toLowerCase().includes(q) ?? false) ||
     (b.genre?.toLowerCase().includes(q) ?? false)
   )

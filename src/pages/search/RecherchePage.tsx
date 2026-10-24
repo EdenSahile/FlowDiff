@@ -6,6 +6,7 @@ import { PRICE_RANGES, type Book, type Universe } from '@/data/mockBooks'
 import { BookCard } from '@/components/catalogue/BookCard'
 import { BackButton } from '@/components/ui/BackButton'
 import { mq } from '@/lib/responsive'
+import { matchesIsbn, hasExactIsbn, matchesFormat, matchesReliure } from '@/lib/bookUtils'
 
 /* ══════════════════════════════════════════════════════
    UTILS
@@ -27,7 +28,7 @@ function searchCatalog(catalog: Book[], query: string): Book[] {
     b.authors.some(a => normalise(a).includes(q)) ||
     normalise(b.publisher).includes(q) ||
     (b.collection && normalise(b.collection).includes(q)) ||
-    b.isbn.includes(q.replace(/[\s-]/g, ''))
+    matchesIsbn(b, q)
   )
 }
 
@@ -439,11 +440,17 @@ export function RecherchePage() {
   const navigate  = useNavigate()
 
   const q        = (params.get('q') ?? '').trim()
-  const pUniverse = (params.get('universe') ?? '') as Universe | ''
+  /* Le panneau de filtres du header sépare les valeurs d'un même groupe par
+     une virgule, pour les 5 groupes. Lire `prix` avec un autre séparateur
+     laissait passer tout le catalogue dès que 2 tranches étaient cochées, et
+     lire `universe` comme une valeur unique ne renvoyait rien dès que 2
+     thématiques l'étaient. */
+  const pUniverses = params.get('universe')?.split(',').filter(Boolean) ?? []
   const pGenres   = params.get('genres')?.split(',').filter(Boolean) ?? []
   const pLangues  = params.get('langues')?.split(',').filter(Boolean) ?? []
-  const pPrix     = params.get('prix')?.split('|').filter(Boolean) ?? []
+  const pPrix     = params.get('prix')?.split(',').filter(Boolean) ?? []
   const pFormats  = params.get('formats')?.split(',').filter(Boolean) ?? []
+  const pReliures = params.get('reliures')?.split(',').filter(Boolean) ?? []
 
   const [universeFilter, setUniverseFilter] = useState<Universe | null>(null)
   const [allBooks, setAllBooks] = useState<Book[]>([])
@@ -457,7 +464,7 @@ export function RecherchePage() {
     if (!q || allBooks.length === 0) return
     const isbn = q.replace(/[\s-]/g, '')
     if (isIsbn(isbn)) {
-      const found = allBooks.find(b => b.isbn === isbn)
+      const found = allBooks.find(b => hasExactIsbn(b, isbn))
       if (found) navigate(`/livre/${found.id}`, { replace: true })
     }
   }, [q, allBooks, navigate])
@@ -467,17 +474,18 @@ export function RecherchePage() {
   const allResults = useMemo(() => {
     let books = q ? searchCatalog(allBooks, q) : [...allBooks]
 
-    if (pUniverse) books = books.filter(b => b.universe === pUniverse)
+    if (pUniverses.length) books = books.filter(b => pUniverses.includes(b.universe))
     if (pGenres.length)  books = books.filter(b => b.genre && pGenres.includes(b.genre))
     if (pLangues.length) books = books.filter(b => b.language && pLangues.includes(b.language))
     if (pPrix.length) {
       const ranges = PRICE_RANGES.filter(r => pPrix.includes(r.label))
       if (ranges.length) books = books.filter(b => ranges.some(r => b.priceTTC >= r.min && b.priceTTC < r.max))
     }
-    if (pFormats.length) books = books.filter(b => b.format && pFormats.includes(b.format))
+    if (pFormats.length) books = books.filter(b => matchesFormat(b, pFormats))
+    if (pReliures.length) books = books.filter(b => matchesReliure(b, pReliures))
 
     return books
-  // paramsStr est dérivé de pUniverse/pGenres/pLangues/pPrix/pFormats — changement unique
+  // paramsStr est dérivé de pUniverses/pGenres/pLangues/pPrix/pFormats, changement unique
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [allBooks, q, paramsStr])
 
@@ -487,11 +495,11 @@ export function RecherchePage() {
   )
 
   /* Filters applied via URL params */
-  const hasAdvancedFilters = !!(pUniverse || pGenres.length || pLangues.length || pPrix.length || pFormats.length)
+  const hasAdvancedFilters = !!(pUniverses.length || pGenres.length || pLangues.length || pPrix.length || pFormats.length || pReliures.length)
 
   /* Cas ISBN hors catalogue */
   const isbnNotFound = q && isIsbn(q.replace(/[\s-]/g, '')) &&
-    !allBooks.find(b => b.isbn === q.replace(/[\s-]/g, ''))
+    !allBooks.find(b => hasExactIsbn(b, q))
 
   /* ── Rendu ── */
   if (!q && !hasAdvancedFilters) {
@@ -539,11 +547,12 @@ export function RecherchePage() {
           <ResultSub>
             Filtres actifs :{' '}
             {[
-              pUniverse,
+              ...pUniverses,
               ...pGenres,
               ...pLangues,
               ...pPrix,
               ...pFormats,
+              ...pReliures,
             ].join(', ')}
           </ResultSub>
         )}

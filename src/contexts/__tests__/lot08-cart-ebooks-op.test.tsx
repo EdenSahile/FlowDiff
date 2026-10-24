@@ -77,10 +77,9 @@ function makeBook(overrides: Partial<Book> = {}): Book {
 
 function makeEbookOption(overrides: Partial<EbookCartOption> = {}): EbookCartOption {
   return {
-    hebergeur: 'Eden Livres',
     format: 'EPUB',
-    price: 5.99,
-    isbnEbook: 'ebook-default-isbn',
+    priceTTC: 5.99,
+    isbn: 'ebook-default-isbn',
     ...overrides,
   }
 }
@@ -270,11 +269,11 @@ describe('FLOW-RM-063 : cle composite ebook et deduplication', () => {
       expect(key).toBe('livre-123')
     })
 
-    it('retourne bookId::isbnEbook pour un item avec ebookOption', () => {
+    it('retourne bookId::isbn pour un item avec ebookOption', () => {
       const item: CartItem = {
         book: makeBook({ id: 'livre-123' }),
         quantity: 1,
-        ebookOption: makeEbookOption({ isbnEbook: '978-ebook-456' }),
+        ebookOption: makeEbookOption({ isbn: '978-ebook-456' }),
       }
 
       const key = getItemKey(item)
@@ -286,12 +285,12 @@ describe('FLOW-RM-063 : cle composite ebook et deduplication', () => {
       const itemEpub: CartItem = {
         book: makeBook({ id: 'livre-123' }),
         quantity: 1,
-        ebookOption: makeEbookOption({ isbnEbook: 'isbn-epub' }),
+        ebookOption: makeEbookOption({ isbn: 'isbn-epub' }),
       }
       const itemPdf: CartItem = {
         book: makeBook({ id: 'livre-123' }),
         quantity: 1,
-        ebookOption: makeEbookOption({ isbnEbook: 'isbn-pdf' }),
+        ebookOption: makeEbookOption({ isbn: 'isbn-pdf' }),
       }
 
       const keyEpub = getItemKey(itemEpub)
@@ -308,7 +307,7 @@ describe('FLOW-RM-063 : cle composite ebook et deduplication', () => {
       const itemEbook: CartItem = {
         book: makeBook({ id: 'livre-123' }),
         quantity: 1,
-        ebookOption: makeEbookOption({ isbnEbook: 'isbn-ebook' }),
+        ebookOption: makeEbookOption({ isbn: 'isbn-ebook' }),
       }
 
       const keyPhysique = getItemKey(itemPhysique)
@@ -320,7 +319,7 @@ describe('FLOW-RM-063 : cle composite ebook et deduplication', () => {
 
   describe('deduplication dans addToCart', () => {
     it('fusionne les quantites pour 2 ajouts ebook avec le meme ISBN ebook', () => {
-      const ebook = makeEbookOption({ isbnEbook: 'isbn-epub-001' })
+      const ebook = makeEbookOption({ isbn: 'isbn-epub-001' })
 
       const { result } = renderHook(() => useCart(), { wrapper: Wrapper })
 
@@ -343,7 +342,7 @@ describe('FLOW-RM-063 : cle composite ebook et deduplication', () => {
       })
       act(() => {
         result.current.addToCart(makeBook({ id: 'livre-a' }), 1, {
-          ebookOption: makeEbookOption({ isbnEbook: 'isbn-epub-001' }),
+          ebookOption: makeEbookOption({ isbn: 'isbn-epub-001' }),
         })
       })
 
@@ -355,12 +354,12 @@ describe('FLOW-RM-063 : cle composite ebook et deduplication', () => {
 
       act(() => {
         result.current.addToCart(makeBook({ id: 'livre-a' }), 1, {
-          ebookOption: makeEbookOption({ isbnEbook: 'isbn-epub' }),
+          ebookOption: makeEbookOption({ isbn: 'isbn-epub' }),
         })
       })
       act(() => {
         result.current.addToCart(makeBook({ id: 'livre-a' }), 1, {
-          ebookOption: makeEbookOption({ isbnEbook: 'isbn-pdf' }),
+          ebookOption: makeEbookOption({ isbn: 'isbn-pdf' }),
         })
       })
 

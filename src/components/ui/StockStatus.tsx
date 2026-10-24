@@ -3,8 +3,12 @@ import { createPortal } from 'react-dom'
 import styled from 'styled-components'
 import type { StockStatut } from '@/data/mockBooks'
 
-/* ── Palette par statut ── */
-const STATUT_CONFIG: Record<StockStatut, { label: string; color: string }> = {
+/*
+  Palette par statut, source unique du projet. La fiche produit et le filtre
+  de disponibilite de la page Fonds en portaient chacun leur copie, avec des
+  libelles qui avaient diverge.
+*/
+export const STATUT_CONFIG: Record<StockStatut, { label: string; color: string }> = {
   disponible:   { label: 'Disponible',      color: '#2E7D32' },
   stock_limite: { label: 'Stock limité',    color: '#C17E00' },
   sur_commande: { label: 'Sur commande',    color: '#5B7A9E' },

@@ -117,7 +117,7 @@ La discipline du projet est d'extraire la logique métier dans un module colocal
 
 `NewsletterPage.tsx` et `RdvPage.tsx` ne figurent plus ici : toutes deux supprimées, la première comme code mort, la seconde avec la fonctionnalité de rendez-vous.
 
-**Composants partagés couverts** (`src/components/`) : `BookCard` (7 tests, rendu), `BookCardRow` (4, rendu), `CatalogueLoadState` (3), `CatalogueFilters` (2), `StockAlertModal` (8), `StockStatus` (6), `BackButton` (3), `ProtectedRoute` (4), `priceNet` (3), `isbnSearch` (3). Les 16 tests du `FeedbackWidget` ont disparu avec son déplacement dans `parked/feedback/`.
+**Composants partagés couverts** (`src/components/`) : `BookCard` (7 tests, rendu), `CatalogueLoadState` (3), `CatalogueFilters` (2), `StockAlertModal` (8), `StockStatus` (6), `BackButton` (3), `ProtectedRoute` (4), `priceNet` (3), `isbnSearch` (3), `listCartActions` (16). Les 16 tests du `FeedbackWidget` ont disparu avec son déplacement dans `parked/feedback/`, et les 4 de `BookCardRow` avec la suppression du composant.
 
 ## E2E (Playwright)
 

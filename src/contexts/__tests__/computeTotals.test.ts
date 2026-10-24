@@ -1,8 +1,12 @@
 import { describe, it, expect } from 'vitest'
-import { computeTotals, REMISE_RATES } from '@/contexts/CartContext'
-import type { CartItem, OPCartGroup } from '@/contexts/CartContext'
+import {
+  computeTotals, REMISE_RATES, getItemUnitPriceTTC, getItemRemiseRate, REMISE_NUMERIQUE,
+} from '@/contexts/CartContext'
+import type { CartItem, OPCartGroup, EbookCartOption } from '@/contexts/CartContext'
 
 const rates = { 'Littérature': 0.09, 'BD/Mangas': 0.10, 'Jeunesse': 0.08, 'Adulte-pratique': 0.09 }
+
+const ebookPdf: EbookCartOption = { isbn: '9789990030022', format: 'PDF', priceTTC: 9.99 }
 
 function makeItem(priceTTC: number, universe: string, quantity = 1): CartItem {
   return {
@@ -24,6 +28,92 @@ describe('FLOW-RM-041 : remises par défaut par univers', () => {
       'Littérature': 0.35,
       'Adulte-pratique': 0.35,
     })
+  })
+})
+
+/*
+  Une ligne numérique se facture au prix de son offre, pas à celui du papier.
+  Les totaux lisaient le prix du livre, donc le récapitulatif contredisait le
+  prix affiché sur la ligne.
+*/
+describe('prix public d\'une ligne de panier', () => {
+  it('retient le prix du papier sur une ligne sans offre numérique', () => {
+    const lignePapier = makeItem(20, 'Littérature')
+
+    expect(getItemUnitPriceTTC(lignePapier)).toBe(20)
+  })
+
+  it('retient le prix de l\'offre sur une ligne numérique', () => {
+    const ligneEbook = { ...makeItem(20, 'Littérature'), ebookOption: ebookPdf }
+
+    expect(getItemUnitPriceTTC(ligneEbook)).toBe(9.99)
+  })
+
+  it('facture un ebook à son prix, pas à celui du grand format', () => {
+    const ligneEbook = { ...makeItem(20, 'Littérature'), ebookOption: ebookPdf }
+
+    const totals = computeTotals([ligneEbook], [], rates)
+
+    expect(totals.subtotalTTC).toBeCloseTo(9.99)
+  })
+
+  it('compte la quantité au prix de l\'offre', () => {
+    const ligneEbook = { ...makeItem(20, 'Littérature', 3), ebookOption: ebookPdf }
+
+    const totals = computeTotals([ligneEbook], [], rates)
+
+    expect(totals.subtotalTTC).toBeCloseTo(29.97)
+  })
+
+  it('assoit la remise sur le prix de l\'offre', () => {
+    const ligneEbook = { ...makeItem(20, 'Littérature'), ebookOption: ebookPdf }
+
+    const totals = computeTotals([ligneEbook], [], rates)
+
+    expect(totals.remiseAmount).toBeCloseTo(9.99 * REMISE_NUMERIQUE)
+  })
+
+  /*
+    Sur le papier, la remise varie par univers parce qu'elle rémunère le
+    risque du libraire : stock acheté ferme, invendus, mise en place. Rien de
+    tout cela n'existe sur un fichier, donc le numérique a un taux unique.
+  */
+  it('applique au numérique un taux unique, quel que soit l\'univers', () => {
+    const ebookLitterature = { ...makeItem(20, 'Littérature'), ebookOption: ebookPdf }
+    const ebookBD = { ...makeItem(20, 'BD/Mangas'), ebookOption: ebookPdf }
+
+    const totalsLitterature = computeTotals([ebookLitterature], [], rates)
+    const totalsBD = computeTotals([ebookBD], [], rates)
+
+    expect(totalsLitterature.remiseAmount).toBeCloseTo(totalsBD.remiseAmount)
+  })
+
+  it('laisse le papier suivre le taux de son univers', () => {
+    const papierLitterature = makeItem(20, 'Littérature')  // 9 %
+    const papierBD = makeItem(20, 'BD/Mangas')             // 10 %
+
+    const totalsLitterature = computeTotals([papierLitterature], [], rates)
+    const totalsBD = computeTotals([papierBD], [], rates)
+
+    expect(totalsLitterature.remiseAmount).toBeCloseTo(1.8)
+    expect(totalsBD.remiseAmount).toBeCloseTo(2)
+  })
+
+  it('retient le taux du numérique sur une ligne numérique, celui de l\'univers sinon', () => {
+    const lignePapier = makeItem(20, 'Littérature')
+    const ligneEbook = { ...lignePapier, ebookOption: ebookPdf }
+
+    expect(getItemRemiseRate(ligneEbook, rates)).toBe(REMISE_NUMERIQUE)
+    expect(getItemRemiseRate(lignePapier, rates)).toBe(0.09)
+  })
+
+  it('additionne le papier et le numérique du même titre à leurs prix respectifs', () => {
+    const lignePapier = makeItem(20, 'Littérature')
+    const ligneEbook = { ...lignePapier, ebookOption: ebookPdf }
+
+    const totals = computeTotals([lignePapier, ligneEbook], [], rates)
+
+    expect(totals.subtotalTTC).toBeCloseTo(29.99)
   })
 })
 
