@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { BackButton as BackNavButton } from '@/components/ui/BackButton'
 import { createPortal } from 'react-dom'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, Link } from 'react-router-dom'
 import styled, { keyframes } from 'styled-components'
-import { getBookByIdAsync, getBooksByTypeAsync } from '@/services/books'
+import { getBookByIdAsync, getBooksByTypeAsync, getAllBooksAsync } from '@/services/books'
 import type { Book, EbookOffer } from '@/data/mockBooks'
 import { BookCover } from '@/components/catalogue/BookCover'
 import { useCart } from '@/contexts/CartContext'
@@ -13,7 +13,7 @@ import { StockAlertModal } from '@/components/ui/StockAlertModal'
 import { slugifyAuthor } from '@/lib/slugify'
 import { theme } from '@/lib/theme'
 import { formatPrice } from '@/lib/format'
-import { getPurchaseAvailability, getEbookLabel } from '@/lib/bookUtils'
+import { getPurchaseAvailability, getEbookLabel, getFormatLabel } from '@/lib/bookUtils'
 import { mq } from '@/lib/responsive'
 import { useRefetchOnFocus } from '@/hooks/useRefetchOnFocus'
 
@@ -387,6 +387,44 @@ const FormatPriceEl = styled.span<{ $active: boolean }>`
   font-size: 11.5px;
   color: ${({ $active, theme }) => $active ? theme.colors.navy : theme.colors.gray[400]};
   font-weight: ${({ $active }) => $active ? '500' : '400'};
+  margin-top: 1px;
+`
+
+/* ── Autres éditions de la même œuvre ── */
+const EditionsWrap = styled.div`
+  margin-bottom: 12px;
+`
+
+const EditionsRow = styled.div`
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+`
+
+const EditionLinkEl = styled(Link)`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 7px 12px;
+  border-radius: 7px;
+  border: 1.5px dashed rgba(42, 42, 40, .18);
+  background: ${({ theme }) => theme.colors.white};
+  text-decoration: none;
+  transition: border-color .15s;
+  &:hover { border-color: ${({ theme }) => theme.colors.navy}; }
+`
+
+const EditionNameEl = styled.span`
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 12.5px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.gray[800]};
+`
+
+const EditionMetaEl = styled.span`
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 11.5px;
+  color: ${({ theme }) => theme.colors.gray[400]};
   margin-top: 1px;
 `
 
@@ -1247,6 +1285,9 @@ export function FicheProduitPage() {
   const [book, setBook]               = useState<Book | null>(null)
   const [bookLoading, setBookLoading] = useState(true)
   const [similar, setSimilar]         = useState<Book[]>([])
+  /* Les autres editions papier de la meme oeuvre : le poche d'un grand
+     format, et reciproquement. Chacune est un titre du catalogue. */
+  const [otherEditions, setOtherEditions] = useState<Book[]>([])
   const [prevId, setPrevId]           = useState(id)
 
   if (prevId !== id) {
@@ -1257,6 +1298,7 @@ export function FicheProduitPage() {
       setBookLoading(true)
       setBook(null)
       setSimilar([])
+      setOtherEditions([])
     }
   }
 
@@ -1268,8 +1310,15 @@ export function FicheProduitPage() {
       setBookLoading(false)
       if (b) {
         getBooksByTypeAsync(b.type).then(all => {
-          setSimilar(all.filter(x => x.universe === b.universe && x.id !== b.id).slice(0, 7))
+          setSimilar(all.filter(x =>
+            x.universe === b.universe && x.id !== b.id && !(b.workId && x.workId === b.workId),
+          ).slice(0, 7))
         }).catch(console.error)
+        if (b.workId) {
+          getAllBooksAsync().then(all => {
+            setOtherEditions(all.filter(x => x.workId === b.workId && x.id !== b.id))
+          }).catch(console.error)
+        }
       }
     }).catch(() => setBookLoading(false))
   }, [id])
@@ -1301,7 +1350,18 @@ export function FicheProduitPage() {
   }
 
   const formats: PhysicalFormat[] = [
-    { id: 'broche', label: 'Broché', description: 'Format standard', priceTTC: book.priceTTC, formatDetail: book.format },
+    /*
+      L'edition papier de cette fiche. Son libelle vient de ses dimensions,
+      « Poche » pour un 115 x 175 mm, suivi de sa collection quand elle en a
+      une : c'est ce qui dit au libraire quelle edition il regarde.
+    */
+    {
+      id: 'broche',
+      label: [getFormatLabel(book.format) ?? 'Papier', book.collection].filter(Boolean).join(' · '),
+      description: 'Édition papier',
+      priceTTC: book.priceTTC,
+      formatDetail: `${getFormatLabel(book.format) ?? 'Papier'} · ${book.format}`,
+    },
     /*
       Pas d'edition poche ici. Elle etait fabriquee a l'affichage, a 62 % du
       prix du grand format, sur les 49 titres du catalogue. Deux fautes
@@ -1561,9 +1621,11 @@ export function FicheProduitPage() {
             {' · '}{new Date(book.publicationDate).getFullYear()}
           </BookEditorMain>
 
-          {/* Un seul format a proposer ne fait pas un choix : le selecteur
-              n'apparait que si le titre a une version numerique. */}
-          {showStandardOrder && formats.length > 1 && (
+          {/* Toujours affiche, meme avec un seul format : cette ligne ne sert
+              pas qu'a choisir, elle dit quelle edition on regarde. La masquer
+              laissait le bloc « Autres editions » seul en haut de la fiche, et
+              son edition se lisait alors comme celle de la page. */}
+          {showStandardOrder && (
             <FormatSelectorWrap>
               <FormatLabelEl>Format</FormatLabelEl>
               <FormatOptionsRow>
@@ -1575,6 +1637,28 @@ export function FicheProduitPage() {
                 ))}
               </FormatOptionsRow>
             </FormatSelectorWrap>
+          )}
+
+          {/* Chaque edition est un titre du catalogue, donc un lien vers sa
+              propre fiche, pas un bouton qui changerait celle-ci. */}
+          {otherEditions.length > 0 && (
+            <EditionsWrap>
+              <FormatLabelEl>Autres éditions</FormatLabelEl>
+              <EditionsRow>
+                {otherEditions.map(edition => (
+                  <EditionLinkEl key={edition.id} to={`/livre/${edition.id}`}>
+                    <EditionNameEl>
+                      {[getFormatLabel(edition.format) ?? 'Autre format', edition.collection]
+                        .filter(Boolean).join(' · ')}
+                      {' '}→
+                    </EditionNameEl>
+                    <EditionMetaEl>
+                      {formatPrice(edition.priceTTC)} € TTC · {edition.publisher}
+                    </EditionMetaEl>
+                  </EditionLinkEl>
+                ))}
+              </EditionsRow>
+            </EditionsWrap>
           )}
 
           <PriceZone>

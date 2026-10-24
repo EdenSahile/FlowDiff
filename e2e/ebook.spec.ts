@@ -45,6 +45,38 @@ test('le choix du format n\'affiche l\'ebook que si le titre en propose un', asy
 })
 
 /*
+  Une edition de poche est un titre du catalogue, pas un bouton de la fiche du
+  grand format : elle a son ISBN, sa collection, sa parution et son prix, et
+  la fiche la presente comme un lien vers sa propre fiche.
+*/
+test('le grand format renvoie vers son édition de poche, et retour', async ({ page }) => {
+  await login(page)
+
+  await page.goto('/livre/f-lit-mathieu')
+
+  await expect(page.getByText('Autres éditions')).toBeVisible()
+  const lienPoche = page.getByRole('link', { name: /Poche · Babel/ })
+  await expect(lienPoche).toContainText('9,90 € TTC')
+
+  await lienPoche.click()
+
+  await expect(page).toHaveURL('/livre/f-lit-mathieu-babel')
+  await expect(page.getByText('9782330139179', { exact: true })).toBeVisible()
+
+  await page.getByRole('link', { name: /Broché/ }).click()
+
+  await expect(page).toHaveURL('/livre/f-lit-mathieu')
+})
+
+test('un titre sans autre édition n\'affiche pas le bloc', async ({ page }) => {
+  await login(page)
+
+  await page.goto(`/livre/${SANS_EBOOK}`)
+
+  await expect(page.getByText('Autres éditions')).toHaveCount(0)
+})
+
+/*
   Le selecteur proposait un poche sur les 49 titres, a 62 % du prix du grand
   format. Un prix de livre est fixe par l'editeur, il ne se calcule pas, et
   un poche n'existe que s'il a ete publie.
@@ -58,12 +90,26 @@ test('aucune fiche ne propose de format poche', async ({ page }) => {
   }
 })
 
-test('un titre sans version numérique n\'affiche pas de choix de format', async ({ page }) => {
+/*
+  La ligne Format est toujours affichee, meme sans choix a faire : elle dit
+  quelle edition la fiche presente. Sans elle, le bloc « Autres editions »
+  restait seul en haut, et son edition se lisait comme celle de la page.
+*/
+test('un titre sans version numérique affiche quand même son format papier', async ({ page }) => {
   await login(page)
 
-  await page.goto(`/livre/${SANS_EBOOK}`)
+  await page.goto('/livre/f-lit-colombani')
 
-  await expect(page.getByText('Broché', { exact: true })).toHaveCount(0)
+  await expect(page.getByText('Broché', { exact: true })).toBeVisible()
+  await expect(page.getByText(/^Ebook \(/)).toHaveCount(0)
+})
+
+test('la ligne Format nomme l\'édition de poche au lieu de ses dimensions', async ({ page }) => {
+  await login(page)
+
+  await page.goto('/livre/f-lit-mathieu-babel')
+
+  await expect(page.getByText('Poche · Babel', { exact: true })).toBeVisible()
 })
 
 test('un titre vendu en PDF et en EPUB propose 2 boutons numériques', async ({ page }) => {
@@ -218,5 +264,5 @@ test('le filtre Poche retient les titres aux dimensions de poche', async ({ page
 
   await page.goto('/recherche?formats=Poche')
 
-  await expect(page.locator('article')).toHaveCount(11)
+  await expect(page.locator('article')).toHaveCount(14)
 })

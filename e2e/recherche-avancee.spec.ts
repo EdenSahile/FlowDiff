@@ -4,13 +4,13 @@ import { test, expect, type Page, type Locator } from '@playwright/test'
   Recherche avancée : le panneau de filtres du header, et les résultats qu'il
   produit sur /recherche.
 
-  Les attendus sont dérivés du catalogue de démonstration (49 titres), pas du
+  Les attendus sont dérivés du catalogue de démonstration (52 titres), pas du
   code qui filtre. Répartition relevée sur les données :
 
-    Thématique  Littérature 15 · BD/Mangas 15 · Adulte-pratique 11 · Jeunesse 8
-    Langue      Français 25 · Japonais 11 · Anglais 10 · Espagnol 2 · Suédois 1
-    Prix        5 à 10 EUR 10 · 10 à 20 EUR 28 · 20 à 50 EUR 11, les 2 autres 0
-    Format      Broché 33 · Poche 11 · Grand format 5 · Numérique 3 · Relié 0
+    Thématique  Littérature 18 · BD/Mangas 15 · Adulte-pratique 11 · Jeunesse 8
+    Langue      Français 28 · Japonais 11 · Anglais 10 · Espagnol 2 · Suédois 1
+    Prix        5 à 10 EUR 13 · 10 à 20 EUR 28 · 20 à 50 EUR 11, les 2 autres 0
+    Format      Broché 33 · Poche 14 · Grand format 5 · Numérique 3 · Relié 0
 
   Règles attendues : un filtre restreint le catalogue, plusieurs pastilles d'un
   même groupe s'additionnent (OU), des groupes différents se croisent (ET), et
@@ -20,7 +20,7 @@ import { test, expect, type Page, type Locator } from '@playwright/test'
 
 test.use({ viewport: { width: 1440, height: 900 } })
 
-const CATALOGUE_SIZE = 49
+const CATALOGUE_SIZE = 52
 
 async function login(page: Page) {
   await page.goto('/login')
@@ -98,7 +98,7 @@ test.describe('Un seul groupe de filtres', () => {
 
     await chip(page, 'Littérature').click()
 
-    await expect(counter(page)).toHaveText('15 ouvrages')
+    await expect(counter(page)).toHaveText('18 ouvrages')
     await expect(panel(page).getByText('Genre', { exact: true })).toBeVisible()
   })
 
@@ -108,7 +108,7 @@ test.describe('Un seul groupe de filtres', () => {
     await chip(page, 'Littérature').click()
     await chip(page, 'Roman contemporain').click()
 
-    await expect(counter(page)).toHaveText('11 ouvrages')
+    await expect(counter(page)).toHaveText('14 ouvrages')
   })
 
   test('retirer la thématique retire aussi le genre retenu', async ({ page }) => {
@@ -143,7 +143,7 @@ test.describe('Un seul groupe de filtres', () => {
 
     await chip(page, 'Poche').click()
 
-    await expect(counter(page)).toHaveText('11 ouvrages')
+    await expect(counter(page)).toHaveText('14 ouvrages')
   })
 
   test('les tranches de prix qu\'aucun titre n\'atteint restent grisées', async ({ page }) => {
@@ -176,7 +176,7 @@ test.describe('Plusieurs choix dans un même groupe', () => {
     await chip(page, 'Littérature').click()
     await chip(page, 'BD/Mangas').click()
 
-    await expect(counter(page)).toHaveText('30 ouvrages')
+    await expect(counter(page)).toHaveText('33 ouvrages')
   })
 
   test('2 langues additionnent leurs titres', async ({ page }) => {
@@ -194,7 +194,7 @@ test.describe('Plusieurs choix dans un même groupe', () => {
     await chip(page, '5 à 10 EUR').click()
     await chip(page, '10 à 20 EUR').click()
 
-    await expect(counter(page)).toHaveText('38 ouvrages')
+    await expect(counter(page)).toHaveText('41 ouvrages')
   })
 
   test('cliquer 2 fois la même pastille la désélectionne', async ({ page }) => {
@@ -217,7 +217,7 @@ test.describe('Croisement de groupes', () => {
     await chip(page, 'Littérature').click()
     await chip(page, 'Français').click()
 
-    await expect(counter(page)).toHaveText('14 ouvrages')
+    await expect(counter(page)).toHaveText('17 ouvrages')
   })
 
   test('thématique et format se croisent', async ({ page }) => {
@@ -229,15 +229,16 @@ test.describe('Croisement de groupes', () => {
     await expect(counter(page)).toHaveText('2 ouvrages')
   })
 
-  // Aucun titre de littérature n'a les dimensions du poche ni du grand format.
+  // La littérature compte des brochés et les 3 éditions de poche, mais aucun
+  // titre aux dimensions du grand format.
   test('une thématique grise les formats qu\'aucun de ses titres ne porte', async ({ page }) => {
     await openPanel(page)
 
     await chip(page, 'Littérature').click()
 
-    await expect(chip(page, 'Poche')).toBeDisabled()
     await expect(chip(page, 'Grand format')).toBeDisabled()
     await expect(chip(page, 'Broché')).toBeEnabled()
+    await expect(chip(page, 'Poche')).toBeEnabled()
   })
 
   // Les 8 titres jeunesse sont tous entre 10 et 20 EUR.
@@ -344,18 +345,18 @@ test.describe('Résultats', () => {
   test('les filtres survivent au rechargement, l\'URL les porte', async ({ page }) => {
     await login(page)
     await page.goto('/recherche?universe=Litt%C3%A9rature')
-    await expect(page.locator('article')).toHaveCount(15)
+    await expect(page.locator('article')).toHaveCount(18)
 
     await page.reload()
 
-    await expect(page.locator('article')).toHaveCount(15)
+    await expect(page.locator('article')).toHaveCount(18)
   })
 
   // La pastille porte son propre compte, qui doit être celui de l'affichage.
   test('le filtre thématique des résultats restreint l\'affichage sans toucher l\'URL', async ({ page }) => {
     await login(page)
     await page.goto('/recherche?langues=Fran%C3%A7ais')
-    await expect(page.locator('article')).toHaveCount(25)
+    await expect(page.locator('article')).toHaveCount(28)
 
     const jeunesse = page.getByRole('button', { name: /^Jeunesse \(\d+\)$/ })
     const annonce = Number((await jeunesse.textContent())!.match(/\((\d+)\)/)![1])

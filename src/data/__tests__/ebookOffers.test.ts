@@ -175,6 +175,60 @@ describe('offres ebook du catalogue', () => {
   })
 })
 
+/*
+  Une oeuvre peut avoir plusieurs editions papier, reliees par workId. Chacune
+  est un titre du catalogue a part entiere : le poche n'est pas une variante
+  de la fiche du grand format, c'est une ligne du FEL avec son ISBN, sa
+  collection, sa parution et son prix.
+*/
+describe('éditions d\'une même œuvre', () => {
+  const editionsParOeuvre = MOCK_BOOKS.reduce<Record<string, typeof MOCK_BOOKS>>((acc, book) => {
+    if (book.workId) (acc[book.workId] ??= []).push(book)
+    return acc
+  }, {})
+  const oeuvres = Object.values(editionsParOeuvre)
+
+  it('au moins une œuvre existe en plusieurs éditions', () => {
+    expect(oeuvres.filter(editions => editions.length > 1).length).toBeGreaterThan(0)
+  })
+
+  it('un workId ne relie jamais une seule édition', () => {
+    const oeuvresSolitaires = oeuvres.filter(editions => editions.length < 2)
+
+    expect(oeuvresSolitaires).toEqual([])
+  })
+
+  it('les éditions d\'une œuvre portent le même titre et le même auteur', () => {
+    oeuvres.forEach(editions => {
+      const titres = new Set(editions.map(book => book.title))
+      const auteurs = new Set(editions.map(book => book.authors.join(', ')))
+
+      expect(titres.size).toBe(1)
+      expect(auteurs.size).toBe(1)
+    })
+  })
+
+  it('chaque édition porte son propre ISBN', () => {
+    oeuvres.forEach(editions => {
+      const isbns = editions.map(book => book.isbn)
+
+      expect(new Set(isbns).size).toBe(isbns.length)
+    })
+  })
+
+  /* Le poche paraît après le grand format, et moins cher. */
+  it('l\'édition de poche est postérieure et moins chère que le grand format', () => {
+    oeuvres.forEach(editions => {
+      const poche = editions.find(book => book.format === '115 x 175 mm')
+      const grandFormat = editions.find(book => book.format !== '115 x 175 mm')
+      if (!poche || !grandFormat) return
+
+      expect(poche.publicationDate > grandFormat.publicationDate).toBe(true)
+      expect(poche.priceTTC).toBeLessThan(grandFormat.priceTTC)
+    })
+  })
+})
+
 describe('EBOOK_FORMATS', () => {
   it('liste les 2 formats de fichier, sans combinaison des deux', () => {
     const expectedFormats: EbookFormat[] = ['PDF', 'EPUB']

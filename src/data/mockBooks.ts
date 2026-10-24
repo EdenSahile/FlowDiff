@@ -59,6 +59,13 @@ export interface Book {
   selection?: boolean
   coverUrl?: string
   ebooks?: EbookOffer[]
+  /*
+    Identifiant de l'oeuvre, partage par ses editions papier. Un poche n'est
+    pas une variante d'une fiche : c'est un produit du catalogue, avec son
+    ISBN, sa collection, sa parution et son prix, et le FEL de Dilicom le
+    porte sur sa propre ligne. Ce champ est le seul lien entre les deux.
+  */
+  workId?: string
 }
 
 /* ── Genres par univers ── */
@@ -407,6 +414,21 @@ const _RAW_MOCK_BOOKS: Book[] = [
     description: "Prix Goncourt 2018. L'été 1992 dans une vallée lorraine sinistrée. Quatre adolescents, leurs familles et une décennie de mutations sociales. Un roman générationnel puissant.",
     topVente: true,
     ebooks: [{ isbn: '9789990030033', format: 'EPUB', priceTTC: 12.99 }],
+    workId: 'w-mathieu-enfants',
+  },
+  {
+    id: 'f-lit-mathieu-babel',
+    isbn: '9782330139179',
+    title: 'Leurs enfants après eux',
+    authors: ['Nicolas Mathieu'],
+    publisher: 'Actes Sud',
+    collection: 'Babel',
+    universe: 'Littérature', type: 'fonds',
+    genre: 'Roman contemporain', language: 'Français',
+    price: 6.64, priceTTC: 9.90, format: '115 x 175 mm', pages: 554,
+    publicationDate: '2020-08-19',
+    description: "Prix Goncourt 2018. L'été 1992 dans une vallée lorraine sinistrée. Quatre adolescents, leurs familles et une décennie de mutations sociales. Un roman générationnel puissant.",
+    workId: 'w-mathieu-enfants',
   },
   {
     id: 'f-lit-colombani',
@@ -482,6 +504,20 @@ const _RAW_MOCK_BOOKS: Book[] = [
     price: 10.00, priceTTC: 14.90, format: '145 x 215 mm', pages: 208,
     publicationDate: '2019-01-17',
     description: "Michka, vieille femme en EHPAD, perd peu à peu les mots. Deux jeunes gens tentent de lui rendre ce qu'elle leur a donné. Un texte délicat sur la gratitude et la mémoire.",
+    workId: 'w-vigan-gratitudes',
+  },
+  {
+    id: 'f-lit-vigan-poche',
+    isbn: '9782253934288',
+    title: 'Les Gratitudes',
+    authors: ['Delphine de Vigan'],
+    publisher: 'Le Livre de Poche',
+    universe: 'Littérature', type: 'fonds',
+    genre: 'Roman contemporain', language: 'Français',
+    price: 5.30, priceTTC: 7.90, format: '115 x 175 mm', pages: 184,
+    publicationDate: '2020-08-19',
+    description: "Michka, vieille femme en EHPAD, perd peu à peu les mots. Deux jeunes gens tentent de lui rendre ce qu'elle leur a donné. Un texte délicat sur la gratitude et la mémoire.",
+    workId: 'w-vigan-gratitudes',
   },
   {
     id: 'f-lit-jeune',
@@ -507,6 +543,21 @@ const _RAW_MOCK_BOOKS: Book[] = [
     publicationDate: '2020-01-02',
     description: "Premier volet de la trilogie familiale. Le Maroc de l'après-guerre : Mathilde, alsacienne, et Amine, marocain, construisent une vie entre deux cultures. Slimani signe son roman le plus ambitieux.",
     topVente: true, selection: true,
+    workId: 'w-slimani-pays',
+  },
+  {
+    id: 'f-lit-slimani-folio',
+    isbn: '9782072923470',
+    title: 'Le Pays des autres',
+    authors: ['Leïla Slimani'],
+    publisher: 'Gallimard',
+    collection: 'Folio',
+    universe: 'Littérature', type: 'fonds',
+    genre: 'Roman contemporain', language: 'Français',
+    price: 6.30, priceTTC: 9.40, format: '115 x 175 mm', pages: 416,
+    publicationDate: '2021-05-06',
+    description: "Premier volet de la trilogie familiale. Le Maroc de l'après-guerre : Mathilde, alsacienne, et Amine, marocain, construisent une vie entre deux cultures. Slimani signe son roman le plus ambitieux.",
+    workId: 'w-slimani-pays',
   },
 
   /* ══════════════════════════════════════════════════════
