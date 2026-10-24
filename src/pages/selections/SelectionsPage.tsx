@@ -16,7 +16,7 @@ import { matchesIsbn } from '@/lib/bookUtils'
 type FilterType = Universe | 'Tous' | 'Prix littéraire'
 
 /* ══════════════════════════════════════════════
-   STYLES — page principale
+   STYLES : page principale
 ══════════════════════════════════════════════ */
 const fadeIn = keyframes`from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}`
 
@@ -408,7 +408,7 @@ const PrixBadge = styled.div`
 `
 
 /* ══════════════════════════════════════════════
-   PLV SECTION — Mini visuel fictif + OP info
+   PLV SECTION : Mini visuel fictif + OP info
 ══════════════════════════════════════════════ */
 const PLVSectionWrapper = styled.div`
   margin: 0 ${({ theme }) => theme.spacing.lg} ${({ theme }) => theme.spacing.md};
@@ -417,7 +417,7 @@ const PLVSectionWrapper = styled.div`
   align-items: stretch;
 `
 
-/* Mini PLV physique fictive — portrait, style affiche librairie */
+/* Mini PLV physique fictive : portrait, style affiche librairie */
 const MiniPLV = styled.div`
   width: 92px;
   flex-shrink: 0;
@@ -485,7 +485,7 @@ const MiniPLVSerieLabel = styled.div`
   line-height: 1.3;
 `
 
-/* Carte info OP — fond gradient jaune, texte navy */
+/* Carte info OP : fond gradient jaune, texte navy */
 const OPInfoCard = styled.div`
   flex: 1;
   background: linear-gradient(135deg, #E8960C 0%, #C47A08 100%);
@@ -715,7 +715,7 @@ const OPTCell = styled.div<{ $bold?: boolean; $color?: string; $head?: boolean }
 `
 
 /* ══════════════════════════════════════════════
-   BLOC QUANTITÉ PLV — commande du lot
+   BLOC QUANTITÉ PLV : commande du lot
 ══════════════════════════════════════════════ */
 const PLVQtyBlock = styled.div`
   margin-top: ${({ theme }) => theme.spacing.md};
@@ -786,7 +786,7 @@ const EmptyState = styled.div`
 `
 
 /* ═══════════════════════════════════════════════
-   STYLES — vue détail série
+   STYLES : vue détail série
 ═══════════════════════════════════════════════ */
 const DetailPage = styled.div`
   max-width: 720px;
@@ -1054,7 +1054,7 @@ function IconCheck() {
 }
 
 /* ══════════════════════════════════════════════
-   COMPOSANT PLV — Mini visuel fictif + OP info
+   COMPOSANT PLV : Mini visuel fictif + OP info
 ══════════════════════════════════════════════ */
 function PLVSection({ offre, nom }: { offre: OffreCommerciale; nom: string }) {
   // Nom du cadeau sans le préfixe "Offre "
@@ -1133,7 +1133,7 @@ function HeroTile({ serie, coverBook, onClick }: { serie: Serie; coverBook?: Boo
 }
 
 /* ══════════════════════════════════════════════
-   RAYON HORIZONTAL — shelf + flèches desktop
+   RAYON HORIZONTAL : shelf + flèches desktop
 ══════════════════════════════════════════════ */
 function SerieShelf({ series, allBooks, onSelect }: { series: Serie[]; allBooks: Book[]; onSelect: (s: Serie) => void }) {
   const shelfRef = useRef<HTMLDivElement>(null)
@@ -1422,7 +1422,7 @@ export function SelectionsPage() {
         <Divider />
 
         {/* ══════════════════════════════
-            MODE OP — lot précomposé
+            MODE OP : lot précomposé
         ══════════════════════════════ */}
         {offre ? (
           <>
@@ -1474,7 +1474,7 @@ export function SelectionsPage() {
                   <OPTCell $bold $color="#2E7D32">0,00 €</OPTCell>
                 </OPTRow>
 
-                {/* Ligne totaux — ouvrages uniquement */}
+                {/* Ligne totaux : ouvrages uniquement */}
                 <OPTRow $variant="total">
                   <OPTCover />
                   <OPTText>
@@ -1487,7 +1487,7 @@ export function SelectionsPage() {
 
               </OPTable>
 
-              {/* ── Sélection nombre de PLV — pilote tout ── */}
+              {/* ── Sélection nombre de PLV : pilote tout ── */}
               <PLVQtyBlock>
                 <PLVQtyLeft>
                   <PLVQtyTitle><IconPLV /> Nombre de PLV</PLVQtyTitle>
@@ -1509,8 +1509,8 @@ export function SelectionsPage() {
               {/* ── Bouton commande ── */}
               <OPAddBtn $added={opAdded} onClick={handleAddOP}>
                 {opAdded
-                  ? <><IconCheck /> OP ajoutée — {totalTitres} titres · {nbCadeaux} cadeaux</>
-                  : <><IconCart /> Commander l'OP — {nbPLV} PLV · {formatEur(totalOuvragesHT)}</>
+                  ? <><IconCheck /> OP ajoutée : {totalTitres} titres · {nbCadeaux} cadeaux</>
+                  : <><IconCart /> Commander l'OP : {nbPLV} PLV · {formatEur(totalOuvragesHT)}</>
                 }
               </OPAddBtn>
 
@@ -1519,7 +1519,7 @@ export function SelectionsPage() {
         ) : (
 
         /* ══════════════════════════════
-            MODE STANDARD — steppers individuels
+            MODE STANDARD : steppers individuels
         ══════════════════════════════ */
         <>
           <DetailSearchBar>

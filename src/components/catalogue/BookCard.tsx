@@ -45,7 +45,7 @@ const Card = styled.article`
 `
 
 /* ══════════════════════════════════════
-   HEADER — titre · auteur · badges
+   HEADER : titre · auteur · badges
 ══════════════════════════════════════ */
 const CardHeader = styled.div`
   padding: 10px 12px 8px;
@@ -146,7 +146,7 @@ const Publisher = styled.p`
 `
 
 /* ══════════════════════════════════════
-   BODY — couverture
+   BODY : couverture
 ══════════════════════════════════════ */
 const CardBody = styled.div`
   position: relative;
@@ -186,7 +186,7 @@ const StarBtn = styled.button<{ $active: boolean }>`
 `
 
 /* ══════════════════════════════════════
-   FOOTER — prix · quantité · panier
+   FOOTER : prix · quantité · panier
 ══════════════════════════════════════ */
 const CardFooter = styled.div`
   padding: 10px 12px 12px;

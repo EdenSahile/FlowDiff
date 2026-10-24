@@ -98,7 +98,7 @@ export function parseMockToken(token: string): MockTokenPayload | null {
  *
  * Se protège notamment contre les URLs "protocol-relative" (`//evil.com`),
  * les schémas explicites (`https://…`, `javascript:…`) et les backslashes
- * que certains navigateurs normalisent comme des slashs — le vecteur d'open
+ * que certains navigateurs normalisent comme des slashs : le vecteur d'open
  * redirect documenté par les CVE React Router 2026 (ex. CVE-2026-40181).
  */
 export function getSafeRedirectPath(target: unknown, fallback = '/'): string {

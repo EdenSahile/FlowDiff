@@ -21,7 +21,7 @@ const STATUTS_WITH_TOOLTIP: ReadonlyArray<StockStatut> = ['sur_commande', 'en_re
 
 export function getTooltipText(statut: StockStatut, delaiReimp: string | undefined): string | null {
   if (statut === 'sur_commande') {
-    return "Commandé spécialement auprès de l'éditeur — délai 7 à 15 jours ouvrés"
+    return "Commandé spécialement auprès de l'éditeur : délai 7 à 15 jours ouvrés"
   }
   if (statut === 'en_reimp') {
     return delaiReimp ? `Délai prévu : ${delaiReimp}` : 'Délai non communiqué'

@@ -248,7 +248,7 @@ function buildHtml(f: Facture): string {
 <body>
 
 <div class="toolbar">
-  <span class="toolbar-title">FlowDiff PRO — ${f.numero}</span>
+  <span class="toolbar-title">FlowDiff PRO : ${f.numero}</span>
   <div class="toolbar-actions">
     <button class="btn btn-secondary" onclick="window.close()">✕ Fermer</button>
     <button class="btn btn-primary" onclick="window.print()">⬇&nbsp; Télécharger en PDF</button>
@@ -290,7 +290,7 @@ function buildHtml(f: Facture): string {
     letter-spacing: 0.5px;
     text-transform: uppercase;
   ">
-    ⚠ Document fictif — à des fins de démonstration uniquement
+    ⚠ Document fictif : à des fins de démonstration uniquement
   </div>
 
   <!-- Adresses -->
@@ -412,14 +412,14 @@ function buildHtml(f: Facture): string {
   <div class="legal">
     <p><strong>Pénalités de retard</strong>&nbsp;: En cas de non-paiement à l'échéance, des pénalités de retard au taux de 3&nbsp;fois le taux d'intérêt légal en vigueur seront exigibles de plein droit, sans mise en demeure préalable (art.&nbsp;L.441-10 C.com.). Le taux d'intérêt légal applicable est celui fixé par décret semestriel.</p>
     <p><strong>Indemnité forfaitaire pour frais de recouvrement</strong>&nbsp;: Tout retard de paiement entraîne de plein droit le versement d'une indemnité forfaitaire de <strong>40&nbsp;€</strong> pour frais de recouvrement (décret&nbsp;n°&nbsp;2012-1115 du 02/10/2012). Lorsque les frais de recouvrement exposés sont supérieurs à ce montant, une indemnité complémentaire pourra être réclamée sur justificatif.</p>
-    <p><strong>Pas d'escompte</strong> pour paiement anticipé. Facture soumise à la TVA au taux de ${f.tauxTVA.toLocaleString('fr-FR')}&nbsp;% (taux réduit applicable aux livres — art.&nbsp;278-0 bis CGI). TVA collectée sur les débits.</p>
+    <p><strong>Pas d'escompte</strong> pour paiement anticipé. Facture soumise à la TVA au taux de ${f.tauxTVA.toLocaleString('fr-FR')}&nbsp;% (taux réduit applicable aux livres : art.&nbsp;278-0 bis CGI). TVA collectée sur les débits.</p>
   </div>
 
   <!-- Pied de page -->
   <div class="page-footer">
-    ${VENDEUR.raisonSociale} — ${VENDEUR.adresse}, ${VENDEUR.codePostal} ${VENDEUR.ville}<br>
-    Tél.&nbsp;: ${VENDEUR.telephone} — ${VENDEUR.email}<br>
-    SIRET&nbsp;: ${VENDEUR.siret} — N°&nbsp;TVA&nbsp;: ${VENDEUR.numTVA} — RCS ${VENDEUR.rcs} — Capital&nbsp;: ${VENDEUR.capital}
+    ${VENDEUR.raisonSociale} : ${VENDEUR.adresse}, ${VENDEUR.codePostal} ${VENDEUR.ville}<br>
+    Tél.&nbsp;: ${VENDEUR.telephone} : ${VENDEUR.email}<br>
+    SIRET&nbsp;: ${VENDEUR.siret} : N°&nbsp;TVA&nbsp;: ${VENDEUR.numTVA} : RCS ${VENDEUR.rcs} : Capital&nbsp;: ${VENDEUR.capital}
   </div>
 
 </div>

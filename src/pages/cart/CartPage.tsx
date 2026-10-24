@@ -1265,7 +1265,7 @@ export function CartPage() {
     </Page>
   )
 
-  /* ────────── TUNNEL — ÉTAPE 1 : Récapitulatif ────────── */
+  /* ────────── TUNNEL : ÉTAPE 1 : Récapitulatif ────────── */
   if (page === 'recap') return (
     <Page>
       <PageTitle style={{ marginBottom: '4px' }}>Votre commande</PageTitle>
@@ -1285,7 +1285,7 @@ export function CartPage() {
         {opGroups.map(op => (
           <div key={op.id} style={{ margin: '8px 0', padding: '8px 0', borderTop: '1px dashed #eee' }}>
             <RecapRow style={{ fontWeight: 700, color: theme.colors.success }}>
-              <span>OP — {op.opTitle}</span><span></span>
+              <span>OP : {op.opTitle}</span><span></span>
             </RecapRow>
             {op.books.map(({ book, quantity }) => (
               <RecapRow key={book.id} style={{ paddingLeft: 12 }}>
@@ -1318,7 +1318,7 @@ export function CartPage() {
 
       <NavActions>
         <Button variant="primary" size="lg" $fullWidth onClick={goNext}>
-          Suivant — Adresses
+          Suivant : Adresses
         </Button>
         <Button variant="ghost" size="md" $fullWidth onClick={goBack}>
           <IconChevronLeft /> Modifier le panier
@@ -1327,7 +1327,7 @@ export function CartPage() {
     </Page>
   )
 
-  /* ────────── TUNNEL — ÉTAPE 2 : Adresses ────────── */
+  /* ────────── TUNNEL : ÉTAPE 2 : Adresses ────────── */
   if (page === 'addresses') return (
     <Page>
       <PageTitle style={{ marginBottom: '4px' }}>Adresses</PageTitle>
@@ -1374,7 +1374,7 @@ export function CartPage() {
 
       <NavActions>
         <Button variant="primary" size="lg" $fullWidth onClick={goNext}>
-          Suivant — Mode de transmission
+          Suivant : Mode de transmission
         </Button>
         <Button variant="ghost" size="md" $fullWidth onClick={goBack}>
           <IconChevronLeft /> Récapitulatif
@@ -1383,7 +1383,7 @@ export function CartPage() {
     </Page>
   )
 
-  /* ────────── TUNNEL — ÉTAPE 3 : Mode de transmission ────────── */
+  /* ────────── TUNNEL : ÉTAPE 3 : Mode de transmission ────────── */
   if (page === 'transmission') return (
     <Page>
       <PageTitle style={{ marginBottom: '4px' }}>Mode de transmission</PageTitle>
@@ -1495,7 +1495,7 @@ export function CartPage() {
 
       <TwoColLayout>
         <ItemsCol>
-          {/* ══ 1. TITRES INDIVIDUELS — groupés par univers ══ */}
+          {/* ══ 1. TITRES INDIVIDUELS : groupés par univers ══ */}
           {items.length > 0 && (
             <Section>
               <RefGlobalRow>
@@ -1533,14 +1533,14 @@ export function CartPage() {
                   <ItemTitle>{book.title}</ItemTitle>
                   {item.enReliquat ? (
                     <ItemStatutLine $variant="reimp">
-                      🔁 Reliquat — expédition dès disponibilité
+                      🔁 Reliquat : expédition dès disponibilité
                     </ItemStatutLine>
                   ) : item.statut === 'sur_commande' ? (
                     <ItemStatutLine $variant="sur_commande">
-                      🔄 Sur commande — délai 7-15 jours
+                      🔄 Sur commande : délai 7-15 jours
                     </ItemStatutLine>
                   ) : null}
-                  <ItemAuthor>{book.authors.join(', ')} — {book.publisher}</ItemAuthor>
+                  <ItemAuthor>{book.authors.join(', ')} : {book.publisher}</ItemAuthor>
                   <ItemIsbn>ISBN {isEbook ? ebookOption!.isbn : book.isbn} · {isEbook ? ebookOption!.format : book.format}</ItemIsbn>
                   <ItemFooter>
                     <div>

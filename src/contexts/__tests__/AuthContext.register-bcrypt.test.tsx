@@ -24,7 +24,7 @@ function wrapper({ children }: { children: ReactNode }) {
   return <AuthProvider>{children}</AuthProvider>
 }
 
-describe('register — FLOW-RM-012 : bcrypt cost factor', () => {
+describe('register, FLOW-RM-012 : bcrypt cost factor', () => {
   beforeEach(() => {
     localStorage.clear()
     hashSpy.mockClear()

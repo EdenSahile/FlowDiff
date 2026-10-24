@@ -47,7 +47,7 @@ const UNIVERSE_ICONS: Record<Universe, JSX.Element> = {
   'Adulte-pratique': <IconPratique />,
 }
 
-/* Couleurs alignées palette Forêt & Lin — toutes accessibles blanc/4.5:1+ */
+/* Couleurs alignées palette Forêt & Lin : toutes accessibles blanc/4.5:1+ */
 const UNIVERSE_ACTIVE_COLORS: Record<Universe, string> = {
   'BD/Mangas':       '#8B6914',   // or foncé
   'Jeunesse':        '#2D6A52',   // vert profond

@@ -147,7 +147,7 @@ test('les 2 formats du même titre occupent 2 lignes de panier', async ({ page }
 
   await expect(page.getByText(`ISBN ${DEUX_FORMATS.pdf.isbn}`)).toBeVisible()
   await expect(page.getByText(`ISBN ${DEUX_FORMATS.epub.isbn}`)).toBeVisible()
-  await expect(page.getByRole('button', { name: /^Panier — 2 articles/ })).toBeVisible()
+  await expect(page.getByRole('button', { name: /^Panier : 2 articles/ })).toBeVisible()
 })
 
 test('le format annonce PDF ou EPUB selon l\'offre du titre', async ({ page }) => {
@@ -228,7 +228,7 @@ test('le papier et l\'ebook du même titre occupent 2 lignes de panier', async (
 
   await expect(page.getByText(`ISBN ${EBOOK_PDF.isbn}`)).toBeVisible()
   await expect(page.getByText(`ISBN ${EBOOK_PDF.isbnPapier}`)).toBeVisible()
-  await expect(page.getByRole('button', { name: /^Panier — 2 articles/ })).toBeVisible()
+  await expect(page.getByRole('button', { name: /^Panier : 2 articles/ })).toBeVisible()
 })
 
 /*

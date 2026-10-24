@@ -16,7 +16,7 @@ describe('getTooltipText', () => {
 
   it('retourne le message sur_commande', () => {
     expect(getTooltipText('sur_commande', undefined)).toBe(
-      "Commandé spécialement auprès de l'éditeur — délai 7 à 15 jours ouvrés"
+      "Commandé spécialement auprès de l'éditeur : délai 7 à 15 jours ouvrés"
     )
   })
 

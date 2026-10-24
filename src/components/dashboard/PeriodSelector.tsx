@@ -21,7 +21,7 @@ export function rangeLabel(period: DateRange): string {
   const sameYear = period.start.getFullYear() === period.end.getFullYear()
   const start = sameYear ? fmtDate(period.start) : fmtDateFull(period.start)
   const end = fmtDateFull(period.end)
-  return `${start} — ${end}`
+  return `${start} – ${end}`
 }
 
 const Wrap = styled.div`

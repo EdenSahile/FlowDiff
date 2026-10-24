@@ -246,7 +246,7 @@ describe('generateEdifactPlaceholder', () => {
     expect(result).toContain("UNZ+")
   })
 
-  it('ORDERS — UNH et UNT utilisent le documentRef', () => {
+  it('ORDERS : UNH et UNT utilisent le documentRef', () => {
     const msg = { ...base, type: 'ORDERS' as const, status: 'SENT' as const }
     const result = generateEdifactPlaceholder(msg)
     expect(result).toContain(`UNH+${base.documentRef}+ORDERS:D:96A:UN:EAN008'`)

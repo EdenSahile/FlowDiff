@@ -182,7 +182,7 @@ function BookCoverBase({
         </TitleArea>
       )}
 
-      {/* Couverture auto-hébergée (locale) — chargement immédiat, fondu court */}
+      {/* Couverture auto-hébergée (locale) : chargement immédiat, fondu court */}
       <CoverImg
         src={src}
         alt={alt}

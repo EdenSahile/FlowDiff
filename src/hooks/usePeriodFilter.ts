@@ -134,7 +134,7 @@ function resolvePreset(preset: PeriodPreset): DateRange {
         end:   endOfDay(today),
       }
     default:
-      // 'custom' — appelant fournit les dates via customStart/End
+      // 'custom' : appelant fournit les dates via customStart/End
       return {
         start: startOfDay(addDays(today, -30)),
         end:   endOfDay(today),
@@ -175,7 +175,7 @@ function resolveComparePeriod(
     }
   }
 
-  // 'custom' — géré par l'appelant via customCompareStart/End
+  // 'custom' : géré par l'appelant via customCompareStart/End
   return null
 }
 

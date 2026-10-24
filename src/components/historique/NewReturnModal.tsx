@@ -228,7 +228,7 @@ export function NewReturnModal({ orders, preselectedOrderId, codeClient, onClose
       onClose()
       onSuccess()
     } catch {
-      showToast('Erreur lors de l\'envoi — réessayez', 'error')
+      showToast('Erreur lors de l\'envoi, réessayez', 'error')
     } finally {
       setSubmitting(false)
     }
@@ -250,7 +250,7 @@ export function NewReturnModal({ orders, preselectedOrderId, codeClient, onClose
               onChange={e => handleOrderChange(e.target.value)}
             >
               {eligibleOrders.map(o => (
-                <option key={o.id} value={o.id}>{o.numero} — {o.status}</option>
+                <option key={o.id} value={o.id}>{o.numero} : {o.status}</option>
               ))}
             </SelectStyled>
           </Section>

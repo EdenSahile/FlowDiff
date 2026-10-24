@@ -1146,8 +1146,8 @@ export function FacturationPage() {
         {totalPages > 1 && (
           <PaginationBar>
             <PaginationInfo>
-              Page {currentPage} / {totalPages} — {filtered.length} résultat{filtered.length !== 1 ? 's' : ''}
-              {selectedIds.size > 0 && ` — ${selectedIds.size} sélectionnée${selectedIds.size > 1 ? 's' : ''}`}
+              Page {currentPage} / {totalPages} : {filtered.length} résultat{filtered.length !== 1 ? 's' : ''}
+              {selectedIds.size > 0 && ` : ${selectedIds.size} sélectionnée${selectedIds.size > 1 ? 's' : ''}`}
             </PaginationInfo>
 
             <PaginationBtns>
@@ -1220,7 +1220,7 @@ export function FacturationPage() {
             {!paySuccess && (
               <SimulationBanner role="note">
                 <IconInfo />
-                <span><strong>Application de démonstration&nbsp;— aucun paiement réel ne sera effectué.</strong> Cliquez sur&nbsp;«&nbsp;Payer&nbsp;» pour simuler le règlement de cette facture.</span>
+                <span><strong>Application de démonstration&nbsp;: aucun paiement réel ne sera effectué.</strong> Cliquez sur&nbsp;«&nbsp;Payer&nbsp;» pour simuler le règlement de cette facture.</span>
               </SimulationBanner>
             )}
 

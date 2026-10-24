@@ -4,7 +4,7 @@
 
 ---
 
-## LOT-01 — Auth : login et gestion de session
+## LOT-01 : Auth : login et gestion de session
 
 ### Objectif
 
@@ -33,7 +33,7 @@ Aucun.
 
 ---
 
-## LOT-02 — Auth : inscription et schémas de validation
+## LOT-02 : Auth : inscription et schémas de validation
 
 ### Objectif
 
@@ -62,7 +62,7 @@ Aucun.
 
 ---
 
-## LOT-03 — Auth : logout, routes protégées et isolation
+## LOT-03 : Auth : logout, routes protégées et isolation
 
 ### Objectif
 
@@ -87,7 +87,7 @@ Aucun.
 
 ---
 
-## LOT-04 — Catalogue : types, statuts et commandabilité
+## LOT-04 : Catalogue : types, statuts et commandabilité
 
 ### Objectif
 
@@ -118,7 +118,7 @@ Recherche et filtrage (LOT-05), affichage des tooltips stock (LOT-16), modale St
 
 ---
 
-## LOT-05 — Catalogue : recherche et filtrage
+## LOT-05 : Catalogue : recherche et filtrage
 
 ### Objectif
 
@@ -146,7 +146,7 @@ Aucun.
 
 ---
 
-## LOT-06 — Panier : ajout, modification et persistance
+## LOT-06 : Panier : ajout, modification et persistance
 
 ### Objectif
 
@@ -179,7 +179,7 @@ Tunnel de commande (LOT-07), ebooks et OP (LOT-08), storedCartSchema unitaire (L
 
 ---
 
-## LOT-07 — Panier : tunnel de commande
+## LOT-07 : Panier : tunnel de commande
 
 ### Objectif
 
@@ -210,7 +210,7 @@ Aucun.
 
 ---
 
-## LOT-08 — Panier : ebooks, OP et reliquat
+## LOT-08 : Panier : ebooks, OP et reliquat
 
 ### Objectif
 
@@ -236,7 +236,7 @@ Aucun.
 
 ---
 
-## LOT-09 — Commandes et historique
+## LOT-09 : Commandes et historique
 
 ### Objectif
 
@@ -266,7 +266,7 @@ Aucun.
 
 ---
 
-## LOT-10 — Retours
+## LOT-10 : Retours
 
 ### Objectif
 
@@ -297,7 +297,7 @@ Aucun.
 
 ---
 
-## LOT-11 — EDI (échanges Dilicom)
+## LOT-11 : EDI (échanges Dilicom)
 
 ### Objectif
 
@@ -326,7 +326,7 @@ Aucun.
 
 ---
 
-## LOT-12 — Admin — ⛔ CADUC
+## LOT-12 : Admin : ⛔ CADUC
 
 > **Caduc depuis le 2026-10-10.** Le back-office (`src/admin/`) est dérouté : les routes ne sont plus enregistrées, les identifiants ont été retirés de la source, et `login` renvoie `false`. Les 7 règles de ce lot (FLOW-RM-092 à 098) ne sont plus testables ni pertinentes. Les 2 tests existants (`adminServices.test.ts`) restent dans la suite pour éviter une régression si le code admin est un jour réactivé, mais aucun nouveau test n'est prévu.
 
@@ -344,7 +344,7 @@ Aucun.
 
 ---
 
-## LOT-13 — Wishlist et RDV
+## LOT-13 : Wishlist et RDV
 
 ### Objectif
 
@@ -369,7 +369,7 @@ Aucun.
 
 ---
 
-## LOT-14 — Notifications
+## LOT-14 : Notifications
 
 ### Objectif
 
@@ -394,7 +394,7 @@ Aucun.
 
 ---
 
-## LOT-15 — Dashboard et KPIs
+## LOT-15 : Dashboard et KPIs
 
 ### Objectif
 
@@ -420,7 +420,7 @@ Aucun.
 
 ---
 
-## LOT-16 — Stock : affichage et confirmation
+## LOT-16 : Stock : affichage et confirmation
 
 ### Objectif
 
@@ -445,7 +445,7 @@ Aucun.
 
 ---
 
-## LOT-17 — Facturation et offices
+## LOT-17 : Facturation et offices
 
 ### Objectif
 
@@ -471,7 +471,7 @@ Aucun.
 
 ---
 
-## LOT-18 — Utilitaires et schémas transverses
+## LOT-18 : Utilitaires et schémas transverses
 
 ### Objectif
 

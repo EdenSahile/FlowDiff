@@ -67,7 +67,7 @@ beforeEach(() => {
   )
 })
 
-describe('catalogues — recherche, filtres et tri', () => {
+describe('catalogues : recherche, filtres et tri', () => {
   it('combine recherche, filtre et remise à zéro dans Fonds', async () => {
     renderPage(<FondsPage />)
     await screen.findByRole('heading', { name: 'Alpha', level: 2 })

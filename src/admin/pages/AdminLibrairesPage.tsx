@@ -97,7 +97,7 @@ export function AdminLibrairesPage() {
       </TableWrap>
 
       {selected && (
-        <AdminModal title={`Modifier — ${selected.nom}`} onClose={() => setSelected(null)} width={480}>
+        <AdminModal title={`Modifier : ${selected.nom}`} onClose={() => setSelected(null)} width={480}>
           <LibraireForm libraire={selected} onSave={data => handleSave(selected.id, data)} saving={saving} />
         </AdminModal>
       )}

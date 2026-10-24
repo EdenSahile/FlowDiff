@@ -4,7 +4,7 @@ Ambiguïtés identifiées lors de l'audit croisé code / documentation / tests, 
 
 ---
 
-## DEC-001 — Titres à paraître / "notés"
+## DEC-001 : Titres à paraître / "notés"
 
 **Lots concernés :** LOT-04
 
@@ -150,7 +150,7 @@ Contient la règle : "les titres à paraître ne sont PAS commandables via l'app
 
 ---
 
-## DEC-002 — Divergence des modèles de statut de commande (admin, libraire, dashboard)
+## DEC-002 : Divergence des modèles de statut de commande (admin, libraire, dashboard)
 
 **Lots concernés :** LOT-09, LOT-12, LOT-15
 
@@ -197,7 +197,7 @@ Chaque lot teste son propre modèle indépendamment :
 
 ---
 
-## DEC-003 — Limite du panier partagé (mode démonstration)
+## DEC-003 : Limite du panier partagé (mode démonstration)
 
 **Lots concernés :** LOT-06, LOT-08
 

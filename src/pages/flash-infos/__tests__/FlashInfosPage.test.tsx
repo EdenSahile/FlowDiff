@@ -33,7 +33,7 @@ function flashCard(title: string) {
   return within(card)
 }
 
-describe('FlashInfosPage — ajout au panier', () => {
+describe('FlashInfosPage : ajout au panier', () => {
   beforeEach(() => {
     mockAddToCart.mockClear()
     mockShowToast.mockClear()
@@ -42,7 +42,7 @@ describe('FlashInfosPage — ajout au panier', () => {
   it('n’affiche pas d’ajout au panier pour un titre en rupture', () => {
     renderPage()
 
-    const card = flashCard('Blue Box T.1 — réimpression express')
+    const card = flashCard('Blue Box T.1 : réimpression express')
     expect(card.getByText('Ouvrage indisponible')).toBeInTheDocument()
     expect(card.queryByRole('button', { name: 'Ajouter au panier' })).not.toBeInTheDocument()
   })
@@ -50,7 +50,7 @@ describe('FlashInfosPage — ajout au panier', () => {
   it('demande confirmation pour une commande spéciale avant l’ajout', () => {
     renderPage()
 
-    fireEvent.click(flashCard('J.K. Rowling — dossier Les Animaux fantastiques').getByRole('button', { name: 'Ajouter au panier' }))
+    fireEvent.click(flashCard('J.K. Rowling : dossier Les Animaux fantastiques').getByRole('button', { name: 'Ajouter au panier' }))
 
     expect(mockAddToCart).not.toHaveBeenCalled()
     expect(screen.getByRole('dialog')).toHaveTextContent('commande spéciale')

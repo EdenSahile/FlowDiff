@@ -87,7 +87,7 @@ describe('DEFAULT_CONFIG', () => {
   // "Greeting + raccourcis groupés" de HomePage) ; seuls panel-edi et
   // panel-nouveautes restent. Le `return null` sur 'panel-raccourcis' dans
   // HomePage.tsx est un garde-fou pour d'anciennes configs localStorage qui
-  // référenceraient encore cet id, pas un panel actif — cf. dette technique
+  // référenceraient encore cet id, pas un panel actif : cf. dette technique
   // notée dans l'inventaire de tests (LABEL orphelin dans CustomizerDrawer).
   it('has 2 bottomPanels all visible', () => {
     expect(DEFAULT_CONFIG.bottomPanels).toHaveLength(2)

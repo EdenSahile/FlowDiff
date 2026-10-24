@@ -107,7 +107,7 @@ export function exportEvolutionCSV(
   period: { start: Date; end: Date },
 ): void {
   const lines: string[] = []
-  lines.push(`Évolution des commandes — ${isoDate(period.start)} au ${isoDate(period.end)}`)
+  lines.push(`Évolution des commandes : ${isoDate(period.start)} au ${isoDate(period.end)}`)
   lines.push('Date;Commandes cumulées')
   for (const pt of chartPoints) {
     lines.push([pt.date, pt.count].join(';'))
@@ -129,7 +129,7 @@ export function exportRepartitionCSV(
   period: { start: Date; end: Date },
 ): void {
   const lines: string[] = []
-  lines.push(`Répartition achats par univers — ${isoDate(period.start)} au ${isoDate(period.end)}`)
+  lines.push(`Répartition achats par univers : ${isoDate(period.start)} au ${isoDate(period.end)}`)
   lines.push('Univers;Part (%);Montant TTC (€)')
   for (const seg of donutData) {
     lines.push([cell(seg.label), seg.percent, fmtNum2(seg.montant)].join(';'))
@@ -151,7 +151,7 @@ export function exportTopEditeursCSV(
   period: { start: Date; end: Date },
 ): void {
   const lines: string[] = []
-  lines.push(`Top éditeurs — ${isoDate(period.start)} au ${isoDate(period.end)}`)
+  lines.push(`Top éditeurs : ${isoDate(period.start)} au ${isoDate(period.end)}`)
   lines.push('Rang;Éditeur;Part (%);Montant commandé (€)')
   publishers.forEach((p, i) => {
     lines.push([i + 1, cell(p.name), p.pct, fmtNum2(p.montant)].join(';'))
@@ -175,7 +175,7 @@ export function exportEDICSV(flux: {
   errors: number
 }): void {
   const lines: string[] = []
-  lines.push(`Suivi flux EDI — ${isoDate(new Date())}`)
+  lines.push(`Suivi flux EDI : ${isoDate(new Date())}`)
   lines.push('Indicateur;Valeur')
   lines.push(['Commandes envoyées', flux.orders].join(';'))
   lines.push(['Expéditions en cours', flux.expeditions].join(';'))
@@ -195,7 +195,7 @@ export function exportEDICSV(flux: {
 
 export function exportActionsCSV(actions: { label: string; count: number; deadline?: string }[]): void {
   const lines: string[] = []
-  lines.push(`Actions en attente — ${isoDate(new Date())}`)
+  lines.push(`Actions en attente : ${isoDate(new Date())}`)
   lines.push('Action;Quantité;Échéance')
   for (const a of actions) {
     lines.push([cell(a.label), a.count, a.deadline ?? ''].join(';'))
@@ -214,7 +214,7 @@ export function exportActionsCSV(actions: { label: string; count: number; deadli
 
 export function exportNouveautesCSV(books: Book[]): void {
   const lines: string[] = []
-  lines.push(`Nouveautés du mois — ${isoDate(new Date())}`)
+  lines.push(`Nouveautés du mois : ${isoDate(new Date())}`)
   lines.push('Titre;Auteur(s);ISBN;Éditeur;Univers;Prix TTC (€);Date de parution')
   for (const b of books) {
     lines.push([

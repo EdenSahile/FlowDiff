@@ -22,7 +22,7 @@ export interface LigneFacture {
   editeur:     string
   univers:     string
   quantite:    number
-  ppHT:        number   // prix public HT (tarif éditeur — source de vérité). PP TTC = ppHT × 1,055
+  ppHT:        number   // prix public HT (tarif éditeur : source de vérité). PP TTC = ppHT × 1,055
   remisePct:   number   // taux de remise accordé (ex : 9)
   puHT:        number   // ppHT × (1 − remisePct/100), arrondi à 2 décimales
   montantHT:   number   // puHT × quantite
@@ -31,8 +31,8 @@ export interface LigneFacture {
 export interface Facture {
   id:               string   // = numero
   numero:           string   // FAC + YYYYMMDD + 4 chiffres
-  date:             string   // ISO date — date d'émission
-  dateEcheance:     string   // ISO date — date d'échéance règlement
+  date:             string   // ISO date : date d'émission
+  dateEcheance:     string   // ISO date : date d'échéance règlement
   dateLivraison:    string   // ISO date
   refCommande:      string   // numéro de commande liée
 
@@ -46,7 +46,7 @@ export interface Facture {
 
   lignes:         LigneFacture[]
 
-  totalBrutHT:    number   // somme(ppHT × quantite) — avant remise
+  totalBrutHT:    number   // somme(ppHT × quantite) : avant remise
   remiseMontant:  number   // totalBrutHT − netHT
   netHT:          number   // somme(montantHT)
   tauxTVA:        number   // 5.5 pour les livres
@@ -57,7 +57,7 @@ export interface Facture {
   conditionsPaiement: string
 }
 
-/* ── Données fictives LIB001 — Librairie Lira ── */
+/* ── Données fictives LIB001 : Librairie Lira ── */
 const CLIENT_LIB001 = {
   nomLibrairie: 'Librairie Lira',
   codeClient:   'LIB001',
@@ -69,7 +69,7 @@ const CLIENT_LIB001 = {
 const RAW_MOCK_FACTURES: Record<string, Facture[]> = {
   LIB001: [
     /* ════════════════════════════════════════════════════════
-       1. FAC202602144739 — Remise 9 % — 4 ouvrages
+       1. FAC202602144739 : Remise 9 % : 4 ouvrages
     ════════════════════════════════════════════════════════ */
     {
       id: 'FAC202602144739', numero: 'FAC202602144739',
@@ -88,7 +88,7 @@ const RAW_MOCK_FACTURES: Record<string, Facture[]> = {
     },
 
     /* ════════════════════════════════════════════════════════
-       2. FAC202601034821 — Sans remise — 3 ouvrages
+       2. FAC202601034821 : Sans remise : 3 ouvrages
     ════════════════════════════════════════════════════════ */
     {
       id: 'FAC202601034821', numero: 'FAC202601034821',
@@ -98,7 +98,7 @@ const RAW_MOCK_FACTURES: Record<string, Facture[]> = {
       lignes: [
         { ref: 'f-lit-03',      designation: 'Notre-Dame de Paris',                          isbn: '9782253004226', editeur: 'Éditeur 4', univers: 'Littérature', quantite: 10, ppHT: 5.90,  remisePct: 0, puHT: 5.90,  montantHT: 59.00 },
         { ref: 'f-bd-02',       designation: 'Astérix chez les Bretons',                     isbn: '9782012101517', editeur: 'Éditeur 5', univers: 'BD/Mangas',   quantite: 6,  ppHT: 7.30,  remisePct: 0, puHT: 7.30,  montantHT: 43.80 },
-        { ref: 'f-lit-sapiens', designation: "Sapiens — Une brève histoire de l'humanité",   isbn: '9782226257017', editeur: 'Éditeur 6', univers: 'Littérature', quantite: 3,  ppHT: 14.20, remisePct: 0, puHT: 14.20, montantHT: 42.60 },
+        { ref: 'f-lit-sapiens', designation: "Sapiens : Une brève histoire de l'humanité",   isbn: '9782226257017', editeur: 'Éditeur 6', univers: 'Littérature', quantite: 3,  ppHT: 14.20, remisePct: 0, puHT: 14.20, montantHT: 42.60 },
       ],
       totalBrutHT: 145.40, remiseMontant: 0, netHT: 145.40,
       tauxTVA: 5.5, montantTVA: 8.00, totalTTC: 153.40,
@@ -106,7 +106,7 @@ const RAW_MOCK_FACTURES: Record<string, Facture[]> = {
     },
 
     /* ════════════════════════════════════════════════════════
-       3. FAC202512185647 — Sans remise
+       3. FAC202512185647 : Sans remise
     ════════════════════════════════════════════════════════ */
     {
       id: 'FAC202512185647', numero: 'FAC202512185647',
@@ -123,7 +123,7 @@ const RAW_MOCK_FACTURES: Record<string, Facture[]> = {
     },
 
     /* ════════════════════════════════════════════════════════
-       4. FAC202512052934 — Remise 5 %
+       4. FAC202512052934 : Remise 5 %
     ════════════════════════════════════════════════════════ */
     {
       id: 'FAC202512052934', numero: 'FAC202512052934',
@@ -141,7 +141,7 @@ const RAW_MOCK_FACTURES: Record<string, Facture[]> = {
     },
 
     /* ════════════════════════════════════════════════════════
-       5. FAC202511207813 — Sans remise
+       5. FAC202511207813 : Sans remise
     ════════════════════════════════════════════════════════ */
     {
       id: 'FAC202511207813', numero: 'FAC202511207813',
@@ -158,7 +158,7 @@ const RAW_MOCK_FACTURES: Record<string, Facture[]> = {
     },
 
     /* ════════════════════════════════════════════════════════
-       6. FAC202511036291 — Remise 9 %
+       6. FAC202511036291 : Remise 9 %
     ════════════════════════════════════════════════════════ */
     {
       id: 'FAC202511036291', numero: 'FAC202511036291',
@@ -166,7 +166,7 @@ const RAW_MOCK_FACTURES: Record<string, Facture[]> = {
       refCommande: 'CMD-2025-0638',
       client: CLIENT_LIB001,
       lignes: [
-        { ref: 'f-lit-sapiens', designation: "Sapiens — Une brève histoire de l'humanité", isbn: '9782226257017', editeur: 'Éditeur 6', univers: 'Littérature', quantite: 4,  ppHT: 14.20, remisePct: 9, puHT: 12.92, montantHT: 51.68 },
+        { ref: 'f-lit-sapiens', designation: "Sapiens : Une brève histoire de l'humanité", isbn: '9782226257017', editeur: 'Éditeur 6', univers: 'Littérature', quantite: 4,  ppHT: 14.20, remisePct: 9, puHT: 12.92, montantHT: 51.68 },
         { ref: 'f-bd-01',       designation: 'Tintin au Tibet',                            isbn: '9782203001046', editeur: 'Éditeur 2', univers: 'BD/Mangas',   quantite: 5,  ppHT: 8.70,  remisePct: 9, puHT: 7.92,  montantHT: 39.60 },
         { ref: 'f-lit-03',      designation: 'Notre-Dame de Paris',                        isbn: '9782253004226', editeur: 'Éditeur 4', univers: 'Littérature', quantite: 3,  ppHT: 5.90,  remisePct: 9, puHT: 5.37,  montantHT: 16.11 },
         { ref: 'f-lit-01',      designation: "L'Étranger",                                 isbn: '9782070360024', editeur: 'Éditeur 1', univers: 'Littérature', quantite: 10, ppHT: 4.90,  remisePct: 9, puHT: 4.46,  montantHT: 44.60 },
@@ -177,7 +177,7 @@ const RAW_MOCK_FACTURES: Record<string, Facture[]> = {
     },
 
     /* ════════════════════════════════════════════════════════
-       7. FAC202510154502 — Sans remise
+       7. FAC202510154502 : Sans remise
     ════════════════════════════════════════════════════════ */
     {
       id: 'FAC202510154502', numero: 'FAC202510154502',
@@ -195,7 +195,7 @@ const RAW_MOCK_FACTURES: Record<string, Facture[]> = {
     },
 
     /* ════════════════════════════════════════════════════════
-       8. FAC202509301876 — Sans remise
+       8. FAC202509301876 : Sans remise
     ════════════════════════════════════════════════════════ */
     {
       id: 'FAC202509301876', numero: 'FAC202509301876',
@@ -212,7 +212,7 @@ const RAW_MOCK_FACTURES: Record<string, Facture[]> = {
     },
 
     /* ════════════════════════════════════════════════════════
-       9. FAC202509153749 — Remise 7 %
+       9. FAC202509153749 : Remise 7 %
     ════════════════════════════════════════════════════════ */
     {
       id: 'FAC202509153749', numero: 'FAC202509153749',
@@ -221,7 +221,7 @@ const RAW_MOCK_FACTURES: Record<string, Facture[]> = {
       client: CLIENT_LIB001,
       lignes: [
         { ref: 'n-pra-02', designation: 'Guide Larousse du jardinage et du potager', isbn: '9782035876614', editeur: 'Éditeur 10', univers: 'Adulte-pratique', quantite: 4, ppHT: 19.90, remisePct: 7, puHT: 18.51, montantHT: 74.04 },
-        { ref: 'n-pra-01', designation: "Pâtisserie — L'ultime référence",           isbn: '9782812303067', editeur: 'Éditeur 10', univers: 'Adulte-pratique', quantite: 2, ppHT: 39.90, remisePct: 7, puHT: 37.11, montantHT: 74.22 },
+        { ref: 'n-pra-01', designation: "Pâtisserie : L'ultime référence",           isbn: '9782812303067', editeur: 'Éditeur 10', univers: 'Adulte-pratique', quantite: 2, ppHT: 39.90, remisePct: 7, puHT: 37.11, montantHT: 74.22 },
       ],
       totalBrutHT: 159.40, remiseMontant: 11.14, netHT: 148.26,
       tauxTVA: 5.5, montantTVA: 8.15, totalTTC: 156.41,
@@ -229,7 +229,7 @@ const RAW_MOCK_FACTURES: Record<string, Facture[]> = {
     },
 
     /* ════════════════════════════════════════════════════════
-       10. FAC202508256382 — Sans remise
+       10. FAC202508256382 : Sans remise
     ════════════════════════════════════════════════════════ */
     {
       id: 'FAC202508256382', numero: 'FAC202508256382',
@@ -246,7 +246,7 @@ const RAW_MOCK_FACTURES: Record<string, Facture[]> = {
     },
 
     /* ════════════════════════════════════════════════════════
-       11. FAC202508102917 — Sans remise
+       11. FAC202508102917 : Sans remise
     ════════════════════════════════════════════════════════ */
     {
       id: 'FAC202508102917', numero: 'FAC202508102917',
@@ -264,7 +264,7 @@ const RAW_MOCK_FACTURES: Record<string, Facture[]> = {
     },
 
     /* ════════════════════════════════════════════════════════
-       12. FAC202507221534 — Remise 9 %
+       12. FAC202507221534 : Remise 9 %
     ════════════════════════════════════════════════════════ */
     {
       id: 'FAC202507221534', numero: 'FAC202507221534',
@@ -282,7 +282,7 @@ const RAW_MOCK_FACTURES: Record<string, Facture[]> = {
     },
 
     /* ════════════════════════════════════════════════════════
-       13. FAC202507014873 — Sans remise
+       13. FAC202507014873 : Sans remise
     ════════════════════════════════════════════════════════ */
     {
       id: 'FAC202507014873', numero: 'FAC202507014873',
@@ -299,7 +299,7 @@ const RAW_MOCK_FACTURES: Record<string, Facture[]> = {
     },
 
     /* ════════════════════════════════════════════════════════
-       14. FAC202506152638 — Sans remise
+       14. FAC202506152638 : Sans remise
     ════════════════════════════════════════════════════════ */
     {
       id: 'FAC202506152638', numero: 'FAC202506152638',
@@ -308,7 +308,7 @@ const RAW_MOCK_FACTURES: Record<string, Facture[]> = {
       client: CLIENT_LIB001,
       lignes: [
         { ref: 'n-bd-03',       designation: 'Le Voyageur des confins T.1',                  isbn: '9782370730220', editeur: 'Éditeur 9', univers: 'BD/Mangas',   quantite: 5, ppHT: 10.00, remisePct: 0, puHT: 10.00, montantHT: 50.00 },
-        { ref: 'f-lit-sapiens', designation: "Sapiens — Une brève histoire de l'humanité",   isbn: '9782226257017', editeur: 'Éditeur 6', univers: 'Littérature', quantite: 4, ppHT: 14.20, remisePct: 0, puHT: 14.20, montantHT: 56.80 },
+        { ref: 'f-lit-sapiens', designation: "Sapiens : Une brève histoire de l'humanité",   isbn: '9782226257017', editeur: 'Éditeur 6', univers: 'Littérature', quantite: 4, ppHT: 14.20, remisePct: 0, puHT: 14.20, montantHT: 56.80 },
         { ref: 'n-lit-02',      designation: 'Chanson douce',                                isbn: '9782072773396', editeur: 'Éditeur 1', univers: 'Littérature', quantite: 3, ppHT: 13.40, remisePct: 0, puHT: 13.40, montantHT: 40.20 },
       ],
       totalBrutHT: 147.00, remiseMontant: 0, netHT: 147.00,
@@ -317,7 +317,7 @@ const RAW_MOCK_FACTURES: Record<string, Facture[]> = {
     },
 
     /* ════════════════════════════════════════════════════════
-       15. FAC202506019284 — Remise 5 %
+       15. FAC202506019284 : Remise 5 %
     ════════════════════════════════════════════════════════ */
     {
       id: 'FAC202506019284', numero: 'FAC202506019284',

@@ -44,7 +44,7 @@ export const MOCK_FLASH_INFOS: FlashInfo[] = [
   },
   {
     id: 'fi-bd-02',
-    title: 'Blue Box T.1 — réimpression express',
+    title: 'Blue Box T.1 : réimpression express',
     universe: 'BD/Mangas',
     category: 'Fonds',
     imageUrl: '/covers/9782413054580.jpg',
@@ -57,7 +57,7 @@ export const MOCK_FLASH_INFOS: FlashInfo[] = [
   },
   {
     id: 'fi-bd-03',
-    title: 'Bande-annonce — Astérix T.40',
+    title: 'Bande-annonce : Astérix T.40',
     universe: 'BD/Mangas',
     category: 'Nouveautés',
     imageUrl: null,
@@ -70,7 +70,7 @@ export const MOCK_FLASH_INFOS: FlashInfo[] = [
   },
   {
     id: 'fi-bd-04',
-    title: 'FlowDiff — Nouveau filtre par collection',
+    title: 'FlowDiff : Nouveau filtre par collection',
     universe: 'BD/Mangas',
     category: 'FlowDiff',
     imageUrl: null,
@@ -82,7 +82,7 @@ export const MOCK_FLASH_INFOS: FlashInfo[] = [
   /* ─── Jeunesse ─── */
   {
     id: 'fi-jes-01',
-    title: 'J.K. Rowling — dossier Les Animaux fantastiques',
+    title: 'J.K. Rowling : dossier Les Animaux fantastiques',
     universe: 'Jeunesse',
     category: 'Auteurs',
     imageUrl: '/covers/9782075128582.jpg',
@@ -95,7 +95,7 @@ export const MOCK_FLASH_INFOS: FlashInfo[] = [
   },
   {
     id: 'fi-jes-02',
-    title: 'La Carte des lucioles — précommandes',
+    title: 'La Carte des lucioles : précommandes',
     universe: 'Jeunesse',
     category: 'Nouveautés',
     imageUrl: '/covers/9789990001003.jpg',
@@ -108,7 +108,7 @@ export const MOCK_FLASH_INFOS: FlashInfo[] = [
   },
   {
     id: 'fi-jes-03',
-    title: 'La Passe-Miroir — sélection Jeunesse d’automne',
+    title: 'La Passe-Miroir : sélection Jeunesse d’automne',
     universe: 'Jeunesse',
     category: 'Nouveautés',
     imageUrl: '/covers/9782075164252.jpg',
@@ -136,7 +136,7 @@ export const MOCK_FLASH_INFOS: FlashInfo[] = [
   },
   {
     id: 'fi-lit-02',
-    title: 'Leurs enfants après eux — édition collector',
+    title: 'Leurs enfants après eux : édition collector',
     universe: 'Littérature',
     category: 'Fonds',
     imageUrl: '/covers/9782330108724.jpg',
@@ -149,7 +149,7 @@ export const MOCK_FLASH_INFOS: FlashInfo[] = [
   },
   {
     id: 'fi-lit-03',
-    title: 'Vidéo — Présentation Rentrée Littéraire 2026',
+    title: 'Vidéo : Présentation Rentrée Littéraire 2026',
     universe: 'Littérature',
     category: 'Nouveautés',
     imageUrl: null,
@@ -162,7 +162,7 @@ export const MOCK_FLASH_INFOS: FlashInfo[] = [
   },
   {
     id: 'fi-lit-04',
-    title: 'FlowDiff — Export panier en PDF',
+    title: 'FlowDiff : Export panier en PDF',
     universe: 'Littérature',
     category: 'FlowDiff',
     imageUrl: null,
@@ -174,7 +174,7 @@ export const MOCK_FLASH_INFOS: FlashInfo[] = [
   /* ─── Adulte-pratique ─── */
   {
     id: 'fi-pra-01',
-    title: 'Le Guide Marabout du bien-être mental — présentation vidéo',
+    title: 'Le Guide Marabout du bien-être mental : présentation vidéo',
     universe: 'Adulte-pratique',
     category: 'Auteurs',
     imageUrl: null,
@@ -189,7 +189,7 @@ export const MOCK_FLASH_INFOS: FlashInfo[] = [
   },
   {
     id: 'fi-pra-02',
-    title: 'Larousse — Cuisine autour du monde',
+    title: 'Larousse : Cuisine autour du monde',
     universe: 'Adulte-pratique',
     category: 'Fonds',
     imageUrl: '/covers/9782036052307.jpg',
@@ -202,7 +202,7 @@ export const MOCK_FLASH_INFOS: FlashInfo[] = [
   },
   {
     id: 'fi-pra-03',
-    title: 'Le Potager de balcon — programme automne',
+    title: 'Le Potager de balcon : programme automne',
     universe: 'Adulte-pratique',
     category: 'Nouveautés',
     imageUrl: '/covers/9789990001004.jpg',

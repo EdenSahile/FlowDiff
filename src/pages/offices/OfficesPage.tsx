@@ -968,7 +968,7 @@ export function OfficesPageFull() {
             <div>
               <PageEyebrow>Outils</PageEyebrow>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-                <PageTitle>Mon office — {office.label}</PageTitle>
+                <PageTitle>Mon office : {office.label}</PageTitle>
                 <PeriodBadge>Période concernée</PeriodBadge>
               </div>
             </div>
@@ -1018,7 +1018,7 @@ export function OfficesPageFull() {
             <SummaryIcon $color="#166534"><IconShield /></SummaryIcon>
             <SummaryBody>
               <SummaryLabel>Exemplaires prévus</SummaryLabel>
-              <SummaryValue>{totalExemplaires} ex. — {totalIncluded} titres</SummaryValue>
+              <SummaryValue>{totalExemplaires} ex. : {totalIncluded} titres</SummaryValue>
             </SummaryBody>
           </SummaryCard>
         </SummaryGrid>
@@ -1237,7 +1237,7 @@ export function OfficesPageFull() {
         createPortal(
           <ExportOverlay onClick={() => setShowExport(false)}>
             <ExportPanel onClick={e => e.stopPropagation()}>
-              <ExportTitle>Export — {office.label}</ExportTitle>
+              <ExportTitle>Export : {office.label}</ExportTitle>
               <ExportMeta>
                 {includedForExport.length} titre{includedForExport.length > 1 ? 's' : ''} inclus ·{' '}
                 {totalExemplaires} exemplaires

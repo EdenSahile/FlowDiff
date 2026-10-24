@@ -12,7 +12,7 @@ function wrapper({ children }: { children: ReactNode }) {
 // dans ces tests.
 type AuthResult = { success: boolean; error?: string; fieldErrors?: Partial<Record<string, string>> }
 
-// Identifiants réels de MOCK_USERS (src/lib/mockUsers.ts) — LIB001, hashé
+// Identifiants réels de MOCK_USERS (src/lib/mockUsers.ts) : LIB001, hashé
 // avec bcrypt cost=4 (DEV_COST), donc rapide même sans mock de bcryptjs.
 const VALID_IDENTIFIER = 'LIB001'
 const VALID_EMAIL = 'marie.lecomte@librairie-lira.fr'

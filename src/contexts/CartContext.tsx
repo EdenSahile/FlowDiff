@@ -37,7 +37,7 @@ export interface CartItem {
   book: Book
   quantity: number
   ebookOption?: EbookCartOption
-  /* Snapshot du statut au moment de l'ajout — évite un changement rétroactif */
+  /* Snapshot du statut au moment de l'ajout : évite un changement rétroactif */
   statut?: StockStatut
   /* true pour en_reimp (expédition différée), false sinon */
   enReliquat?: boolean
@@ -169,7 +169,7 @@ function loadCart(key: string): StoredCart {
 export function computeTotals(items: CartItem[], opGroups: OPCartGroup[], rates: Record<string, number>) {
   const rate = (universe: string) => rates[universe] ?? 0
 
-  /* Titres individuels — base TTC (prix public) */
+  /* Titres individuels : base TTC (prix public) */
   const booksTTC = items.reduce(
     (sum, item) => sum + getItemUnitPriceTTC(item) * item.quantity, 0)
   const booksRemise = items.reduce(
@@ -230,7 +230,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setCart(c => ({ ...c, opGroups: fn(c.opGroups) }))
   , [])
 
-  /* Persistance localStorage — clé par utilisateur (skip si non connecté) */
+  /* Persistance localStorage : clé par utilisateur (skip si non connecté) */
   useEffect(() => {
     if (!user?.codeClient) return
     localStorage.setItem(key, JSON.stringify({ items, opGroups }))
