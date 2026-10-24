@@ -15,7 +15,7 @@ import { theme } from '@/lib/theme'
 import { formatPrice } from '@/lib/format'
 import {
   getPurchaseAvailability, getEbookLabel, getFormatLabel,
-  getOtherEditions, getReplacementEdition, getReplacedEdition,
+  getOtherEditions, getReplacementEdition, getReplacedEdition, getReliureLabel,
 } from '@/lib/bookUtils'
 import { StockStatus } from '@/components/ui/StockStatus'
 import { mq } from '@/lib/responsive'
@@ -33,6 +33,8 @@ interface PhysicalFormat {
   /* Ce que la ligne « Format » affiche : les dimensions pour le papier, le
      format de fichier pour l'ebook, qui n'a pas de dimensions. */
   formatDetail: string
+  /* Les dimensions du papier, absentes d'une offre numerique. */
+  dimensions?: string
   /* Un ebook est une reference commerciale distincte, avec son propre ISBN. */
   isbn?: string
   /* Presente seulement sur une offre numerique : ce qui part au panier. */
@@ -392,6 +394,13 @@ const FormatPriceEl = styled.span<{ $active: boolean }>`
   color: ${({ $active, theme }) => $active ? theme.colors.navy : theme.colors.gray[400]};
   font-weight: ${({ $active }) => $active ? '500' : '400'};
   margin-top: 1px;
+`
+
+/* Les dimensions prennent leur propre ligne et ne se coupent jamais en
+   deux : « 210 x 280 mm » restait sinon à cheval sur 2 lignes. */
+const DimensionsLineEl = styled.span`
+  display: block;
+  white-space: nowrap;
 `
 
 /* ── Autres éditions de la même œuvre ── */
@@ -1366,10 +1375,17 @@ export function FicheProduitPage() {
     */
     {
       id: 'broche',
-      label: [getFormatLabel(book.format) ?? 'Papier', book.collection].filter(Boolean).join(' · '),
+      label: [getFormatLabel(book) ?? 'Papier', book.collection].filter(Boolean).join(' · '),
       description: 'Édition papier',
       priceTTC: book.priceTTC,
-      formatDetail: `${getFormatLabel(book.format) ?? 'Papier'} · ${book.format}`,
+      /* Les 2 axes d'un cote, les dimensions de l'autre : elles vont sur leur
+         propre ligne, la colonne etant trop etroite pour les garder d'un
+         seul tenant a la suite du reste. */
+      formatDetail: [
+        getFormatLabel(book) ?? 'Papier',
+        getReliureLabel(book)?.toLowerCase(),
+      ].filter(Boolean).join(' · '),
+      dimensions: book.format,
     },
     /*
       Pas d'edition poche ici. Elle etait fabriquee a l'affichage, a 62 % du
@@ -1475,7 +1491,10 @@ export function FicheProduitPage() {
               </ArgMetaItem>
               <ArgMetaItem>
                 <ArgMetaLabel>Format</ArgMetaLabel>
-                <ArgMetaValue>{selectedFormat.formatDetail}</ArgMetaValue>
+                <ArgMetaValue>
+                  {[selectedFormat.formatDetail, selectedFormat.dimensions]
+                    .filter(Boolean).join(' · ')}
+                </ArgMetaValue>
               </ArgMetaItem>
               {book.pages && (
                 <ArgMetaItem>
@@ -1588,7 +1607,12 @@ export function FicheProduitPage() {
             )}
             <MetaRowItem>
               <MetaLabelEl>Format</MetaLabelEl>
-              <MetaValueEl>{selectedFormat.formatDetail}</MetaValueEl>
+              <MetaValueEl>
+                {selectedFormat.formatDetail}
+                {selectedFormat.dimensions && (
+                  <DimensionsLineEl>{selectedFormat.dimensions}</DimensionsLineEl>
+                )}
+              </MetaValueEl>
             </MetaRowItem>
             {book.collection && (
               <MetaRowItem>
@@ -1682,7 +1706,7 @@ export function FicheProduitPage() {
                 {otherEditions.map(edition => (
                   <EditionLinkEl key={edition.id} to={`/livre/${edition.id}`}>
                     <EditionNameEl>
-                      {[getFormatLabel(edition.format) ?? 'Autre format', edition.collection]
+                      {[getFormatLabel(edition) ?? 'Autre format', edition.collection]
                         .filter(Boolean).join(' · ')}
                       {' '}→
                     </EditionNameEl>

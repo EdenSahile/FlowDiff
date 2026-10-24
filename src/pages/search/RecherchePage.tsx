@@ -6,7 +6,7 @@ import { PRICE_RANGES, type Book, type Universe } from '@/data/mockBooks'
 import { BookCard } from '@/components/catalogue/BookCard'
 import { BackButton } from '@/components/ui/BackButton'
 import { mq } from '@/lib/responsive'
-import { matchesIsbn, hasExactIsbn, matchesFormat } from '@/lib/bookUtils'
+import { matchesIsbn, hasExactIsbn, matchesFormat, matchesReliure } from '@/lib/bookUtils'
 
 /* ══════════════════════════════════════════════════════
    UTILS
@@ -450,6 +450,7 @@ export function RecherchePage() {
   const pLangues  = params.get('langues')?.split(',').filter(Boolean) ?? []
   const pPrix     = params.get('prix')?.split(',').filter(Boolean) ?? []
   const pFormats  = params.get('formats')?.split(',').filter(Boolean) ?? []
+  const pReliures = params.get('reliures')?.split(',').filter(Boolean) ?? []
 
   const [universeFilter, setUniverseFilter] = useState<Universe | null>(null)
   const [allBooks, setAllBooks] = useState<Book[]>([])
@@ -481,6 +482,7 @@ export function RecherchePage() {
       if (ranges.length) books = books.filter(b => ranges.some(r => b.priceTTC >= r.min && b.priceTTC < r.max))
     }
     if (pFormats.length) books = books.filter(b => matchesFormat(b, pFormats))
+    if (pReliures.length) books = books.filter(b => matchesReliure(b, pReliures))
 
     return books
   // paramsStr est dérivé de pUniverses/pGenres/pLangues/pPrix/pFormats, changement unique
@@ -493,7 +495,7 @@ export function RecherchePage() {
   )
 
   /* Filters applied via URL params */
-  const hasAdvancedFilters = !!(pUniverses.length || pGenres.length || pLangues.length || pPrix.length || pFormats.length)
+  const hasAdvancedFilters = !!(pUniverses.length || pGenres.length || pLangues.length || pPrix.length || pFormats.length || pReliures.length)
 
   /* Cas ISBN hors catalogue */
   const isbnNotFound = q && isIsbn(q.replace(/[\s-]/g, '')) &&
@@ -550,6 +552,7 @@ export function RecherchePage() {
               ...pLangues,
               ...pPrix,
               ...pFormats,
+              ...pReliures,
             ].join(', ')}
           </ResultSub>
         )}

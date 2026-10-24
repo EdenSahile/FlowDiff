@@ -1,4 +1,6 @@
-import type { BookType, StockStatut, EbookFormat } from '@/data/mockBooks'
+import type {
+  BookType, StockStatut, EbookFormat, Reliure, CategorieCommerciale,
+} from '@/data/mockBooks'
 import type { TypeCommande } from '@/data/mockOrders'
 
 const TYPE_COMMANDE_BY_BOOK_TYPE: Record<BookType, TypeCommande> = {
@@ -103,37 +105,60 @@ export function getPurchaseAvailability(type: BookType, statut?: StockStatut) {
 }
 
 /*
-  Filtre « Format » de la recherche avancée.
+  Filtres « Format » et « Reliure » de la recherche avancée.
 
-  Le champ `format` d'un livre contient ses dimensions, pas un nom de format
-  commercial. Les pastilles « Poche », « Broché » et « Grand format » ne
-  pouvaient donc correspondre à aucun titre, et restaient toutes grisées.
-  Le format se déduit des dimensions, seule donnée disponible.
+  Les 2 ne sont pas sur le même axe, et le métier ne les confond pas. La
+  reliure dit comment le livre est fabriqué, broché ou relié. La catégorie
+  commerciale dit s'il s'agit de l'édition d'origine, le grand format, ou de
+  sa reprise en poche 12 à 24 mois plus tard. Un roman français est presque
+  toujours grand format ET broché.
 
-  « Numérique » ne regarde pas les dimensions : il retient les titres qui
-  proposent une offre ebook.
+  Les 2 étaient auparavant déduits des dimensions et mélangés dans une seule
+  liste de pastilles qui s'excluaient. « Broché » y désignait en réalité un
+  grand format de taille moyenne, et « Relié » restait vide non parce
+  qu'aucun livre n'était cartonné, mais parce qu'aucune dimension ne lui
+  était attribuée. Les 2 viennent maintenant des données.
 */
-const FORMAT_BY_DIMENSIONS: Record<string, string> = {
-  '115 x 175 mm': 'Poche',
-  '145 x 195 mm': 'Broché',
-  '145 x 215 mm': 'Broché',
-  '155 x 235 mm': 'Broché',
-  '190 x 240 mm': 'Grand format',
-  '210 x 280 mm': 'Grand format',
-  '220 x 290 mm': 'Grand format',
+const CATEGORIE_LABELS: Record<CategorieCommerciale, string> = {
+  'poche':        'Poche',
+  'grand format': 'Grand format',
+}
+
+const RELIURE_LABELS: Record<Reliure, string> = {
+  'broche': 'Broché',
+  'relie':  'Relié',
 }
 
 const DIGITAL_FORMAT = 'Numérique'
 
-type BookFormat = { format?: string; ebooks?: unknown[] }
+export const FORMAT_OPTIONS = [...Object.values(CATEGORIE_LABELS), DIGITAL_FORMAT]
+export const RELIURE_OPTIONS = Object.values(RELIURE_LABELS)
 
-export function getFormatLabel(dimensions: string | undefined): string | null {
-  return dimensions ? FORMAT_BY_DIMENSIONS[dimensions] ?? null : null
+type BookFormat = {
+  categorie?: CategorieCommerciale
+  reliure?: Reliure
+  collection?: string
+  ebooks?: unknown[]
+}
+
+/** Nom commercial de l'édition, « Poche · Babel » sur une fiche. */
+export function getFormatLabel(book: BookFormat): string | null {
+  return book.categorie ? CATEGORIE_LABELS[book.categorie] : null
+}
+
+export function getReliureLabel(book: BookFormat): string | null {
+  return book.reliure ? RELIURE_LABELS[book.reliure] : null
 }
 
 export function matchesFormat(book: BookFormat, selected: string[]): boolean {
   if (selected.length === 0) return true
   if (selected.includes(DIGITAL_FORMAT) && book.ebooks?.length) return true
-  const label = getFormatLabel(book.format)
+  const label = getFormatLabel(book)
+  return label !== null && selected.includes(label)
+}
+
+export function matchesReliure(book: BookFormat, selected: string[]): boolean {
+  if (selected.length === 0) return true
+  const label = getReliureLabel(book)
   return label !== null && selected.includes(label)
 }

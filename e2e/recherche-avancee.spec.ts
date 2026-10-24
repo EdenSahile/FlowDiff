@@ -9,8 +9,9 @@ import { test, expect, type Page, type Locator } from '@playwright/test'
 
     Thématique  Littérature 22 · BD/Mangas 15 · Adulte-pratique 11 · Jeunesse 8
     Langue      Français 32 · Japonais 11 · Anglais 10 · Espagnol 2 · Suédois 1
-    Prix        5 à 10 EUR 17 · 10 à 20 EUR 28 · 20 à 50 EUR 11, les 2 autres 0
-    Format      Broché 33 · Poche 18 · Grand format 5 · Numérique 3 · Relié 0
+    Prix        5 à 10 EUR 17 · 10 à 20 EUR 27 · 20 à 50 EUR 12, les 2 autres 0
+    Format      Poche 7 · Grand format 38 · Numérique 3, et 11 tankobon ni l'un ni l'autre
+    Reliure     Broché 52 · Relié 4
 
   Règles attendues : un filtre restreint le catalogue, plusieurs pastilles d'un
   même groupe s'additionnent (OU), des groupes différents se croisent (ET), et
@@ -135,7 +136,7 @@ test.describe('Un seul groupe de filtres', () => {
 
     await chip(page, '10 à 20 EUR').click()
 
-    await expect(counter(page)).toHaveText('28 ouvrages')
+    await expect(counter(page)).toHaveText('27 ouvrages')
   })
 
   test('un format restreint le compteur', async ({ page }) => {
@@ -143,7 +144,26 @@ test.describe('Un seul groupe de filtres', () => {
 
     await chip(page, 'Poche').click()
 
-    await expect(counter(page)).toHaveText('18 ouvrages')
+    await expect(counter(page)).toHaveText('7 ouvrages')
+  })
+
+  /* La reliure est un axe distinct du format : un grand format est presque
+     toujours broché, les 2 pastilles se cumulent au lieu de s'exclure. */
+  test('une reliure restreint le compteur', async ({ page }) => {
+    await openPanel(page)
+
+    await chip(page, 'Relié').click()
+
+    await expect(counter(page)).toHaveText('4 ouvrages')
+  })
+
+  test('format et reliure se croisent au lieu de s\'exclure', async ({ page }) => {
+    await openPanel(page)
+
+    await chip(page, 'Grand format').click()
+    await chip(page, 'Broché').click()
+
+    await expect(counter(page)).toHaveText('34 ouvrages')
   })
 
   test('les tranches de prix qu\'aucun titre n\'atteint restent grisées', async ({ page }) => {
@@ -194,7 +214,7 @@ test.describe('Plusieurs choix dans un même groupe', () => {
     await chip(page, '5 à 10 EUR').click()
     await chip(page, '10 à 20 EUR').click()
 
-    await expect(counter(page)).toHaveText('45 ouvrages')
+    await expect(counter(page)).toHaveText('44 ouvrages')
   })
 
   test('cliquer 2 fois la même pastille la désélectionne', async ({ page }) => {
@@ -229,16 +249,16 @@ test.describe('Croisement de groupes', () => {
     await expect(counter(page)).toHaveText('2 ouvrages')
   })
 
-  // La littérature compte des brochés et les 3 éditions de poche, mais aucun
-  // titre aux dimensions du grand format.
+  // La littérature compte des grands formats et des poches, tous brochés.
   test('une thématique grise les formats qu\'aucun de ses titres ne porte', async ({ page }) => {
     await openPanel(page)
 
     await chip(page, 'Littérature').click()
 
-    await expect(chip(page, 'Grand format')).toBeDisabled()
-    await expect(chip(page, 'Broché')).toBeEnabled()
+    await expect(chip(page, 'Grand format')).toBeEnabled()
     await expect(chip(page, 'Poche')).toBeEnabled()
+    // Aucun titre de littérature n'est cartonné.
+    await expect(chip(page, 'Relié')).toBeDisabled()
   })
 
   // Les 8 titres jeunesse sont tous entre 10 et 20 EUR.

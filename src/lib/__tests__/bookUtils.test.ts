@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { MOCK_BOOKS, EBOOK_FORMATS } from '@/data/mockBooks'
 import type { BookType, Universe, StockStatut } from '@/data/mockBooks'
 import {
-  getPurchaseAvailability, getTypeCommande, getEbookLabel, hasExactIsbn, matchesIsbn, matchesFormat,
+  getPurchaseAvailability, getTypeCommande, getEbookLabel, hasExactIsbn, matchesIsbn, matchesFormat, matchesReliure,
   getReplacementEdition, getReplacedEdition, getOtherEditions,
 } from '@/lib/bookUtils'
 
@@ -228,42 +228,75 @@ describe('matchesIsbn', () => {
 ══════════════════════════════════════════════════════ */
 
 describe('matchesFormat', () => {
-  const poche      = { format: '115 x 175 mm' }
-  const broche     = { format: '155 x 235 mm' }
-  const grand      = { format: '220 x 290 mm' }
-  const avecEbook  = { format: '155 x 235 mm', ebooks: [{ isbn: '9789990030011', format: 'PDF' as const, priceTTC: 9.99 }] }
+  const poche      = { categorie: 'poche' as const,        reliure: 'broche' as const }
+  const grandFormat = { categorie: 'grand format' as const, reliure: 'broche' as const }
+  const manga      = { reliure: 'broche' as const }  // tankobon : ni poche ni grand format
+  const avecEbook  = {
+    categorie: 'grand format' as const,
+    reliure: 'broche' as const,
+    ebooks: [{ isbn: '9789990030011', format: 'PDF' as const, priceTTC: 9.99 }],
+  }
 
   it('ne filtre rien quand aucun format n\'est coché', () => {
     expect(matchesFormat(poche, [])).toBe(true)
-    expect(matchesFormat(grand, [])).toBe(true)
+    expect(matchesFormat(grandFormat, [])).toBe(true)
   })
 
-  it('reconnaît un poche à ses dimensions', () => {
+  it('distingue le poche du grand format', () => {
     expect(matchesFormat(poche, ['Poche'])).toBe(true)
-    expect(matchesFormat(broche, ['Poche'])).toBe(false)
+    expect(matchesFormat(grandFormat, ['Poche'])).toBe(false)
+    expect(matchesFormat(grandFormat, ['Grand format'])).toBe(true)
   })
 
-  it('reconnaît un broché et un grand format à leurs dimensions', () => {
-    expect(matchesFormat(broche, ['Broché'])).toBe(true)
-    expect(matchesFormat(grand, ['Grand format'])).toBe(true)
-    expect(matchesFormat(grand, ['Broché'])).toBe(false)
+  /* La reliure est un autre axe : un broché peut être poche ou grand format,
+     « Broché » n'est donc pas une réponse à la question du format. */
+  it('ne connaît pas la reliure comme un format', () => {
+    expect(matchesFormat(grandFormat, ['Broché'])).toBe(false)
   })
 
   it('accepte un titre si l\'un des formats cochés correspond', () => {
-    expect(matchesFormat(poche, ['Broché', 'Poche'])).toBe(true)
+    expect(matchesFormat(poche, ['Grand format', 'Poche'])).toBe(true)
   })
 
   it('ne retient en numérique que les titres ayant une offre ebook', () => {
     expect(matchesFormat(avecEbook, ['Numérique'])).toBe(true)
-    expect(matchesFormat(broche, ['Numérique'])).toBe(false)
+    expect(matchesFormat(grandFormat, ['Numérique'])).toBe(false)
   })
 
   it('accepte un titre numérique croisé avec son format papier', () => {
     expect(matchesFormat(avecEbook, ['Numérique', 'Poche'])).toBe(true)
   })
 
-  it('refuse un titre dont les dimensions sont inconnues', () => {
-    expect(matchesFormat({ format: '999 x 999 mm' }, ['Poche'])).toBe(false)
+  /* Un manga ne se vend ni en poche ni en grand format : il ne répond à
+     aucune des 2 pastilles plutôt que d'être rangé de force dans l'une. */
+  it('ne retient un tankobon dans aucune des 2 catégories', () => {
+    expect(matchesFormat(manga, ['Poche'])).toBe(false)
+    expect(matchesFormat(manga, ['Grand format'])).toBe(false)
+  })
+})
+
+describe('matchesReliure', () => {
+  const broche = { categorie: 'grand format' as const, reliure: 'broche' as const }
+  const relie  = { categorie: 'grand format' as const, reliure: 'relie' as const }
+
+  it('ne filtre rien quand aucune reliure n\'est cochée', () => {
+    expect(matchesReliure(broche, [])).toBe(true)
+  })
+
+  it('distingue le broché du relié', () => {
+    expect(matchesReliure(broche, ['Broché'])).toBe(true)
+    expect(matchesReliure(relie, ['Broché'])).toBe(false)
+    expect(matchesReliure(relie, ['Relié'])).toBe(true)
+  })
+
+  /* Les 2 axes se cumulent : un grand format relié répond aux deux. */
+  it('se croise avec le format sans l\'exclure', () => {
+    expect(matchesFormat(relie, ['Grand format'])).toBe(true)
+    expect(matchesReliure(relie, ['Relié'])).toBe(true)
+  })
+
+  it('écarte un titre dont la reliure n\'est pas renseignée', () => {
+    expect(matchesReliure({ categorie: 'poche' as const }, ['Broché'])).toBe(false)
   })
 })
 

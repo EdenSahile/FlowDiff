@@ -22,12 +22,19 @@ import { needsNotedConfirmation, buildNotedMessage, buildAddedToCartMessage, isI
 import { useToast } from '@/contexts/ToastContext'
 import { IconTrash, IconCart, IconSearch } from '@/components/ui/icons'
 import { exportToCSV } from '@/lib/csv'
-import { hasExactIsbn, matchesFormat, getFormatLabel } from '@/lib/bookUtils'
+import {
+  hasExactIsbn, matchesFormat, matchesReliure, getFormatLabel, getReliureLabel,
+  FORMAT_OPTIONS, RELIURE_OPTIONS,
+} from '@/lib/bookUtils'
 
 const GOLD = theme.colors.accent
 
 const UNIVERSES: Universe[] = ['Littérature', 'BD/Mangas', 'Jeunesse', 'Adulte-pratique']
-const FORMATS = ['Poche', 'Grand format', 'Broché', 'Relié', 'Numérique']
+/* Deux axes distincts : la categorie commerciale et la reliure. Les 5
+   pastilles d'origine les melangeaient dans une seule liste de choix
+   exclusifs, alors qu'un roman est presque toujours grand format ET broche. */
+const FORMATS = FORMAT_OPTIONS
+const RELIURES_LABELS = RELIURE_OPTIONS
 
 /* ── Header bar ── */
 const HeaderBar = styled.header`
@@ -1033,6 +1040,7 @@ export function Header({ cartCount = 0, onBurgerClick, onCartClick }: HeaderProp
   const [selLangue, setSelLangue]     = useState<string[]>([])
   const [selPrix, setSelPrix]         = useState<string[]>([])
   const [selFormat, setSelFormat]     = useState<string[]>([])
+  const [selReliure, setSelReliure]   = useState<string[]>([])
 
   const containerRef  = useRef<HTMLDivElement>(null)
   const listsBtnRef   = useRef<HTMLButtonElement>(null)
@@ -1067,7 +1075,7 @@ export function Header({ cartCount = 0, onBurgerClick, onCartClick }: HeaderProp
     return arr.includes(val) ? arr.filter(x => x !== val) : [...arr, val]
   }
 
-  const activeCount = selUniverse.length + selGenre.length + selLangue.length + selPrix.length + selFormat.length
+  const activeCount = selUniverse.length + selGenre.length + selLangue.length + selPrix.length + selFormat.length + selReliure.length
 
   /* ── Base books (by search query) ── */
   const baseBooks = useMemo(() =>
@@ -1091,9 +1099,10 @@ export function Header({ cartCount = 0, onBurgerClick, onCartClick }: HeaderProp
     if (selLangue.length) b = b.filter(x => x.language && selLangue.includes(x.language))
     b = applyPrix(b, selPrix)
     if (selFormat.length) b = b.filter(x => matchesFormat(x, selFormat))
+    if (selReliure.length) b = b.filter(x => matchesReliure(x, selReliure))
     return b
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [baseBooks, selGenre, selLangue, selPrix, selFormat])
+  }, [baseBooks, selGenre, selLangue, selPrix, selFormat, selReliure])
 
   const booksForGenre = useMemo(() => {
     let b = baseBooks
@@ -1101,9 +1110,10 @@ export function Header({ cartCount = 0, onBurgerClick, onCartClick }: HeaderProp
     if (selLangue.length)   b = b.filter(x => x.language && selLangue.includes(x.language))
     b = applyPrix(b, selPrix)
     if (selFormat.length)   b = b.filter(x => matchesFormat(x, selFormat))
+    if (selReliure.length) b = b.filter(x => matchesReliure(x, selReliure))
     return b
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [baseBooks, selUniverse, selLangue, selPrix, selFormat])
+  }, [baseBooks, selUniverse, selLangue, selPrix, selFormat, selReliure])
 
   const booksForLangue = useMemo(() => {
     let b = baseBooks
@@ -1111,9 +1121,10 @@ export function Header({ cartCount = 0, onBurgerClick, onCartClick }: HeaderProp
     if (selGenre.length)    b = b.filter(x => x.genre && selGenre.includes(x.genre))
     b = applyPrix(b, selPrix)
     if (selFormat.length)   b = b.filter(x => matchesFormat(x, selFormat))
+    if (selReliure.length) b = b.filter(x => matchesReliure(x, selReliure))
     return b
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [baseBooks, selUniverse, selGenre, selPrix, selFormat])
+  }, [baseBooks, selUniverse, selGenre, selPrix, selFormat, selReliure])
 
   const booksForPrix = useMemo(() => {
     let b = baseBooks
@@ -1121,18 +1132,33 @@ export function Header({ cartCount = 0, onBurgerClick, onCartClick }: HeaderProp
     if (selGenre.length)    b = b.filter(x => x.genre && selGenre.includes(x.genre))
     if (selLangue.length)   b = b.filter(x => x.language && selLangue.includes(x.language))
     if (selFormat.length)   b = b.filter(x => matchesFormat(x, selFormat))
+    if (selReliure.length) b = b.filter(x => matchesReliure(x, selReliure))
     return b
-  }, [baseBooks, selUniverse, selGenre, selLangue, selFormat])
+  }, [baseBooks, selUniverse, selGenre, selLangue, selFormat, selReliure])
 
+  /* Tous les filtres sauf ceux de l'axe concerne : chaque axe doit pouvoir se
+     changer sans se griser lui-meme, mais reste limite par l'autre. */
   const booksForFormat = useMemo(() => {
     let b = baseBooks
     if (selUniverse.length) b = b.filter(x => selUniverse.includes(x.universe))
     if (selGenre.length)    b = b.filter(x => x.genre && selGenre.includes(x.genre))
     if (selLangue.length)   b = b.filter(x => x.language && selLangue.includes(x.language))
     b = applyPrix(b, selPrix)
+    if (selReliure.length)  b = b.filter(x => matchesReliure(x, selReliure))
     return b
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [baseBooks, selUniverse, selGenre, selLangue, selPrix])
+  }, [baseBooks, selUniverse, selGenre, selLangue, selPrix, selReliure])
+
+  const booksForReliure = useMemo(() => {
+    let b = baseBooks
+    if (selUniverse.length) b = b.filter(x => selUniverse.includes(x.universe))
+    if (selGenre.length)    b = b.filter(x => x.genre && selGenre.includes(x.genre))
+    if (selLangue.length)   b = b.filter(x => x.language && selLangue.includes(x.language))
+    b = applyPrix(b, selPrix)
+    if (selFormat.length)   b = b.filter(x => matchesFormat(x, selFormat))
+    return b
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [baseBooks, selUniverse, selGenre, selLangue, selPrix, selFormat])
 
   /* ── Available options per group ── */
   const availableUniverses = useMemo(() => new Set(booksForUniverse.map(b => b.universe)), [booksForUniverse])
@@ -1145,13 +1171,17 @@ export function Header({ cartCount = 0, onBurgerClick, onCartClick }: HeaderProp
     })
     return s
   }, [booksForPrix])
-  /* Une pastille n'est cliquable que si au moins un titre y répond. Le format
-     se déduit des dimensions, et « Numérique » de la présence d'une offre ebook. */
+  /* Une pastille n'est cliquable que si au moins un titre y répond.
+     « Numérique » tient à la présence d'une offre ebook. */
   const availableFormats   = useMemo(() => {
-    const labels = new Set(booksForFormat.map(b => getFormatLabel(b.format)).filter(Boolean) as string[])
+    const labels = new Set(booksForFormat.map(b => getFormatLabel(b)).filter(Boolean) as string[])
     if (booksForFormat.some(b => b.ebooks?.length)) labels.add('Numérique')
     return labels
   }, [booksForFormat])
+  const availableReliures  = useMemo(
+    () => new Set(booksForReliure.map(b => getReliureLabel(b)).filter(Boolean) as string[]),
+    [booksForReliure],
+  )
 
   /* ── Auto-clear selections that become unavailable ──
      Note: setState-in-effect est intentionnel ici pour synchroniser
@@ -1180,6 +1210,9 @@ export function Header({ cartCount = 0, onBurgerClick, onCartClick }: HeaderProp
   useEffect(() => {
     setSelFormat(prev => keepAvailable(prev, availableFormats))
   }, [availableFormats])
+  useEffect(() => {
+    setSelReliure(prev => keepAvailable(prev, availableReliures))
+  }, [availableReliures])
   /* eslint-enable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps */
 
   /* ── Filtered count (all filters applied) ── */
@@ -1190,9 +1223,10 @@ export function Header({ cartCount = 0, onBurgerClick, onCartClick }: HeaderProp
     if (selLangue.length)   b = b.filter(x => x.language && selLangue.includes(x.language))
     b = applyPrix(b, selPrix)
     if (selFormat.length)   b = b.filter(x => matchesFormat(x, selFormat))
+    if (selReliure.length) b = b.filter(x => matchesReliure(x, selReliure))
     return b.length
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [baseBooks, selUniverse, selGenre, selLangue, selPrix, selFormat])
+  }, [baseBooks, selUniverse, selGenre, selLangue, selPrix, selFormat, selReliure])
 
   /* close panel on Escape (backdrop onClick gère le clic extérieur) */
   useEffect(() => {
@@ -1210,6 +1244,7 @@ export function Header({ cartCount = 0, onBurgerClick, onCartClick }: HeaderProp
     setSelLangue([])
     setSelPrix([])
     setSelFormat([])
+    setSelReliure([])
   }
 
   function buildParams(q: string) {
@@ -1220,6 +1255,7 @@ export function Header({ cartCount = 0, onBurgerClick, onCartClick }: HeaderProp
     if (selLangue.length)   params.set('langues',  selLangue.join(','))
     if (selPrix.length)     params.set('prix',     selPrix.join(','))
     if (selFormat.length)   params.set('formats',  selFormat.join(','))
+    if (selReliure.length)  params.set('reliures', selReliure.join(','))
     return params.toString()
   }
 
@@ -1414,6 +1450,24 @@ export function Header({ cartCount = 0, onBurgerClick, onCartClick }: HeaderProp
                       onClick={() => setSelFormat(toggle(selFormat, f))}
                     >
                       {f}
+                    </Chip>
+                  ))}
+                </ChipGroup>
+              </PanelSection>
+
+              {/* Axe distinct du precedent : un grand format est presque
+                  toujours broche, les 2 se cumulent au lieu de s'exclure. */}
+              <PanelSection>
+                <PanelLabel>Reliure</PanelLabel>
+                <ChipGroup>
+                  {RELIURES_LABELS.map(r => (
+                    <Chip
+                      key={r}
+                      $active={selReliure.includes(r)}
+                      disabled={!availableReliures.has(r)}
+                      onClick={() => setSelReliure(toggle(selReliure, r))}
+                    >
+                      {r}
                     </Chip>
                   ))}
                 </ChipGroup>

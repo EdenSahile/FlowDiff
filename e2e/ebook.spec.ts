@@ -37,7 +37,7 @@ test('le choix du format n\'affiche l\'ebook que si le titre en propose un', asy
 
   await page.goto(`/livre/${EBOOK_PDF.id}`)
   await expect(page.getByText(EBOOK_PDF.label, { exact: true })).toBeVisible()
-  await expect(page.getByText('Broché', { exact: true })).toBeVisible()
+  await expect(page.getByText('Grand format', { exact: true })).toBeVisible()
 
   await page.goto(`/livre/${SANS_EBOOK}`)
 
@@ -63,7 +63,7 @@ test('le grand format renvoie vers son édition de poche, et retour', async ({ p
   await expect(page).toHaveURL('/livre/f-lit-mathieu-babel')
   await expect(page.getByText('9782330139179', { exact: true })).toBeVisible()
 
-  await page.getByRole('link', { name: /Broché/ }).click()
+  await page.getByRole('link', { name: /Grand format/ }).click()
 
   await expect(page).toHaveURL('/livre/f-lit-mathieu')
 })
@@ -100,7 +100,7 @@ test('un titre sans version numérique affiche quand même son format papier', a
 
   await page.goto('/livre/f-lit-colombani')
 
-  await expect(page.getByText('Broché', { exact: true })).toBeVisible()
+  await expect(page.getByText('Grand format', { exact: true })).toBeVisible()
   await expect(page.getByText(/^Ebook \(/)).toHaveCount(0)
 })
 
@@ -252,17 +252,17 @@ test('les pastilles de format sont cliquables, sauf celles sans titre correspond
 
   await page.getByRole('button', { name: 'Filtres avancés' }).click()
 
-  for (const format of ['Poche', 'Grand format', 'Broché', 'Numérique']) {
+  for (const format of ['Poche', 'Grand format', 'Numérique', 'Broché', 'Relié']) {
     await expect(page.getByRole('button', { name: format, exact: true })).toBeEnabled()
   }
-  // Aucun titre du catalogue n'est relié : la pastille reste inactive.
-  await expect(page.getByRole('button', { name: 'Relié', exact: true })).toBeDisabled()
 })
 
-test('le filtre Poche retient les titres aux dimensions de poche', async ({ page }) => {
+/* Le poche est une categorie commerciale, pas une taille : un manga au
+   format tankobon mesure la meme chose et n'en est pas un. */
+test('le filtre Poche retient les éditions de poche, pas les tankobon', async ({ page }) => {
   await login(page)
 
   await page.goto('/recherche?formats=Poche')
 
-  await expect(page.locator('article')).toHaveCount(18)
+  await expect(page.locator('article')).toHaveCount(7)
 })
