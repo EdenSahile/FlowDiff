@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNotifications } from '@/contexts/NotificationsContext'
 import { useNavigate } from 'react-router-dom'
 import styled, { keyframes } from 'styled-components'
-import { useCart, REMISE_RATES, getItemKey } from '@/contexts/CartContext'
+import { useCart, REMISE_RATES, getItemKey, getItemUnitPriceTTC } from '@/contexts/CartContext'
 import { useOrders } from '@/contexts/OrdersContext'
 import { useAuth } from '@/hooks/useAuth'
 import { BookCover } from '@/components/catalogue/BookCover'
@@ -1131,7 +1131,7 @@ export function CartPage() {
   const montantHT = subtotalTTC / 1.055
 
   /* ── Badge remise % (base livres uniquement, hors PLV) ── */
-  const booksTTCOnly = items.reduce((s, { book, quantity }) => s + book.priceTTC * quantity, 0)
+  const booksTTCOnly = items.reduce((s, item) => s + getItemUnitPriceTTC(item) * item.quantity, 0)
     + opGroups.reduce((s, op) => s + op.books.reduce((ss, { book, quantity }) => ss + book.priceTTC * quantity, 0), 0)
   const remisePct = booksTTCOnly > 0 ? (remiseAmount / booksTTCOnly) * 100 : 0
 
@@ -1272,10 +1272,10 @@ export function CartPage() {
       <RecapCard>
         <RecapTitle>Détail de la commande</RecapTitle>
 
-        {items.map(({ book, quantity }) => (
-          <RecapRow key={book.id}>
-            <span>{book.title} × {quantity}</span>
-            <span>{fmt(book.priceTTC * quantity)}</span>
+        {items.map(item => (
+          <RecapRow key={getItemKey(item)}>
+            <span>{item.book.title} × {item.quantity}</span>
+            <span>{fmt(getItemUnitPriceTTC(item) * item.quantity)}</span>
           </RecapRow>
         ))}
 
@@ -1401,10 +1401,10 @@ export function CartPage() {
         <RecapTitle>Récapitulatif de votre commande</RecapTitle>
 
         {/* Titres */}
-        {items.map(({ book, quantity }) => (
-          <RecapRow key={book.id}>
-            <span>{book.title} × {quantity}</span>
-            <span>{fmt(book.priceTTC * quantity)}</span>
+        {items.map(item => (
+          <RecapRow key={getItemKey(item)}>
+            <span>{item.book.title} × {item.quantity}</span>
+            <span>{fmt(getItemUnitPriceTTC(item) * item.quantity)}</span>
           </RecapRow>
         ))}
         {opGroups.map(op => op.books.map(({ book, quantity }) => (

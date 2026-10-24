@@ -12,17 +12,21 @@ export type StockStatut =
   | 'rupture'
 
 /*
-  Formats d'un ebook. Un titre peut n'exister qu'en PDF, qu'en EPUB, ou dans
-  les deux, auquel cas l'achat donne accès aux deux fichiers.
+  Formats d'un ebook. Il n'existe pas de format « PDF+EPUB » : chaque format
+  de fichier disponible separement est une reference a part entiere, avec son
+  propre ISBN, regle posee par ISBN International et suivie par les editeurs
+  francais. Une fiche de L'Harmattan porte ainsi 3 numeros pour un meme
+  titre : EAN13 pour le papier, EAN ePub et EAN PDF.
 */
-export const EBOOK_FORMATS = ['PDF', 'EPUB', 'PDF+EPUB'] as const
+export const EBOOK_FORMATS = ['PDF', 'EPUB'] as const
 import { matchesIsbn } from '@/lib/bookUtils'
 
 export type EbookFormat = (typeof EBOOK_FORMATS)[number]
 
 /*
-  Une offre ebook est une 2e référence commerciale du même titre : son ISBN
-  et son prix lui sont propres, comme pour une édition poche.
+  Une offre ebook est une référence commerciale distincte du même titre : son
+  ISBN et son prix lui sont propres, comme pour une édition poche. Un titre
+  disponible en PDF et en EPUB en porte donc 2.
 */
 export interface EbookOffer {
   isbn: string
@@ -54,7 +58,7 @@ export interface Book {
   topVente?: boolean
   selection?: boolean
   coverUrl?: string
-  ebook?: EbookOffer
+  ebooks?: EbookOffer[]
 }
 
 /* ── Genres par univers ── */
@@ -134,7 +138,10 @@ const _RAW_MOCK_BOOKS: Book[] = [
     price: 14.60, priceTTC: 21.90, format: '155 x 235 mm', pages: 320,
     publicationDate: '2025-01-15',
     description: "Chroniques rassemblées de l'auteur du Prix Goncourt 2024. Kamel Daoud livre un regard lucide et acéré sur le monde contemporain, entre Orient et Occident, sur dix ans d'écriture.",
-    ebook: { isbn: '9789990030011', format: 'PDF+EPUB', priceTTC: 15.99 },
+    ebooks: [
+      { isbn: '9789990030011', format: 'PDF',  priceTTC: 15.99 },
+      { isbn: '9789990030055', format: 'EPUB', priceTTC: 15.99 },
+    ],
   },
   {
     id: 'n-lit-02',
@@ -243,7 +250,7 @@ const _RAW_MOCK_BOOKS: Book[] = [
     publicationDate: '2017-01-04',
     description: "L'ikigaï est la raison de se lever le matin. Ce livre explore le secret de la longévité et du bonheur des habitants d'Okinawa.",
     topVente: true,
-    ebook: { isbn: '9789990030022', format: 'PDF', priceTTC: 9.99 },
+    ebooks: [{ isbn: '9789990030022', format: 'PDF', priceTTC: 9.99 }],
   },
 
   /* ══════════════════════════════════════════════════════
@@ -399,7 +406,7 @@ const _RAW_MOCK_BOOKS: Book[] = [
     publicationDate: '2018-08-22',
     description: "Prix Goncourt 2018. L'été 1992 dans une vallée lorraine sinistrée. Quatre adolescents, leurs familles et une décennie de mutations sociales. Un roman générationnel puissant.",
     topVente: true,
-    ebook: { isbn: '9789990030033', format: 'EPUB', priceTTC: 12.99 },
+    ebooks: [{ isbn: '9789990030033', format: 'EPUB', priceTTC: 12.99 }],
   },
   {
     id: 'f-lit-colombani',

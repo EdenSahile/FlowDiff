@@ -69,6 +69,16 @@ export function getItemKey(item: CartItem): string {
   return item.ebookOption ? `${item.book.id}::${item.ebookOption.isbn}` : item.book.id
 }
 
+/*
+  Prix public d'une ligne : celui de l'offre numerique quand la ligne en porte
+  une, sinon celui du papier. Les totaux lisaient directement le prix du
+  livre, donc un ebook a 9,99 EUR etait compte au prix du grand format, et le
+  recapitulatif contredisait le prix affiche sur la ligne.
+*/
+export function getItemUnitPriceTTC(item: Pick<CartItem, 'book' | 'ebookOption'>): number {
+  return item.ebookOption?.priceTTC ?? item.book.priceTTC
+}
+
 export interface AddToCartOptions {
   ebookOption?: EbookCartOption
   enReliquat?: boolean
@@ -136,9 +146,9 @@ export function computeTotals(items: CartItem[], opGroups: OPCartGroup[], rates:
 
   /* Titres individuels — base TTC (prix public) */
   const booksTTC = items.reduce(
-    (sum, { book, quantity }) => sum + book.priceTTC * quantity, 0)
+    (sum, item) => sum + getItemUnitPriceTTC(item) * item.quantity, 0)
   const booksRemise = items.reduce(
-    (sum, { book, quantity }) => sum + book.priceTTC * quantity * rate(book.universe), 0)
+    (sum, item) => sum + getItemUnitPriceTTC(item) * item.quantity * rate(item.book.universe), 0)
 
   /* OPs : ouvrages + PLV (remise sur ouvrages, pas sur PLV) */
   const opBooksTTC = opGroups.reduce((sum, op) =>

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { MOCK_BOOKS } from '@/data/mockBooks'
+import { MOCK_BOOKS, EBOOK_FORMATS } from '@/data/mockBooks'
 import type { BookType, Universe, StockStatut } from '@/data/mockBooks'
 import { getPurchaseAvailability, getTypeCommande, getEbookLabel, hasExactIsbn, matchesIsbn, matchesFormat } from '@/lib/bookUtils'
 
@@ -153,8 +153,10 @@ describe('getEbookLabel', () => {
     expect(getEbookLabel('EPUB')).toBe('Ebook (epub)')
   })
 
-  it('annonce les 2 formats quand l\'ebook est disponible dans les deux', () => {
-    expect(getEbookLabel('PDF+EPUB')).toBe('Ebook (pdf+epub)')
+  /* Un titre vendu dans les 2 formats porte 2 offres distinctes, donc 2
+     boutons, jamais un libellé qui réunirait les 2 formats. */
+  it('ne connaît aucun libellé réunissant les 2 formats', () => {
+    expect(EBOOK_FORMATS).toEqual(['PDF', 'EPUB'])
   })
 })
 
@@ -165,7 +167,7 @@ describe('getEbookLabel', () => {
 describe('hasExactIsbn', () => {
   const bookWithEbook = {
     isbn: '9782501172097',
-    ebook: { isbn: '9789990030022', format: 'PDF' as const, priceTTC: 9.99 },
+    ebooks: [{ isbn: '9789990030022', format: 'PDF' as const, priceTTC: 9.99 }],
   }
   const bookWithoutEbook = { isbn: '9782330108724' }
 
@@ -202,7 +204,7 @@ describe('hasExactIsbn', () => {
 describe('matchesIsbn', () => {
   const bookWithEbook = {
     isbn: '9782501172097',
-    ebook: { isbn: '9789990030022', format: 'PDF' as const, priceTTC: 9.99 },
+    ebooks: [{ isbn: '9789990030022', format: 'PDF' as const, priceTTC: 9.99 }],
   }
 
   it('accepte un début d\'ISBN papier', () => {
@@ -226,7 +228,7 @@ describe('matchesFormat', () => {
   const poche      = { format: '115 x 175 mm' }
   const broche     = { format: '155 x 235 mm' }
   const grand      = { format: '220 x 290 mm' }
-  const avecEbook  = { format: '155 x 235 mm', ebook: { isbn: '9789990030011', format: 'PDF' as const, priceTTC: 9.99 } }
+  const avecEbook  = { format: '155 x 235 mm', ebooks: [{ isbn: '9789990030011', format: 'PDF' as const, priceTTC: 9.99 }] }
 
   it('ne filtre rien quand aucun format n\'est coché', () => {
     expect(matchesFormat(poche, [])).toBe(true)

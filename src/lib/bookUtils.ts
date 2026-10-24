@@ -31,14 +31,14 @@ export function getEbookLabel(format: EbookFormat): string {
   fonctions n'ont besoin que des ISBN, et plusieurs appelants manipulent des
   objets partiels.
 */
-type BookIsbns = { isbn: string; ebook?: { isbn: string } }
+type BookIsbns = { isbn: string; ebooks?: { isbn: string }[] }
 
 function normalizeIsbn(value: string): string {
   return value.replace(/[\s-]/g, '')
 }
 
 function isbnsOf(book: BookIsbns): string[] {
-  return book.ebook ? [book.isbn, book.ebook.isbn] : [book.isbn]
+  return [book.isbn, ...(book.ebooks ?? []).map(offer => offer.isbn)]
 }
 
 /** Correspondance exacte, pour la recherche d'un ISBN saisi en entier. */
@@ -91,7 +91,7 @@ const FORMAT_BY_DIMENSIONS: Record<string, string> = {
 
 const DIGITAL_FORMAT = 'Numérique'
 
-type BookFormat = { format?: string; ebook?: unknown }
+type BookFormat = { format?: string; ebooks?: unknown[] }
 
 export function getFormatLabel(dimensions: string | undefined): string | null {
   return dimensions ? FORMAT_BY_DIMENSIONS[dimensions] ?? null : null
@@ -99,7 +99,7 @@ export function getFormatLabel(dimensions: string | undefined): string | null {
 
 export function matchesFormat(book: BookFormat, selected: string[]): boolean {
   if (selected.length === 0) return true
-  if (selected.includes(DIGITAL_FORMAT) && book.ebook) return true
+  if (selected.includes(DIGITAL_FORMAT) && book.ebooks?.length) return true
   const label = getFormatLabel(book.format)
   return label !== null && selected.includes(label)
 }

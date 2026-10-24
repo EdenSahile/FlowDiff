@@ -4,7 +4,7 @@ import { createPortal } from 'react-dom'
 import { useParams, useNavigate } from 'react-router-dom'
 import styled, { keyframes } from 'styled-components'
 import { getBookByIdAsync, getBooksByTypeAsync } from '@/services/books'
-import type { Book } from '@/data/mockBooks'
+import type { Book, EbookOffer } from '@/data/mockBooks'
 import { BookCover } from '@/components/catalogue/BookCover'
 import { useCart } from '@/contexts/CartContext'
 import { useToast } from '@/contexts/ToastContext'
@@ -18,14 +18,21 @@ import { mq } from '@/lib/responsive'
 import { useRefetchOnFocus } from '@/hooks/useRefetchOnFocus'
 
 /* ── Formats physiques ── */
-type FormatId = 'broche' | 'poche' | 'ebook'
+/* 'broche', 'poche', puis un identifiant par offre numerique du titre. */
+type FormatId = string
 
 interface PhysicalFormat {
   id: FormatId
   label: string
   description: string
   priceTTC: number
-  dimensions: string
+  /* Ce que la ligne « Format » affiche : les dimensions pour le papier, le
+     format de fichier pour l'ebook, qui n'a pas de dimensions. */
+  formatDetail: string
+  /* Un ebook est une reference commerciale distincte, avec son propre ISBN. */
+  isbn?: string
+  /* Presente seulement sur une offre numerique : ce qui part au panier. */
+  ebookOffer?: EbookOffer
 }
 
 const LOREM_SHORT =
@@ -1294,19 +1301,31 @@ export function FicheProduitPage() {
   }
 
   const formats: PhysicalFormat[] = [
-    { id: 'broche', label: 'Broché', description: 'Format standard', priceTTC: book.priceTTC,                                      dimensions: book.format },
-    { id: 'poche',  label: 'Poche',  description: 'Format poche',    priceTTC: Math.round(book.priceTTC * 0.62 * 100) / 100, dimensions: '108 x 177 mm' },
-    // L'ebook n'apparaît que si le titre en propose un, contrairement aux
-    // formats papier qui sont toujours affichés.
-    ...(book.ebook
-      ? [{
-          id: 'ebook' as const,
-          label: getEbookLabel(book.ebook.format),
-          description: 'Version numérique',
-          priceTTC: book.ebook.priceTTC,
-          dimensions: `ISBN ${book.ebook.isbn}`,
-        }]
-      : []),
+    { id: 'broche', label: 'Broché', description: 'Format standard', priceTTC: book.priceTTC, formatDetail: book.format },
+    /*
+      Pas d'edition poche ici. Elle etait fabriquee a l'affichage, a 62 % du
+      prix du grand format, sur les 49 titres du catalogue. Deux fautes
+      metier : en France le prix d'un livre est fixe par l'editeur et
+      opposable a tous (loi du 10 aout 1981 pour le papier, loi du 26 mai
+      2011 pour le numerique), donc aucun prix ne se calcule ; et un poche
+      n'existe que s'il a ete publie, ce qui n'est jamais le cas d'un manga
+      au format tankobon 115 x 175 mm ni d'un beau livre 220 x 290 mm.
+      Une edition poche est un produit distinct, avec son ISBN, sa collection
+      et sa parution 12 a 24 mois apres le grand format : elle se declare
+      dans les donnees ou elle ne s'affiche pas.
+    */
+    // Un bouton par offre numerique, aucun si le titre n'en a pas, alors que
+    // les formats papier sont toujours affiches. Un titre vendu en PDF et en
+    // EPUB en propose donc 2, chacun avec son ISBN et son prix.
+    ...(book.ebooks ?? []).map(offer => ({
+      id: `ebook-${offer.format}`,
+      label: getEbookLabel(offer.format),
+      description: 'Version numérique',
+      priceTTC: offer.priceTTC,
+      formatDetail: offer.format,
+      isbn: offer.isbn,
+      ebookOffer: offer,
+    })),
   ]
 
   const selectedFormat = formats.find(f => f.id === formatId)!
@@ -1319,19 +1338,14 @@ export function FicheProduitPage() {
   const performAdd = (enReliquat: boolean) => {
     // Un ebook entre au panier comme sa propre ligne, avec son ISBN et son
     // prix : c'est une reference distincte du papier, pas une remise dessus.
-    if (formatId === 'ebook' && book.ebook) {
-      addToCart(book, qty, { enReliquat, ebookOption: book.ebook })
-      showToast(`${getEbookLabel(book.ebook.format)} ajouté au panier`)
+    if (selectedFormat.ebookOffer) {
+      addToCart(book, qty, { enReliquat, ebookOption: selectedFormat.ebookOffer })
+      showToast(`${selectedFormat.label} ajouté au panier`)
       setAdded(true)
       setTimeout(() => setAdded(false), 2000)
       return
     }
-    const ratio = selectedFormat.priceTTC / book.priceTTC
-    addToCart({
-      ...book,
-      priceTTC: selectedFormat.priceTTC,
-      price: Math.round(book.price * ratio * 100) / 100,
-    }, qty, { enReliquat })
+    addToCart(book, qty, { enReliquat })
     showToast('Ouvrage ajouté au panier')
     setAdded(true)
     setTimeout(() => setAdded(false), 2000)
@@ -1392,7 +1406,7 @@ export function FicheProduitPage() {
               </ArgMetaItem>
               <ArgMetaItem>
                 <ArgMetaLabel>Format</ArgMetaLabel>
-                <ArgMetaValue>{selectedFormat.dimensions}</ArgMetaValue>
+                <ArgMetaValue>{selectedFormat.formatDetail}</ArgMetaValue>
               </ArgMetaItem>
               {book.pages && (
                 <ArgMetaItem>
@@ -1402,7 +1416,7 @@ export function FicheProduitPage() {
               )}
               <ArgMetaItem>
                 <ArgMetaLabel>Prix TTC</ArgMetaLabel>
-                <ArgMetaValue>{formatPrice(book.priceTTC)} €</ArgMetaValue>
+                <ArgMetaValue>{formatPrice(selectedFormat.priceTTC)} €</ArgMetaValue>
               </ArgMetaItem>
             </ArgMeta>
           </ArgBody>
@@ -1492,7 +1506,7 @@ export function FicheProduitPage() {
           <MetaBox>
             <MetaRowItem>
               <MetaLabelEl>ISBN</MetaLabelEl>
-              <MetaValueEl style={{ fontSize: 13 }}><strong>{book.isbn}</strong></MetaValueEl>
+              <MetaValueEl style={{ fontSize: 13 }}><strong>{selectedFormat.isbn ?? book.isbn}</strong></MetaValueEl>
             </MetaRowItem>
             <MetaRowItem>
               <MetaLabelEl>Éditeur</MetaLabelEl>
@@ -1510,7 +1524,7 @@ export function FicheProduitPage() {
             )}
             <MetaRowItem>
               <MetaLabelEl>Format</MetaLabelEl>
-              <MetaValueEl>{selectedFormat.dimensions}</MetaValueEl>
+              <MetaValueEl>{selectedFormat.formatDetail}</MetaValueEl>
             </MetaRowItem>
             {book.collection && (
               <MetaRowItem>
@@ -1547,7 +1561,9 @@ export function FicheProduitPage() {
             {' · '}{new Date(book.publicationDate).getFullYear()}
           </BookEditorMain>
 
-          {showStandardOrder && (
+          {/* Un seul format a proposer ne fait pas un choix : le selecteur
+              n'apparait que si le titre a une version numerique. */}
+          {showStandardOrder && formats.length > 1 && (
             <FormatSelectorWrap>
               <FormatLabelEl>Format</FormatLabelEl>
               <FormatOptionsRow>

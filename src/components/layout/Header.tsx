@@ -1149,7 +1149,7 @@ export function Header({ cartCount = 0, onBurgerClick, onCartClick }: HeaderProp
      se déduit des dimensions, et « Numérique » de la présence d'une offre ebook. */
   const availableFormats   = useMemo(() => {
     const labels = new Set(booksForFormat.map(b => getFormatLabel(b.format)).filter(Boolean) as string[])
-    if (booksForFormat.some(b => b.ebook)) labels.add('Numérique')
+    if (booksForFormat.some(b => b.ebooks?.length)) labels.add('Numérique')
     return labels
   }, [booksForFormat])
 

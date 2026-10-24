@@ -1,13 +1,15 @@
 import { describe, it, expect } from 'vitest'
-import { MOCK_BOOKS, EBOOK_FORMATS, getCatalogueBooks, type EbookFormat } from '@/data/mockBooks'
+import { MOCK_BOOKS, EBOOK_FORMATS, getCatalogueBooks, type EbookFormat, type EbookOffer } from '@/data/mockBooks'
 
 /*
-  Une offre ebook est une 2e référence commerciale du même titre : elle a son
-  propre ISBN et son propre prix. Ces tests verrouillent la cohérence des
-  données, pas l'affichage.
+  Une offre ebook est une référence commerciale distincte du même titre : elle
+  a son propre ISBN et son propre prix. Un titre vendu en PDF et en EPUB porte
+  donc 2 offres, règle posée par ISBN International. Ces tests verrouillent la
+  cohérence des données, pas l'affichage.
 */
 
-const booksWithEbook = MOCK_BOOKS.filter(book => book.ebook !== undefined)
+const booksWithEbook = MOCK_BOOKS.filter(book => book.ebooks !== undefined)
+const allOffers: EbookOffer[] = MOCK_BOOKS.flatMap(book => book.ebooks ?? [])
 
 /*
   Les numéros inventés du projet, titres de démonstration comme offres ebook,
@@ -29,29 +31,62 @@ describe('offres ebook du catalogue', () => {
     expect(booksWithEbook.length).toBeGreaterThan(0)
   })
 
+  it('un titre qui declare des offres en declare au moins une', () => {
+    const listesVides = booksWithEbook.filter(book => book.ebooks!.length === 0)
+
+    expect(listesVides).toEqual([])
+  })
+
   it('chaque offre annonce un format connu', () => {
-    const offresAuFormatInconnu = booksWithEbook.filter(
-      book => !EBOOK_FORMATS.includes(book.ebook!.format),
+    const offresAuFormatInconnu = allOffers.filter(
+      offer => !EBOOK_FORMATS.includes(offer.format),
     )
 
     expect(offresAuFormatInconnu).toEqual([])
   })
 
-  it('les 3 formats sont représentés dans les données', () => {
-    const formatsPresents = [...new Set(booksWithEbook.map(book => book.ebook!.format))]
+  it('les 2 formats sont représentés dans les données', () => {
+    const formatsPresents = [...new Set(allOffers.map(offer => offer.format))]
 
     expect(formatsPresents.sort()).toEqual([...EBOOK_FORMATS].sort())
   })
 
-  it('l\'ISBN de l\'ebook diffère de celui du papier', () => {
-    const offresAvecMemeIsbn = booksWithEbook.filter(book => book.ebook!.isbn === book.isbn)
+  /*
+    Un titre vendu en PDF et en EPUB porte 2 references distinctes, pas une
+    offre unique qui reunirait les 2 fichiers sous un seul numero. C'est la
+    regle d'ISBN International, suivie par les editeurs francais : une fiche
+    de L'Harmattan porte un EAN13 papier, un EAN ePub et un EAN PDF.
+  */
+  it('un même titre ne déclare jamais 2 fois le même format', () => {
+    const titresAvecDoublon = booksWithEbook.filter(book => {
+      const formats = book.ebooks!.map(offer => offer.format)
+      return new Set(formats).size !== formats.length
+    })
+
+    expect(titresAvecDoublon).toEqual([])
+  })
+
+  it('un titre disponible dans les 2 formats porte 2 ISBN distincts', () => {
+    const titresMultiFormats = booksWithEbook.filter(book => book.ebooks!.length > 1)
+
+    expect(titresMultiFormats.length).toBeGreaterThan(0)
+    titresMultiFormats.forEach(book => {
+      const isbns = book.ebooks!.map(offer => offer.isbn)
+      expect(new Set(isbns).size).toBe(isbns.length)
+    })
+  })
+
+  it('l\'ISBN d\'une offre diffère de celui du papier', () => {
+    const offresAvecMemeIsbn = booksWithEbook.filter(
+      book => book.ebooks!.some(offer => offer.isbn === book.isbn),
+    )
 
     expect(offresAvecMemeIsbn).toEqual([])
   })
 
   it('chaque ISBN d\'ebook compte 13 chiffres', () => {
-    const isbnsMalFormes = booksWithEbook
-      .map(book => book.ebook!.isbn)
+    const isbnsMalFormes = allOffers
+      .map(offer => offer.isbn)
       .filter(isbn => !/^\d{13}$/.test(isbn))
 
     expect(isbnsMalFormes).toEqual([])
@@ -66,7 +101,7 @@ describe('offres ebook du catalogue', () => {
     const catalogue = getCatalogueBooks()
     const tousLesIsbns = [
       ...catalogue.map(book => book.isbn),
-      ...catalogue.filter(book => book.ebook).map(book => book.ebook!.isbn),
+      ...catalogue.flatMap(book => (book.ebooks ?? []).map(offer => offer.isbn)),
     ]
 
     const doublons = tousLesIsbns.filter((isbn, i) => tousLesIsbns.indexOf(isbn) !== i)
@@ -81,8 +116,8 @@ describe('offres ebook du catalogue', () => {
     « corriger » en ISBN valides, qui pourraient désigner un vrai ouvrage.
   */
   it('les ISBN d\'ebook sont volontairement invalides, donc fictifs', () => {
-    const isbnsAvecCleValide = booksWithEbook
-      .map(book => book.ebook!.isbn)
+    const isbnsAvecCleValide = allOffers
+      .map(offer => offer.isbn)
       .filter(isbn => isbn[12] === computeIsbn13CheckDigit(isbn.slice(0, 12)))
 
     expect(isbnsAvecCleValide).toEqual([])
@@ -101,8 +136,8 @@ describe('offres ebook du catalogue', () => {
   })
 
   it('les ISBN d\'ebook vivent dans la plage reservee aux numeros inventes', () => {
-    const horsPlage = booksWithEbook
-      .map(book => book.ebook!.isbn)
+    const horsPlage = allOffers
+      .map(offer => offer.isbn)
       .filter(isbn => !isbn.startsWith(FICTIVE_ISBN_PREFIX))
 
     expect(horsPlage).toEqual([])
@@ -125,9 +160,9 @@ describe('offres ebook du catalogue', () => {
     expect(clesInvalides.every(book => book.isbn.startsWith(FICTIVE_ISBN_PREFIX))).toBe(true)
   })
 
-  it('le prix de l\'ebook est strictement positif et inférieur au papier', () => {
+  it('le prix de chaque offre est strictement positif et inférieur au papier', () => {
     const prixIncoherents = booksWithEbook.filter(
-      book => book.ebook!.priceTTC <= 0 || book.ebook!.priceTTC >= book.priceTTC,
+      book => book.ebooks!.some(offer => offer.priceTTC <= 0 || offer.priceTTC >= book.priceTTC),
     )
 
     expect(prixIncoherents).toEqual([])
@@ -141,8 +176,8 @@ describe('offres ebook du catalogue', () => {
 })
 
 describe('EBOOK_FORMATS', () => {
-  it('liste exactement les 3 combinaisons de formats', () => {
-    const expectedFormats: EbookFormat[] = ['PDF', 'EPUB', 'PDF+EPUB']
+  it('liste les 2 formats de fichier, sans combinaison des deux', () => {
+    const expectedFormats: EbookFormat[] = ['PDF', 'EPUB']
 
     expect([...EBOOK_FORMATS]).toEqual(expectedFormats)
   })
