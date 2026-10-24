@@ -1314,10 +1314,10 @@ export function CartPage() {
       </RecapCard>
 
       <NavActions>
-        <Button variant="primary" size="lg" fullWidth onClick={goNext}>
+        <Button variant="primary" size="lg" $fullWidth onClick={goNext}>
           Suivant — Adresses
         </Button>
-        <Button variant="ghost" size="md" fullWidth onClick={goBack}>
+        <Button variant="ghost" size="md" $fullWidth onClick={goBack}>
           <IconChevronLeft /> Modifier le panier
         </Button>
       </NavActions>
@@ -1370,10 +1370,10 @@ export function CartPage() {
       )}
 
       <NavActions>
-        <Button variant="primary" size="lg" fullWidth onClick={goNext}>
+        <Button variant="primary" size="lg" $fullWidth onClick={goNext}>
           Suivant — Mode de transmission
         </Button>
-        <Button variant="ghost" size="md" fullWidth onClick={goBack}>
+        <Button variant="ghost" size="md" $fullWidth onClick={goBack}>
           <IconChevronLeft /> Récapitulatif
         </Button>
       </NavActions>
@@ -1434,13 +1434,13 @@ export function CartPage() {
       </RecapCard>
 
       <NavActions>
-        <Button variant="primary" size="lg" fullWidth onClick={() => {
+        <Button variant="primary" size="lg" $fullWidth onClick={() => {
           if (saveAsDefault) setTransmissionMode(localTransmission)
           handleConfirmOrder()
         }}>
           Envoyer la commande
         </Button>
-        <Button variant="ghost" size="md" fullWidth onClick={goBack}>
+        <Button variant="ghost" size="md" $fullWidth onClick={goBack}>
           <IconChevronLeft /> Adresses
         </Button>
       </NavActions>

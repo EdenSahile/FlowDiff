@@ -94,7 +94,7 @@ export function ForgotPasswordPage() {
                 autoFocus
               />
 
-              <Button type="button" fullWidth disabled={isSubmitting} onClick={handleSubmit}>
+              <Button type="button" $fullWidth disabled={isSubmitting} onClick={handleSubmit}>
                 {isSubmitting ? 'Envoi en cours…' : 'Envoyer le lien'}
               </Button>
             </AuthForm>
