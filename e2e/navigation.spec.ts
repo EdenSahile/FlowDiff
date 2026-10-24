@@ -163,10 +163,10 @@ test.describe('Header', () => {
   // deux désignent le même ouvrage : le libraire doit arriver sur la fiche
   // quel que soit celui qu'il saisit.
   test('une recherche par ISBN d\'ebook ouvre la fiche du titre', async ({ page }) => {
-    await page.locator('input[aria-label="Recherche globale"]').fill('9782501990022')
+    await page.locator('input[aria-label="Recherche globale"]').fill('9789990030022')
     await page.locator('input[aria-label="Recherche globale"]').press('Enter')
 
-    await expect(page).toHaveURL('/livre/n-pra-01')
+    await expect(page).toHaveURL('/livre/n-pra-02')
   })
 
   test('le panier est accessible depuis le header', async ({ page }) => {

@@ -145,16 +145,16 @@ describe('MOCK_BOOKS — à paraître sans statut (FLOW-RM-026)', () => {
 ══════════════════════════════════════════════════════ */
 
 describe('getEbookLabel', () => {
-  it('annonce le format PDF entre parenthèses', () => {
-    expect(getEbookLabel('PDF')).toBe('Ebook (PDF)')
+  it('annonce le format PDF en minuscules entre parenthèses', () => {
+    expect(getEbookLabel('PDF')).toBe('Ebook (pdf)')
   })
 
-  it('annonce le format EPUB entre parenthèses', () => {
-    expect(getEbookLabel('EPUB')).toBe('Ebook (EPUB)')
+  it('annonce le format EPUB en minuscules entre parenthèses', () => {
+    expect(getEbookLabel('EPUB')).toBe('Ebook (epub)')
   })
 
   it('annonce les 2 formats quand l\'ebook est disponible dans les deux', () => {
-    expect(getEbookLabel('PDF+EPUB')).toBe('Ebook (PDF+EPUB)')
+    expect(getEbookLabel('PDF+EPUB')).toBe('Ebook (pdf+epub)')
   })
 })
 
@@ -165,7 +165,7 @@ describe('getEbookLabel', () => {
 describe('hasExactIsbn', () => {
   const bookWithEbook = {
     isbn: '9782501172097',
-    ebook: { isbn: '9782501990022', format: 'PDF' as const, priceTTC: 9.99 },
+    ebook: { isbn: '9789990030022', format: 'PDF' as const, priceTTC: 9.99 },
   }
   const bookWithoutEbook = { isbn: '9782330108724' }
 
@@ -174,11 +174,11 @@ describe('hasExactIsbn', () => {
   })
 
   it('reconnaît l\'ISBN de l\'ebook, qui désigne le même titre', () => {
-    expect(hasExactIsbn(bookWithEbook, '9782501990022')).toBe(true)
+    expect(hasExactIsbn(bookWithEbook, '9789990030022')).toBe(true)
   })
 
   it('ignore les espaces et les tirets de la saisie', () => {
-    expect(hasExactIsbn(bookWithEbook, ' 978-2501-990022 ')).toBe(true)
+    expect(hasExactIsbn(bookWithEbook, ' 978-99900-30022 ')).toBe(true)
   })
 
   it('refuse un ISBN qui n\'est ni le papier ni l\'ebook', () => {
@@ -186,12 +186,12 @@ describe('hasExactIsbn', () => {
   })
 
   it('refuse un ISBN partiel, la correspondance est exacte', () => {
-    expect(hasExactIsbn(bookWithEbook, '978250199')).toBe(false)
+    expect(hasExactIsbn(bookWithEbook, '978999003')).toBe(false)
   })
 
   it('ne plante pas sur un titre sans ebook', () => {
     expect(hasExactIsbn(bookWithoutEbook, '9782330108724')).toBe(true)
-    expect(hasExactIsbn(bookWithoutEbook, '9782501990022')).toBe(false)
+    expect(hasExactIsbn(bookWithoutEbook, '9789990030022')).toBe(false)
   })
 
   it('refuse une recherche vide', () => {
@@ -202,7 +202,7 @@ describe('hasExactIsbn', () => {
 describe('matchesIsbn', () => {
   const bookWithEbook = {
     isbn: '9782501172097',
-    ebook: { isbn: '9782501990022', format: 'PDF' as const, priceTTC: 9.99 },
+    ebook: { isbn: '9789990030022', format: 'PDF' as const, priceTTC: 9.99 },
   }
 
   it('accepte un début d\'ISBN papier', () => {
@@ -210,7 +210,7 @@ describe('matchesIsbn', () => {
   })
 
   it('accepte un début d\'ISBN ebook', () => {
-    expect(matchesIsbn(bookWithEbook, '9782501990')).toBe(true)
+    expect(matchesIsbn(bookWithEbook, '9789990030')).toBe(true)
   })
 
   it('refuse une suite de chiffres absente des deux', () => {

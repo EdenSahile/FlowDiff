@@ -11,9 +11,13 @@ export function getTypeCommande(type: BookType): TypeCommande {
   return TYPE_COMMANDE_BY_BOOK_TYPE[type]
 }
 
-/* Libellé du choix de format, à côté de « Broché » et « Poche ». */
+/*
+  Libellé du choix de format, à côté de « Broché » et « Poche ». Le format
+  s'écrit en minuscules entre parenthèses, les capitales attirant l'oeil plus
+  que le mot « Ebook » lui-même.
+*/
 export function getEbookLabel(format: EbookFormat): string {
-  return `Ebook (${format})`
+  return `Ebook (${format.toLowerCase()})`
 }
 
 /*
