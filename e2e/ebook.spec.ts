@@ -212,9 +212,9 @@ test('le total du panier retient le prix de l\'ebook, pas celui du papier', asyn
   await page.locator('button[aria-label="Ajouter au panier"]').first().click()
   await page.goto('/panier')
 
-  // 9,99 TTC, remise 35 % sur l'Adulte-pratique, donc 6,49 net TTC et 6,15 HT.
+  // 9,99 TTC, remise de 30 % propre au numérique, donc 6,99 net TTC.
   await expect(page.getByText('Montant HT').locator('..')).toContainText('9,47')
-  await expect(page.getByText('Total TTC').first().locator('..')).toContainText('6,49')
+  await expect(page.getByText('Total TTC').first().locator('..')).toContainText('6,99')
 })
 
 test('le papier et l\'ebook du même titre occupent 2 lignes de panier', async ({ page }) => {

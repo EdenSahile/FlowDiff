@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNotifications } from '@/contexts/NotificationsContext'
 import { useNavigate } from 'react-router-dom'
 import styled, { keyframes } from 'styled-components'
-import { useCart, REMISE_RATES, getItemKey, getItemUnitPriceTTC } from '@/contexts/CartContext'
+import { useCart, REMISE_RATES, getItemKey, getItemUnitPriceTTC, REMISE_NUMERIQUE } from '@/contexts/CartContext'
 import { useOrders } from '@/contexts/OrdersContext'
 import { useAuth } from '@/hooks/useAuth'
 import { BookCover } from '@/components/catalogue/BookCover'
@@ -1140,6 +1140,9 @@ export function CartPage() {
     ...opGroups.flatMap(op => op.books.map(b => b.book.universe)),
   ]
   const universeRates = [...new Set(allUniverses)].map(u => getUserRate(u) * 100)
+  /* Une ligne numerique porte un taux de plus, qui compte dans la detection
+     des taux multiples. */
+  if (items.some(i => i.ebookOption)) universeRates.push(REMISE_NUMERIQUE * 100)
   const hasMultiRates = new Set(universeRates).size > 1
 
   /* La PLV est au taux normal : le récapitulatif doit annoncer les 2 taux. */
@@ -1512,8 +1515,9 @@ export function CartPage() {
             const { book, quantity, ebookOption } = item
             const key       = getItemKey(item)
             const isEbook   = !!ebookOption
-            const unitPrice = isEbook ? ebookOption!.priceTTC : book.priceTTC
-            const remise    = getUserRate(book.universe)
+            const unitPrice = getItemUnitPriceTTC(item)
+            /* Le numerique a son propre taux, sans stock ni invendu a couvrir. */
+            const remise    = isEbook ? REMISE_NUMERIQUE : getUserRate(book.universe)
 
             return (
               <ItemCard key={key} $ebook={isEbook}>

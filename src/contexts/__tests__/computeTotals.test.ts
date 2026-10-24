@@ -1,5 +1,7 @@
 import { describe, it, expect } from 'vitest'
-import { computeTotals, REMISE_RATES, getItemUnitPriceTTC } from '@/contexts/CartContext'
+import {
+  computeTotals, REMISE_RATES, getItemUnitPriceTTC, getItemRemiseRate, REMISE_NUMERIQUE,
+} from '@/contexts/CartContext'
 import type { CartItem, OPCartGroup, EbookCartOption } from '@/contexts/CartContext'
 
 const rates = { 'Littérature': 0.09, 'BD/Mangas': 0.10, 'Jeunesse': 0.08, 'Adulte-pratique': 0.09 }
@@ -68,7 +70,41 @@ describe('prix public d\'une ligne de panier', () => {
 
     const totals = computeTotals([ligneEbook], [], rates)
 
-    expect(totals.remiseAmount).toBeCloseTo(0.8991)  // 9,99 × 9 %
+    expect(totals.remiseAmount).toBeCloseTo(9.99 * REMISE_NUMERIQUE)
+  })
+
+  /*
+    Sur le papier, la remise varie par univers parce qu'elle rémunère le
+    risque du libraire : stock acheté ferme, invendus, mise en place. Rien de
+    tout cela n'existe sur un fichier, donc le numérique a un taux unique.
+  */
+  it('applique au numérique un taux unique, quel que soit l\'univers', () => {
+    const ebookLitterature = { ...makeItem(20, 'Littérature'), ebookOption: ebookPdf }
+    const ebookBD = { ...makeItem(20, 'BD/Mangas'), ebookOption: ebookPdf }
+
+    const totalsLitterature = computeTotals([ebookLitterature], [], rates)
+    const totalsBD = computeTotals([ebookBD], [], rates)
+
+    expect(totalsLitterature.remiseAmount).toBeCloseTo(totalsBD.remiseAmount)
+  })
+
+  it('laisse le papier suivre le taux de son univers', () => {
+    const papierLitterature = makeItem(20, 'Littérature')  // 9 %
+    const papierBD = makeItem(20, 'BD/Mangas')             // 10 %
+
+    const totalsLitterature = computeTotals([papierLitterature], [], rates)
+    const totalsBD = computeTotals([papierBD], [], rates)
+
+    expect(totalsLitterature.remiseAmount).toBeCloseTo(1.8)
+    expect(totalsBD.remiseAmount).toBeCloseTo(2)
+  })
+
+  it('retient le taux du numérique sur une ligne numérique, celui de l\'univers sinon', () => {
+    const lignePapier = makeItem(20, 'Littérature')
+    const ligneEbook = { ...lignePapier, ebookOption: ebookPdf }
+
+    expect(getItemRemiseRate(ligneEbook, rates)).toBe(REMISE_NUMERIQUE)
+    expect(getItemRemiseRate(lignePapier, rates)).toBe(0.09)
   })
 
   it('additionne le papier et le numérique du même titre à leurs prix respectifs', () => {

@@ -79,6 +79,31 @@ export function getItemUnitPriceTTC(item: Pick<CartItem, 'book' | 'ebookOption'>
   return item.ebookOption?.priceTTC ?? item.book.priceTTC
 }
 
+/*
+  Remise du numerique : un taux unique, independant de l'univers.
+
+  Sur le papier, la remise varie par univers parce qu'elle remunere le risque
+  pris par le libraire, le stock achete ferme, les invendus et le travail de
+  mise en place. Aucun de ces 3 elements n'existe sur un fichier numerique,
+  donc rien ne justifie qu'un ebook de litterature soit mieux remise qu'un
+  ebook de BD, comme c'etait le cas ici.
+
+  Le taux lui-meme n'a aucune source publique : la loi du 26 mai 2011 laisse
+  volontairement l'editeur le fixer, en tenant compte des « services
+  qualitatifs rendus en faveur de la promotion du livre numerique », et les
+  conditions sont bilaterales. 30 % est le milieu de la fourchette
+  couramment avancee, 25 a 35 %. A ajuster avec un vrai chiffre de diffuseur.
+*/
+export const REMISE_NUMERIQUE = 0.30
+
+export function getItemRemiseRate(
+  item: Pick<CartItem, 'book' | 'ebookOption'>,
+  rates: Record<string, number>,
+): number {
+  if (item.ebookOption) return REMISE_NUMERIQUE
+  return rates[item.book.universe] ?? 0
+}
+
 export interface AddToCartOptions {
   ebookOption?: EbookCartOption
   enReliquat?: boolean
@@ -148,7 +173,7 @@ export function computeTotals(items: CartItem[], opGroups: OPCartGroup[], rates:
   const booksTTC = items.reduce(
     (sum, item) => sum + getItemUnitPriceTTC(item) * item.quantity, 0)
   const booksRemise = items.reduce(
-    (sum, item) => sum + getItemUnitPriceTTC(item) * item.quantity * rate(item.book.universe), 0)
+    (sum, item) => sum + getItemUnitPriceTTC(item) * item.quantity * getItemRemiseRate(item, rates), 0)
 
   /* OPs : ouvrages + PLV (remise sur ouvrages, pas sur PLV) */
   const opBooksTTC = opGroups.reduce((sum, op) =>
