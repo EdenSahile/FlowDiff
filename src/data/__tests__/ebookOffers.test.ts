@@ -285,6 +285,44 @@ describe('éditions remplacées du catalogue', () => {
   })
 })
 
+/*
+  Les 2 axes de description d'une edition sont des donnees, plus une
+  deduction. Un titre qui les oublie ne repond a aucune pastille des filtres
+  et sa fiche n'annonce rien : il devient invisible sans rien casser, ce que
+  TypeScript ne peut pas signaler puisque les 2 champs sont facultatifs.
+  Ces tests sont le garde-fou, et la raison pour laquelle ils existent.
+*/
+describe('reliure et catégorie de chaque titre', () => {
+  const catalogue = getCatalogueBooks()
+
+  it('chaque titre déclare sa reliure', () => {
+    const sansReliure = catalogue.filter(book => !book.reliure).map(book => book.id)
+
+    expect(sansReliure).toEqual([])
+  })
+
+  it('chaque titre déclare sa catégorie, sauf les mangas au format tankobon', () => {
+    const sansCategorie = catalogue
+      .filter(book => !book.categorie && book.universe !== 'BD/Mangas')
+      .map(book => book.id)
+
+    expect(sansCategorie).toEqual([])
+  })
+
+  /* Un poche est une catégorie commerciale portée par une collection, pas
+     une taille : un tankobon mesure la même chose sans en être un. */
+  it('tout titre déclaré poche appartient à une collection de poche', () => {
+    const poches = catalogue.filter(book => book.categorie === 'poche')
+    const COLLECTIONS_DE_POCHE = ['Babel', 'Folio', 'Folio Junior', 'Le Livre de Poche', "J'ai lu"]
+
+    poches.forEach(book => {
+      const porteur = book.collection ?? book.publisher
+
+      expect(COLLECTIONS_DE_POCHE).toContain(porteur)
+    })
+  })
+})
+
 describe('EBOOK_FORMATS', () => {
   it('liste les 2 formats de fichier, sans combinaison des deux', () => {
     const expectedFormats: EbookFormat[] = ['PDF', 'EPUB']

@@ -165,7 +165,29 @@ En permanence : **Panier** (droite, avec badge quantité) +  à gauche du panier
 
 - Les **3 types de titres (fonds, nouveautés, à paraître) sont commandables** directement via l'app
 - Les remises sont **personnalisées par librairie** et s'appliquent automatiquement selon la thématique
+- Le **numérique a son propre taux de remise**, unique quel que soit l'univers (`REMISE_NUMERIQUE`, `CartContext.tsx`). Sur le papier le taux varie par univers parce qu'il rémunère le stock acheté ferme, les invendus et la mise en place. Rien de tout cela n'existe sur un fichier.
+- **Aucun prix ne se calcule.** Le prix d'un livre est fixé par l'éditeur et opposable à tous : loi du 10 août 1981 pour le papier, loi du 26 mai 2011 pour le numérique. Tout prix affiché vient des données. Seule exception admise : la conversion TTC vers HT par le taux de TVA, qui est une opération fiscale, pas un prix.
 - L'app est **B2B exclusif** : aucun accès grand public
+
+---
+
+## Décrire une édition, les 4 champs à ne jamais oublier
+
+Quand un titre entre au catalogue (`src/data/mockBooks.ts`), il déclare **4 informations qui ne se déduisent de rien**. Un titre qui les oublie ne casse rien, il devient simplement invisible aux filtres et muet sur sa fiche. TypeScript ne peut pas le signaler, ces champs étant facultatifs : ce sont les tests de `src/data/__tests__/ebookOffers.test.ts` qui montent la garde.
+
+| Champ | Ce qu'il dit | Valeurs |
+|---|---|---|
+| `reliure` | comment le livre est **fabriqué**, le `ProductForm` de la norme ONIX | `broche`, `relie` |
+| `categorie` | le **moment commercial**, laissé vide pour un manga au format tankobon, qui n'est ni l'un ni l'autre | `poche`, `grand format` |
+| `format` | les **dimensions**, pour l'affichage seul | `'155 x 235 mm'` |
+| `workId` | l'**œuvre**, partagée par ses éditions papier | `'w-mathieu-enfants'` |
+
+Les 2 premiers sont des **axes distincts que le métier ne confond pas**, et les fiches des libraires les présentent séparément, « Support principal » d'un côté, « Infos supplémentaires » de l'autre. Un roman français est presque toujours grand format **et** broché, les 2 à la fois. Le poche n'est pas une taille mais une catégorie portée par une collection : Babel, Folio, Le Livre de Poche, J'ai lu.
+
+Deux règles qui en découlent :
+
+- **Un format de fichier numérique** (`EBOOK_FORMATS`) se déclare dans la liste, et chaque format disponible séparément reçoit **son propre ISBN**, règle posée par ISBN International. Il n'existe pas d'offre « PDF+EPUB » sous un numéro unique.
+- **Une édition épuisée remplacée** par une autre porte `replacedById`. Le lien inverse ne se stocke pas, il se déduit en parcourant le catalogue.
 
 ---
 
