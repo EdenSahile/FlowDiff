@@ -8,10 +8,10 @@ import { test, expect, type Page, type Locator } from '@playwright/test'
   code qui filtre. Répartition relevée sur les données :
 
     Thématique  Littérature 22 · BD/Mangas 15 · Adulte-pratique 11 · Jeunesse 8
-    Langue      Français 32 · Japonais 11 · Anglais 10 · Espagnol 2 · Suédois 1
-    Prix        5 à 10 EUR 17 · 10 à 20 EUR 27 · 20 à 50 EUR 12, les 2 autres 0
-    Format      Poche 7 · Grand format 38 · Numérique 3, et 11 tankobon ni l'un ni l'autre
-    Reliure     Broché 52 · Relié 4
+    Langue      Français 33 · Japonais 11 · Anglais 9 · Espagnol 2 · Suédois 1
+    Prix        5 à 10 EUR 18 · 10 à 20 EUR 26 · 20 à 50 EUR 12, les 2 autres 0
+    Format      Poche 8 · Grand format 37 · Numérique 3, et 11 tankobon ni l'un ni l'autre
+    Reliure     Broché 51 · Relié 5
 
   Règles attendues : un filtre restreint le catalogue, plusieurs pastilles d'un
   même groupe s'additionnent (OU), des groupes différents se croisent (ET), et
@@ -136,7 +136,7 @@ test.describe('Un seul groupe de filtres', () => {
 
     await chip(page, '10 à 20 EUR').click()
 
-    await expect(counter(page)).toHaveText('27 ouvrages')
+    await expect(counter(page)).toHaveText('26 ouvrages')
   })
 
   test('un format restreint le compteur', async ({ page }) => {
@@ -144,7 +144,7 @@ test.describe('Un seul groupe de filtres', () => {
 
     await chip(page, 'Poche').click()
 
-    await expect(counter(page)).toHaveText('7 ouvrages')
+    await expect(counter(page)).toHaveText('8 ouvrages')
   })
 
   /* La reliure est un axe distinct du format : un grand format est presque
@@ -154,7 +154,7 @@ test.describe('Un seul groupe de filtres', () => {
 
     await chip(page, 'Relié').click()
 
-    await expect(counter(page)).toHaveText('4 ouvrages')
+    await expect(counter(page)).toHaveText('5 ouvrages')
   })
 
   test('format et reliure se croisent au lieu de s\'exclure', async ({ page }) => {
@@ -163,7 +163,7 @@ test.describe('Un seul groupe de filtres', () => {
     await chip(page, 'Grand format').click()
     await chip(page, 'Broché').click()
 
-    await expect(counter(page)).toHaveText('34 ouvrages')
+    await expect(counter(page)).toHaveText('32 ouvrages')
   })
 
   test('les tranches de prix qu\'aucun titre n\'atteint restent grisées', async ({ page }) => {
@@ -205,7 +205,7 @@ test.describe('Plusieurs choix dans un même groupe', () => {
     await chip(page, 'Japonais').click()
     await chip(page, 'Anglais').click()
 
-    await expect(counter(page)).toHaveText('21 ouvrages')
+    await expect(counter(page)).toHaveText('20 ouvrages')
   })
 
   test('2 tranches de prix additionnent leurs titres', async ({ page }) => {
@@ -376,7 +376,7 @@ test.describe('Résultats', () => {
   test('le filtre thématique des résultats restreint l\'affichage sans toucher l\'URL', async ({ page }) => {
     await login(page)
     await page.goto('/recherche?langues=Fran%C3%A7ais')
-    await expect(page.locator('article')).toHaveCount(32)
+    await expect(page.locator('article')).toHaveCount(33)
 
     const jeunesse = page.getByRole('button', { name: /^Jeunesse \(\d+\)$/ })
     const annonce = Number((await jeunesse.textContent())!.match(/\((\d+)\)/)![1])

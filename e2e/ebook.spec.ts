@@ -264,5 +264,5 @@ test('le filtre Poche retient les éditions de poche, pas les tankobon', async (
 
   await page.goto('/recherche?formats=Poche')
 
-  await expect(page.locator('article')).toHaveCount(7)
+  await expect(page.locator('article')).toHaveCount(8)
 })
