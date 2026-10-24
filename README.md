@@ -1,4 +1,4 @@
-# 📚 FlowDiff — Plateforme B2B de commande de livres pour libraires
+# 📚 FlowDiff : Plateforme B2B de commande de livres pour libraires
 
 > **Application de démonstration conçue et construite de bout en bout en pilotant l'IA (Claude Code).**
 > Un cas concret de *Product Owner augmenté par l'IA* : de la vision produit et des règles métier jusqu'au produit livré, testé et déployé.
@@ -48,40 +48,40 @@ Les libraires commandent leurs livres à leurs diffuseurs via des outils souvent
 
 ## 🧠 Règles métier modélisées *(le cœur du travail produit)*
 
-- **À paraître non commandable** — consultation catalogue uniquement, commande via représentant.
+- **À paraître non commandable** : consultation catalogue uniquement, commande via représentant.
 - **Remises personnalisées** par librairie et par thématique, appliquées automatiquement.
-- **TVA livre à 5,5 %** — chaîne de prix cohérente : prix public **HT** (donnée source) → TTC → prix net après remise.
-- **EDI Dilicom** — un diffuseur unique, GLN, références de commande, structure EDIFACT réelle.
-- **Isolation des données par `codeClient`** — panier et historique partagés au sein d'une librairie, jamais entre librairies.
-- **B2B exclusif** — inscription contrôlée (code client + email professionnel).
+- **TVA livre à 5,5 %** : chaîne de prix cohérente : prix public **HT** (donnée source) → TTC → prix net après remise.
+- **EDI Dilicom** : un diffuseur unique, GLN, références de commande, structure EDIFACT réelle.
+- **Isolation des données par `codeClient`** : panier et historique partagés au sein d'une librairie, jamais entre librairies.
+- **B2B exclusif** : inscription contrôlée (code client + email professionnel).
 
 ---
 
 ## 🤖 Construit en pilotant l'IA
 
-Ce projet a été **spécifié, développé, revu et testé en orchestrant Claude Code** — et c'est volontaire : il illustre la posture d'un **Product Owner qui livre, pas seulement qui rédige des tickets**.
+Ce projet a été **spécifié, développé, revu et testé en orchestrant Claude Code**, et c'est volontaire : il illustre la posture d'un **Product Owner qui livre, pas seulement qui rédige des tickets**.
 
 Concrètement, mon rôle sur ce produit :
 
-- **Discovery & cadrage** — définition du domaine, des personas (libraires), des règles métier et du périmètre.
-- **Spécification exécutable** — découpage en phases, critères d'acceptation, charte graphique et design system.
-- **Pilotage de l'IA** — rédaction de prompts précis, décomposition des tâches, revue de code, arbitrages techniques (stack, structure de données, sécurité).
-- **Qualité** — TypeScript strict, tests Vitest, vérification systématique avant de considérer une tâche « terminée ».
+- **Discovery & cadrage** : définition du domaine, des personas (libraires), des règles métier et du périmètre.
+- **Spécification exécutable** : découpage en phases, critères d'acceptation, charte graphique et design system.
+- **Pilotage de l'IA** : rédaction de prompts précis, décomposition des tâches, revue de code, arbitrages techniques (stack, structure de données, sécurité).
+- **Qualité** : TypeScript strict, tests Vitest, vérification systématique avant de considérer une tâche « terminée ».
 
-> 🎙️ *La compétence démontrée : transformer une intention produit en logiciel fonctionnel en utilisant l'IA comme force de réalisation — du métier au déployé.*
+> 🎙️ *La compétence démontrée : transformer une intention produit en logiciel fonctionnel en utilisant l'IA comme force de réalisation : du métier au déployé.*
 
 ---
 
 ## 🛠️ Stack technique
 
-- **Vite 5 + React 18** — SPA, **React Router v6**
+- **Vite 5 + React 18** : SPA, **React Router v6**
 - **TypeScript** (mode strict)
-- **Styled-components v6** — design system & thème centralisé (`src/lib/theme.ts`)
-- **Supabase** — catalogue & couvertures
-- **Zod** — validation de toutes les entrées
-- **bcryptjs** — hachage des mots de passe (auth mock)
-- **Vitest** — tests unitaires (logique métier : calcul des totaux, commandabilité…)
-- **Vercel** — déploiement continu
+- **Styled-components v6** : design system & thème centralisé (`src/lib/theme.ts`)
+- **Supabase** : catalogue & couvertures
+- **Zod** : validation de toutes les entrées
+- **bcryptjs** : hachage des mots de passe (auth mock)
+- **Vitest** : tests unitaires (logique métier : calcul des totaux, commandabilité…)
+- **Vercel** : déploiement continu
 
 ---
 
@@ -118,7 +118,7 @@ npm run build    # build de production (tsc + vite)
 C'est une **application de démonstration** :
 
 - **Données fictives** (livres, librairies, commandes) à des fins pédagogiques.
-- **Authentification simplifiée** (mock JWT en `localStorage`) — pas destinée à la production.
+- **Authentification simplifiée** (mock JWT en `localStorage`) : pas destinée à la production.
 - Certaines sections sont **en cours** et affichées comme telles (ex. *Mon office* → « Bientôt disponible »).
 
 Ces choix sont délibérés : l'objectif est de démontrer la **conception produit, la modélisation métier et la capacité à livrer**, pas de mettre une app en production.

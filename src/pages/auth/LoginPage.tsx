@@ -199,7 +199,7 @@ export function LoginPage() {
           <cite>— Librairie fictive, Paris 10e</cite>
         </BrandQuote>
 
-        <BrandFooter>© 2026 FlowDiff — Accès réservé aux libraires</BrandFooter>
+        <BrandFooter>© 2026 FlowDiff : Accès réservé aux libraires</BrandFooter>
       </BrandPanel>
 
       <FormPanel>

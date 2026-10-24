@@ -30,7 +30,7 @@ const books: Book[] = [
 ]
 
 describe('FondsPage filter logic', () => {
-  it('pas de filtre — retourne tout', () => {
+  it('pas de filtre : retourne tout', () => {
     expect(applyFilters(books, null, null)).toHaveLength(4)
   })
 

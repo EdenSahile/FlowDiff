@@ -72,7 +72,7 @@ export interface Order {
   commandePar?: string   // nom de la personne ayant passé la commande
   deliveryMode: 'standard' | 'specific'
   deliveryDate?: string      // ISO date
-  dateFacturation?: string   // ISO date — si facturé
+  dateFacturation?: string   // ISO date : si facturé
   numFacture?: string        // ex. FACT-2024-0892
   shipment?: Shipment
   transmissionMode?: 'FLOWDIFF' | 'EDI'
@@ -226,7 +226,7 @@ export const MOCK_ORDERS: Record<string, Order[]> = {
         },
         {
           bookId: 'ap-jes-01',
-          title: 'La Passe-Miroir T.2 — Les Disparus du Clairdelune',
+          title: 'La Passe-Miroir T.2 : Les Disparus du Clairdelune',
           author: 'Christelle Dabos',
           publisher: 'Gallimard Jeunesse',
           isbn: '9782075081757',

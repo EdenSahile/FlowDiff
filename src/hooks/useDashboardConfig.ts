@@ -90,7 +90,7 @@ function saveConfig(config: DashboardConfig): void {
   try {
     localStorage.setItem(LS_KEY, JSON.stringify(config))
   } catch {
-    // quota or incognito — ignore
+    // quota or incognito : ignore
   }
 }
 

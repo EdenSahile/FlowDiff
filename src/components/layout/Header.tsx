@@ -75,7 +75,7 @@ const LogoWrap = styled.div`
   flex-shrink: 0;
   order: 1;
 
-  /* Desktop : masqué — le logo est dans la sidebar */
+  /* Desktop : masqué : le logo est dans la sidebar */
   @media (min-width: ${({ theme }) => theme.breakpoints.mobile}) {
     display: none;
   }
@@ -1330,7 +1330,7 @@ export function Header({ cartCount = 0, onBurgerClick, onCartClick }: HeaderProp
             ref={listsBtnRef}
             $hasLists={lists.length > 0}
             onClick={toggleListsPanel}
-            aria-label={`Mes listes — ${lists.length} liste${lists.length !== 1 ? 's' : ''}`}
+            aria-label={`Mes listes : ${lists.length} liste${lists.length !== 1 ? 's' : ''}`}
           >
             <IconLists />
             <ListsLabel $show={lists.length > 0}>Listes</ListsLabel>
@@ -1343,7 +1343,7 @@ export function Header({ cartCount = 0, onBurgerClick, onCartClick }: HeaderProp
             id="tour-cart"
             $hasItems={cartCount > 0}
             onClick={onCartClick}
-            aria-label={`Panier — ${cartCount} article${cartCount !== 1 ? 's' : ''}`}
+            aria-label={`Panier : ${cartCount} article${cartCount !== 1 ? 's' : ''}`}
           >
             <IconCart size={16} filled={cartCount > 0} />
             <CartLabel>Panier</CartLabel>

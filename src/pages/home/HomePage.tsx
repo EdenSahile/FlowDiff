@@ -2091,7 +2091,7 @@ export function HomePage() {
     <Page>
       <Content>
 
-        {/* 1 — Greeting + raccourcis groupés */}
+        {/* 1 : Greeting + raccourcis groupés */}
         <TopSection>
           <GreetingRow>
             <div>
@@ -2132,7 +2132,7 @@ export function HomePage() {
           </QuickActionsGrid>
         </TopSection>
 
-        {/* 2-5 — Sections réordonnables */}
+        {/* 2-5 : Sections réordonnables */}
         {dashConfig.config.sectionOrder.map((sectionId, sectionIdx) => {
           const isFirst = sectionIdx === 0
           const isLast  = sectionIdx === dashConfig.config.sectionOrder.length - 1

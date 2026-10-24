@@ -109,7 +109,7 @@ export function AdminCommandesPage() {
       </TableWrap>
 
       {detail && (
-        <AdminModal title={`Commande — ${detail.librairie}`} onClose={() => setDetail(null)} width={600}>
+        <AdminModal title={`Commande : ${detail.librairie}`} onClose={() => setDetail(null)} width={600}>
           <DetailGrid>
             <DetailRow><DetailLabel>Librairie</DetailLabel><DetailVal>{detail.librairie}</DetailVal></DetailRow>
             <DetailRow><DetailLabel>Code client</DetailLabel><DetailVal style={{ fontFamily: 'monospace' }}>{detail.code_client}</DetailVal></DetailRow>

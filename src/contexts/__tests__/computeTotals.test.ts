@@ -208,7 +208,7 @@ describe('computeTotals', () => {
     expect(totals.totalTTC).toBeCloseTo(totals.netHT + totals.tva, 5)
   })
 
-  it('récap 4 articles réels — remiseAmount est la somme TTC des remises ligne par ligne', () => {
+  it('récap 4 articles réels : remiseAmount est la somme TTC des remises ligne par ligne', () => {
     const cartRates = { 'BD/Mangas': 0.30, 'Littérature': 0.35, 'Jeunesse': 0.30, 'Adulte-pratique': 0.35 }
     const items = [
       makeItem(12.99, 'BD/Mangas'),   // Le Lotus Bleu

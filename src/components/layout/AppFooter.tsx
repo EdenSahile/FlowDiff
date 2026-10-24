@@ -11,7 +11,7 @@ const FooterBar = styled.footer`
   padding: 0 ${({ theme }) => theme.spacing.lg};
   flex-shrink: 0;
 
-  /* Masqué sur mobile — BottomNav gère le bas */
+  /* Masqué sur mobile : BottomNav gère le bas */
   @media (max-width: calc(${({ theme }) => theme.breakpoints.mobile} - 1px)) {
     display: none;
   }

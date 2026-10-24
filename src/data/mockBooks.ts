@@ -258,7 +258,7 @@ const _RAW_MOCK_BOOKS: Book[] = [
   {
     id: 'n-jes-02',
     isbn: '9782075164252',
-    title: "La Passe-Miroir T.1 — Les Fiancés de l'hiver",
+    title: "La Passe-Miroir T.1 : Les Fiancés de l'hiver",
     authors: ['Christelle Dabos'],
     publisher: 'Gallimard Jeunesse',
     universe: 'Jeunesse', type: 'nouveaute',
@@ -288,7 +288,7 @@ const _RAW_MOCK_BOOKS: Book[] = [
   {
     id: 'n-pra-02',
     isbn: '9782823854169',
-    title: 'Ikigaï — Les secrets des Japonais pour une longue vie heureuse',
+    title: 'Ikigaï : Les secrets des Japonais pour une longue vie heureuse',
     authors: ['Héctor García', 'Francesc Miralles'],
     publisher: 'Twiggy',
     universe: 'Adulte-pratique', type: 'nouveaute',
@@ -351,7 +351,7 @@ const _RAW_MOCK_BOOKS: Book[] = [
   {
     id: 'ap-jes-01',
     isbn: '9782075081757',
-    title: 'La Passe-Miroir T.2 — Les Disparus du Clairdelune',
+    title: 'La Passe-Miroir T.2 : Les Disparus du Clairdelune',
     authors: ['Christelle Dabos'],
     publisher: 'Gallimard Jeunesse',
     universe: 'Jeunesse', type: 'a-paraitre',
@@ -449,7 +449,7 @@ const _RAW_MOCK_BOOKS: Book[] = [
   },
 
   /* ══════════════════════════════════════════════════════
-     FONDS — Littérature
+     FONDS : Littérature
   ══════════════════════════════════════════════════════ */
 
   {
@@ -690,7 +690,7 @@ const _RAW_MOCK_BOOKS: Book[] = [
   },
 
   /* ══════════════════════════════════════════════════════
-     FONDS — BD/Mangas
+     FONDS : BD/Mangas
   ══════════════════════════════════════════════════════ */
 
   /* ── My Hero Academia Team-up Mission ── */
@@ -817,7 +817,7 @@ const _RAW_MOCK_BOOKS: Book[] = [
   {
     id: 'f-bd-arabe-04',
     isbn: '9782370731258',
-    title: "L'Arabe du futur T.4 — Une jeunesse au Moyen-Orient (1987-1992)",
+    title: "L'Arabe du futur T.4 : Une jeunesse au Moyen-Orient (1987-1992)",
     authors: ['Riad Sattouf'],
     publisher: 'Allary Éditions',
     universe: 'BD/Mangas', type: 'fonds',
@@ -825,7 +825,7 @@ const _RAW_MOCK_BOOKS: Book[] = [
     price: 12.50, priceTTC: 19.00, format: '220 x 290 mm', pages: 184,
     reliure: 'relie', categorie: 'grand format',
     publicationDate: '2018-10-11',
-    description: "Riad a 10 ans. La Libye de Kadhafi, la Syrie d'Assad — la chronique autobiographique qui a conquis le monde entier.",
+    description: "Riad a 10 ans. La Libye de Kadhafi, la Syrie d'Assad : la chronique autobiographique qui a conquis le monde entier.",
     topVente: true,
   },
 
@@ -833,7 +833,7 @@ const _RAW_MOCK_BOOKS: Book[] = [
   {
     id: 'f-bd-esther-01',
     isbn: '9782370730848',
-    title: "Les Cahiers d'Esther T.1 — Histoires de mes 10 ans",
+    title: "Les Cahiers d'Esther T.1 : Histoires de mes 10 ans",
     authors: ['Riad Sattouf'],
     publisher: 'Allary Éditions',
     universe: 'BD/Mangas', type: 'fonds',
@@ -846,7 +846,7 @@ const _RAW_MOCK_BOOKS: Book[] = [
   },
 
   /* ══════════════════════════════════════════════════════
-     FONDS — Jeunesse
+     FONDS : Jeunesse
   ══════════════════════════════════════════════════════ */
 
   {
@@ -909,13 +909,13 @@ const _RAW_MOCK_BOOKS: Book[] = [
   },
 
   /* ══════════════════════════════════════════════════════
-     FONDS — Adulte-pratique
+     FONDS : Adulte-pratique
   ══════════════════════════════════════════════════════ */
 
   {
     id: 'f-pra-james',
     isbn: '9782036082793',
-    title: 'Un rien peut tout changer — Le carnet officiel',
+    title: 'Un rien peut tout changer : Le carnet officiel',
     authors: ['James Clear'],
     publisher: 'Ynnis Éditions',
     universe: 'Adulte-pratique', type: 'fonds',
@@ -929,7 +929,7 @@ const _RAW_MOCK_BOOKS: Book[] = [
   {
     id: 'f-pra-homo',
     isbn: '9782226425676',
-    title: "Homo Deus — Une brève histoire de l'avenir",
+    title: "Homo Deus : Une brève histoire de l'avenir",
     authors: ['Yuval Noah Harari'],
     publisher: 'Albin Michel',
     universe: 'Adulte-pratique', type: 'fonds',
@@ -964,7 +964,7 @@ const _RAW_MOCK_BOOKS: Book[] = [
     price: 13.20, priceTTC: 19.90, format: '155 x 235 mm', pages: 352,
     reliure: 'broche', categorie: 'grand format',
     publicationDate: '2019-01-09',
-    description: "Pourquoi notre vision du monde est systématiquement fausse — et comment la corriger avec des données réelles. Le manifeste de la pensée factuelle.",
+    description: "Pourquoi notre vision du monde est systématiquement fausse, et comment la corriger avec des données réelles. Le manifeste de la pensée factuelle.",
   },
   {
     id: 'f-pra-attenborough',
@@ -1009,7 +1009,7 @@ const _RAW_MOCK_BOOKS: Book[] = [
   },
 ]
 
-/* ─── Statuts de stock — démo ─── */
+/* ─── Statuts de stock : démo ─── */
 const STOCK_OVERRIDES: Record<string, StockStatut> = {
   /* Stock limité */
   'f-lit-jeune':      'stock_limite',

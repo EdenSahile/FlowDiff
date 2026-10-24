@@ -13,7 +13,7 @@ import { useToast } from '@/contexts/ToastContext'
 import { BackButton } from '@/components/ui/BackButton'
 
 /* ══════════════════════════════════════════════════════
-   DONNÉES MOCK — ventes rolling 30 jours
+   DONNÉES MOCK : ventes rolling 30 jours
 ══════════════════════════════════════════════════════ */
 
 interface SalesData { units: number; trend: 'up' | 'down' | 'stable' }
@@ -68,7 +68,7 @@ type TabView = 'tous' | Universe
 
 const UNIVERSES: Universe[] = ['BD/Mangas', 'Jeunesse', 'Littérature', 'Adulte-pratique']
 
-/* Palette Forêt & Lin — cohérente avec UniverseFilter et FlashInfosPage */
+/* Palette Forêt & Lin : cohérente avec UniverseFilter et FlashInfosPage */
 const UNIVERSE_COLORS: Record<Universe, { bg: string; text: string; dot: string }> = {
   'BD/Mangas':       { bg: '#F7F0DC', text: '#8B6914', dot: '#8B6914' },
   'Jeunesse':        { bg: '#EFF4F1', text: '#2D6A52', dot: '#2D6A52' },
@@ -100,7 +100,7 @@ function getSection(books: Book[], type: 'nouveaute' | 'fonds', universe: TabVie
 const fadeIn = keyframes`from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}`
 
 /* ══════════════════════════════════════════════════════
-   STYLED — PAGE
+   STYLED : PAGE
 ══════════════════════════════════════════════════════ */
 
 const Page = styled.div`
@@ -182,7 +182,7 @@ const PeriodBtn = styled.button<{ $active: boolean }>`
 `
 
 /* ══════════════════════════════════════════════════════
-   STYLED — TABS
+   STYLED : TABS
 ══════════════════════════════════════════════════════ */
 
 const TabBar = styled.div`
@@ -231,7 +231,7 @@ const Tab = styled.button<{ $active: boolean }>`
 `
 
 /* ══════════════════════════════════════════════════════
-   STYLED — CONTENU
+   STYLED : CONTENU
 ══════════════════════════════════════════════════════ */
 
 const Content = styled.div`

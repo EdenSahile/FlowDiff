@@ -463,7 +463,7 @@ const EDIFACT_TEMPLATES: Record<EDIMessageType, (msg: EDIMessage) => string> = {
     seg.push(`BGM+380+${msg.documentRef}+9'`)
     seg.push(`DTM+137:${fmtEdifactDate(msg.createdAt)}:102'`)
 
-    /* Parties — acheteur d'abord, puis fournisseur */
+    /* Parties : acheteur d'abord, puis fournisseur */
     seg.push(`NAD+BY+${BUYER_GLN}::9'`)
     seg.push(`RFF+API:${BUYER_GLN}'`)
     seg.push(`NAD+SU+${SUPPLIER_GLN}::9'`)

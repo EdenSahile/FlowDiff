@@ -38,7 +38,7 @@ function loadMessages(cc: string): EDIMessage[] {
   try {
     const storedVersion = localStorage.getItem(versionKey(cc))
     if (storedVersion !== MOCK_EDI_VERSION) {
-      // Mocks mis à jour — on réinitialise localStorage
+      // Mocks mis à jour : on réinitialise localStorage
       localStorage.removeItem(messagesKey(cc))
       localStorage.setItem(versionKey(cc), MOCK_EDI_VERSION)
       return MOCK_EDI_MESSAGES

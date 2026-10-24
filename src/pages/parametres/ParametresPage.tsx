@@ -406,7 +406,7 @@ export function ParametresPage() {
 
         {/* ── EDI ── */}
         <Section>
-          <SectionTitle>EDI — Échanges de données</SectionTitle>
+          <SectionTitle>EDI : Échanges de données</SectionTitle>
           <Row>
             <RowLabel>Préférer EDI par défaut</RowLabel>
             <Toggle

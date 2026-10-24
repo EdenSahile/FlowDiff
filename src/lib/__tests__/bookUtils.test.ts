@@ -50,7 +50,7 @@ describe('getTypeCommande', () => {
    FLOW-RM-022 : 3 types de titres
 ══════════════════════════════════════════════════════ */
 
-describe('MOCK_BOOKS — types de titres (FLOW-RM-022)', () => {
+describe('MOCK_BOOKS : types de titres (FLOW-RM-022)', () => {
   const validTypes: BookType[] = ['nouveaute', 'a-paraitre', 'fonds']
 
   it('chaque livre a un type appartenant à BookType', () => {
@@ -70,7 +70,7 @@ describe('MOCK_BOOKS — types de titres (FLOW-RM-022)', () => {
    FLOW-RM-023 : 4 univers
 ══════════════════════════════════════════════════════ */
 
-describe('MOCK_BOOKS — univers (FLOW-RM-023)', () => {
+describe('MOCK_BOOKS : univers (FLOW-RM-023)', () => {
   const validUniverses: Universe[] = ['BD/Mangas', 'Jeunesse', 'Littérature', 'Adulte-pratique']
 
   it('chaque livre a un univers appartenant à Universe', () => {
@@ -90,7 +90,7 @@ describe('MOCK_BOOKS — univers (FLOW-RM-023)', () => {
    FLOW-RM-024 : 6 statuts de stock
 ══════════════════════════════════════════════════════ */
 
-describe('MOCK_BOOKS — statuts de stock (FLOW-RM-024)', () => {
+describe('MOCK_BOOKS : statuts de stock (FLOW-RM-024)', () => {
   const validStatuts: StockStatut[] = ['disponible', 'stock_limite', 'sur_commande', 'en_reimp', 'epuise', 'rupture']
 
   it('chaque statut présent appartient à StockStatut', () => {
@@ -111,7 +111,7 @@ describe('MOCK_BOOKS — statuts de stock (FLOW-RM-024)', () => {
    FLOW-RM-025 : sur_commande/en_reimp interdits pour nouveautés
 ══════════════════════════════════════════════════════ */
 
-describe('MOCK_BOOKS — statuts interdits pour nouveautés (FLOW-RM-025)', () => {
+describe('MOCK_BOOKS : statuts interdits pour nouveautés (FLOW-RM-025)', () => {
   it('aucune nouveauté n\'a le statut sur_commande', () => {
     const nouveautesSurCommande = MOCK_BOOKS.filter(
       b => b.type === 'nouveaute' && b.statut === 'sur_commande'
@@ -133,7 +133,7 @@ describe('MOCK_BOOKS — statuts interdits pour nouveautés (FLOW-RM-025)', () =
    FLOW-RM-026 : à paraître n'ont pas de statut de stock
 ══════════════════════════════════════════════════════ */
 
-describe('MOCK_BOOKS — à paraître sans statut (FLOW-RM-026)', () => {
+describe('MOCK_BOOKS : à paraître sans statut (FLOW-RM-026)', () => {
   it('aucun titre à paraître n\'a de propriété statut', () => {
     const aParaitreWithStatut = MOCK_BOOKS.filter(
       b => b.type === 'a-paraitre' && b.statut !== undefined

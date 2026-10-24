@@ -57,7 +57,7 @@ async function main() {
 
   const todo = manifest.filter(b => b.cover && !existsSync(`${DIR}/${b.isbn}.jpg`))
   const already = manifest.length - todo.length
-  console.log(`${manifest.length} entrées dans ${MANIFEST} — ${already} déjà présentes, ${todo.length} à télécharger\n`)
+  console.log(`${manifest.length} entrées dans ${MANIFEST} : ${already} déjà présentes, ${todo.length} à télécharger\n`)
 
   let ok = 0
   const failed = []
@@ -74,8 +74,8 @@ async function main() {
 
   console.log(`\n✓ ${ok}/${todo.length} téléchargées`)
   if (failed.length) {
-    console.log(`\nÉchecs (${failed.length}) — ces titres gardent le placeholder :`)
-    failed.forEach(f => console.log(`  ${f.isbn} — ${f.title.slice(0, 60)}`))
+    console.log(`\nÉchecs (${failed.length}) : ces titres gardent le placeholder :`)
+    failed.forEach(f => console.log(`  ${f.isbn} : ${f.title.slice(0, 60)}`))
   }
 }
 

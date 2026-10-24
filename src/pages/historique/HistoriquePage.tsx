@@ -24,7 +24,7 @@ const fadeSlideIn = keyframes`
 `
 const fadeIn = keyframes`from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}`
 
-/* ── Couleurs par statut — palette Forêt & Lin ── */
+/* ── Couleurs par statut : palette Forêt & Lin ── */
 const STATUS_COLORS: Record<OrderStatus, { bg: string; text: string; dot: string }> = {
   'en préparation': { bg: '#F7F0DC', text: '#8B6914', dot: '#8B6914' },
   'expédié':        { bg: '#E6EFE9', text: theme.colors.success, dot: theme.colors.success },
@@ -779,7 +779,7 @@ export function HistoriquePage() {
             </DateGroup>
           </SelectRow>
 
-          {/* Filtre statut — pills */}
+          {/* Filtre statut : pills */}
           <FilterPillsRow>
             <FilterPill $active={selectedStatus === null} onClick={() => setSelectedStatus(null)}>
               Tous

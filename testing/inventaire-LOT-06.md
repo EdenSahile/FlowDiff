@@ -1,4 +1,4 @@
-# Inventaire des tests — LOT-06 : Panier, ajout, modification et persistance
+# Inventaire des tests : LOT-06 : Panier, ajout, modification et persistance
 
 ## Résumé
 
@@ -14,22 +14,22 @@
 
 ## Règles déjà couvertes
 
-### FLOW-RM-043 — Remise sur ouvrages (y compris OP) mais PAS sur PLV
+### FLOW-RM-043 : Remise sur ouvrages (y compris OP) mais PAS sur PLV
 
 - **État** : 🟢 Déjà couvert
 - **Tests existants** : `src/contexts/__tests__/computeTotals.test.ts` (1 test dédié)
 
-### FLOW-RM-044 — TVA fixe 5,5% extraite du net TTC
+### FLOW-RM-044 : TVA fixe 5,5% extraite du net TTC
 
 - **État** : 🟢 Déjà couvert
 - **Tests existants** : `src/contexts/__tests__/computeTotals.test.ts` (tests 4 et 7)
 
-### FLOW-RM-045 — Formule : netHT = (subtotalTTC - remiseTTC) / 1.055
+### FLOW-RM-045 : Formule : netHT = (subtotalTTC - remiseTTC) / 1.055
 
 - **État** : 🟢 Déjà couvert
 - **Tests existants** : `src/contexts/__tests__/computeTotals.test.ts` (tests 7 et 8)
 
-### FLOW-RM-046 — Panier vide : computeTotals retourne tout à 0
+### FLOW-RM-046 : Panier vide : computeTotals retourne tout à 0
 
 - **État** : 🟢 Déjà couvert
 - **Tests existants** : `src/contexts/__tests__/computeTotals.test.ts` (test 1)
@@ -38,7 +38,7 @@
 
 ## Règles à tester en unitaire
 
-### FLOW-RM-041 — Remises par défaut par univers
+### FLOW-RM-041 : Remises par défaut par univers
 
 - **État** : 🟢 Testable en unitaire
 - **Tests existants** : `computeTotals.test.ts` utilise des taux personnalisés (9%, 10%, 8%), pas les taux réels. Le test 7 utilise les vrais taux mais ne vérifie pas les valeurs de la constante.
@@ -50,7 +50,7 @@
   - Adulte-pratique = 0.35
   - Les 4 univers sont présents comme clés
 
-### FLOW-RM-038 — Limite du panier à 30 articles
+### FLOW-RM-038 : Limite du panier à 30 articles
 
 - **État** : 🟢 Testable en unitaire (via renderHook + CartProvider)
 - **Tests existants** : `formSchemas.test.ts` teste `cartQtySchema` (quantité individuelle), pas le total panier
@@ -60,11 +60,11 @@
 - **Cas à couvrir** :
   - Panier 29, ajout qty=1 : accepté (total 30)
   - Panier 30, ajout qty=1 : refusé
-  - Panier 29, ajout qty=3 : refusé (29 + 3 > 30) — **red** (bug DEC-003)
-  - Panier 27, ajout qty=3 : accepté (27 + 3 = 30) — **red** (bug DEC-003)
-  - Livre déjà dans le panier (qty=3), total=28, ajout qty=3 : refusé — **red** (bug DEC-003)
+  - Panier 29, ajout qty=3 : refusé (29 + 3 > 30) : **red** (bug DEC-003)
+  - Panier 27, ajout qty=3 : accepté (27 + 3 = 30) : **red** (bug DEC-003)
+  - Livre déjà dans le panier (qty=3), total=28, ajout qty=3 : refusé : **red** (bug DEC-003)
 
-### FLOW-RM-039 — Ajout : même livre = incrémentation quantité
+### FLOW-RM-039 : Ajout : même livre = incrémentation quantité
 
 - **État** : 🟢 Testable en unitaire (via renderHook)
 - **Tests existants** : aucun
@@ -74,7 +74,7 @@
   - Ajouter le même livre avec ebookOption différent : 2 items distincts
   - Ajouter un livre différent : 2 items distincts
 
-### FLOW-RM-040 — Limite atteinte : toast d'erreur, panier inchangé
+### FLOW-RM-040 : Limite atteinte : toast d'erreur, panier inchangé
 
 - **État** : 🟢 Testable en unitaire (via renderHook + mock showToast)
 - **Tests existants** : aucun
@@ -83,7 +83,7 @@
   - Limite atteinte : `showToast` appelé avec type `'error'`
   - Limite atteinte : les items restent inchangés (pas d'ajout)
 
-### FLOW-RM-047 — updateQty < 1 supprime l'article
+### FLOW-RM-047 : updateQty < 1 supprime l'article
 
 - **État** : 🟢 Testable en unitaire (via renderHook)
 - **Tests existants** : aucun
@@ -93,7 +93,7 @@
   - `updateQty(key, -1)` : l'item est supprimé
   - `updateQty(key, 3)` : la quantité passe à 3
 
-### FLOW-RM-049 — Validation panier stocké via Zod : données invalides = panier vidé
+### FLOW-RM-049 : Validation panier stocké via Zod : données invalides = panier vidé
 
 - **État** : 🟢 Testable en unitaire (via renderHook + localStorage prérempli)
 - **Tests existants** : `storageSchemas.test.ts` teste le schéma. La logique de purge dans `loadCart` (`CartContext.tsx:107-118`) n'est pas testée.
@@ -108,7 +108,7 @@
 
 ## Règle partielle
 
-### FLOW-RM-042 — Taux effectifs libraire prioritaires sur REMISE_RATES
+### FLOW-RM-042 : Taux effectifs libraire prioritaires sur REMISE_RATES
 
 - **État** : 🟠 Unitaire + smoke
 - **Tests existants** : aucun
@@ -119,7 +119,7 @@
 - **Part smoke** :
   - Vérifier visuellement que le prix net affiché dans BookCard et dans le récap panier correspond aux taux du libraire connecté
 
-### FLOW-RM-048 — Panier persisté en localStorage par codeClient
+### FLOW-RM-048 : Panier persisté en localStorage par codeClient
 
 - **État** : 🟢 Déjà couvert dans `storageKeyIsolation.test.tsx` (LOT-03)
 - **Tests existants** : 3 tests (charge par codeClient, suffixe guest, isolation entre clients)

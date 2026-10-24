@@ -41,7 +41,7 @@ function fmtTime(iso: string): string {
 }
 
 /* Retourne le N° de commande (CMD-...) quelle que soit le type de message.
-   Pour ORDRSP, documentRef est l'ACK ref — le vrai CMD est dans payload.orderId. */
+   Pour ORDRSP, documentRef est l'ACK ref : le vrai CMD est dans payload.orderId. */
 function getOrderRef(msg: EDIMessage): string {
   const p = msg.payload as Record<string, unknown>
   if (typeof p.orderId === 'string' && p.orderId.length > 0) return p.orderId
@@ -50,7 +50,7 @@ function getOrderRef(msg: EDIMessage): string {
 
 
 /* ════════════════════════════════════════════════════
-   STYLED — layout racine
+   STYLED : layout racine
 ════════════════════════════════════════════════════ */
 const fadeIn = keyframes`from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}`
 
@@ -154,7 +154,7 @@ const CardTitle = styled.div`
   gap: 6px;
 `
 
-/* statcard 1 — Statut */
+/* statcard 1 : Statut */
 const ConnectedBadge = styled.div`
   display: flex;
   align-items: center;
@@ -211,7 +211,7 @@ const ActiveBadge = styled.span`
   font-weight: ${({ theme }) => theme.typography.weights.medium};
 `
 
-/* statcard 3 — Flux */
+/* statcard 3 : Flux */
 const FluxGrid = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -497,7 +497,7 @@ const ContactBtn = styled.button`
 
 
 /* ════════════════════════════════════════════════════
-   STYLED — Footer EDI
+   STYLED : Footer EDI
 ════════════════════════════════════════════════════ */
 const EDIFooter = styled.footer`
   border-top: 1px solid ${({ theme }) => theme.colors.gray[200]};
@@ -582,7 +582,7 @@ export function EDIPage() {
           <BackButton />
           <TitleBlock>
             <PageEyebrow>Outils</PageEyebrow>
-            <Title>EDI — Échanges de données informatisés</Title>
+            <Title>EDI : Échanges de données informatisés</Title>
             <Subtitle>
               Suivez vos commandes et livraisons avec Dilicom.
             </Subtitle>
@@ -675,7 +675,7 @@ export function EDIPage() {
             <HelpRow>✉ edi@flowdiff-fictif.fr</HelpRow>
             <ContactBtn onClick={() => {
               const body = `Nom : ${user?.nomLibrairie ?? ''}\nNuméro de compte : ${user?.codeClient ?? ''}\n\n`
-              window.location.href = `mailto:edi@flowdiff-fictif.fr?subject=${encodeURIComponent('Support EDI — ' + (user?.nomLibrairie ?? ''))}&body=${encodeURIComponent(body)}`
+              window.location.href = `mailto:edi@flowdiff-fictif.fr?subject=${encodeURIComponent('Support EDI : ' + (user?.nomLibrairie ?? ''))}&body=${encodeURIComponent(body)}`
             }}>Nous contacter</ContactBtn>
           </Card>
         </StatsRow>

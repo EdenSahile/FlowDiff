@@ -141,7 +141,7 @@ function formatEur(val: number) {
 }
 
 function openContestEmail(ret: ReturnRequest) {
-  const subject = encodeURIComponent(`Contestation retour ${ret.id} — ${ret.orderNumero}`)
+  const subject = encodeURIComponent(`Contestation retour ${ret.id} : ${ret.orderNumero}`)
   const body = encodeURIComponent(
     `Bonjour,\n\nJe souhaite contester le refus de ma demande de retour ${ret.id} (commande ${ret.orderNumero}).\n\nMotif de refus communiqué : ${ret.refusalReason ?? '—'}\n\nMa contestation :\n\n[Votre message ici]\n\nCordialement`
   )

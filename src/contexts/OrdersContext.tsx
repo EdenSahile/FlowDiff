@@ -5,7 +5,7 @@ import { useAuthContext } from '@/contexts/AuthContext'
 import { storedOrdersSchema } from '@/lib/storageSchemas'
 import { getTypeCommande } from '@/lib/bookUtils'
 
-/* Hoisted — MOCK_ORDERS est statique, pas besoin de recalculer à chaque render */
+/* Hoisted : MOCK_ORDERS est statique, pas besoin de recalculer à chaque render */
 const MOCK_IDS = new Set(Object.values(MOCK_ORDERS).flat().map(o => o.id))
 
 function ordersKey(codeClient: string | undefined) {

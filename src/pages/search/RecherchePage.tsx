@@ -33,7 +33,7 @@ function searchCatalog(catalog: Book[], query: string): Book[] {
 }
 
 /* ══════════════════════════════════════════════════════
-   GOOGLE BOOKS — confirmation hors-catalogue
+   GOOGLE BOOKS : confirmation hors-catalogue
 ══════════════════════════════════════════════════════ */
 
 interface ExternalBook {
@@ -354,7 +354,7 @@ const SearchCatalogBtn = styled.button`
 `
 
 /* ══════════════════════════════════════════════════════
-   SOUS-COMPOSANT — hors catalogue
+   SOUS-COMPOSANT : hors catalogue
 ══════════════════════════════════════════════════════ */
 
 function HorsCatalogue({ isbn }: { isbn: string }) {
@@ -469,7 +469,7 @@ export function RecherchePage() {
     }
   }, [q, allBooks, navigate])
 
-  /* Résultats catalogue — texte puis filtres avancés */
+  /* Résultats catalogue : texte puis filtres avancés */
   const paramsStr = params.toString()
   const allResults = useMemo(() => {
     let books = q ? searchCatalog(allBooks, q) : [...allBooks]

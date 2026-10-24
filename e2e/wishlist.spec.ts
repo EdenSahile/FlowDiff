@@ -49,7 +49,7 @@ test('ajouter au panier depuis une liste affiche une confirmation et la mention 
   await input.press('Enter')
   await expect(page.getByText('Titre ajouté à la liste « Ma commande »')).toBeVisible()
 
-  await page.getByRole('button', { name: /^Mes listes — \d+ liste/ }).click()
+  await page.getByRole('button', { name: /^Mes listes : \d+ liste/ }).click()
   // La ligne de liste est un div cliquable sans rôle : on passe par son nom.
   const listsPanel = page.locator('[aria-label="Mes listes de commandes"]')
   await listsPanel.getByText('Ma commande', { exact: true }).click()
@@ -60,5 +60,5 @@ test('ajouter au panier depuis une liste affiche une confirmation et la mention 
 
   await expect(page.getByText(/ajouté au panier/)).toBeVisible()
   await expect(listsPanel.getByText('✓ Ajouté au panier')).toBeVisible()
-  await expect(page.getByRole('button', { name: /^Panier — 1 article/ })).toBeVisible()
+  await expect(page.getByRole('button', { name: /^Panier : 1 article/ })).toBeVisible()
 })

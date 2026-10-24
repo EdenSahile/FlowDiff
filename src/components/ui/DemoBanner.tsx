@@ -40,7 +40,7 @@ export function DemoBanner() {
   return (
     <BannerWrap role="note" aria-label="Site de démonstration">
       <Dot aria-hidden="true" />
-      Site de démonstration — Toutes les données affichées sont fictives et créées à des fins pédagogiques uniquement.
+      Site de démonstration : Toutes les données affichées sont fictives et créées à des fins pédagogiques uniquement.
     </BannerWrap>
   )
 }

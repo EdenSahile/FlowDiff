@@ -31,14 +31,14 @@ async function login(page: Page) {
 const BOOK_ID = 'n-lit-01'
 
 function cartLink(page: Page) {
-  return page.getByRole('button', { name: /^Panier — \d+ article/ })
+  return page.getByRole('button', { name: /^Panier : \d+ article/ })
 }
 
-// Le libellé du panier porte le compte : « Panier — 3 articles ».
+// Le libellé du panier porte le compte : « Panier : 3 articles ».
 // Assertion à réessai : le badge se met à jour au re-rendu du header.
 async function expectCartCount(page: Page, count: number) {
   const plural = count === 1 ? 'article' : 'articles'
-  await expect(cartLink(page)).toHaveAttribute('aria-label', `Panier — ${count} ${plural}`)
+  await expect(cartLink(page)).toHaveAttribute('aria-label', `Panier : ${count} ${plural}`)
 }
 
 // On ajoute depuis la fiche produit, où le bouton est seul sur la page.
@@ -68,8 +68,8 @@ async function runCheckout(page: Page) {
   await page.goto('/panier')
 
   await page.getByRole('button', { name: 'Valider la commande' }).click()
-  await page.getByRole('button', { name: /^Suivant — Adresses/ }).click()
-  await page.getByRole('button', { name: /^Suivant — Mode de transmission/ }).click()
+  await page.getByRole('button', { name: /^Suivant : Adresses/ }).click()
+  await page.getByRole('button', { name: /^Suivant : Mode de transmission/ }).click()
   await page.getByRole('button', { name: 'Envoyer la commande' }).click()
 }
 
@@ -108,12 +108,12 @@ test.describe('Tunnel de commande', () => {
     await page.goto('/panier')
 
     await page.getByRole('button', { name: 'Valider la commande' }).click()
-    await expect(page.getByRole('button', { name: /^Suivant — Adresses/ })).toBeVisible()
+    await expect(page.getByRole('button', { name: /^Suivant : Adresses/ })).toBeVisible()
 
-    await page.getByRole('button', { name: /^Suivant — Adresses/ }).click()
-    await expect(page.getByRole('button', { name: /^Suivant — Mode de transmission/ })).toBeVisible()
+    await page.getByRole('button', { name: /^Suivant : Adresses/ }).click()
+    await expect(page.getByRole('button', { name: /^Suivant : Mode de transmission/ })).toBeVisible()
 
-    await page.getByRole('button', { name: /^Suivant — Mode de transmission/ }).click()
+    await page.getByRole('button', { name: /^Suivant : Mode de transmission/ }).click()
     await expect(page.getByRole('button', { name: 'Envoyer la commande' })).toBeVisible()
 
     await page.getByRole('button', { name: 'Envoyer la commande' }).click()

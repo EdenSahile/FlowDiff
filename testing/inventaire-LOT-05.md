@@ -1,4 +1,4 @@
-# Inventaire des tests — LOT-05 : Catalogue, recherche et filtrage
+# Inventaire des tests : LOT-05 : Catalogue, recherche et filtrage
 
 ## Résumé
 
@@ -14,19 +14,19 @@
 
 ## Règles déjà couvertes
 
-### FLOW-RM-032 — Recherche ISBN directe : correspondance exacte, trim
+### FLOW-RM-032 : Recherche ISBN directe : correspondance exacte, trim
 
 - **État** : 🟢 Déjà couvert
 - **Tests existants** : `src/components/layout/__tests__/isbnSearch.test.ts` (3 tests)
 - **Couverture** : correspondance exacte, ISBN inexistant, trim des espaces
 
-### FLOW-RM-035 — Filtrage cumulatif univers + statut (page Fonds)
+### FLOW-RM-035 : Filtrage cumulatif univers + statut (page Fonds)
 
 - **État** : 🟢 Déjà couvert
 - **Tests existants** : `src/pages/fonds/__tests__/fondsFilter.test.ts` (5 tests)
 - **Couverture** : sans filtre, univers seul, statut seul, cumulatif, combinaison vide
 
-### FLOW-RM-036 — Calcul prix net remisé : priceTTC * (1 - rate)
+### FLOW-RM-036 : Calcul prix net remisé : priceTTC * (1 - rate)
 
 - **État** : 🟢 Déjà couvert
 - **Tests existants** : `src/components/catalogue/__tests__/priceNet.test.ts` (3 tests)
@@ -36,7 +36,7 @@
 
 ## Règles à tester en unitaire
 
-### FLOW-RM-031 — Recherche locale multi-champs
+### FLOW-RM-031 : Recherche locale multi-champs
 
 - **État** : 🟢 Testable en unitaire (compléter la couverture)
 - **Tests existants** : `src/services/__tests__/books.test.ts` (4 tests : titre, auteur, vide, aucun résultat)
@@ -49,7 +49,7 @@
   - Requête avec espaces autour (trim)
   - Insensibilité à la casse sur tous les champs
 
-### FLOW-RM-033 — Fallback Supabase vers données mock
+### FLOW-RM-033 : Fallback Supabase vers données mock
 
 - **État** : 🟢 Testable en unitaire (avec mock de supabase)
 - **Tests existants** : aucun
@@ -60,7 +60,7 @@
   - Supabase retourne une erreur : fallback vers MOCK_BOOKS
   - Cache module-level : 2e appel retourne le cache sans refetch
 
-### FLOW-RM-034 — Filtrage par prix TTC : borne inf incluse, borne sup exclue
+### FLOW-RM-034 : Filtrage par prix TTC : borne inf incluse, borne sup exclue
 
 - **État** : 🟢 Testable en unitaire
 - **Tests existants** : aucun
@@ -73,7 +73,7 @@
   - Plusieurs tranches : union (livre dans au moins 1 tranche)
   - Tranche "50 EUR et plus" (max = Infinity)
 
-### FLOW-RM-037 — Genres rattachés à chaque univers (GENRE_BY_UNIVERSE)
+### FLOW-RM-037 : Genres rattachés à chaque univers (GENRE_BY_UNIVERSE)
 
 - **État** : 🟢 Testable en unitaire
 - **Tests existants** : aucun

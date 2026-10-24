@@ -5,7 +5,7 @@ import 'driver.js/dist/driver.css'
 import { useOnboarding } from '@/contexts/OnboardingContext'
 import { useNavigate, useLocation } from 'react-router-dom'
 
-/* ── Driver.js style overrides — navy/or cohérent avec le design ── */
+/* ── Driver.js style overrides : navy/or cohérent avec le design ── */
 const DriverOverride = createGlobalStyle`
   .driver-popover {
     background: #2D3A4A !important;

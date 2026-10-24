@@ -63,7 +63,7 @@ export function CGVPage() {
 
       <Card>
         <Article>
-          <ArticleTitle>Article 1 — Objet</ArticleTitle>
+          <ArticleTitle>Article 1 : Objet</ArticleTitle>
           <ArticleText>
             Les présentes Conditions Générales de Vente (CGV) régissent les relations
             commerciales entre FlowDiff (ci-après "l'Éditeur") et les libraires
@@ -77,7 +77,7 @@ export function CGVPage() {
         </Article>
 
         <Article>
-          <ArticleTitle>Article 2 — Commandes</ArticleTitle>
+          <ArticleTitle>Article 2 : Commandes</ArticleTitle>
           <ArticleText>
             Les commandes passées via l'application sont fermes et définitives dès
             confirmation par le Client. Elles sont transmises automatiquement au
@@ -91,7 +91,7 @@ export function CGVPage() {
         </Article>
 
         <Article>
-          <ArticleTitle>Article 3 — Prix et remises</ArticleTitle>
+          <ArticleTitle>Article 3 : Prix et remises</ArticleTitle>
           <ArticleText>
             Les prix affichés sont les prix publics conseillés hors taxes (HT).
             Les remises personnalisées accordées au Client s'appliquent automatiquement
@@ -105,7 +105,7 @@ export function CGVPage() {
         </Article>
 
         <Article>
-          <ArticleTitle>Article 4 — Livraison</ArticleTitle>
+          <ArticleTitle>Article 4 : Livraison</ArticleTitle>
           <ArticleText>
             Les délais de livraison habituels sont de 1 à 3 jours ouvrés à compter
             de la confirmation de commande, selon disponibilité en stock. Une date
@@ -118,7 +118,7 @@ export function CGVPage() {
         </Article>
 
         <Article>
-          <ArticleTitle>Article 5 — Retours</ArticleTitle>
+          <ArticleTitle>Article 5 : Retours</ArticleTitle>
           <ArticleText>
             Les retours de livres sont soumis aux conditions générales de retour en
             vigueur dans la profession. Ils doivent être signalés dans un délai de
@@ -128,7 +128,7 @@ export function CGVPage() {
         </Article>
 
         <Article>
-          <ArticleTitle>Article 6 — Protection des données</ArticleTitle>
+          <ArticleTitle>Article 6 : Protection des données</ArticleTitle>
           <ArticleText>
             Les données personnelles collectées (nom, email, code client, adresse)
             sont utilisées exclusivement dans le cadre de la relation commerciale.
@@ -139,7 +139,7 @@ export function CGVPage() {
         </Article>
 
         <Article>
-          <ArticleTitle>Article 7 — Droit applicable</ArticleTitle>
+          <ArticleTitle>Article 7 : Droit applicable</ArticleTitle>
           <ArticleText>
             Les présentes CGV sont régies par le droit français. Tout litige
             relatif à leur interprétation ou exécution sera soumis aux tribunaux

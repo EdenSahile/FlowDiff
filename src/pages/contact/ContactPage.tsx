@@ -213,7 +213,7 @@ export function ContactPage() {
 
   const [recipient, setRecipient] = useState<Recipient>('representant')
   const [sujet, setSujet] = useState(
-    fromBook ? `Renseignement — ${fromBook.title}` : ''
+    fromBook ? `Renseignement : ${fromBook.title}` : ''
   )
   const [message, setMessage] = useState(
     fromBook

@@ -1,4 +1,4 @@
-// DEV ONLY — remplacé par API Dilicom en production
+// DEV ONLY : remplacé par API Dilicom en production
 import type { EDIMessage } from '@/lib/ediUtils'
 
 export const MOCK_EDI_MESSAGES: EDIMessage[] = [
@@ -40,8 +40,8 @@ export const MOCK_EDI_MESSAGES: EDIMessage[] = [
       lines: [
         { lineNumber: 1, ean: '9782070360024', title: 'Le Voyageur des confins T.1',     qtyRequested: 3, qtyConfirmed: 3, status: 'ACCEPTED',    estimatedDelivery: '2026-04-29' },
         { lineNumber: 2, ean: '9782075017346', title: 'Kaguya-sama T.1',                 qtyRequested: 2, qtyConfirmed: 2, status: 'ACCEPTED',    estimatedDelivery: '2026-04-29' },
-        { lineNumber: 3, ean: '9782812919483', title: "Pâtisserie – L'ultime référence", qtyRequested: 1, qtyConfirmed: 0, status: 'BACKORDERED', backorderQty: 1, note: 'Rupture stock — sans date de réassort' },
-        { lineNumber: 4, ean: '9782344044285', title: 'Chainsaw Man T.12',               qtyRequested: 3, qtyConfirmed: 2, status: 'BACKORDERED', backorderQty: 1, estimatedDelivery: '2026-05-05', note: 'Stock partiel — 1 ex. en réassort semaine 19' },
+        { lineNumber: 3, ean: '9782812919483', title: "Pâtisserie – L'ultime référence", qtyRequested: 1, qtyConfirmed: 0, status: 'BACKORDERED', backorderQty: 1, note: 'Rupture stock : sans date de réassort' },
+        { lineNumber: 4, ean: '9782344044285', title: 'Chainsaw Man T.12',               qtyRequested: 3, qtyConfirmed: 2, status: 'BACKORDERED', backorderQty: 1, estimatedDelivery: '2026-05-05', note: 'Stock partiel : 1 ex. en réassort semaine 19' },
         { lineNumber: 5, ean: '9782756099736', title: 'One Piece T.105',                 qtyRequested: 1, qtyConfirmed: 1, status: 'ACCEPTED',    estimatedDelivery: '2026-04-29' },
       ],
     },
@@ -179,9 +179,9 @@ export const MOCK_EDI_MESSAGES: EDIMessage[] = [
         { lineNumber: 2, ean: '9782756099736', title: 'One Piece T.105',                      qtyRequested: 3, qtyConfirmed: 3, status: 'ACCEPTED',    estimatedDelivery: '2026-04-28' },
         { lineNumber: 3, ean: '9782344044285', title: 'Chainsaw Man T.12',                    qtyRequested: 2, qtyConfirmed: 2, status: 'ACCEPTED',    estimatedDelivery: '2026-04-28' },
         { lineNumber: 4, ean: '9782012101227', title: 'Tintin : Les Bijoux de la Castafiore', qtyRequested: 2, qtyConfirmed: 2, status: 'ACCEPTED',    estimatedDelivery: '2026-04-28' },
-        { lineNumber: 5, ean: '9782072970962', title: 'Astérix T.38',                         qtyRequested: 3, qtyConfirmed: 2, status: 'BACKORDERED', backorderQty: 1, estimatedDelivery: '2026-05-10', note: 'Stock partiel — 1 ex. en réassort semaine 19' },
+        { lineNumber: 5, ean: '9782072970962', title: 'Astérix T.38',                         qtyRequested: 3, qtyConfirmed: 2, status: 'BACKORDERED', backorderQty: 1, estimatedDelivery: '2026-05-10', note: 'Stock partiel : 1 ex. en réassort semaine 19' },
         { lineNumber: 6, ean: '9782070360628', title: 'Les Misérables T.1',                   qtyRequested: 1, qtyConfirmed: 1, status: 'ACCEPTED',    estimatedDelivery: '2026-04-28' },
-        { lineNumber: 7, ean: '9782221257906', title: 'Dune',                                 qtyRequested: 2, qtyConfirmed: 0, status: 'BACKORDERED', backorderQty: 2, estimatedDelivery: '2026-05-15', note: 'Rupture totale — réassort prévu semaine 20' },
+        { lineNumber: 7, ean: '9782221257906', title: 'Dune',                                 qtyRequested: 2, qtyConfirmed: 0, status: 'BACKORDERED', backorderQty: 2, estimatedDelivery: '2026-05-15', note: 'Rupture totale : réassort prévu semaine 20' },
       ],
     },
   },
@@ -366,7 +366,7 @@ export const MOCK_EDI_MESSAGES: EDIMessage[] = [
       orderResponseId: 'ACK-2026-0426-003',
       responseDate: '2026-04-26T18:05:00Z',
       globalStatus: 'REJECTED',
-      rejectionReason: 'Compte librairie suspendu — encours dépassé',
+      rejectionReason: 'Compte librairie suspendu : encours dépassé',
       lines: [
         { lineNumber: 1, ean: '9782070360024', title: 'Le Voyageur des confins T.1', qtyRequested: 6, qtyConfirmed: 0, status: 'REJECTED', note: 'Encours client dépassé' },
         { lineNumber: 2, ean: '9782075017346', title: 'Kaguya-sama T.1',             qtyRequested: 4, qtyConfirmed: 0, status: 'REJECTED', note: 'Encours client dépassé' },
@@ -405,8 +405,8 @@ export const MOCK_EDI_MESSAGES: EDIMessage[] = [
       responseDate: '2026-04-27T08:30:00Z',
       globalStatus: 'PARTIAL',
       lines: [
-        { lineNumber: 1, ean: '9781234567890', title: "L'Été des sirènes", qtyRequested: 10, qtyConfirmed: 8,  status: 'BACKORDERED', backorderQty: 2, estimatedDelivery: '2026-04-30', note: 'Stock partiel — 2 ex. en réassort semaine 19' },
-        { lineNumber: 2, ean: '9781234567891', title: 'Dragon Ball Z T.3', qtyRequested: 15, qtyConfirmed: 13, status: 'BACKORDERED', backorderQty: 2, estimatedDelivery: '2026-05-07', note: 'Rupture partielle — 2 ex. en réassort semaine 19' },
+        { lineNumber: 1, ean: '9781234567890', title: "L'Été des sirènes", qtyRequested: 10, qtyConfirmed: 8,  status: 'BACKORDERED', backorderQty: 2, estimatedDelivery: '2026-04-30', note: 'Stock partiel : 2 ex. en réassort semaine 19' },
+        { lineNumber: 2, ean: '9781234567891', title: 'Dragon Ball Z T.3', qtyRequested: 15, qtyConfirmed: 13, status: 'BACKORDERED', backorderQty: 2, estimatedDelivery: '2026-05-07', note: 'Rupture partielle : 2 ex. en réassort semaine 19' },
       ],
     },
   },
@@ -484,7 +484,7 @@ export const MOCK_EDI_MESSAGES: EDIMessage[] = [
     status: 'ERROR',
     documentRef: 'ERR-2026-0508-001',
     diffuseur: 'Diffuseur 2',
-    detail: 'Erreur de format — champ GLN manquant',
+    detail: 'Erreur de format : champ GLN manquant',
     createdAt: '2026-05-08T14:22:00.000Z',
     payload: { errorCode: 'MISSING_GLN', orderId: 'CMD0000012' },
   },

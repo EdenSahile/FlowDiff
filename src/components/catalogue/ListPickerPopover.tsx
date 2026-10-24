@@ -290,7 +290,7 @@ export function ListPickerPopover({ book, anchorRect, onClose }: Props) {
 
       <ListsArea>
         {lists.length === 0 ? (
-          <EmptyMsg>Aucune liste — créez-en une ci-dessous</EmptyMsg>
+          <EmptyMsg>Aucune liste, créez-en une ci-dessous</EmptyMsg>
         ) : (
           lists.map(list => {
             const checked = isInList(list.id, book.id)

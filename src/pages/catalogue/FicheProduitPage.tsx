@@ -1514,7 +1514,7 @@ export function FicheProduitPage() {
     if (index === 1) {
       return (
         <PdfPage>
-          <InteriorPageNum>— PAGE 1 —</InteriorPageNum>
+          <InteriorPageNum>PAGE 1</InteriorPageNum>
           <InteriorChapter>Chapitre I</InteriorChapter>
           <InteriorParagraph><InteriorDrop>L</InteriorDrop>{LOREM_LONG}</InteriorParagraph>
           <InteriorParagraph>{LOREM_P2}</InteriorParagraph>
@@ -1523,7 +1523,7 @@ export function FicheProduitPage() {
     }
     return (
       <PdfPage>
-        <InteriorPageNum>— PAGE 2 —</InteriorPageNum>
+        <InteriorPageNum>PAGE 2</InteriorPageNum>
         <InteriorChapter>Chapitre I (suite)</InteriorChapter>
         <InteriorParagraph>{LOREM_P2}</InteriorParagraph>
         <InteriorParagraph>{LOREM_LONG}</InteriorParagraph>
@@ -1954,7 +1954,7 @@ export function FicheProduitPage() {
       )}
 
       {/* ══════════════════════════════════════════════════════
-          MODAL — PAGES INTÉRIEURES
+          MODAL : PAGES INTÉRIEURES
       ══════════════════════════════════════════════════════ */}
       {pagesOpen && createPortal(
         <ModalOverlay onClick={() => setPagesOpen(false)}>
@@ -1989,7 +1989,7 @@ export function FicheProduitPage() {
       )}
 
       {/* ══════════════════════════════════════════════════════
-          MODAL — BANDE ANNONCE
+          MODAL : BANDE ANNONCE
       ══════════════════════════════════════════════════════ */}
       {videoOpen && createPortal(
         <ModalOverlay onClick={() => setVideoOpen(false)}>
@@ -2005,10 +2005,10 @@ export function FicheProduitPage() {
                   <YtLabel>Exemple fictif</YtLabel>
                 </YtBrand>
                 <PlayBtn className="play-btn" />
-                <VideoThumbnailText>{book.title} — Bande annonce officielle</VideoThumbnailText>
+                <VideoThumbnailText>{book.title} : Bande annonce officielle</VideoThumbnailText>
               </VideoThumb>
               <VideoInfo>
-                <VideoTitle>{book.title} — Bande annonce</VideoTitle>
+                <VideoTitle>{book.title} : Bande annonce</VideoTitle>
                 <VideoUrlRow>
                   <span style={{ fontSize: 14, flexShrink: 0 }}>🔗</span>
                   <VideoUrl>{fakeYtUrl}</VideoUrl>

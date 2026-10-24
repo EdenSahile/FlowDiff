@@ -394,7 +394,7 @@ export function MonComptePage() {
                 <line x1="3" y1="10" x2="21" y2="10"/>
               </svg>
             </PolicyTileIcon>
-            <PolicyTileLabel>Notés — titres à paraître</PolicyTileLabel>
+            <PolicyTileLabel>Notés : titres à paraître</PolicyTileLabel>
             <PolicyTileValue>Conservés indéfiniment</PolicyTileValue>
             <PolicyTileDesc>
               Les titres à paraître ajoutés au panier sont enregistrés en noté jusqu'à leur mise en disponibilité.
@@ -408,7 +408,7 @@ export function MonComptePage() {
                 <polyline points="12 6 12 12 16 14"/>
               </svg>
             </PolicyTileIcon>
-            <PolicyTileLabel>Reliquats — titres en réassort</PolicyTileLabel>
+            <PolicyTileLabel>Reliquats : titres en réassort</PolicyTileLabel>
             <PolicyTileValue>3 mois (fin de mois)</PolicyTileValue>
             <PolicyTileDesc>
               Les reliquats sont conservés 3 mois et expédiés avec votre prochaine commande.

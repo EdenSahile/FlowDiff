@@ -90,7 +90,7 @@ beforeEach(() => {
    FLOW-RM-027 : titre épuisé = bouton désactivé
 ══════════════════════════════════════════════════════ */
 
-describe('BookCard — titre épuisé (FLOW-RM-027)', () => {
+describe('BookCard : titre épuisé (FLOW-RM-027)', () => {
   it('affiche le bouton "Épuisé" désactivé pour un livre épuisé', () => {
     const epuiseBook = makeBook({ id: 'epuise-01', statut: 'epuise' })
 
@@ -124,7 +124,7 @@ describe('BookCard — titre épuisé (FLOW-RM-027)', () => {
    mène au titre commandable, celui que le libraire cherche
 ══════════════════════════════════════════════════════ */
 
-describe('BookCard — édition remplacée', () => {
+describe('BookCard : édition remplacée', () => {
   it('remplace le bouton désactivé par un lien vers la nouvelle édition', () => {
     const remplacee = makeBook({ id: 'ed-2021', statut: 'epuise', replacedById: 'ed-2024' })
 
@@ -165,7 +165,7 @@ describe('BookCard — édition remplacée', () => {
    FLOW-RM-028 : BookCard permet l'ajout d'un titre à paraître
 ══════════════════════════════════════════════════════ */
 
-describe('BookCard — titre à paraître (FLOW-RM-028)', () => {
+describe('BookCard : titre à paraître (FLOW-RM-028)', () => {
   it('le bouton d\'ajout est actif pour un titre à paraître', () => {
     const aParaitreBook = makeBook({
       id: 'ap-01',
@@ -197,7 +197,7 @@ describe('BookCard — titre à paraître (FLOW-RM-028)', () => {
    FLOW-RM-030 : modale de confirmation pour sur_commande/en_reimp
 ══════════════════════════════════════════════════════ */
 
-describe('BookCard — modale stock alert (FLOW-RM-030)', () => {
+describe('BookCard : modale stock alert (FLOW-RM-030)', () => {
   it('cliquer sur ajout d\'un livre sur_commande ouvre la modale de confirmation', () => {
     const surCommandeBook = makeBook({
       id: 'sc-01',

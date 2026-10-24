@@ -100,7 +100,7 @@ type DemoOrderSeed = Omit<DashboardOrder, 'id' | 'orderId' | 'date' | 'reference
 }
 
 const DEMO_ORDER_SEEDS: DemoOrderSeed[] = [
-  // 7 derniers jours — comparaison immédiatement lisible.
+  // 7 derniers jours : comparaison immédiatement lisible.
   { daysAgo: 0,   montantTTC: 42.00, nbExemplaires: 3, publisher: 'Gallimard',          universe: 'Littérature',     cancelled: false, deliveryDays: 2 },
   { daysAgo: 3,   montantTTC: 31.50, nbExemplaires: 2, publisher: 'Dargaud',            universe: 'BD/Mangas',       cancelled: false, deliveryDays: 1 },
   { daysAgo: 6,   montantTTC: 18.90, nbExemplaires: 1, publisher: 'Bayard',             universe: 'Jeunesse',        cancelled: true,  deliveryDays: 0 },

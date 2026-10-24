@@ -12,7 +12,7 @@ export const storedCartSchema = z.object({
   opGroups: z.array(z.unknown()).default([]),
 })
 
-/* ── StoredOrders (extras localStorage seulement — pas les mocks) ── */
+/* ── StoredOrders (extras localStorage seulement : pas les mocks) ── */
 
 const storedOrderSchema = z.object({
   id:               z.string(),

@@ -146,7 +146,7 @@ export function AuteurPage() {
     return null
   }, [auteurSlug])
 
-  /* Livres de cet auteur — triés du plus récent au plus ancien */
+  /* Livres de cet auteur : triés du plus récent au plus ancien */
   const books = useMemo(() => {
     if (!authorName) return []
     return getCatalogueBooks()

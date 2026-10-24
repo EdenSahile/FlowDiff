@@ -39,7 +39,7 @@ export function buildNotifications(totalItems: number): Notification[] {
   const now = new Date()
   const notifs: Notification[] = []
 
-  /* Panier en attente — en premier (urgence) */
+  /* Panier en attente : en premier (urgence) */
   if (totalItems > 0) {
     notifs.push({
       id: 'panier',
@@ -51,7 +51,7 @@ export function buildNotifications(totalItems: number): Notification[] {
     })
   }
 
-  /* Nouveautés — livres de type nouveaute publiés dans les 60 derniers jours */
+  /* Nouveautés : livres de type nouveaute publiés dans les 60 derniers jours */
   const recentNouveautes = getCatalogueBooks().filter(b =>
     b.type === 'nouveaute' &&
     new Date(b.publicationDate) <= now &&
@@ -72,7 +72,7 @@ export function buildNotifications(totalItems: number): Notification[] {
     })
   }
 
-  /* Top Ventes — mock statique */
+  /* Top Ventes : mock statique */
   notifs.push({
     id: 'topventes',
     emoji: '🏆',

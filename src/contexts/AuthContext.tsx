@@ -154,7 +154,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return { success: false, error: 'Un compte existe déjà pour ce code client.' }
     }
 
-    // Créer le compte (session uniquement — remplacé par Prisma en Phase 12)
+    // Créer le compte (session uniquement : remplacé par Prisma en Phase 12)
     const base = MOCK_USERS.find((u) => u.codeClient === codeClient)!
     try {
       const { default: bcrypt } = await import('bcryptjs')

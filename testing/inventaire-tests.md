@@ -1,4 +1,4 @@
-# Inventaire des tests — FlowDiff
+# Inventaire des tests : FlowDiff
 
 État réel de la couverture de test, module par module, tel que le code se présente aujourd'hui (pas un plan pour du code à venir).
 
