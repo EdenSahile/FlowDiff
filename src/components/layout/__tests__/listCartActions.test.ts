@@ -108,7 +108,7 @@ describe('isInCart', () => {
 
   it('reconnaît un titre commandé en ebook, dont la ligne de panier porte une clé distincte', () => {
     const cartWithEbookLine = [makeCartItem(fonds, {
-      ebookOption: { hebergeur: 'Numilog', format: 'EPUB', price: 9.99, isbnEbook: '9780000000009' },
+      ebookOption: { format: 'EPUB', priceTTC: 9.99, isbn: '9780000000009' },
     })]
 
     expect(isInCart(cartWithEbookLine, fonds.id)).toBe(true)

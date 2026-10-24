@@ -13,12 +13,12 @@ import { StockAlertModal } from '@/components/ui/StockAlertModal'
 import { slugifyAuthor } from '@/lib/slugify'
 import { theme } from '@/lib/theme'
 import { formatPrice } from '@/lib/format'
-import { getPurchaseAvailability } from '@/lib/bookUtils'
+import { getPurchaseAvailability, getEbookLabel } from '@/lib/bookUtils'
 import { mq } from '@/lib/responsive'
 import { useRefetchOnFocus } from '@/hooks/useRefetchOnFocus'
 
 /* ── Formats physiques ── */
-type FormatId = 'broche' | 'poche'
+type FormatId = 'broche' | 'poche' | 'ebook'
 
 interface PhysicalFormat {
   id: FormatId
@@ -1296,6 +1296,17 @@ export function FicheProduitPage() {
   const formats: PhysicalFormat[] = [
     { id: 'broche', label: 'Broché', description: 'Format standard', priceTTC: book.priceTTC,                                      dimensions: book.format },
     { id: 'poche',  label: 'Poche',  description: 'Format poche',    priceTTC: Math.round(book.priceTTC * 0.62 * 100) / 100, dimensions: '108 x 177 mm' },
+    // L'ebook n'apparaît que si le titre en propose un, contrairement aux
+    // formats papier qui sont toujours affichés.
+    ...(book.ebook
+      ? [{
+          id: 'ebook' as const,
+          label: getEbookLabel(book.ebook.format),
+          description: 'Version numérique',
+          priceTTC: book.ebook.priceTTC,
+          dimensions: `ISBN ${book.ebook.isbn}`,
+        }]
+      : []),
   ]
 
   const selectedFormat = formats.find(f => f.id === formatId)!
@@ -1306,6 +1317,15 @@ export function FicheProduitPage() {
   }).format(new Date(`${book.publicationDate}T00:00:00Z`))
 
   const performAdd = (enReliquat: boolean) => {
+    // Un ebook entre au panier comme sa propre ligne, avec son ISBN et son
+    // prix : c'est une reference distincte du papier, pas une remise dessus.
+    if (formatId === 'ebook' && book.ebook) {
+      addToCart(book, qty, { enReliquat, ebookOption: book.ebook })
+      showToast(`${getEbookLabel(book.ebook.format)} ajouté au panier`)
+      setAdded(true)
+      setTimeout(() => setAdded(false), 2000)
+      return
+    }
     const ratio = selectedFormat.priceTTC / book.priceTTC
     addToCart({
       ...book,

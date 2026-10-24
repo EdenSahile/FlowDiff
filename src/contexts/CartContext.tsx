@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
-import type { Book, StockStatut, Universe } from '@/data/mockBooks'
+import type { Book, StockStatut, Universe, EbookOffer } from '@/data/mockBooks'
 import { useAuthContext } from '@/contexts/AuthContext'
 import { useToast } from '@/contexts/ToastContext'
 import { storedCartSchema } from '@/lib/storageSchemas'
@@ -26,12 +26,12 @@ export const REMISE_RATES: Record<Universe, number> = {
 }
 
 /* ── Types ── */
-export interface EbookCartOption {
-  hebergeur: string
-  format: string
-  price: number
-  isbnEbook: string
-}
+/*
+  La ligne de panier reprend telle quelle l'offre du catalogue : meme ISBN,
+  meme format, meme prix. L'ancien type portait en plus un hebergeur et une
+  grille de droits, abandonnes avec le composant qui les affichait.
+*/
+export type EbookCartOption = EbookOffer
 
 export interface CartItem {
   book: Book
@@ -66,7 +66,7 @@ export interface OPCartGroup {
 }
 
 export function getItemKey(item: CartItem): string {
-  return item.ebookOption ? `${item.book.id}::${item.ebookOption.isbnEbook}` : item.book.id
+  return item.ebookOption ? `${item.book.id}::${item.ebookOption.isbn}` : item.book.id
 }
 
 export interface AddToCartOptions {
@@ -266,15 +266,15 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         }
         return prev
       }
-      const itemKey = ebookOption ? `${book.id}::${ebookOption.isbnEbook}` : book.id
+      const itemKey = ebookOption ? `${book.id}::${ebookOption.isbn}` : book.id
       const existing = prev.items.find(i =>
         ebookOption
-          ? i.book.id === book.id && i.ebookOption?.isbnEbook === ebookOption.isbnEbook
+          ? i.book.id === book.id && i.ebookOption?.isbn === ebookOption.isbn
           : i.book.id === book.id && !i.ebookOption
       )
       const newItems = existing
         ? prev.items.map(i => {
-            const iKey = i.ebookOption ? `${i.book.id}::${i.ebookOption.isbnEbook}` : i.book.id
+            const iKey = i.ebookOption ? `${i.book.id}::${i.ebookOption.isbn}` : i.book.id
             return iKey === itemKey ? { ...i, quantity: i.quantity + qty } : i
           })
         : [...prev.items, {

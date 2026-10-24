@@ -136,7 +136,7 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
       statut,
       enReliquat,
       referenceLigne: params.referencesParLigne
-        ? (params.referencesParLigne[ebookOption ? `${book.id}::${ebookOption.isbnEbook}` : book.id]?.trim() || undefined)
+        ? (params.referencesParLigne[ebookOption ? `${book.id}::${ebookOption.isbn}` : book.id]?.trim() || undefined)
         : undefined,
     }))
 

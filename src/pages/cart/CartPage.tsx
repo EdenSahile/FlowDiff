@@ -170,19 +170,6 @@ const EbookFormatBadge = styled.span`
   margin-bottom: 3px;
 `
 
-const EbookPlatformTag = styled.span<{ $color: string }>`
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  font-size: 10px;
-  font-weight: 600;
-  color: ${({ $color }) => $color};
-  background: ${({ $color }) => $color}18;
-  border: 1px solid ${({ $color }) => $color}35;
-  border-radius: ${({ theme }) => theme.radii.xl};
-  padding: 2px 8px;
-  margin-left: 6px;
-`
 
 const ItemInfo = styled.div`flex: 1; min-width: 0;`
 
@@ -1525,16 +1512,8 @@ export function CartPage() {
             const { book, quantity, ebookOption } = item
             const key       = getItemKey(item)
             const isEbook   = !!ebookOption
-            const unitPrice = isEbook ? ebookOption!.price : book.priceTTC
+            const unitPrice = isEbook ? ebookOption!.priceTTC : book.priceTTC
             const remise    = getUserRate(book.universe)
-
-            const platformColor =
-              ebookOption?.hebergeur === 'OpenEdition' ? '#D4500A' :
-              ebookOption?.hebergeur === 'Cairn'       ? '#1A5E8A' :
-              ebookOption?.hebergeur === 'Izneo'       ? '#6B3FA0' :
-              ebookOption?.hebergeur === 'Numilog'     ? '#2D7A3A' : '#555'
-
-            const showPlatformTag = isEbook && ebookOption!.hebergeur !== 'Amalivre'
 
             return (
               <ItemCard key={key} $ebook={isEbook}>
@@ -1545,11 +1524,6 @@ export function CartPage() {
                       <EbookFormatBadge>
                         <IconScreen /> EBOOK · {ebookOption!.format}
                       </EbookFormatBadge>
-                      {showPlatformTag && (
-                        <EbookPlatformTag $color={platformColor}>
-                          {ebookOption!.hebergeur}
-                        </EbookPlatformTag>
-                      )}
                     </div>
                   )}
                   <ItemTitle>{book.title}</ItemTitle>
@@ -1563,7 +1537,7 @@ export function CartPage() {
                     </ItemStatutLine>
                   ) : null}
                   <ItemAuthor>{book.authors.join(', ')} — {book.publisher}</ItemAuthor>
-                  <ItemIsbn>ISBN {isEbook ? ebookOption!.isbnEbook : book.isbn} · {isEbook ? ebookOption!.format : book.format}</ItemIsbn>
+                  <ItemIsbn>ISBN {isEbook ? ebookOption!.isbn : book.isbn} · {isEbook ? ebookOption!.format : book.format}</ItemIsbn>
                   <ItemFooter>
                     <div>
                       <PriceStrip>
