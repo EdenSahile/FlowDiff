@@ -518,5 +518,27 @@
     "universe": "Adulte-pratique",
     "type": "fonds",
     "query": "Larousse cuisine"
+  },
+  {
+    "isbn": "9782370731258",
+    "title": "L'Arabe du futur T.4 — Une jeunesse au Moyen-Orient (1987-1992)",
+    "authors": [
+      "Riad Sattouf"
+    ],
+    "cover": "https://images.epagine.fr/258/9782370731258_1_75.jpg",
+    "universe": "BD/Mangas",
+    "type": "fonds",
+    "query": "L'Arabe du futur 4 Riad Sattouf"
+  },
+  {
+    "isbn": "9782370730848",
+    "title": "Les Cahiers d'Esther T.1 — Histoires de mes 10 ans",
+    "authors": [
+      "Riad Sattouf"
+    ],
+    "cover": "https://images.epagine.fr/848/9782370730848_1_75.jpg",
+    "universe": "BD/Mangas",
+    "type": "fonds",
+    "query": "Les Cahiers d'Esther 1 Riad Sattouf"
   }
 ]

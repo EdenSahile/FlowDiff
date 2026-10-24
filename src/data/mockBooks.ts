@@ -134,7 +134,7 @@ const _RAW_MOCK_BOOKS: Book[] = [
     price: 14.60, priceTTC: 21.90, format: '155 x 235 mm', pages: 320,
     publicationDate: '2025-01-15',
     description: "Chroniques rassemblées de l'auteur du Prix Goncourt 2024. Kamel Daoud livre un regard lucide et acéré sur le monde contemporain, entre Orient et Occident, sur dix ans d'écriture.",
-    ebook: { isbn: '9782258990011', format: 'PDF+EPUB', priceTTC: 15.99 },
+    ebook: { isbn: '9789990030011', format: 'PDF+EPUB', priceTTC: 15.99 },
   },
   {
     id: 'n-lit-02',
@@ -150,7 +150,7 @@ const _RAW_MOCK_BOOKS: Book[] = [
   },
   {
     id: 'n-lit-03',
-    isbn: '9782226476265',
+    isbn: '9789990010061',
     title: 'La Fille sans visage',
     authors: ['Amélie Nothomb'],
     publisher: 'Albin Michel',
@@ -159,6 +159,7 @@ const _RAW_MOCK_BOOKS: Book[] = [
     price: 13.20, priceTTC: 19.90, format: '155 x 235 mm', pages: 192,
     publicationDate: '2024-08-21',
     description: "Amélie Nothomb explore l'identité et le corps à travers une femme effacée qui cherche à exister. Étrange et envoûtant comme toujours.",
+    fictif: true,
   },
 
   /* ── BD/Mangas ── */
@@ -219,7 +220,7 @@ const _RAW_MOCK_BOOKS: Book[] = [
   /* ── Adulte-pratique ── */
   {
     id: 'n-pra-01',
-    isbn: '9782501172097',
+    isbn: '9789990010072',
     title: 'Le Guide Marabout du bien-être mental',
     authors: ['Dr Sarah Rayner'],
     publisher: 'Marabout',
@@ -228,7 +229,7 @@ const _RAW_MOCK_BOOKS: Book[] = [
     price: 10.00, priceTTC: 14.90, format: '155 x 235 mm', pages: 256,
     publicationDate: '2022-09-14',
     description: "Un guide pratique et bienveillant pour comprendre et améliorer sa santé mentale au quotidien. Exercices, conseils et outils pour retrouver l'équilibre.",
-    ebook: { isbn: '9782501990022', format: 'PDF', priceTTC: 9.99 },
+    fictif: true,
   },
   {
     id: 'n-pra-02',
@@ -242,6 +243,7 @@ const _RAW_MOCK_BOOKS: Book[] = [
     publicationDate: '2017-01-04',
     description: "L'ikigaï est la raison de se lever le matin. Ce livre explore le secret de la longévité et du bonheur des habitants d'Okinawa.",
     topVente: true,
+    ebook: { isbn: '9789990030022', format: 'PDF', priceTTC: 9.99 },
   },
 
   /* ══════════════════════════════════════════════════════
@@ -397,7 +399,7 @@ const _RAW_MOCK_BOOKS: Book[] = [
     publicationDate: '2018-08-22',
     description: "Prix Goncourt 2018. L'été 1992 dans une vallée lorraine sinistrée. Quatre adolescents, leurs familles et une décennie de mutations sociales. Un roman générationnel puissant.",
     topVente: true,
-    ebook: { isbn: '9782330990033', format: 'EPUB', priceTTC: 12.99 },
+    ebook: { isbn: '9789990030033', format: 'EPUB', priceTTC: 12.99 },
   },
   {
     id: 'f-lit-colombani',
@@ -619,7 +621,7 @@ const _RAW_MOCK_BOOKS: Book[] = [
   /* ── L'Arabe du futur ── */
   {
     id: 'f-bd-arabe-04',
-    isbn: '9782370733498',
+    isbn: '9782370731258',
     title: "L'Arabe du futur T.4 — Une jeunesse au Moyen-Orient (1987-1992)",
     authors: ['Riad Sattouf'],
     publisher: 'Allary Éditions',
@@ -634,7 +636,7 @@ const _RAW_MOCK_BOOKS: Book[] = [
   /* ── Les Cahiers d'Esther ── */
   {
     id: 'f-bd-esther-01',
-    isbn: '9782370733047',
+    isbn: '9782370730848',
     title: "Les Cahiers d'Esther T.1 — Histoires de mes 10 ans",
     authors: ['Riad Sattouf'],
     publisher: 'Allary Éditions',
@@ -869,7 +871,7 @@ const ROTATING_FUTURE_TEMPLATES: Omit<Book, 'publicationDate' | 'type'>[] = [
     programme: 'Programme printemps', fictif: true,
   },
   {
-    id: 'rolling-ap-jes-01', isbn: '9789990002003',
+    id: 'rolling-ap-jes-01', isbn: '9789990002004',
     title: 'Le Secret du phare bleu', authors: ['Maëlle Rose'],
     publisher: 'Les Petites Étoiles', universe: 'Jeunesse',
     genre: 'Aventure', language: 'Français',
@@ -878,7 +880,7 @@ const ROTATING_FUTURE_TEMPLATES: Omit<Book, 'publicationDate' | 'type'>[] = [
     programme: 'Programme été', fictif: true,
   },
   {
-    id: 'rolling-ap-pra-01', isbn: '9789990002004',
+    id: 'rolling-ap-pra-01', isbn: '9789990002006',
     title: 'Cuisiner les saisons à 2', authors: ['Léa Fournier'],
     publisher: 'Atelier du Goût', universe: 'Adulte-pratique',
     genre: 'Cuisine & Gastronomie', language: 'Français',
