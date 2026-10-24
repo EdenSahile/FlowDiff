@@ -1,0 +1,9 @@
+# Git identifie un auteur par son adresse, pas par son nom : 3 configurations
+# successives de la meme personne en faisaient 3 contributeurs distincts, ce
+# qui cassait le filtrage de git blame et faussait les statistiques.
+#
+# Format : Nom canonique <adresse canonique> <adresse rencontree dans l'historique>
+# Aucun commit n'est reecrit, Git applique la correspondance a la lecture.
+
+Eden Sahilé <78043748+EdenSahile@users.noreply.github.com> <edensahile28@gmail.com>
+Eden Sahilé <78043748+EdenSahile@users.noreply.github.com> <EdenSahile@users.noreply.github.com>
