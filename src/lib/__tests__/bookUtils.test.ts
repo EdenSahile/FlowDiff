@@ -1,7 +1,10 @@
 import { describe, it, expect } from 'vitest'
 import { MOCK_BOOKS, EBOOK_FORMATS } from '@/data/mockBooks'
 import type { BookType, Universe, StockStatut } from '@/data/mockBooks'
-import { getPurchaseAvailability, getTypeCommande, getEbookLabel, hasExactIsbn, matchesIsbn, matchesFormat } from '@/lib/bookUtils'
+import {
+  getPurchaseAvailability, getTypeCommande, getEbookLabel, hasExactIsbn, matchesIsbn, matchesFormat,
+  getReplacementEdition, getReplacedEdition, getOtherEditions,
+} from '@/lib/bookUtils'
 
 describe('getPurchaseAvailability', () => {
   it('autorise l’ajout direct d’un titre à paraître par son unique bouton', () => {
@@ -261,5 +264,66 @@ describe('matchesFormat', () => {
 
   it('refuse un titre dont les dimensions sont inconnues', () => {
     expect(matchesFormat({ format: '999 x 999 mm' }, ['Poche'])).toBe(false)
+  })
+})
+
+/* ══════════════════════════════════════════════════════
+   Filiation d'une référence : une édition épuisée est
+   remplacée par une autre, qui porte un ISBN neuf
+══════════════════════════════════════════════════════ */
+
+describe('éditions remplacées', () => {
+  const ancienne = { id: 'ed-2021', workId: 'w-1', replacedById: 'ed-2024' }
+  const nouvelle = { id: 'ed-2024', workId: 'w-1' }
+  const broche   = { id: 'ed-broche', workId: 'w-1' }
+  const autreOeuvre = { id: 'ed-autre', workId: 'w-2' }
+  const catalogue = [ancienne, nouvelle, broche, autreOeuvre]
+
+  it('donne l\'édition qui remplace celle-ci', () => {
+    expect(getReplacementEdition(ancienne, catalogue)).toBe(nouvelle)
+  })
+
+  it('ne donne rien pour une édition qui n\'est pas remplacée', () => {
+    expect(getReplacementEdition(nouvelle, catalogue)).toBe(null)
+  })
+
+  it('retrouve l\'édition précédente sans qu\'elle soit déclarée sur le remplaçant', () => {
+    expect(getReplacedEdition(nouvelle, catalogue)).toBe(ancienne)
+  })
+
+  it('ne donne rien quand aucune édition ne désigne celle-ci', () => {
+    expect(getReplacedEdition(broche, catalogue)).toBe(null)
+  })
+
+  it('ne donne rien si le remplaçant déclaré est absent du catalogue', () => {
+    const orpheline = { id: 'ed-x', replacedById: 'ed-inexistante' }
+
+    expect(getReplacementEdition(orpheline, catalogue)).toBe(null)
+  })
+})
+
+describe('getOtherEditions', () => {
+  const ancienne = { id: 'ed-2021', workId: 'w-1', replacedById: 'ed-2024' }
+  const nouvelle = { id: 'ed-2024', workId: 'w-1' }
+  const broche   = { id: 'ed-broche', workId: 'w-1' }
+  const autreOeuvre = { id: 'ed-autre', workId: 'w-2' }
+  const catalogue = [ancienne, nouvelle, broche, autreOeuvre]
+
+  it('liste les éditions de la même œuvre, sauf elle-même', () => {
+    expect(getOtherEditions(broche, catalogue)).toEqual([nouvelle])
+  })
+
+  /* Une édition remplacée n'est plus la référence courante : elle ne
+     s'offre pas au choix, et reste atteignable depuis son remplaçant. */
+  it('écarte les éditions remplacées', () => {
+    expect(getOtherEditions(nouvelle, catalogue)).toEqual([broche])
+  })
+
+  it('écarte le remplaçant de la liste de l\'édition remplacée', () => {
+    expect(getOtherEditions(ancienne, catalogue)).toEqual([broche])
+  })
+
+  it('ne retient aucune édition pour un titre sans œuvre déclarée', () => {
+    expect(getOtherEditions({ id: 'seul' }, catalogue)).toEqual([])
   })
 })

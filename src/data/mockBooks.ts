@@ -66,6 +66,13 @@ export interface Book {
     porte sur sa propre ligne. Ce champ est le seul lien entre les deux.
   */
   workId?: string
+  /*
+    Identifiant de l'edition qui remplace celle-ci, quand elle est epuisee.
+    Une edition epuisee est le plus souvent remplacee par une autre, qui porte
+    un ISBN neuf. Le lien inverse n'est pas stocke : il se deduit en parcourant
+    le catalogue, comme pour workId, pour n'avoir qu'une source de verite.
+  */
+  replacedById?: string
 }
 
 /* ── Genres par univers ── */
@@ -164,16 +171,15 @@ const _RAW_MOCK_BOOKS: Book[] = [
   },
   {
     id: 'n-lit-03',
-    isbn: '9789990010061',
-    title: 'La Fille sans visage',
+    isbn: '9782226495945',
+    title: "L'Impossible retour",
     authors: ['Amélie Nothomb'],
     publisher: 'Albin Michel',
     universe: 'Littérature', type: 'nouveaute',
     genre: 'Roman contemporain', language: 'Français',
-    price: 13.20, priceTTC: 19.90, format: '155 x 235 mm', pages: 192,
+    price: 12.54, priceTTC: 18.90, format: '155 x 235 mm', pages: 157,
     publicationDate: '2024-08-21',
-    description: "Amélie Nothomb explore l'identité et le corps à travers une femme effacée qui cherche à exister. Étrange et envoûtant comme toujours.",
-    fictif: true,
+    description: "Amélie Nothomb retourne au Japon avec son amie photographe Pep Williams. Un récit de voyage mélancolique sur le pays de son enfance, qu'on ne retrouve jamais tout à fait.",
   },
 
   /* ── BD/Mangas ── */
@@ -442,6 +448,20 @@ const _RAW_MOCK_BOOKS: Book[] = [
     publicationDate: '2017-05-03',
     description: "Trois femmes, trois continents, trois destins qui s'entrelacent : une Indienne intouchable, une Sicilienne et une avocate canadienne. Un roman sur la force des femmes.",
     topVente: true, selection: true,
+    workId: 'w-colombani-tresse',
+  },
+  {
+    id: 'f-lit-colombani-poche',
+    isbn: '9782253906568',
+    title: 'La Tresse',
+    authors: ['Laetitia Colombani'],
+    publisher: 'Le Livre de Poche',
+    universe: 'Littérature', type: 'fonds',
+    genre: 'Roman contemporain', language: 'Français',
+    price: 5.97, priceTTC: 8.90, format: '115 x 175 mm', pages: 237,
+    publicationDate: '2018-05-30',
+    description: "Trois femmes, trois continents, trois destins qui s'entrelacent : une Indienne intouchable, une Sicilienne et une avocate canadienne. Un roman sur la force des femmes.",
+    workId: 'w-colombani-tresse',
   },
   {
     id: 'f-lit-vuillard',
@@ -454,6 +474,40 @@ const _RAW_MOCK_BOOKS: Book[] = [
     price: 10.00, priceTTC: 14.90, format: '145 x 215 mm', pages: 160,
     publicationDate: '2017-08-23',
     description: "Prix Goncourt 2017. Le récit de la montée du nazisme à travers le prisme des industriels et des hommes politiques qui ont facilité l'accession de Hitler au pouvoir.",
+    workId: 'w-vuillard-ordre',
+  },
+  {
+    id: 'f-lit-vuillard-babel',
+    isbn: '9782330153045',
+    title: "L'Ordre du jour",
+    authors: ['Eric Vuillard'],
+    publisher: 'Actes Sud',
+    collection: 'Babel',
+    universe: 'Littérature', type: 'fonds',
+    genre: 'Roman historique', language: 'Français',
+    price: 4.90, priceTTC: 7.30, format: '115 x 175 mm', pages: 149,
+    publicationDate: '2021-08-18',
+    description: "Prix Goncourt 2017. Le récit de la montée du nazisme à travers le prisme des industriels et des hommes politiques qui ont facilité l'accession de Hitler au pouvoir.",
+    workId: 'w-vuillard-ordre',
+    replacedById: 'f-lit-vuillard-babel-2',
+  },
+  /*
+    Edition de remplacement : celle de 2021 est epuisee, et sa fiche chez un
+    libraire renvoie vers ce numero.
+  */
+  {
+    id: 'f-lit-vuillard-babel-2',
+    isbn: '9782330218676',
+    title: "L'Ordre du jour",
+    authors: ['Eric Vuillard'],
+    publisher: 'Actes Sud',
+    collection: 'Babel',
+    universe: 'Littérature', type: 'fonds',
+    genre: 'Roman historique', language: 'Français',
+    price: 4.90, priceTTC: 7.30, format: '115 x 175 mm', pages: 149,
+    publicationDate: '2026-03-04',
+    description: "Prix Goncourt 2017. Le récit de la montée du nazisme à travers le prisme des industriels et des hommes politiques qui ont facilité l'accession de Hitler au pouvoir.",
+    workId: 'w-vuillard-ordre',
   },
   {
     id: 'f-lit-houellebecq',
@@ -467,6 +521,20 @@ const _RAW_MOCK_BOOKS: Book[] = [
     publicationDate: '2019-01-04',
     description: "Un ingénieur agricole fuit son existence et se réfugie dans un Paris mélancolique. Houellebecq dresse un portrait glaçant de la solitude et du déclin occidental.",
     delaiReimp: '3 semaines',
+    workId: 'w-houellebecq-serotonine',
+  },
+  {
+    id: 'f-lit-houellebecq-poche',
+    isbn: '9782290212196',
+    title: 'Sérotonine',
+    authors: ['Michel Houellebecq'],
+    publisher: "J'ai lu",
+    universe: 'Littérature', type: 'fonds',
+    genre: 'Roman contemporain', language: 'Français',
+    price: 6.04, priceTTC: 9.00, format: '115 x 175 mm', pages: 348,
+    publicationDate: '2020-10-07',
+    description: "Un ingénieur agricole fuit son existence et se réfugie dans un Paris mélancolique. Houellebecq dresse un portrait glaçant de la solitude et du déclin occidental.",
+    workId: 'w-houellebecq-serotonine',
   },
   {
     id: 'f-lit-letellier',
@@ -886,6 +954,8 @@ const STOCK_OVERRIDES: Record<string, StockStatut> = {
   /* Épuisé */
   'f-bd-esther-01':   'epuise',
   'f-lit-berest':     'epuise',
+  /* Epuise, mais remplace : voir replacedById sur ce titre. */
+  'f-lit-vuillard-babel': 'epuise',
 }
 
 /* Statuts interdits pour une nouveauté */

@@ -55,6 +55,40 @@ export function matchesIsbn(book: BookIsbns, query: string): boolean {
   return isbnsOf(book).some(isbn => normalizeIsbn(isbn).includes(normalized))
 }
 
+/*
+  Filiation d'une reference : une edition epuisee est le plus souvent
+  remplacee par une autre, qui porte un ISBN neuf. Seul le sens « remplace
+  par » est stocke, dans replacedById ; le sens inverse se deduit.
+*/
+type BookLineage = { id: string; replacedById?: string }
+
+export function getReplacementEdition<T extends BookLineage>(book: BookLineage, catalogue: T[]): T | null {
+  if (!book.replacedById) return null
+  return catalogue.find(candidate => candidate.id === book.replacedById) ?? null
+}
+
+export function getReplacedEdition<T extends BookLineage>(book: BookLineage, catalogue: T[]): T | null {
+  return catalogue.find(candidate => candidate.replacedById === book.id) ?? null
+}
+
+/*
+  Editions papier de la meme oeuvre, hors celles qui ont ete remplacees : une
+  edition remplacee n'est plus la reference courante, elle ne s'offre donc pas
+  au choix. Elle reste atteignable par son ISBN et depuis la fiche de son
+  remplacant.
+*/
+type BookEdition = BookLineage & { workId?: string }
+
+export function getOtherEditions<T extends BookEdition>(book: BookEdition, catalogue: T[]): T[] {
+  if (!book.workId) return []
+  return catalogue.filter(candidate =>
+    candidate.workId === book.workId
+    && candidate.id !== book.id
+    && !candidate.replacedById
+    && candidate.id !== book.replacedById,
+  )
+}
+
 export function getPurchaseAvailability(type: BookType, statut?: StockStatut) {
   const isAParaitre = type === 'a-paraitre'
   const isEpuise = statut === 'epuise' || statut === 'rupture'

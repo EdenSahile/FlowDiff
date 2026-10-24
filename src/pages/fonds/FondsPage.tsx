@@ -9,16 +9,20 @@ import type { Universe, StockStatut, Book } from '@/data/mockBooks'
 import { Input } from '@/components/ui/Input'
 import { BackButton } from '@/components/ui/BackButton'
 import { useRefetchOnFocus } from '@/hooks/useRefetchOnFocus'
+import { STATUT_CONFIG } from '@/components/ui/StockStatus'
 
-// Colors must stay in sync with STATUT_CONFIG in src/components/ui/StockStatus.tsx
-const DISPO_OPTIONS: Array<{ value: StockStatut; label: string; color: string | null }> = [
-  { value: 'disponible',   label: 'Disponible',      color: '#2E7D32' },
-  { value: 'stock_limite', label: 'Stock limité',     color: '#C17E00' },
-  { value: 'sur_commande', label: 'Sur commande',     color: '#5B7A9E' },
-  { value: 'en_reimp',     label: 'En réimpression',  color: '#A07040' },
-  { value: 'rupture',      label: 'Rupture',           color: '#C0392B' },
-  { value: 'epuise',       label: 'Épuisé',           color: null },
+/* L'epuise n'a pas de point de couleur, c'est la seule exception. Le reste,
+   libelle comme couleur, vient de la table partagee. */
+const DISPO_ORDER: StockStatut[] = [
+  'disponible', 'stock_limite', 'sur_commande', 'en_reimp', 'rupture', 'epuise',
 ]
+
+const DISPO_OPTIONS: Array<{ value: StockStatut; label: string; color: string | null }> =
+  DISPO_ORDER.map(value => ({
+    value,
+    label: STATUT_CONFIG[value].label,
+    color: value === 'epuise' ? null : STATUT_CONFIG[value].color,
+  }))
 
 const Page = styled.div`
   padding: ${({ theme }) => theme.spacing.lg};

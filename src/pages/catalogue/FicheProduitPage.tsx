@@ -13,7 +13,11 @@ import { StockAlertModal } from '@/components/ui/StockAlertModal'
 import { slugifyAuthor } from '@/lib/slugify'
 import { theme } from '@/lib/theme'
 import { formatPrice } from '@/lib/format'
-import { getPurchaseAvailability, getEbookLabel, getFormatLabel } from '@/lib/bookUtils'
+import {
+  getPurchaseAvailability, getEbookLabel, getFormatLabel,
+  getOtherEditions, getReplacementEdition, getReplacedEdition,
+} from '@/lib/bookUtils'
+import { StockStatus } from '@/components/ui/StockStatus'
 import { mq } from '@/lib/responsive'
 import { useRefetchOnFocus } from '@/hooks/useRefetchOnFocus'
 
@@ -1288,6 +1292,9 @@ export function FicheProduitPage() {
   /* Les autres editions papier de la meme oeuvre : le poche d'un grand
      format, et reciproquement. Chacune est un titre du catalogue. */
   const [otherEditions, setOtherEditions] = useState<Book[]>([])
+  /* L'edition qui remplace celle-ci, et celle qu'elle remplace. */
+  const [replacement, setReplacement] = useState<Book | null>(null)
+  const [replaced, setReplaced]       = useState<Book | null>(null)
   const [prevId, setPrevId]           = useState(id)
 
   if (prevId !== id) {
@@ -1299,6 +1306,8 @@ export function FicheProduitPage() {
       setBook(null)
       setSimilar([])
       setOtherEditions([])
+      setReplacement(null)
+      setReplaced(null)
     }
   }
 
@@ -1314,11 +1323,11 @@ export function FicheProduitPage() {
             x.universe === b.universe && x.id !== b.id && !(b.workId && x.workId === b.workId),
           ).slice(0, 7))
         }).catch(console.error)
-        if (b.workId) {
-          getAllBooksAsync().then(all => {
-            setOtherEditions(all.filter(x => x.workId === b.workId && x.id !== b.id))
-          }).catch(console.error)
-        }
+        getAllBooksAsync().then(all => {
+          setOtherEditions(getOtherEditions(b, all))
+          setReplacement(getReplacementEdition(b, all))
+          setReplaced(getReplacedEdition(b, all))
+        }).catch(console.error)
       }
     }).catch(() => setBookLoading(false))
   }, [id])
@@ -1508,11 +1517,6 @@ export function FicheProduitPage() {
   const uvStyle        = UNIVERSE_STYLES[book.universe] ?? { bg: '#E8EDF3', color: '#1C3252' }
   const sectionLabel   = book.type === 'a-paraitre' ? 'À paraître' : book.type === 'nouveaute' ? 'Nouveautés' : 'Fonds'
   const sectionPath    = book.type === 'fonds' ? '/fonds' : '/nouveautes'
-  const stockLabel =
-    book.statut === 'disponible'   ? 'Disponible' :
-    book.statut === 'sur_commande' ? 'Sur commande' :
-    book.statut === 'en_reimp'     ? 'En réimpression' :
-    book.statut === 'rupture'      ? 'Rupture de stock' : 'Disponible'
   return (
     <Page>
       <BackNavButton />
@@ -1621,11 +1625,12 @@ export function FicheProduitPage() {
             {' · '}{new Date(book.publicationDate).getFullYear()}
           </BookEditorMain>
 
-          {/* Toujours affiche, meme avec un seul format : cette ligne ne sert
-              pas qu'a choisir, elle dit quelle edition on regarde. La masquer
-              laissait le bloc « Autres editions » seul en haut de la fiche, et
-              son edition se lisait alors comme celle de la page. */}
-          {showStandardOrder && (
+          {/* Toujours affichee : cette ligne ne sert pas qu'a choisir, elle dit
+              quelle edition on regarde. La masquer, faute de 2e format ou
+              parce que le titre n'est pas commandable, laissait le bloc
+              « Autres editions » seul en haut de la fiche, et son edition se
+              lisait alors comme celle de la page. */}
+          {(
             <FormatSelectorWrap>
               <FormatLabelEl>Format</FormatLabelEl>
               <FormatOptionsRow>
@@ -1637,6 +1642,35 @@ export function FicheProduitPage() {
                 ))}
               </FormatOptionsRow>
             </FormatSelectorWrap>
+          )}
+
+          {/* Filiation d'une meme reference, a ne pas confondre avec le bloc
+              suivant : « Autres editions » liste les formats de l'oeuvre,
+              celui-ci dit quel ISBN prend la suite d'un ISBN epuise. */}
+          {replacement && (
+            <EditionsWrap>
+              <FormatLabelEl>Remplacé par</FormatLabelEl>
+              <EditionsRow>
+                <EditionLinkEl to={`/livre/${replacement.id}`}>
+                  <EditionNameEl>Nouvelle édition →</EditionNameEl>
+                  <EditionMetaEl>
+                    ISBN {replacement.isbn} · {formatPrice(replacement.priceTTC)} € TTC
+                  </EditionMetaEl>
+                </EditionLinkEl>
+              </EditionsRow>
+            </EditionsWrap>
+          )}
+
+          {replaced && (
+            <EditionsWrap>
+              <FormatLabelEl>Édition précédente</FormatLabelEl>
+              <EditionsRow>
+                <EditionLinkEl to={`/livre/${replaced.id}`}>
+                  <EditionNameEl>Épuisée →</EditionNameEl>
+                  <EditionMetaEl>ISBN {replaced.isbn}</EditionMetaEl>
+                </EditionLinkEl>
+              </EditionsRow>
+            </EditionsWrap>
           )}
 
           {/* Chaque edition est un titre du catalogue, donc un lien vers sa
@@ -1669,12 +1703,20 @@ export function FicheProduitPage() {
 
             {(showStandardOrder || isEpuise || isAParaitre) && <PriceDividerEl />}
 
+            {/* La disponibilite ne depend pas du fait de pouvoir commander :
+                elle est affichee pour tous les statuts, epuise et rupture
+                compris, ou elle n'apparaissait nulle part sur cet ecran. */}
+            {book.statut && (
+              <StockZoneEl>
+                <StockStatus statut={book.statut} delaiReimp={book.delaiReimp} />
+                {showStandardOrder && (
+                  <StockDispoDetailEl>· Livraison 1–3 jours ouvrés</StockDispoDetailEl>
+                )}
+              </StockZoneEl>
+            )}
+
             {showStandardOrder && (
               <>
-                <StockZoneEl>
-                  <StockIndicatorEl $statut={book.statut}>{stockLabel}</StockIndicatorEl>
-                  <StockDispoDetailEl>· Livraison 1–3 jours ouvrés</StockDispoDetailEl>
-                </StockZoneEl>
                 <OrderZoneEl>
                   <QtyStepperLg>
                     <QtyBtnLg onClick={() => setQty(q => Math.max(1, q - 1))} disabled={qty <= 1} aria-label="Diminuer">−</QtyBtnLg>

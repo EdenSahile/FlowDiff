@@ -229,6 +229,62 @@ describe('éditions d\'une même œuvre', () => {
   })
 })
 
+/*
+  Une edition epuisee est le plus souvent remplacee par une autre, qui porte
+  un ISBN neuf. Ces tests verrouillent la coherence du lien.
+*/
+describe('éditions remplacées du catalogue', () => {
+  const catalogue = getCatalogueBooks()
+  const remplacees = catalogue.filter(book => book.replacedById)
+
+  it('au moins une édition du catalogue est remplacée', () => {
+    expect(remplacees.length).toBeGreaterThan(0)
+  })
+
+  it('chaque remplaçant déclaré existe au catalogue', () => {
+    const cibleIntrouvable = remplacees.filter(
+      book => !catalogue.some(candidate => candidate.id === book.replacedById),
+    )
+
+    expect(cibleIntrouvable).toEqual([])
+  })
+
+  it('une édition remplacée est épuisée', () => {
+    const encoreDisponibles = remplacees.filter(book => book.statut !== 'epuise')
+
+    expect(encoreDisponibles).toEqual([])
+  })
+
+  it('une édition ne se remplace jamais elle-même', () => {
+    const boucles = remplacees.filter(book => book.replacedById === book.id)
+
+    expect(boucles).toEqual([])
+  })
+
+  it('un remplaçant n\'est jamais lui-même remplacé par son prédécesseur', () => {
+    const allerRetours = remplacees.filter(book => {
+      const cible = catalogue.find(candidate => candidate.id === book.replacedById)
+      return cible?.replacedById === book.id
+    })
+
+    expect(allerRetours).toEqual([])
+  })
+
+  it('2 éditions ne sont jamais remplacées par la même', () => {
+    const cibles = remplacees.map(book => book.replacedById)
+
+    expect(new Set(cibles).size).toBe(cibles.length)
+  })
+
+  it('les 2 éditions d\'une filiation portent le même titre', () => {
+    remplacees.forEach(book => {
+      const cible = catalogue.find(candidate => candidate.id === book.replacedById)
+
+      expect(cible!.title).toBe(book.title)
+    })
+  })
+})
+
 describe('EBOOK_FORMATS', () => {
   it('liste les 2 formats de fichier, sans combinaison des deux', () => {
     const expectedFormats: EbookFormat[] = ['PDF', 'EPUB']

@@ -264,5 +264,5 @@ test('le filtre Poche retient les titres aux dimensions de poche', async ({ page
 
   await page.goto('/recherche?formats=Poche')
 
-  await expect(page.locator('article')).toHaveCount(14)
+  await expect(page.locator('article')).toHaveCount(18)
 })
