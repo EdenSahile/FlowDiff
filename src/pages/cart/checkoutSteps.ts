@@ -29,3 +29,18 @@ export function isLastStep(step: CheckoutStep): boolean {
 export function getStepLabel(step: CheckoutStep): string {
   return STEP_LABELS[step]
 }
+
+/*
+  L'etape du tunnel vit dans l'URL (`/panier?etape=...`) et non dans un state
+  de composant : le bouton retour du navigateur et le bouton « Panier » de
+  l'en-tete agissent sur l'URL, ils ne peuvent rien contre un state interne.
+*/
+export const CHECKOUT_PAGES = ['cart', ...CHECKOUT_STEPS, 'success'] as const
+
+export type CheckoutPage = (typeof CHECKOUT_PAGES)[number]
+
+export const STEP_QUERY_PARAM = 'etape'
+
+export function parseCheckoutPage(raw: string | null): CheckoutPage {
+  return CHECKOUT_PAGES.find(page => page === raw) ?? 'cart'
+}

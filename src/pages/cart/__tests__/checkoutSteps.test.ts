@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { CHECKOUT_STEPS, getNextStep, getPrevStep, isLastStep, getStepIndex, getStepLabel } from '../checkoutSteps'
+import { CHECKOUT_PAGES, CHECKOUT_STEPS, getNextStep, getPrevStep, isLastStep, getStepIndex, getStepLabel, parseCheckoutPage } from '../checkoutSteps'
 
 describe('checkout stepper', () => {
   it('defines 3 steps in order', () => {
@@ -40,5 +40,33 @@ describe('checkout stepper', () => {
     for (const s of CHECKOUT_STEPS) {
       expect(getStepLabel(s).length).toBeGreaterThan(0)
     }
+  })
+})
+
+describe('parseCheckoutPage, lecture de l\'etape depuis l\'URL', () => {
+  it('reconnait chacune des 5 pages du tunnel', () => {
+    for (const expectedPage of CHECKOUT_PAGES) {
+      expect(parseCheckoutPage(expectedPage)).toBe(expectedPage)
+    }
+  })
+
+  it('retombe sur le panier quand le parametre est absent', () => {
+    expect(parseCheckoutPage(null)).toBe('cart')
+  })
+
+  it('retombe sur le panier quand le parametre est vide', () => {
+    expect(parseCheckoutPage('')).toBe('cart')
+  })
+
+  it('retombe sur le panier quand le parametre est inconnu', () => {
+    expect(parseCheckoutPage('paiement')).toBe('cart')
+  })
+
+  it('ne reconnait pas une casse differente, une URL etant comparee telle quelle', () => {
+    expect(parseCheckoutPage('Addresses')).toBe('cart')
+  })
+
+  it('expose les 5 pages dans l\'ordre du parcours', () => {
+    expect(CHECKOUT_PAGES).toEqual(['cart', 'recap', 'addresses', 'transmission', 'success'])
   })
 })

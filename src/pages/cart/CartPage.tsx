@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useNotifications } from '@/contexts/NotificationsContext'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import styled, { keyframes } from 'styled-components'
 import { useCart, REMISE_RATES, getItemKey, getItemUnitPriceTTC, REMISE_NUMERIQUE } from '@/contexts/CartContext'
 import { useOrders } from '@/contexts/OrdersContext'
@@ -12,7 +12,7 @@ import { useToast } from '@/contexts/ToastContext'
 import { theme } from '@/lib/theme'
 import { mq } from '@/lib/responsive'
 import { formatPrice } from '@/lib/format'
-import { CHECKOUT_STEPS, type CheckoutStep, getNextStep, getPrevStep, getStepIndex, getStepLabel } from './checkoutSteps'
+import { CHECKOUT_STEPS, type CheckoutPage, type CheckoutStep, STEP_QUERY_PARAM, getNextStep, getPrevStep, getStepIndex, getStepLabel, parseCheckoutPage } from './checkoutSteps'
 import { addressSchema, parseAddressString, type AddressData, type TransmissionMode } from './checkoutSchemas'
 import { OrderTransmissionStep } from './OrderTransmissionStep'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
@@ -1008,7 +1008,7 @@ const EDIHintIcon = styled.div`
 /* ══════════════════════════════════════════════════════
    TYPE & HELPERS
 ══════════════════════════════════════════════════════ */
-type Page = 'cart' | CheckoutStep | 'success'
+type Page = CheckoutPage
 type DeliveryMode = 'standard' | 'specific'
 type FormErrors = Partial<Record<keyof AddressData, string>>
 
@@ -1122,7 +1122,25 @@ export function CartPage() {
   const { user } = useAuth()
   const navigate = useNavigate()
 
-  const [page, setPage]         = useState<Page>('cart')
+  /*
+    L'etape vit dans l'URL, pas dans un state : sinon le bouton retour du
+    navigateur sort du panier au lieu de reculer d'une etape, et le bouton
+    « Panier » de l'en-tete, qui mene deja a /panier, ne produit aucun effet.
+  */
+  const [searchParams, setSearchParams] = useSearchParams()
+  const page: Page = parseCheckoutPage(searchParams.get(STEP_QUERY_PARAM))
+
+  const setPage = useCallback((next: Page, { replace = false } = {}) => {
+    setSearchParams(
+      prev => {
+        const params = new URLSearchParams(prev)
+        if (next === 'cart') params.delete(STEP_QUERY_PARAM)
+        else params.set(STEP_QUERY_PARAM, next)
+        return params
+      },
+      { replace },
+    )
+  }, [setSearchParams])
   const [delivery, setDelivery] = useState<DeliveryMode>('standard')
   const [specificDate, setSpecific] = useState('')
   const [confirm, setConfirm]   = useState<{ open: false } | { open: true; title: string; message: string; onConfirm: () => void }>({ open: false })
@@ -1223,7 +1241,7 @@ export function CartPage() {
     })
     void effectiveBilling // billing address acknowledged
     clearCart()
-    setPage('success')
+    setPage('success', { replace: true })
     if (reliquat) {
       showToast('📧 Vous serez notifié par email dès l\'expédition des titres en reliquat.')
     }
@@ -1282,8 +1300,12 @@ export function CartPage() {
     </Page>
   )
 
-  /* ── Panier vide ── */
-  if (!hasItems && page === 'cart') return (
+  /* ── Panier vide ──
+     Vaut pour toutes les etapes du tunnel : revenir par la fleche du
+     navigateur sur une etape dont le panier a ete vide entre-temps ne doit
+     pas afficher un recapitulatif sans articles. L'ecran de succes est deja
+     sorti plus haut, il n'est donc pas concerne. */
+  if (!hasItems) return (
     <Page>
       <PageTitle>Panier</PageTitle>
       <Empty>
