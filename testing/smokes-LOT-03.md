@@ -46,7 +46,7 @@
 
 **Preconditions**
 
-- L'application tourne en local (`pnpm dev`)
+- L'application tourne en local (`npm run dev`)
 - Aucun utilisateur n'est connecte (page `/login` affichee)
 - Le localStorage du navigateur est vide pour les cles `bookflow_*` (ouvrir DevTools > Application > Local Storage et supprimer les entrees qui commencent par `bookflow_`)
 

@@ -1,7 +1,7 @@
 # Smoke tests manuels - LOT-07 : Panier, tunnel de commande
 
 > **Ces scenarios sont ecrits apres l'implementation**, contrairement aux fichiers des LOT-02, 03, 04, 10 et 11, qui precedaient le code (test-first). Les libelles, chemins et numeros de ligne cites ont donc ete releves dans la source le 25 octobre 2026.
-> A executer sur l'application lancee en local (`pnpm dev`).
+> A executer sur l'application lancee en local (`npm run dev`).
 
 ---
 
@@ -42,7 +42,7 @@
 
 **Preconditions**
 
-- Application lancee en local (`pnpm dev`)
+- Application lancee en local (`npm run dev`)
 - Connecte avec le compte LIB001 / marie.lecomte@librairie-lira.fr / Libraire123!
 - Partir d'un panier vide. Si besoin, vider via le bouton « Tout vider » de `/panier`
 - Noter le nombre de commandes deja presentes sur `/historique`
@@ -84,7 +84,7 @@
 
 **Preconditions**
 
-- Application lancee en local (`pnpm dev`)
+- Application lancee en local (`npm run dev`)
 - Connecte avec le compte LIB001 / marie.lecomte@librairie-lira.fr / Libraire123!
 - Panier vide au depart
 - Un titre au statut `en_reimp` est necessaire. Le catalogue en compte 3 (`src/data/mockBooks.ts:1028-1030`) : « Serotonine » de Houellebecq, « Jujutsu Kaisen T.8 », « Homo Deus » (`f-pra-homo`)
@@ -118,7 +118,7 @@
 
 **Preconditions**
 
-- Application lancee en local (`pnpm dev`)
+- Application lancee en local (`npm run dev`)
 - Connecte avec le compte LIB001 / marie.lecomte@librairie-lira.fr / Libraire123!
 - Panier vide au depart
 
@@ -162,7 +162,7 @@
 
 **Preconditions**
 
-- Application lancee en local (`pnpm dev`)
+- Application lancee en local (`npm run dev`)
 - Connecte avec le compte LIB001 / marie.lecomte@librairie-lira.fr / Libraire123!
 - 1 titre disponible dans le panier, par exemple « Leurs enfants apres eux »
 - Preparer une chaine de 40 caracteres, par exemple `ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ABCD`, et savoir que ses 35 premiers caracteres sont `ABCDEFGHIJKLMNOPQRSTUVWXYZ012345678`
@@ -198,7 +198,7 @@
 
 **Preconditions**
 
-- Application lancee en local (`pnpm dev`)
+- Application lancee en local (`npm run dev`)
 - Connecte avec le compte LIB001 / marie.lecomte@librairie-lira.fr / Libraire123!
 - 1 titre disponible dans le panier, par exemple « Leurs enfants apres eux »
 - Noter la date du jour

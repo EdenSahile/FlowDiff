@@ -1,7 +1,7 @@
 # Smoke tests manuels - LOT-04
 
 > **Ces scenarios sont ecrits avant l'implementation (test-first).**
-> **Ne les executer qu'une fois l'implementation terminee**, sur l'application lancee en local (`pnpm dev`).
+> **Ne les executer qu'une fois l'implementation terminee**, sur l'application lancee en local (`npm run dev`).
 
 ---
 
@@ -43,7 +43,7 @@
 
 **Preconditions**
 
-- Application lancee en local (`pnpm dev`)
+- Application lancee en local (`npm run dev`)
 - Connecte avec le compte LIB001 / marie.lecomte@librairie-lira.fr / Libraire123!
 
 **Etapes**
@@ -73,7 +73,7 @@
 
 **Preconditions**
 
-- Application lancee en local (`pnpm dev`)
+- Application lancee en local (`npm run dev`)
 - Connecte avec le compte LIB001 / marie.lecomte@librairie-lira.fr / Libraire123!
 - Panier vide ou note du contenu actuel
 
@@ -103,7 +103,7 @@
 
 **Preconditions**
 
-- Application lancee en local (`pnpm dev`)
+- Application lancee en local (`npm run dev`)
 - Connecte avec le compte LIB001 / marie.lecomte@librairie-lira.fr / Libraire123!
 - **Le composant BookCardRow doit etre integre dans une page de l'application** (voir point remonte ci-dessous)
 
@@ -134,7 +134,7 @@
 
 **Preconditions**
 
-- Application lancee en local (`pnpm dev`)
+- Application lancee en local (`npm run dev`)
 - Connecte avec le compte LIB001 / marie.lecomte@librairie-lira.fr / Libraire123!
 - Panier vide ou note du contenu actuel
 

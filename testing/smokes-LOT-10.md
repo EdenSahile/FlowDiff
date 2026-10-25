@@ -1,7 +1,7 @@
 # Smoke tests manuels - LOT-10 : Retours
 
 > **Ces scenarios sont ecrits avant l'implementation (test-first).**
-> **Ne les executer qu'une fois l'implementation terminee**, sur l'application lancee en local (`pnpm dev`).
+> **Ne les executer qu'une fois l'implementation terminee**, sur l'application lancee en local (`npm run dev`).
 
 ---
 
@@ -46,7 +46,7 @@
 
 **Preconditions**
 
-- Application lancee en local (`pnpm dev`)
+- Application lancee en local (`npm run dev`)
 - Connecte avec le compte LIB001 / marie.lecomte@librairie-lira.fr / Libraire123!
 - Le client LIB001 a au moins 2 commandes dans les mock : `CMD0000013` (statut `en preparation`) et `CMD0000014` (statut `livre`)
 
@@ -77,7 +77,7 @@
 
 **Preconditions**
 
-- Application lancee en local (`pnpm dev`)
+- Application lancee en local (`npm run dev`)
 - Connecte avec le compte LIB001 / marie.lecomte@librairie-lira.fr / Libraire123!
 - Formulaire de retour ouvert (depuis `/historique`, bouton "Retour" sur la commande `CMD0000014`)
 

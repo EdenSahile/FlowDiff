@@ -1,7 +1,7 @@
 # Smoke tests manuels - LOT-06 : Panier et remises
 
 > **Ces scenarios sont ecrits apres l'implementation**, contrairement aux fichiers des LOT-02, 03, 04, 10 et 11, qui precedaient le code (test-first). Les libelles, chemins et numeros de ligne cites ont donc ete releves dans la source le 25 octobre 2026.
-> A executer sur l'application lancee en local (`pnpm dev`).
+> A executer sur l'application lancee en local (`npm run dev`).
 
 ---
 
@@ -40,7 +40,7 @@
 
 **Preconditions**
 
-- Application lancee en local (`pnpm dev`)
+- Application lancee en local (`npm run dev`)
 - Connecte avec le compte LIB001 / marie.lecomte@librairie-lira.fr / Libraire123!
 - Panier vide au depart
 - **Modification temporaire** : dans `src/lib/mockUsers.ts`, sur le seul utilisateur `LIB001`, remplacer `'BD/Mangas': 30` par `'BD/Mangas': 42`. Laisser LIB002 et LIB003 intacts, ils servent de temoin. Se deconnecter puis se reconnecter pour que le contexte d'authentification relise l'utilisateur

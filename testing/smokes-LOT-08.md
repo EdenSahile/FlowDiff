@@ -1,7 +1,7 @@
 # Smoke tests manuels - LOT-08 : Panier, ebooks, OP et reliquat
 
 > **Ces scenarios sont ecrits apres l'implementation**, contrairement aux fichiers des LOT-02, 03, 04, 10 et 11, qui precedaient le code (test-first). Les libelles, chemins et numeros de ligne cites ont donc ete releves dans la source le 25 octobre 2026.
-> A executer sur l'application lancee en local (`pnpm dev`).
+> A executer sur l'application lancee en local (`npm run dev`).
 
 ---
 
@@ -31,7 +31,7 @@
 
 **Preconditions**
 
-- Application lancee en local (`pnpm dev`)
+- Application lancee en local (`npm run dev`)
 - Connecte avec le compte LIB001 / marie.lecomte@librairie-lira.fr / Libraire123!
 - 1 titre disponible dans le panier, par exemple « Leurs enfants apres eux » de Nicolas Mathieu
 - L'adresse de livraison du compte LIB001 est `12 rue du Parc, 75001 Paris`

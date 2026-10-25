@@ -1,7 +1,7 @@
 # Smoke tests manuels - LOT-11 : EDI (echanges Dilicom)
 
 > **Ces scenarios sont ecrits avant l'implementation (test-first).**
-> **Ne les executer qu'une fois l'implementation terminee**, sur l'application lancee en local (`pnpm dev`).
+> **Ne les executer qu'une fois l'implementation terminee**, sur l'application lancee en local (`npm run dev`).
 
 ---
 
@@ -29,7 +29,7 @@
 
 **Preconditions**
 
-- Application lancee en local (`pnpm dev`)
+- Application lancee en local (`npm run dev`)
 - Connecte avec le compte LIB001 / marie.lecomte@librairie-lira.fr / Libraire123!
 - Au moins 1 article dans le panier (par exemple, ajouter "Leurs enfants apres eux" de Nicolas Mathieu depuis le catalogue Fonds)
 - Vider les messages EDI existants de localStorage pour partir d'un etat propre : ouvrir la console du navigateur et executer `localStorage.removeItem('bookflow_edi_LIB001'); localStorage.removeItem('bookflow_edi_version_LIB001')` puis recharger la page
@@ -60,7 +60,7 @@
 
 **Preconditions**
 
-- Application lancee en local (`pnpm dev`)
+- Application lancee en local (`npm run dev`)
 - 2 comptes mock disponibles :
   - LIB001 / marie.lecomte@librairie-lira.fr / Libraire123!
   - LIB002 / thomas.beaumont@motsvoyageurs.fr / Libraire123!
