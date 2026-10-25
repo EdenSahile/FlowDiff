@@ -23,8 +23,7 @@ const BOTTOM_NAV_TABS = [
   { label: 'Sélections', path: '/selections' },
 ] as const
 
-// Les 11 liens de navigation du menu burger. Le libellé diffère parfois de
-// celui de la sidebar pour une même route : EDI ici, Transmissions en desktop.
+// Les 11 liens de navigation du menu burger.
 const BURGER_LINKS = [
   { label: 'Top Ventes',     path: '/top-ventes'  },
   { label: 'Mon compte',     path: '/compte'      },

@@ -603,6 +603,32 @@ const EmptySubtext = styled.p`
   color: ${({ theme }) => theme.colors.gray[600]};
 `
 
+const SuccessLinks = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.spacing.sm};
+  align-items: center;
+  margin-top: ${({ theme }) => theme.spacing.lg};
+`
+
+const SuccessLink = styled.button`
+  background: none;
+  border: none;
+  padding: 4px;
+  font-family: inherit;
+  font-size: ${({ theme }) => theme.typography.sizes.sm};
+  color: ${({ theme }) => theme.colors.gray[600]};
+  text-decoration: underline;
+  cursor: pointer;
+
+  &:hover { color: ${({ theme }) => theme.colors.navy}; }
+  &:focus-visible {
+    outline: 2px solid ${({ theme }) => theme.colors.accent};
+    outline-offset: 2px;
+    border-radius: ${({ theme }) => theme.radii.sm};
+  }
+`
+
 const SuccessBox = styled.div`
   text-align: center;
   padding: ${({ theme }) => theme.spacing['3xl']};
@@ -1217,31 +1243,41 @@ export function CartPage() {
             <EmptySubtext style={{ marginBottom: '8px' }}>
               Statut EDI initial : <strong>En attente d'envoi</strong>
             </EmptySubtext>
-            <EmptySubtext style={{ marginBottom: '24px', fontStyle: 'italic', opacity: 0.7 }}>
+            <EmptySubtext style={{ fontStyle: 'italic', opacity: 0.7 }}>
               Ceci est une démonstration. Aucune commande réelle n'a été passée.
             </EmptySubtext>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'center' }}>
-              <Button variant="primary" size="lg" onClick={() => navigate('/historique')}>
-                Voir mes commandes
-              </Button>
-              <Button variant="ghost" size="md" onClick={() => navigate('/')}>
-                Retour à l'accueil
-              </Button>
-            </div>
           </>
         ) : (
           <>
             <EmptySubtext style={{ marginBottom: '8px' }}>
               Votre commande a bien été transmise via FlowDiff. Un récapitulatif vous sera envoyé par email.
             </EmptySubtext>
-            <EmptySubtext style={{ marginBottom: '24px', fontStyle: 'italic', opacity: 0.7 }}>
+            <EmptySubtext style={{ fontStyle: 'italic', opacity: 0.7 }}>
               Ceci est une démonstration. Aucune commande réelle n'a été passée.
             </EmptySubtext>
-            <Button variant="primary" size="lg" onClick={() => navigate('/')}>
-              Retour à l'accueil
-            </Button>
           </>
         )}
+
+        {/*
+          Une seule action principale, les autres sorties en liens : 3 boutons
+          de meme poids ne disent pas lequel suivre. « Voir mes commandes »
+          vaut pour les 2 modes, la commande etant creee dans les 2 cas.
+        */}
+        <div style={{ marginTop: theme.spacing.xl }}>
+          <Button variant="primary" size="lg" onClick={() => navigate('/')}>
+            Retour à l'accueil
+          </Button>
+        </div>
+        <SuccessLinks>
+          <SuccessLink type="button" onClick={() => navigate('/historique')}>
+            Voir mes commandes
+          </SuccessLink>
+          {localTransmission === 'EDI' && (
+            <SuccessLink type="button" onClick={() => navigate('/edi')}>
+              Voir les échanges EDI
+            </SuccessLink>
+          )}
+        </SuccessLinks>
       </SuccessBox>
     </Page>
   )
