@@ -97,3 +97,7 @@
 | FLOW-RM-035 | Filtrage univers + statut | `src/pages/fonds/__tests__/fondsFilter.test.ts` | Rien (déjà couvert) |
 | FLOW-RM-036 | Prix net remisé | `src/components/catalogue/__tests__/priceNet.test.ts` | Rien (déjà couvert) |
 | FLOW-RM-037 | Genres par univers | `src/data/__tests__/genreByUniverse.test.ts` | Nouveau fichier : intégrité structure |
+
+## Pas de fichier de smoke pour ce lot
+
+Aucune regle de ce lot n'est 🟠 ni 🔴, donc **il n'existe pas de `testing/smokes-LOT-05.md`, et c'est voulu**. L'absence du fichier n'est pas un oubli : un relevé qui compare le nombre d'inventaires au nombre de fichiers de smoke conclura a tort qu'il en manque.

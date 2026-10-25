@@ -31,12 +31,12 @@
 
 - Application lancee en local (`pnpm dev`)
 - Connecte avec le compte LIB001 / marie.lecomte@librairie-lira.fr / Libraire123!
-- Au moins 1 article dans le panier (par exemple, ajouter "Houris" de Kamel Daoud depuis le catalogue Fonds ou Nouveautes)
+- Au moins 1 article dans le panier (par exemple, ajouter "Leurs enfants apres eux" de Nicolas Mathieu depuis le catalogue Fonds)
 - Vider les messages EDI existants de localStorage pour partir d'un etat propre : ouvrir la console du navigateur et executer `localStorage.removeItem('bookflow_edi_LIB001'); localStorage.removeItem('bookflow_edi_version_LIB001')` puis recharger la page
 
 **Etapes**
 
-1. Aller sur `/panier` et lancer le tunnel de commande ("Valider mon panier")
+1. Aller sur `/panier` et lancer le tunnel de commande ("Valider la commande")
 2. Remplir l'etape Livraison (les champs sont pre-remplis par defaut), passer a l'etape suivante
 3. A l'etape "Mode de transmission", selectionner **EDI** et cliquer "Envoyer la commande"
 4. Apres confirmation, aller sur `/edi` et descendre jusqu'a la section "Historique des echanges". Noter l'heure exacte affichee et observer la liste pendant 10 secondes
