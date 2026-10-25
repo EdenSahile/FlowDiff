@@ -112,8 +112,9 @@
 ### SMOKE-057 : Le message de succes differe entre FLOWDIFF et EDI
 
 > ✅ **Ce qu'on verifie :**
-> - En FLOWDIFF, l'ecran de succes annonce un recapitulatif par email et propose un seul bouton
-> - En EDI, il annonce l'accuse de reception Dilicom, affiche le statut EDI initial et propose 2 boutons
+> - En FLOWDIFF, l'ecran de succes annonce un recapitulatif par email
+> - En EDI, il annonce l'accuse de reception Dilicom et affiche le statut EDI initial
+> - Les 2 modes offrent la meme action principale et le meme lien vers l'historique. Seul le lien vers les echanges EDI est propre au mode EDI
 > - Le branchement est du JSX conditionnel sur `localTransmission` (`CartPage.tsx:1212`), sans logique pure extractible
 
 **Preconditions**
@@ -137,15 +138,18 @@
   - titre « Commande envoyee ! »
   - « Votre commande a bien ete transmise via FlowDiff. Un recapitulatif vous sera envoye par email. »
   - la mention de demonstration
-  - **1 seul bouton**, « Retour a l'accueil »
-  - aucune mention de Dilicom ni de statut EDI
+  - **1 seul bouton plein**, « Retour a l'accueil »
+  - **1 lien souligne** sous le bouton, « Voir mes commandes », qui mene a `/historique`
+  - aucune mention de Dilicom ni de statut EDI, et aucun lien vers les echanges EDI
 - Etape 6, en EDI :
   - meme titre « Commande envoyee ! »
   - « Commande transmise via Dilicom (EDI). Vous recevrez un accuse de reception automatique. »
   - « Statut EDI initial : **En attente d'envoi** »
   - la mention de demonstration
-  - **2 boutons**, « Voir mes commandes » puis « Retour a l'accueil »
+  - **le meme bouton plein unique**, « Retour a l'accueil »
+  - **2 liens soulignes**, « Voir mes commandes » puis « Voir les echanges EDI », qui menent a `/historique` et `/edi`
   - aucune mention de recapitulatif par email
+- Dans les 2 modes : un seul element a l'aspect d'un bouton. Si 2 boutons pleins se font face, la hierarchie est cassee
 
 - [ ] Verifie
 

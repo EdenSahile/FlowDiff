@@ -26,7 +26,7 @@ const SIDEBAR_LINKS = [
   { label: 'Mon historique', path: '/historique'  },
   { label: 'Facturation',    path: '/facturation' },
   { label: 'Paramètres',     path: '/parametres'  },
-  { label: 'Transmissions',  path: '/edi'         },
+  { label: 'EDI',            path: '/edi'         },
   { label: 'Offices',        path: '/offices'     },
   { label: 'Contact',        path: '/contact'     },
   { label: 'Flash Infos',    path: '/flash-infos' },

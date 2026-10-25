@@ -9,18 +9,21 @@ import type { StockStatut } from '@/data/mockBooks'
 const CONTENT: Record<'sur_commande' | 'en_reimp', {
   title: string
   message: string
+  note: string
   confirmLabel: string
 }> = {
   sur_commande: {
     title: '🔄 Titre disponible sur commande spéciale',
     message:
-      "Cet ouvrage n'est pas en stock. Il sera commandé spécialement auprès de l'éditeur. Délai estimé : 7 à 15 jours ouvrés.",
+      "Cet ouvrage n'est pas en stock. Il sera commandé spécialement auprès de l'éditeur.",
+    note: 'Délai estimé : 7 à 15 jours ouvrés.',
     confirmLabel: 'Confirmer la commande',
   },
   en_reimp: {
     title: '🔁 Titre en réimpression',
     message:
-      "Cet ouvrage est en cours de réimpression. Il sera enregistré en reliquat et expédié automatiquement dès sa disponibilité. Vous recevrez un email de confirmation à l'expédition.",
+      "Cet ouvrage est en cours de réimpression. Il sera enregistré en reliquat et expédié automatiquement dès sa disponibilité.",
+    note: "Vous recevrez un email de confirmation à l'expédition.",
     confirmLabel: 'Ajouter en reliquat',
   },
 }
@@ -71,10 +74,19 @@ const Title = styled.h2`
 `
 
 const Message = styled.p`
-  margin: 0 0 20px;
+  margin: 0 0 12px;
   font-size: 14px;
   color: ${({ theme }) => theme.colors.gray[600]};
-  line-height: 1.5;
+  line-height: 1.65;
+`
+
+const Note = styled.p`
+  margin: 0 0 20px;
+  padding-top: 12px;
+  border-top: 1px solid ${({ theme }) => theme.colors.gray[200]};
+  font-size: 14px;
+  color: ${({ theme }) => theme.colors.gray[600]};
+  line-height: 1.65;
 `
 
 const Actions = styled.div`
@@ -146,13 +158,14 @@ export function StockAlertModal({ open, statut, onConfirm, onCancel }: Props) {
   if (!open) return null
   if (statut !== 'sur_commande' && statut !== 'en_reimp') return null
 
-  const { title, message, confirmLabel } = CONTENT[statut]
+  const { title, message, note, confirmLabel } = CONTENT[statut]
 
   return createPortal(
     <Overlay onClick={onCancel} role="dialog" aria-modal="true" aria-labelledby="stock-alert-title">
       <Panel onClick={e => e.stopPropagation()}>
         <Title id="stock-alert-title">{title}</Title>
         <Message>{message}</Message>
+        <Note>{note}</Note>
         <Actions>
           <ConfirmBtn onClick={onConfirm} autoFocus>{confirmLabel}</ConfirmBtn>
           <CancelBtn onClick={onCancel}>Annuler</CancelBtn>
