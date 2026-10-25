@@ -71,7 +71,7 @@
   - le Total TTC releve a l'etape 2, au centime
   - 2 exemplaires de « Leurs enfants apres eux »
 
-- [ ] Verifie
+- [x] Verifie
 
 ---
 
@@ -105,7 +105,7 @@
 - Etape 5 : un toast apparait, texte « 📧 Vous serez notifie par email des l'expedition des titres en reliquat. »
 - Etape 6 : aucun toast de reliquat apres la confirmation de la commande de « Leurs enfants apres eux ». Le toast d'ajout au panier, lui, reste normal et ne doit pas etre confondu avec celui-ci
 
-- [ ] Verifie
+- [x] Verifie
 
 ---
 
@@ -151,7 +151,7 @@
   - aucune mention de recapitulatif par email
 - Dans les 2 modes : un seul element a l'aspect d'un bouton. Si 2 boutons pleins se font face, la hierarchie est cassee
 
-- [ ] Verifie
+- [x] Verifie
 
 ---
 
@@ -187,7 +187,7 @@
 - Etapes 4 et 5 : meme comportement sur la reference de ligne
 - Etape 7 : la commande porte la reference globale tronquee a 35 caracteres, et la ligne « Leurs enfants apres eux » porte sa propre reference, elle aussi tronquee a 35. Les 2 references sont distinctes et ne se melangent pas
 
-- [ ] Verifie
+- [x] Verifie
 
 ---
 
@@ -226,4 +226,4 @@
 - Etape 6 : la date choisie s'affiche au format JJ/MM/AAAA et le bouton « Valider la commande » redevient actif
 - Etape 7 : la commande porte la date de livraison choisie. Avec le choix par defaut, elle n'en porte aucune, `deliveryDate` ne valant quelque chose que pour le mode `specific`
 
-- [ ] Verifie
+- [x] Verifie
