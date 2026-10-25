@@ -58,4 +58,4 @@
 - Etape 8 : les 2 encarts affichent la meme adresse, `12 rue du Parc, 75001 Paris`
 - Etape 9 : les 2 encarts affichent 2 adresses differentes, la livraison a Paris et la facturation a Lyon
 
-- [ ] Verifie
+- [x] Verifie
