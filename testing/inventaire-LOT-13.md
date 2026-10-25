@@ -42,3 +42,7 @@ Aucune regle.
 ### Verification manuelle (-> `smoke-test-writer`)
 
 Aucune regle.
+
+## Pas de fichier de smoke pour ce lot
+
+Aucune regle de ce lot n'est 🟠 ni 🔴, donc **il n'existe pas de `testing/smokes-LOT-13.md`, et c'est voulu**. L'absence du fichier n'est pas un oubli : un relevé qui compare le nombre d'inventaires au nombre de fichiers de smoke conclura a tort qu'il en manque.
