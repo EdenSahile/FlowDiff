@@ -257,6 +257,32 @@ const DeliveryLabel = styled.span`
   color: ${({ theme }) => theme.colors.navy};
 `
 
+/* ── Adresses ── */
+const AddressBlock = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: ${({ theme }) => theme.spacing.md};
+  margin-bottom: ${({ theme }) => theme.spacing.md};
+  padding-bottom: ${({ theme }) => theme.spacing.md};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.gray[100]};
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
+    grid-template-columns: 1fr;
+    gap: ${({ theme }) => theme.spacing.sm};
+  }
+`
+
+const AddressLabel = styled.div`
+  font-size: ${({ theme }) => theme.typography.sizes.xs};
+  color: ${({ theme }) => theme.colors.gray[600]};
+  margin-bottom: 2px;
+`
+
+const AddressValue = styled.div`
+  font-size: ${({ theme }) => theme.typography.sizes.sm};
+  color: ${({ theme }) => theme.colors.navy};
+`
+
 /* ── Corps ── */
 const OrderBody = styled.div`
   padding: ${({ theme }) => theme.spacing.md} ${({ theme }) => theme.spacing.lg};
@@ -863,6 +889,17 @@ export function HistoriquePage() {
 
               {/* Articles */}
               <OrderBody>
+                <AddressBlock>
+                  <div>
+                    <AddressLabel>Adresse de livraison</AddressLabel>
+                    <AddressValue>{order.adresseLivraison}</AddressValue>
+                  </div>
+                  <div>
+                    <AddressLabel>Adresse de facturation</AddressLabel>
+                    <AddressValue>{order.adresseFacturation ?? order.adresseLivraison}</AddressValue>
+                  </div>
+                </AddressBlock>
+
                 <ItemsList>
                   {order.items.map((item, idx) => (
                     <Item key={idx}>
