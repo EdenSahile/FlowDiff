@@ -356,7 +356,7 @@ function buildHtml(f: Facture): string {
           <th style="width:28px" class="center">Qté</th>
           <th style="width:56px" class="right">PP T.T.C.</th>
           <th style="width:44px" class="center">Rem %</th>
-          <th style="width:58px" class="right">PU H.T.</th>
+          <th style="width:72px" class="right">PU net H.T.</th>
           <th style="width:66px" class="right">Mnt H.T.</th>
         </tr>
       </thead>
