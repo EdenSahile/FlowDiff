@@ -81,3 +81,73 @@ describe('FLOW-RM-117 : TVA 5,5 % sur les factures', () => {
     })
   })
 })
+
+/* ─────────────────────────────────────────────────
+   Totaux de facture cohérents
+─────────────────────────────────────────────────── */
+
+describe('Totaux de facture', () => {
+  it('totalBrutHT = somme(ppHT × quantité)', () => {
+    allFactures.forEach(facture => {
+      const expectedBrutHT = round2(facture.lignes.reduce((s, l) => s + l.ppHT * l.quantite, 0))
+
+      expect(facture.totalBrutHT).toBe(expectedBrutHT)
+    })
+  })
+
+  it('netHT = somme(montantHT)', () => {
+    allFactures.forEach(facture => {
+      const expectedNetHT = round2(facture.lignes.reduce((s, l) => s + l.montantHT, 0))
+
+      expect(facture.netHT).toBe(expectedNetHT)
+    })
+  })
+
+  it('remiseMontant = totalBrutHT − netHT', () => {
+    allFactures.forEach(facture => {
+      const expectedRemiseMontant = round2(facture.totalBrutHT - facture.netHT)
+
+      expect(facture.remiseMontant).toBe(expectedRemiseMontant)
+    })
+  })
+})
+
+/* ─────────────────────────────────────────────────
+   Remise par univers (taux réels du compte LIB001)
+─────────────────────────────────────────────────── */
+
+describe('Remise par univers', () => {
+  // Taux réels LIB001 (spec : remisesParUnivers dans src/lib/mockUsers.ts)
+  const remiseAttendueParUnivers: Record<string, number> = {
+    'Littérature':     35,
+    'Adulte-pratique': 35,
+    'BD/Mangas':       30,
+    'Jeunesse':        30,
+  }
+
+  it('chaque ligne porte le taux de son univers, ou 0 pour une commande spéciale', () => {
+    allLignes.forEach(ligne => {
+      const tauxUnivers = remiseAttendueParUnivers[ligne.univers]
+
+      expect([tauxUnivers, 0]).toContain(ligne.remisePct)
+    })
+  })
+
+  it('aucune ligne ne porte un ancien taux arbitraire (5 %, 7 %, 9 %)', () => {
+    const lignesTauxArbitraire = allLignes.filter(l => [5, 7, 9].includes(l.remisePct))
+
+    expect(lignesTauxArbitraire).toEqual([])
+  })
+})
+
+/* ─────────────────────────────────────────────────
+   Factures récentes 2026
+─────────────────────────────────────────────────── */
+
+describe('Factures récentes', () => {
+  it('contient des factures émises à partir de mai 2026', () => {
+    const facturesRecentes = allFactures.filter(f => f.date >= '2026-05-01')
+
+    expect(facturesRecentes.length).toBeGreaterThanOrEqual(3)
+  })
+})
