@@ -204,7 +204,7 @@ function buildHtml(f: Facture): string {
   td.mono   { font-family: 'Courier New', monospace; font-size: 8px; }
   td.gray   { color: #888; }
   td.bold   { font-weight: 700; }
-  td.remise-pct { color: #C0392B; font-weight: 600; }
+  td.remise-pct { color: #C0392B; font-weight: 600; white-space: nowrap; }
 
   /* ── Totaux ── */
   .totals-block { display: flex; justify-content: flex-end; margin-bottom: 24px; }
