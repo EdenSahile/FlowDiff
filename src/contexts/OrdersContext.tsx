@@ -49,6 +49,7 @@ interface OrdersContextValue {
   addOrder: (params: {
     codeClient: string
     adresseLivraison: string
+    adresseFacturation?: string
     items: CartItem[]
     subtotalHT: number
     remiseAmount: number
@@ -110,6 +111,7 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
   function addOrder(params: {
     codeClient: string
     adresseLivraison: string
+    adresseFacturation?: string
     items: CartItem[]
     subtotalHT: number
     remiseAmount: number
@@ -155,6 +157,7 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
       status: 'en préparation',
       codeClient: params.codeClient,
       adresseLivraison: params.adresseLivraison,
+      adresseFacturation: params.adresseFacturation,
       deliveryMode: params.deliveryMode,
       deliveryDate: params.deliveryDate,
       transmissionMode: params.transmissionMode,

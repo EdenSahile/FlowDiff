@@ -1227,6 +1227,7 @@ export function CartPage() {
     addOrder({
       codeClient: user?.codeClient ?? '',
       adresseLivraison: fmtAddress(deliveryAddress),
+      adresseFacturation: fmtAddress(effectiveBilling),
       items,
       subtotalHT: subtotalTTC / 1.055,
       remiseAmount: remiseAmount / 1.055,
@@ -1239,7 +1240,6 @@ export function CartPage() {
       referenceCommande: refGlobale.trim() || undefined,
       referencesParLigne: Object.keys(refsParLigne).length > 0 ? refsParLigne : undefined,
     })
-    void effectiveBilling // billing address acknowledged
     clearCart()
     setPage('success', { replace: true })
     if (reliquat) {

@@ -68,6 +68,7 @@ export interface Order {
   tva: number
   totalTTC: number
   adresseLivraison: string
+  adresseFacturation?: string
   codeClient: string
   commandePar?: string   // nom de la personne ayant passé la commande
   deliveryMode: 'standard' | 'specific'

@@ -232,6 +232,36 @@ describe('LOT-09 : Commandes et historique', () => {
       expect(specificOrder.deliveryMode).toBe('specific')
       expect(specificOrder.deliveryDate).toBe('2026-10-01')
     })
+
+    it('reporte l\'adresse de facturation sur la commande', () => {
+      const { result } = renderHook(() => useOrders(), { wrapper: Wrapper })
+
+      let orderWithBilling!: Order
+      act(() => {
+        orderWithBilling = result.current.addOrder({
+          ...baseOrderParams(),
+          adresseFacturation: '5 avenue Comptable, 75009 Paris',
+        })
+      })
+
+      expect(orderWithBilling.adresseFacturation).toBe('5 avenue Comptable, 75009 Paris')
+    })
+
+    it('garde une adresse de facturation distincte de la livraison', () => {
+      const { result } = renderHook(() => useOrders(), { wrapper: Wrapper })
+
+      let orderWithSeparateBilling!: Order
+      act(() => {
+        orderWithSeparateBilling = result.current.addOrder({
+          ...baseOrderParams(),
+          adresseLivraison: '1 rue Livraison, 75001 Paris',
+          adresseFacturation: '5 avenue Comptable, 75009 Paris',
+        })
+      })
+
+      expect(orderWithSeparateBilling.adresseLivraison).toBe('1 rue Livraison, 75001 Paris')
+      expect(orderWithSeparateBilling.adresseFacturation).toBe('5 avenue Comptable, 75009 Paris')
+    })
   })
 
   /* ── Referentiels (statuts et types) ── */
