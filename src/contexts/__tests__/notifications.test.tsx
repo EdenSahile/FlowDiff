@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, act } from '@testing-library/react'
 import { buildNotifications, NotificationsProvider, useNotifications } from '../NotificationsContext'
-import type { NotifId } from '../NotificationsContext'
 import * as mockBooks from '@/data/mockBooks'
 import type { Book } from '@/data/mockBooks'
 

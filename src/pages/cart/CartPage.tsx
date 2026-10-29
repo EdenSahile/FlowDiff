@@ -1252,7 +1252,7 @@ export function CartPage() {
     <Page>
       <SuccessBox>
         <IconCheck />
-        <EmptyText>Commande envoyée !</EmptyText>
+        <EmptyText as="h1">Commande envoyée !</EmptyText>
         {localTransmission === 'EDI' ? (
           <>
             <EmptySubtext style={{ marginBottom: '8px' }}>
@@ -1579,7 +1579,7 @@ export function CartPage() {
 
             return (
               <ItemCard key={key} $ebook={isEbook}>
-                <BookCover isbn={book.isbn} alt={book.title} width={56} height={80} universe={book.universe} authors={book.authors} publisher={book.publisher} coverUrl={book.coverUrl} />
+                <BookCover isbn={book.isbn} alt={book.title} width={56} height={80} universe={book.universe} authors={book.authors} coverUrl={book.coverUrl} />
                 <ItemInfo>
                   {isEbook && (
                     <div style={{ marginBottom: 4 }}>
@@ -1707,7 +1707,7 @@ export function CartPage() {
                   {op.books.map(({ book, quantity }) => (
                     <OPRow key={book.id} $variant="book">
                       <OPCover>
-                        <BookCover isbn={book.isbn} alt={book.title} width={34} height={48} universe={book.universe} authors={book.authors} publisher={book.publisher} coverUrl={book.coverUrl} />
+                        <BookCover isbn={book.isbn} alt={book.title} width={34} height={48} universe={book.universe} authors={book.authors} coverUrl={book.coverUrl} />
                       </OPCover>
                       <OPText>
                         <OPRowTitle>{book.title}</OPRowTitle>

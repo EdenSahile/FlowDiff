@@ -1101,7 +1101,6 @@ export function OfficesPageFull() {
                             height={58}
                             universe={book.universe}
                             authors={book.authors}
-                            publisher={book.publisher}
                             coverUrl={book.coverUrl}
                           />
                         </div>

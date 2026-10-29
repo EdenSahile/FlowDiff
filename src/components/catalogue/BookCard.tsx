@@ -639,8 +639,6 @@ export function BookCard({ book, showType = false, coverFirst = false }: Props) 
                 alt={book.title}
                 universe={book.universe}
                 authors={book.authors}
-                publisher={book.publisher}
-                collection={book.collection}
                 width={108}
                 height={158}
                 coverUrl={book.coverUrl}
@@ -801,8 +799,6 @@ export function BookCard({ book, showType = false, coverFirst = false }: Props) 
             height={138}
             universe={book.universe}
             authors={book.authors}
-            publisher={book.publisher}
-            collection={book.collection}
             coverUrl={book.coverUrl}
           />
           <StarWrap ref={starRef}>
