@@ -204,7 +204,7 @@ function buildHtml(f: Facture): string {
   td.mono   { font-family: 'Courier New', monospace; font-size: 8px; }
   td.gray   { color: #888; }
   td.bold   { font-weight: 700; }
-  td.remise-pct { color: #C0392B; font-weight: 600; }
+  td.remise-pct { color: #C0392B; font-weight: 600; white-space: nowrap; }
 
   /* ── Totaux ── */
   .totals-block { display: flex; justify-content: flex-end; margin-bottom: 24px; }
@@ -356,7 +356,7 @@ function buildHtml(f: Facture): string {
           <th style="width:28px" class="center">Qté</th>
           <th style="width:56px" class="right">PP T.T.C.</th>
           <th style="width:44px" class="center">Rem %</th>
-          <th style="width:58px" class="right">PU H.T.</th>
+          <th style="width:72px" class="right">PU net H.T.</th>
           <th style="width:66px" class="right">Mnt H.T.</th>
         </tr>
       </thead>
