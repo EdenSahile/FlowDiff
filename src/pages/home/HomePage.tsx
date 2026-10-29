@@ -2779,7 +2779,6 @@ export function HomePage() {
                                 height={150}
                                 universe={book.universe}
                                 authors={book.authors}
-                                publisher={book.publisher}
                                 coverUrl={book.coverUrl}
                               />
                             </MiniCoverWrap>

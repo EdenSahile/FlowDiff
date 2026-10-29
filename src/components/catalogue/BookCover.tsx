@@ -140,8 +140,6 @@ interface Props {
   height?: number
   universe?: Universe
   authors?: string[]
-  publisher?: string
-  collection?: string
   fill?: boolean
   coverUrl?: string
 }
@@ -153,8 +151,6 @@ function BookCoverBase({
   height = 120,
   universe = 'Littérature',
   authors = [],
-  publisher = '',
-  collection,
   fill = false,
   coverUrl,
 }: Props) {
