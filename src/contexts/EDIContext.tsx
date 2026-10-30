@@ -22,7 +22,9 @@ interface EDIContextValue {
 
 const EDIContext = createContext<EDIContextValue | null>(null)
 
-const MOCK_EDI_VERSION = 'v8' // incrémenter à chaque modification de MOCK_EDI_MESSAGES
+// Incrémenter à chaque modification de MOCK_EDI_MESSAGES ou de la forme des
+// payloads générés : v9 purge les ORDRSP/DESADV écrits sans `lines` par v8.
+const MOCK_EDI_VERSION = 'v9'
 
 function messagesKey(cc: string)  { return `bookflow_edi_${cc}` }
 function paramsKey(cc: string)    { return `bookflow_edi_params_${cc}` }
@@ -63,10 +65,27 @@ function loadParams(cc: string): EDIParams {
   return DEFAULT_PARAMS
 }
 
+// Au premier rendu, `AuthContext` n'a pas encore repondu : `user` est nul et le
+// compte vaudrait `guest`. Les initialiseurs d'etat ne tournant qu'une fois, ils
+// resteraient figes sur ce stockage-la. La `key` remonte le provider quand le
+// compte reel arrive, ce qui les relance sur la bonne cle. Sans elle, les
+// messages deja stockes sont ignores et chaque commande EDI est regeneree avec
+// la date du jour a chaque chargement de page.
 export function EDIProvider({ children }: { children: ReactNode }) {
   const { user } = useAuthContext()
-  const { orders } = useOrders()
   const codeClient = user?.codeClient ?? 'guest'
+
+  return (
+    <EDIAccountProvider key={codeClient} codeClient={codeClient}>
+      {children}
+    </EDIAccountProvider>
+  )
+}
+
+function EDIAccountProvider(
+  { codeClient, children }: { codeClient: string; children: ReactNode }
+) {
+  const { orders } = useOrders()
 
   const [messages, setMessages] = useState<EDIMessage[]>(() => loadMessages(codeClient))
   const [params, setParams]     = useState<EDIParams>(() => loadParams(codeClient))
@@ -128,31 +147,54 @@ export function EDIProvider({ children }: { children: ReactNode }) {
       setMessages(prev => [...prev, ordersMsg])
 
       setTimeout(() => {
+        const ackRef    = `ACK-${order.numero.replace('CMD', '')}`
+        const ackDate   = new Date(now.getTime() + 3000).toISOString()
         const ack: EDIMessage = {
           id: `edi-${order.id}-ordrsp`,
           type: 'ORDRSP',
           status: 'RECEIVED',
-          documentRef: `ACK-${order.numero.replace('CMD', '')}`,
+          documentRef: ackRef,
           diffuseur: 'Interforum (Editis)',
           detail: 'Acceptée',
-          createdAt: new Date(now.getTime() + 3000).toISOString(),
+          createdAt: ackDate,
           orderId: order.id,
-          payload: { orderId: order.numero, ackRef: `ACK-${order.numero}`, decision: 'accepted' },
+          payload: {
+            orderId: order.numero,
+            orderResponseId: ackRef,
+            responseDate: ackDate,
+            globalStatus: 'ACCEPTED',
+            lines: order.items.map((item, i) => ({
+              lineNumber: i + 1,
+              ean: item.isbn,
+              title: item.title,
+              qtyRequested: item.quantity,
+              qtyConfirmed: item.quantity,
+              status: 'ACCEPTED',
+            })),
+          },
         }
         setMessages(prev => [...prev, ack])
       }, 3000)
 
       setTimeout(() => {
+        const desadvRef = `DESADV-${order.numero.replace('CMD', '')}`
         const desadv: EDIMessage = {
           id: `edi-${order.id}-desadv`,
           type: 'DESADV',
           status: 'RECEIVED',
-          documentRef: `DESADV-${order.numero.replace('CMD', '')}`,
+          documentRef: desadvRef,
           diffuseur: 'Interforum (Editis)',
           detail: `${order.items.reduce((s, i) => s + i.quantity, 0)} ex.`,
           createdAt: new Date(now.getTime() + 8000).toISOString(),
           orderId: order.id,
-          payload: { orderId: order.numero, desadvRef: `DESADV-${order.numero}`, status: 'complete' },
+          payload: {
+            desadvRef,
+            orderId: order.numero,
+            lines: order.items.map(item => ({
+              isbn: item.isbn,
+              qtyShipped: item.quantity,
+            })),
+          },
         }
         setMessages(prev => [...prev, desadv])
       }, 8000)

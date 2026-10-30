@@ -488,6 +488,56 @@ describe('groupDESADVByOrder', () => {
     expect(grouped[0].lines[0].status).toBe('SOLDE')
   })
 
+  /* Un ORDRSP/DESADV relu d'un localStorage ecrit avant la v9 d'EDIContext
+     arrive sans `lines`. Le groupement doit l'absorber au lieu de lever. */
+  it('ORDRSP sans lignes ne fait pas lever le groupement', () => {
+    const messages: EDIMessage[] = [
+      {
+        id: 'ordrsp-sans-lignes', type: 'ORDRSP', status: 'RECEIVED', documentRef: 'ACK-004',
+        diffuseur: 'Interforum (Editis)', detail: 'Acceptée', createdAt: '2026-04-25T11:00:00.000Z',
+        payload: { orderId: 'CMD-004', ackRef: 'ACK-CMD-004', decision: 'accepted' },
+      },
+      {
+        id: 'desadv-4', type: 'DESADV', status: 'RECEIVED', documentRef: 'DES-004',
+        diffuseur: 'Interforum (Editis)', detail: '2 ex.', createdAt: '2026-04-26T09:00:00.000Z',
+        payload: { desadvRef: 'DES-004', orderId: 'CMD-004', lines: [{ isbn: '9782070360024', qtyShipped: 2 }] },
+      },
+    ]
+
+    const { grouped } = groupDESADVByOrder(messages)
+
+    expect(grouped).toHaveLength(1)
+    expect(grouped[0].orderId).toBe('CMD-004')
+    expect(grouped[0].lines).toEqual([])
+    expect(grouped[0].globalStatus).toBe('EN_COURS')
+  })
+
+  it('DESADV sans lignes ne fait pas lever le groupement', () => {
+    const messages: EDIMessage[] = [
+      {
+        id: 'ordrsp-5', type: 'ORDRSP', status: 'RECEIVED', documentRef: 'ACK-005',
+        diffuseur: 'Interforum (Editis)', detail: 'Acceptée', createdAt: '2026-04-25T11:00:00.000Z',
+        payload: {
+          orderId: 'CMD-005', orderResponseId: 'ACK-005', responseDate: '2026-04-25',
+          globalStatus: 'ACCEPTED',
+          lines: [{ lineNumber: 1, ean: '9782070360024', title: 'Titre E', qtyRequested: 4, qtyConfirmed: 4, status: 'ACCEPTED' }],
+        },
+      },
+      {
+        id: 'desadv-sans-lignes', type: 'DESADV', status: 'RECEIVED', documentRef: 'DES-005',
+        diffuseur: 'Interforum (Editis)', detail: '4 ex.', createdAt: '2026-04-26T09:00:00.000Z',
+        payload: { orderId: 'CMD-005', desadvRef: 'DESADV-CMD-005', status: 'complete' },
+      },
+    ]
+
+    const { grouped } = groupDESADVByOrder(messages)
+
+    expect(grouped).toHaveLength(1)
+    expect(grouped[0].lines[0].qtyShippedTotal).toBe(0)
+    expect(grouped[0].lines[0].qtyConfirmed).toBe(4)
+    expect(grouped[0].globalStatus).toBe('EN_COURS')
+  })
+
   it('DESADV sans orderId atterrit dans ungrouped', () => {
     const messages: EDIMessage[] = [
       {
