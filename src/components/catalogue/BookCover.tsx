@@ -180,10 +180,22 @@ function BookCoverBase({
 
       {/* Couverture auto-hébergée (locale) : chargement immédiat, fondu court */}
       <CoverImg
+        ref={(img) => {
+          /*
+            Une image deja en cache est `complete` des que l'element existe, et
+            son `load` a pu se declencher avant que React n'attache le handler :
+            l'attendre afficherait le placeholder pour rien. Le ref est appele en
+            phase de commit, donc ce setState est applique avant le premier
+            rendu a l'ecran, sans clignotement.
+          */
+          if (img?.complete && img.naturalWidth >= 10 && img.naturalHeight >= 10) {
+            setLoadedSrc(src)
+          }
+        }}
         src={src}
         alt={alt}
         loading="eager"
-        decoding="async"
+        decoding="sync"
         $visible={loaded}
         onLoad={(e) => {
           const img = e.currentTarget
