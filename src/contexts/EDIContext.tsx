@@ -23,8 +23,9 @@ interface EDIContextValue {
 const EDIContext = createContext<EDIContextValue | null>(null)
 
 // Incrémenter à chaque modification de MOCK_EDI_MESSAGES ou de la forme des
-// payloads générés : v9 purge les ORDRSP/DESADV écrits sans `lines` par v8.
-const MOCK_EDI_VERSION = 'v9'
+// payloads générés : v9 purge les ORDRSP/DESADV écrits sans `lines` par v8,
+// v10 ceux que v9 avait redatés du jour au lieu de la date de la commande.
+const MOCK_EDI_VERSION = 'v10'
 
 function messagesKey(cc: string)  { return `bookflow_edi_${cc}` }
 function paramsKey(cc: string)    { return `bookflow_edi_params_${cc}` }
@@ -112,7 +113,15 @@ function EDIAccountProvider(
       if (processedIds.current.has(order.id)) return
       processedIds.current.add(order.id)
 
-      const now = new Date()
+      // Une commande du jour vient d'etre passee : l'heure courante est juste, et
+      // les delais simulent Dilicom qui repond progressivement. Une commande plus
+      // ancienne est rejouee, ses messages ayant ete purges par un changement de
+      // MOCK_EDI_VERSION alors qu'elle-meme est restee : on la date depuis la
+      // commande et sans delai, sinon elle reapparait avec la date du jour.
+      const estDuJour    = order.date === new Date().toISOString().slice(0, 10)
+      const now          = estDuJour ? new Date() : new Date(`${order.date}T09:00:00.000Z`)
+      const delaiAck     = estDuJour ? 3000 : 0
+      const delaiDesadv  = estDuJour ? 8000 : 0
 
       const ordersMsg: EDIMessage = {
         id: `edi-${order.id}-orders`,
@@ -174,7 +183,7 @@ function EDIAccountProvider(
           },
         }
         setMessages(prev => [...prev, ack])
-      }, 3000)
+      }, delaiAck)
 
       setTimeout(() => {
         const desadvRef = `DESADV-${order.numero.replace('CMD', '')}`
@@ -197,7 +206,7 @@ function EDIAccountProvider(
           },
         }
         setMessages(prev => [...prev, desadv])
-      }, 8000)
+      }, delaiDesadv)
     })
   }, [orders, codeClient])
 
