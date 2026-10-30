@@ -88,17 +88,32 @@ function loadOrders(key: string): Order[] {
   return base
 }
 
+// Au premier rendu, `AuthContext` n'a pas encore repondu : le compte vaut
+// `guest`. La `key` remonte le provider quand le compte reel arrive, ce qui
+// relance le chargement sur la bonne cle.
+//
+// Recharger dans un effet ne suffisait pas : l'effet de persistance s'executait
+// entre-temps avec l'etat de `guest` encore en memoire, et ecrasait la cle du
+// vrai compte avec un tableau vide avant de la reecrire au rendu suivant. Les
+// commandes etaient donc effacees du stockage, puis restaurees, a chaque
+// chargement de page. Une fermeture d'onglet dans cet intervalle les perdait.
 export function OrdersProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuthContext()
-  const key = ordersKey(user?.codeClient)
+  const codeClient = user?.codeClient
 
-  const [orders, setOrders] = useState<Order[]>(() => loadOrders(ordersKey(user?.codeClient)))
+  return (
+    <OrdersAccountProvider key={ordersKey(codeClient)} codeClient={codeClient}>
+      {children}
+    </OrdersAccountProvider>
+  )
+}
 
-  /* Re-charger les commandes quand l'utilisateur change */
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setOrders(loadOrders(key))
-  }, [key])
+function OrdersAccountProvider(
+  { codeClient, children }: { codeClient: string | undefined; children: React.ReactNode }
+) {
+  const key = ordersKey(codeClient)
+
+  const [orders, setOrders] = useState<Order[]>(() => loadOrders(key))
 
   /* Persister uniquement les nouvelles commandes (pas les mocks statiques) */
   useEffect(() => {
