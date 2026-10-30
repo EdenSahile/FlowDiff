@@ -113,11 +113,13 @@ export function groupDESADVByOrder(messages: EDIMessage[]): {
   grouped: DesadvGroup[]
   ungrouped: EDIMessage[]
 } {
-  const ordrspByOrder = new Map<string, ORDRSPPayload>()
+  // Partial : un ORDRSP d'erreur, ou un ORDRSP relu d'un localStorage ecrit par
+  // une version anterieure, peut arriver sans `lines`.
+  const ordrspByOrder = new Map<string, Partial<ORDRSPPayload>>()
   messages
     .filter(m => m.type === 'ORDRSP')
     .forEach(m => {
-      const p = m.payload as ORDRSPPayload
+      const p = m.payload as Partial<ORDRSPPayload>
       if (p.orderId) ordrspByOrder.set(p.orderId, p)
     })
 
@@ -140,13 +142,13 @@ export function groupDESADVByOrder(messages: EDIMessage[]): {
 
     const shippedByIsbn = new Map<string, number>()
     desadvList.forEach(msg => {
-      const desadvPayload = msg.payload as DESADVPayload
-      desadvPayload.lines.forEach(l => {
+      const desadvPayload = msg.payload as Partial<DESADVPayload>
+      ;(desadvPayload.lines ?? []).forEach(l => {
         shippedByIsbn.set(l.isbn, (shippedByIsbn.get(l.isbn) ?? 0) + l.qtyShipped)
       })
     })
 
-    const lines: DesadvGroupLine[] = ordrsp
+    const lines: DesadvGroupLine[] = ordrsp?.lines
       ? ordrsp.lines.map(ol => {
           const qtyShippedTotal = shippedByIsbn.get(ol.ean) ?? 0
           return {

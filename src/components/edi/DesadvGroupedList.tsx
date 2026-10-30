@@ -14,8 +14,8 @@ function fmtDate(iso: string) {
 function fmtTime(iso: string) {
   return new Date(iso).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
 }
-function linesSummary(lines: DESADVPayload['lines']): string {
-  return lines.map(l => `…${l.isbn.slice(-3)} ×${l.qtyShipped}`).join(' · ')
+function linesSummary(lines: DESADVPayload['lines'] | undefined): string {
+  return (lines ?? []).map(l => `…${l.isbn.slice(-3)} ×${l.qtyShipped}`).join(' · ')
 }
 
 /* ─── Styled ─────────────────────────────────────────── */
@@ -171,7 +171,7 @@ export function DesadvGroupedList({ messages, onSelect, isbnFilter }: Props) {
                 </GroupTr>
 
                 {isOpen(group.orderId) && group.desadvs.map(desadv => {
-                  const p = desadv.payload as DESADVPayload
+                  const p = desadv.payload as Partial<DESADVPayload>
                   return (
                     <SubTr key={desadv.id}>
                       <TreeTd>└</TreeTd>
