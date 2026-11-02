@@ -408,14 +408,7 @@ export function ParametresPage() {
         <Section>
           <SectionTitle>EDI : Échanges de données</SectionTitle>
           <Row>
-            <RowLabel>Préférer EDI par défaut</RowLabel>
-            <Toggle
-              checked={ediParams.preferEdiByDefault}
-              onChange={v => updateEdiParams({ preferEdiByDefault: v })}
-            />
-          </Row>
-          <Row>
-            <RowLabel>Notifications EDI par email</RowLabel>
+            <RowLabel>Afficher les notifications EDI de démonstration</RowLabel>
             <Toggle
               checked={ediParams.emailNotifications}
               onChange={v => updateEdiParams({ emailNotifications: v })}

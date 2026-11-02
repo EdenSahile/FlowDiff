@@ -175,7 +175,7 @@ describe('LOT-09 : Commandes et historique', () => {
       expect(createdOrder.status).toBe('en préparation')
     })
 
-    it('FLOW-RM-068 : ediStatus = PENDING quand transmissionMode === EDI', () => {
+    it('FLOW-RM-068 : ediStatus = ACK quand la simulation EDI génère ses messages', () => {
       const { result } = renderHook(() => useOrders(), { wrapper: Wrapper })
 
       let ediOrder!: Order
@@ -186,7 +186,7 @@ describe('LOT-09 : Commandes et historique', () => {
         })
       })
 
-      expect(ediOrder.ediStatus).toBe('PENDING')
+      expect(ediOrder.ediStatus).toBe('ACK')
     })
 
     it('FLOW-RM-068 : ediStatus = undefined quand transmissionMode === FLOWDIFF', () => {
@@ -201,6 +201,21 @@ describe('LOT-09 : Commandes et historique', () => {
       })
 
       expect(flowdiffOrder.ediStatus).toBeUndefined()
+    })
+
+    it('crée une simulation EDI sans toucher au panier et avec son origine EDI', () => {
+      const { result } = renderHook(() => useOrders(), { wrapper: Wrapper })
+
+      let simulated!: Order
+      act(() => {
+        simulated = result.current.createEdiSimulation()
+      })
+
+      expect(simulated.transmissionMode).toBe('EDI')
+      expect(simulated.ediStatus).toBe('ACK')
+      expect(simulated.codeClient).toBe('LIB001')
+      expect(simulated.items.length).toBeGreaterThan(0)
+      expect(localStorage.getItem('bookflow_cart_LIB001')).toBeNull()
     })
 
     it('FLOW-RM-072 : reporte deliveryMode standard sur la commande', () => {

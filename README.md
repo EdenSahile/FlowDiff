@@ -24,7 +24,7 @@ Les libraires commandent leurs livres à leurs diffuseurs via des outils souvent
 
 - la **commande** de fonds, nouveautés, top ventes et sélections éditoriales,
 - un **tableau de bord** d'activité (volumes, montants, top éditeurs, taux de rupture…),
-- la **transmission EDI** des commandes au format EDIFACT (Dilicom),
+- une **simulation de suivi EDI** inspirée de Dilicom, sans connexion ni transmission réelle,
 - la **facturation** et l'historique, avec remises personnalisées par librairie.
 
 > 💡 L'enjeu n'était pas « faire une app » mais **modéliser un domaine métier réel** (chaîne du livre, remises, TVA, EDI) et le traduire en un produit utilisable.
@@ -37,7 +37,7 @@ Les libraires commandent leurs livres à leurs diffuseurs via des outils souvent
 |---|---|
 | **Catalogue** | Fonds, Nouveautés, À paraître, Top ventes, Sélections · recherche + filtres par univers · fiches produit · **vraies couvertures** (Google Books / Open Library, stockées en Supabase) |
 | **Commande** | Panier avec **remises auto par thématique**, calcul HT / remise / TVA 5,5 % / TTC, références de commande, validation |
-| **EDI EDIFACT** | Génération de messages **ORDERS** et **ORDRSP** conformes (UNA/UNB, BGM, segments IMD/PIA/RFF/CNT…), suivi des flux, ACK/DESADV |
+| **Simulation EDI** | Génération illustrative de messages **ORDERS**, **ORDRSP** et **DESADV**, suivi fictif des flux |
 | **Tableau de bord** | KPIs, courbes d'évolution, répartition par univers, top éditeurs, comparaison N-1, **exports CSV** par section, personnalisation des cartes (drag & drop) |
 | **Facturation** | Factures PDF générées à la volée, paiement (CB/virement), historique |
 | **Compte & historique** | Profil librairie, remise & adresse, historique des commandes + duplication 1 clic |
@@ -51,7 +51,7 @@ Les libraires commandent leurs livres à leurs diffuseurs via des outils souvent
 - **À paraître non commandable** : consultation catalogue uniquement, commande via représentant.
 - **Remises personnalisées** par librairie et par thématique, appliquées automatiquement.
 - **TVA livre à 5,5 %** : chaîne de prix cohérente : prix public **HT** (donnée source) → TTC → prix net après remise.
-- **EDI Dilicom** : un diffuseur unique, GLN, références de commande, structure EDIFACT réelle.
+- **EDI inspiré de Dilicom** : un seul distributeur fictif, références de commande et structure illustrative ; aucune intégration réelle.
 - **Isolation des données par `codeClient`** : panier et historique partagés au sein d'une librairie, jamais entre librairies.
 - **B2B exclusif** : inscription contrôlée (code client + email professionnel).
 

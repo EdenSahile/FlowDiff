@@ -83,7 +83,6 @@ export interface EDIMessage {
 }
 
 export interface EDIParams {
-  preferEdiByDefault: boolean
   emailNotifications: boolean
   relanceDelay: '12h' | '24h' | '48h'
 }
@@ -266,10 +265,10 @@ export function formatEDIStatusLabel(status: EDIStatus): string {
 }
 
 const BUSINESS_STATUS: Record<EDIMessageType, string> = {
-  ORDERS: 'Commande envoyée',
-  ORDRSP: 'Réponse commande reçue',
-  DESADV: 'Info expédition reçue',
-  INVOIC: 'Facture reçue',
+  ORDERS: 'Commande simulée',
+  ORDRSP: 'Réponse du distributeur simulée',
+  DESADV: 'Avis d’expédition simulé',
+  INVOIC: 'Facture simulée',
 }
 
 export function getBusinessStatus(type: EDIMessageType): string {

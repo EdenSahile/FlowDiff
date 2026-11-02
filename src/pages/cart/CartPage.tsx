@@ -13,8 +13,7 @@ import { theme } from '@/lib/theme'
 import { mq } from '@/lib/responsive'
 import { formatPrice } from '@/lib/format'
 import { CHECKOUT_STEPS, type CheckoutPage, type CheckoutStep, STEP_QUERY_PARAM, getNextStep, getPrevStep, getStepIndex, getStepLabel, parseCheckoutPage } from './checkoutSteps'
-import { addressSchema, parseAddressString, type AddressData, type TransmissionMode } from './checkoutSchemas'
-import { OrderTransmissionStep } from './OrderTransmissionStep'
+import { addressSchema, parseAddressString, type AddressData } from './checkoutSchemas'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { IconTrash, IconCart, IconChevronLeft } from '@/components/ui/icons'
 import { BackButton } from '@/components/ui/BackButton'
@@ -974,37 +973,6 @@ const ValidateBtn = styled.button`
   &:disabled { opacity: 0.5; cursor: not-allowed; }
 `
 
-const EDIHint = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-family: ${({ theme }) => theme.typography.fontFamily};
-  font-size: 12px;
-  color: ${({ theme }) => theme.colors.gray[600]};
-  padding: 8px 0;
-
-  a {
-    color: ${({ theme }) => theme.colors.navy};
-    font-weight: 600;
-    text-decoration: underline;
-    cursor: pointer;
-  }
-`
-
-const EDIHintIcon = styled.div`
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: ${({ theme }) => theme.colors.primaryLight};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  color: ${({ theme }) => theme.colors.navy};
-  font-size: 15px;
-  font-weight: 700;
-`
-
 /* ══════════════════════════════════════════════════════
    TYPE & HELPERS
 ══════════════════════════════════════════════════════ */
@@ -1116,7 +1084,7 @@ export function CartPage() {
 
   const { items, opGroups, totalItems, updateQty, removeFromCart, removeOP, clearCart, hasReliquatItems,
           subtotalTTC, remiseAmount, netHT, tva, totalTTC,
-          transmissionMode, setTransmissionMode } = useCart()
+          } = useCart()
   const { addOrder } = useOrders()
   const { showToast } = useToast()
   const { user } = useAuth()
@@ -1128,7 +1096,8 @@ export function CartPage() {
     « Panier » de l'en-tete, qui mene deja a /panier, ne produit aucun effet.
   */
   const [searchParams, setSearchParams] = useSearchParams()
-  const page: Page = parseCheckoutPage(searchParams.get(STEP_QUERY_PARAM))
+  const rawPage = searchParams.get(STEP_QUERY_PARAM)
+  const page: Page = parseCheckoutPage(rawPage)
 
   const setPage = useCallback((next: Page, { replace = false } = {}) => {
     setSearchParams(
@@ -1141,6 +1110,9 @@ export function CartPage() {
       { replace },
     )
   }, [setSearchParams])
+  useEffect(() => {
+    if (rawPage === 'transmission') setPage('addresses', { replace: true })
+  }, [rawPage, setPage])
   const [delivery, setDelivery] = useState<DeliveryMode>('standard')
   const [specificDate, setSpecific] = useState('')
   const [confirm, setConfirm]   = useState<{ open: false } | { open: true; title: string; message: string; onConfirm: () => void }>({ open: false })
@@ -1154,8 +1126,6 @@ export function CartPage() {
   const [sameAsDelivery, setSameAsDelivery]     = useState(true)
   const [deliveryErrors, setDeliveryErrors]     = useState<FormErrors>({})
   const [billingErrors, setBillingErrors]       = useState<FormErrors>({})
-  const [localTransmission, setLocalTransmission] = useState<TransmissionMode>(transmissionMode)
-  const [saveAsDefault, setSaveAsDefault]       = useState(false)
   const [refGlobale, setRefGlobale]             = useState('')
   const [refsParLigne, setRefsParLigne]         = useState<Record<string, string>>({})
 
@@ -1222,6 +1192,14 @@ export function CartPage() {
   }
 
   function handleConfirmOrder() {
+    const delivErr = validateAddress(deliveryAddress)
+    const billErr = sameAsDelivery ? {} : validateAddress(billingAddress)
+    if (Object.keys(delivErr).length || Object.keys(billErr).length) {
+      setDeliveryErrors(delivErr)
+      setBillingErrors(billErr)
+      setPage('addresses')
+      return
+    }
     const effectiveBilling = sameAsDelivery ? deliveryAddress : billingAddress
     const reliquat = hasReliquatItems
     addOrder({
@@ -1236,14 +1214,14 @@ export function CartPage() {
       totalTTC,
       deliveryMode: delivery,
       deliveryDate: delivery === 'specific' ? specificDate : undefined,
-      transmissionMode: localTransmission,
+      transmissionMode: 'FLOWDIFF',
       referenceCommande: refGlobale.trim() || undefined,
       referencesParLigne: Object.keys(refsParLigne).length > 0 ? refsParLigne : undefined,
     })
     clearCart()
     setPage('success', { replace: true })
     if (reliquat) {
-      showToast('📧 Vous serez notifié par email dès l\'expédition des titres en reliquat.')
+      showToast('Démonstration : les titres en reliquat apparaîtront dans le suivi de commande.')
     }
   }
 
@@ -1252,29 +1230,10 @@ export function CartPage() {
     <Page>
       <SuccessBox>
         <IconCheck />
-        <EmptyText as="h1">Commande envoyée !</EmptyText>
-        {localTransmission === 'EDI' ? (
-          <>
-            <EmptySubtext style={{ marginBottom: '8px' }}>
-              Commande transmise via Dilicom (EDI). Vous recevrez un accusé de réception automatique.
-            </EmptySubtext>
-            <EmptySubtext style={{ marginBottom: '8px' }}>
-              Statut EDI initial : <strong>En attente d'envoi</strong>
-            </EmptySubtext>
-            <EmptySubtext style={{ fontStyle: 'italic', opacity: 0.7 }}>
-              Ceci est une démonstration. Aucune commande réelle n'a été passée.
-            </EmptySubtext>
-          </>
-        ) : (
-          <>
-            <EmptySubtext style={{ marginBottom: '8px' }}>
-              Votre commande a bien été transmise via FlowDiff. Un récapitulatif vous sera envoyé par email.
-            </EmptySubtext>
-            <EmptySubtext style={{ fontStyle: 'italic', opacity: 0.7 }}>
-              Ceci est une démonstration. Aucune commande réelle n'a été passée.
-            </EmptySubtext>
-          </>
-        )}
+        <EmptyText as="h1">Votre commande a été enregistrée sur FlowDiff.</EmptyText>
+        <EmptySubtext style={{ fontStyle: 'italic', opacity: 0.7 }}>
+          Démonstration : aucune commande réelle n’a été transmise.
+        </EmptySubtext>
 
         {/*
           Une seule action principale, les autres sorties en liens : 3 boutons
@@ -1290,11 +1249,6 @@ export function CartPage() {
           <SuccessLink type="button" onClick={() => navigate('/historique')}>
             Voir mes commandes
           </SuccessLink>
-          {localTransmission === 'EDI' && (
-            <SuccessLink type="button" onClick={() => navigate('/edi')}>
-              Voir les échanges EDI
-            </SuccessLink>
-          )}
         </SuccessLinks>
       </SuccessBox>
     </Page>
@@ -1326,7 +1280,7 @@ export function CartPage() {
   /* ────────── TUNNEL : ÉTAPE 1 : Récapitulatif ────────── */
   if (page === 'recap') return (
     <Page>
-      <PageTitle style={{ marginBottom: '4px' }}>Votre commande</PageTitle>
+      <PageTitle style={{ marginBottom: '4px' }}>Vérifiez votre commande</PageTitle>
       <ClientCode>Code client : <ClientCodeBold>{user?.codeClient ?? '—'}</ClientCodeBold></ClientCode>
       <CheckoutStepper current="recap" />
 
@@ -1374,12 +1328,23 @@ export function CartPage() {
         </div>
       </RecapCard>
 
+      <div style={{ display: 'flex', gap: '12px', marginBottom: theme.spacing.xl }}>
+        <AddressSummary style={{ flex: 1 }}>
+          <AddressSummaryLabel>Adresse de livraison</AddressSummaryLabel>
+          <AddressSummaryValue>{fmtAddress(deliveryAddress)}</AddressSummaryValue>
+        </AddressSummary>
+        <AddressSummary style={{ flex: 1 }}>
+          <AddressSummaryLabel>Adresse de facturation</AddressSummaryLabel>
+          <AddressSummaryValue>{fmtAddress(sameAsDelivery ? deliveryAddress : billingAddress)}</AddressSummaryValue>
+        </AddressSummary>
+      </div>
+
       <NavActions>
-        <Button variant="primary" size="lg" $fullWidth onClick={goNext}>
-          Suivant : Adresses
+        <Button variant="primary" size="lg" $fullWidth onClick={handleConfirmOrder}>
+          Valider ma commande
         </Button>
-        <Button variant="ghost" size="md" $fullWidth onClick={goBack}>
-          <IconChevronLeft /> Modifier le panier
+        <Button variant="ghost" size="md" $fullWidth onClick={() => setPage('addresses')}>
+          <IconChevronLeft /> Modifier les adresses
         </Button>
       </NavActions>
     </Page>
@@ -1432,77 +1397,10 @@ export function CartPage() {
 
       <NavActions>
         <Button variant="primary" size="lg" $fullWidth onClick={goNext}>
-          Suivant : Mode de transmission
+          Vérifier ma commande
         </Button>
         <Button variant="ghost" size="md" $fullWidth onClick={goBack}>
-          <IconChevronLeft /> Récapitulatif
-        </Button>
-      </NavActions>
-    </Page>
-  )
-
-  /* ────────── TUNNEL : ÉTAPE 3 : Mode de transmission ────────── */
-  if (page === 'transmission') return (
-    <Page>
-      <PageTitle style={{ marginBottom: '4px' }}>Mode de transmission</PageTitle>
-      <ClientCode>Code client : <ClientCodeBold>{user?.codeClient ?? '—'}</ClientCodeBold></ClientCode>
-      <CheckoutStepper current="transmission" />
-
-      <FormCard>
-        <OrderTransmissionStep
-          value={localTransmission}
-          onChange={setLocalTransmission}
-          saveAsDefault={saveAsDefault}
-          onSaveAsDefaultChange={setSaveAsDefault}
-        />
-      </FormCard>
-
-      {/* ── Récapitulatif commande ── */}
-      <RecapCard style={{ marginBottom: theme.spacing.xl }}>
-        <RecapTitle>Récapitulatif de votre commande</RecapTitle>
-
-        {/* Titres */}
-        {items.map(item => (
-          <RecapRow key={getItemKey(item)}>
-            <span>{item.book.title} × {item.quantity}</span>
-            <span>{fmt(getItemUnitPriceTTC(item) * item.quantity)}</span>
-          </RecapRow>
-        ))}
-        {opGroups.map(op => op.books.map(({ book, quantity }) => (
-          <RecapRow key={book.id}>
-            <span>{book.title} × {quantity}</span>
-            <span>{fmt(book.priceTTC * quantity)}</span>
-          </RecapRow>
-        )))}
-
-        {/* Total */}
-        <RecapRow style={{ fontWeight: 700, color: theme.colors.navy, borderTop: `1px solid ${theme.colors.gray[200]}`, paddingTop: '10px', marginTop: '6px' }}>
-          <span>Total TTC</span>
-          <span>{fmt(totalTTC)}</span>
-        </RecapRow>
-
-        {/* Adresses */}
-        <div style={{ display: 'flex', gap: '12px', marginTop: theme.spacing.md }}>
-          <AddressSummary style={{ flex: 1 }}>
-            <AddressSummaryLabel>Adresse de livraison</AddressSummaryLabel>
-            <AddressSummaryValue>{fmtAddress(deliveryAddress)}</AddressSummaryValue>
-          </AddressSummary>
-          <AddressSummary style={{ flex: 1 }}>
-            <AddressSummaryLabel>Adresse de facturation</AddressSummaryLabel>
-            <AddressSummaryValue>{fmtAddress(sameAsDelivery ? deliveryAddress : billingAddress)}</AddressSummaryValue>
-          </AddressSummary>
-        </div>
-      </RecapCard>
-
-      <NavActions>
-        <Button variant="primary" size="lg" $fullWidth onClick={() => {
-          if (saveAsDefault) setTransmissionMode(localTransmission)
-          handleConfirmOrder()
-        }}>
-          Envoyer la commande
-        </Button>
-        <Button variant="ghost" size="md" $fullWidth onClick={goBack}>
-          <IconChevronLeft /> Adresses
+          <IconChevronLeft /> Panier
         </Button>
       </NavActions>
     </Page>
@@ -1847,16 +1745,12 @@ export function CartPage() {
           </RecapSideCard>
 
           <ValidateBtn
-            onClick={() => setPage('recap')}
+            onClick={() => setPage('addresses')}
             disabled={delivery === 'specific' && !specificDate}
           >
             Valider la commande
           </ValidateBtn>
 
-          <EDIHint>
-            <EDIHintIcon>⇄</EDIHintIcon>
-            <span>Commande EDI disponible via <a onClick={() => navigate('/edi')}>Dilicom</a></span>
-          </EDIHint>
         </RecapCol>
       </TwoColLayout>
     </Page>
