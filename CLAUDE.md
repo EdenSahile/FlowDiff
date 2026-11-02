@@ -45,7 +45,7 @@ Application B2B **FlowDiff** à destination exclusive des **libraires**, permett
   
 L'app permet également :
 - de voir les flash infos sur les titres, l'app, les auteurs etc..
-- de passer des commandes via le site ou via Dilicom (EDI)
+- de passer des commandes depuis le site et de consulter une simulation EDI distincte
 - de créer des listes de titres 
 - de voir l'historique des commande
 - de contacter son représentant ou service commercial
@@ -86,7 +86,7 @@ L'app permet également :
 - **Inscription** : code client + email professionnel + mot de passe + confirmation
 - **Double vérification** : le code client existe-t-il ? + l'email correspond-il à la librairie ?
 - **Connexion** : code client ou email + mot de passe + "mot de passe oublié"
-- Une fois connecté : interface liée au compte interne (remise personnalisée, adresse de livraison) via AS400 / CRM
+- Une fois connecté : interface alimentée par un compte de démonstration local (remise et adresse de livraison). Aucune liaison AS400 / CRM n'est active.
 
 ---
 
@@ -122,7 +122,7 @@ En permanence : **Panier** (droite, avec badge quantité) +  à gauche du panier
 ### À paraître (sous Nouveautés)
 - Commandables via l'app (comme les nouveautés et le fonds)
 - Tri par univers puis par programme (tranches 2-4 mois)
-- Bouton "Recevoir le catalogue" par email
+- Bouton illustratif « Recevoir le catalogue » ; aucun email réel n'est envoyé
 
 ### Fonds
 - Titres déjà parus, commandables directement
@@ -146,15 +146,15 @@ En permanence : **Panier** (droite, avec badge quantité) +  à gauche du panier
 - Code client affiché automatiquement
 - Récap en haut : Montant HT, Remise (%), Net HT, TVA 5,5%, Total TTC, nb articles
 - Date de livraison : délai habituel (1-3 jours) ou date spécifique
-- Remises appliquées automatiquement par thématique (liaison AS400/CRM)
+- Remises de démonstration appliquées automatiquement par thématique depuis les données locales
 - Modification quantité / suppression avant validation
-- Après validation : résumé de commande → bouton "Confirmer" pour envoi
+- Après validation : vérification des informations puis bouton « Valider ma commande » ; la commande est enregistrée dans la démonstration, sans envoi réel
 
 ### Menu Burger
 - Photo + nom librairie en en-tête
 - Mon compte | Mon historique | Contact | Inscription Newsletter | Paramètres | Aide | CGV | Se déconnecter
 - **Mon historique** : liste des commandes passées + duplication en 1 clic
-- **Contact** : envoi email vers représentant ou service clients
+- **Contact** : formulaire et coordonnées de démonstration, sans envoi réel
 - **Paramètres** : préférences notifications par univers
 - **Aide** : lien vers onboarding
 - Réseaux sociaux en pied : Site web, Facebook, Instagram, YouTube
@@ -163,11 +163,12 @@ En permanence : **Panier** (droite, avec badge quantité) +  à gauche du panier
 
 ## Règles métier importantes
 
-- Les **3 types de titres (fonds, nouveautés, à paraître) sont commandables** directement via l'app
+- Les **3 types de titres (fonds, nouveautés, à paraître) sont commandables** directement dans le portail. Les à paraître sont enregistrés avec leur type de commande « A paraître ».
 - Les remises sont **personnalisées par librairie** et s'appliquent automatiquement selon la thématique
 - Le **numérique a son propre taux de remise**, unique quel que soit l'univers (`REMISE_NUMERIQUE`, `CartContext.tsx`). Sur le papier le taux varie par univers parce qu'il rémunère le stock acheté ferme, les invendus et la mise en place. Rien de tout cela n'existe sur un fichier.
 - **Aucun prix ne se calcule.** Le prix d'un livre est fixé par l'éditeur et opposable à tous : loi du 10 août 1981 pour le papier, loi du 26 mai 2011 pour le numérique. Tout prix affiché vient des données. Seule exception admise : la conversion TTC vers HT par le taux de TVA, qui est une opération fiscale, pas un prix.
 - L'app est **B2B exclusif** : aucun accès grand public
+- **Canaux de commande** : le panier crée uniquement des commandes d'origine « Site FlowDiff ». La page EDI simule séparément une commande externe issue du logiciel du libraire ; les messages et la référence à Dilicom sont fictifs, sans connexion réelle.
 
 ---
 
@@ -208,7 +209,7 @@ Deux règles qui en découlent :
 | API serveur | **aucune.** Pas de dossier `api/`, rien à déployer côté serveur |
 | Validation | **Zod** (tous les inputs) |
 | Tests | **Vitest** (jsdom) |
-| Déploiement | **Vercel**, https://flowdiff-demo-app.vercel.app |
+| Déploiement | Configuration Vercel statique présente ; aucune disponibilité d'URL n'est à supposer |
 
 ### Il n'y a pas de backend
 
@@ -265,7 +266,7 @@ Deux ensembles existent dans le repo sans être compilés ni atteignables. Ne pa
 | 10 | ~~PWA avec vite-plugin-pwa (manifest, service worker, icônes)~~, **annulé** | 🚫 Annulé |
 | 11 | Tests + recette fonctionnelle | ✅ Fait (Vitest) |
 | 12 | ~~Migration Next.js 14~~, **annulé**, le projet reste sur Vite | 🚫 Annulé |
-| 13 | Déploiement Vercel | ✅ Fait (https://flowdiff-omega.vercel.app) |
+| 13 | Déploiement Vercel | ⚠️ État historique : configuration statique présente ; disponibilité d'une URL non vérifiée dans le code courant |
 
 
 ---

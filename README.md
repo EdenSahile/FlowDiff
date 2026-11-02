@@ -7,12 +7,10 @@
   <img alt="React" src="https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white">
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white">
   <img alt="Vite" src="https://img.shields.io/badge/Vite-5-646CFF?logo=vite&logoColor=white">
-  <img alt="Vercel" src="https://img.shields.io/badge/Vercel-deployed-000000?logo=vercel&logoColor=white">
-  <img alt="Tests" src="https://img.shields.io/badge/tests-180%2B%20passing-success">
+  <img alt="Démonstrateur" src="https://img.shields.io/badge/statut-d%C3%A9monstrateur-42556C">
 </p>
 
-**🔗 Démo live :**`https://flowdiff-demo-app.vercel.app/login`
-**🔑 Connexion :** cliquer directement sur **Se connecter**.
+**🔑 Connexion de démonstration :** cliquer directement sur **Se connecter**.
  
  📸  ![Aperçu FlowDiff](docs/screenshots/dashboard.png)
 
@@ -20,7 +18,12 @@
 
 ## 🎯 Le produit
 
-Les libraires commandent leurs livres à leurs diffuseurs via des outils souvent vieillissants (EDI Dilicom, bons de commande, tableurs). **FlowDiff** est une application **B2B exclusive aux libraires** qui réunit en un seul endroit :
+**FlowDiff** est le portail de démonstration d'un diffuseur-distributeur fictif, à destination des libraires. Il distingue deux parcours, tous deux fictifs :
+
+- les commandes créées dans le panier, enregistrées depuis le **site FlowDiff** ;
+- les commandes externes simulées depuis la page **EDI**, comme si elles provenaient du logiciel de gestion habituel du libraire.
+
+Le démonstrateur ne se connecte pas à Dilicom et ne transmet aucune commande réelle. Il réunit aussi :
 
 - la **commande** de fonds, nouveautés, top ventes et sélections éditoriales,
 - un **tableau de bord** d'activité (volumes, montants, top éditeurs, taux de rupture…),
@@ -35,12 +38,12 @@ Les libraires commandent leurs livres à leurs diffuseurs via des outils souvent
 
 | Domaine | Ce qui est implémenté |
 |---|---|
-| **Catalogue** | Fonds, Nouveautés, À paraître, Top ventes, Sélections · recherche + filtres par univers · fiches produit · **vraies couvertures** (Google Books / Open Library, stockées en Supabase) |
-| **Commande** | Panier avec **remises auto par thématique**, calcul HT / remise / TVA 5,5 % / TTC, références de commande, validation |
-| **Simulation EDI** | Génération illustrative de messages **ORDERS**, **ORDRSP** et **DESADV**, suivi fictif des flux |
+| **Catalogue** | Fonds, Nouveautés, À paraître, Top ventes, Sélections · recherche + filtres par univers · fiches produit · couvertures locales dans `public/covers` |
+| **Commande** | Panier avec remises et calculs de démonstration, vérification des adresses, validation depuis le site FlowDiff |
+| **Simulation EDI** | Depuis la page EDI uniquement : création d'une commande externe fictive et génération immédiate, pour la démonstration, des messages **ORDERS**, **ORDRSP** et **DESADV** |
 | **Tableau de bord** | KPIs, courbes d'évolution, répartition par univers, top éditeurs, comparaison N-1, **exports CSV** par section, personnalisation des cartes (drag & drop) |
-| **Facturation** | Factures PDF générées à la volée, paiement (CB/virement), historique |
-| **Compte & historique** | Profil librairie, remise & adresse, historique des commandes + duplication 1 clic |
+| **Facturation** | Factures PDF fictives générées à la volée ; aucun paiement réel n'est encaissé |
+| **Compte & historique** | Profil fictif, remises et adresse de démonstration, historique distinguant « Site FlowDiff » et « EDI — simulation » |
 | **Onboarding** | Tour guidé (Driver.js) + infobulles métier |
 | **UX** | Responsive **360 px → 1400 px**, design system maison, accessibilité (touch ≥ 44 px, contrastes WCAG AA) |
 
@@ -48,12 +51,12 @@ Les libraires commandent leurs livres à leurs diffuseurs via des outils souvent
 
 ## 🧠 Règles métier modélisées *(le cœur du travail produit)*
 
-- **À paraître non commandable** : consultation catalogue uniquement, commande via représentant.
-- **Remises personnalisées** par librairie et par thématique, appliquées automatiquement.
+- **À paraître commandable** : le type « A paraître » est conservé sur la ligne de commande pour distinguer ce cas métier.
+- **Remises de démonstration** par librairie et par thématique, appliquées automatiquement depuis les données locales.
 - **TVA livre à 5,5 %** : chaîne de prix cohérente : prix public **HT** (donnée source) → TTC → prix net après remise.
 - **EDI inspiré de Dilicom** : un seul distributeur fictif, références de commande et structure illustrative ; aucune intégration réelle.
 - **Isolation des données par `codeClient`** : panier et historique partagés au sein d'une librairie, jamais entre librairies.
-- **B2B exclusif** : inscription contrôlée (code client + email professionnel).
+- **B2B exclusif simulé** : inscription et comptes de démonstration stockés localement.
 
 ---
 
@@ -77,11 +80,11 @@ Concrètement, mon rôle sur ce produit :
 - **Vite 5 + React 18** : SPA, **React Router v6**
 - **TypeScript** (mode strict)
 - **Styled-components v6** : design system & thème centralisé (`src/lib/theme.ts`)
-- **Supabase** : catalogue & couvertures
+- **Données locales** : catalogue mock et couvertures servies depuis `public/covers`
 - **Zod** : validation de toutes les entrées
 - **bcryptjs** : hachage des mots de passe (auth mock)
 - **Vitest** : tests unitaires (logique métier : calcul des totaux, commandabilité…)
-- **Vercel** : déploiement continu
+- **Vercel** : configuration de déploiement statique présente ; aucun service serveur n'est utilisé
 
 ---
 
@@ -118,6 +121,9 @@ npm run build    # build de production (tsc + vite)
 C'est une **application de démonstration** :
 
 - **Données fictives** (livres, librairies, commandes) à des fins pédagogiques.
+- **Stockage local uniquement** : catalogue embarqué et données utilisateur dans le `localStorage` du navigateur ; aucune base de données, API ou intégration AS400/CRM active.
+- **EDI fictif** : Dilicom est une référence métier, sans connexion, partenariat ni échange effectif. Le panier ne propose aucun choix EDI ; l'EDI se simule exclusivement depuis sa page dédiée.
+- **Emails et paiements non opérationnels** : les libellés et documents sont illustratifs ; aucun message ni paiement réel n'est envoyé ou encaissé.
 - **Authentification simplifiée** (mock JWT en `localStorage`) : pas destinée à la production.
 - Certaines sections sont **en cours** et affichées comme telles (ex. *Mon office* → « Bientôt disponible »).
 
