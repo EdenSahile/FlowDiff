@@ -1,11 +1,10 @@
-export const CHECKOUT_STEPS = ['recap', 'addresses', 'transmission'] as const
+export const CHECKOUT_STEPS = ['addresses', 'recap'] as const
 
 export type CheckoutStep = (typeof CHECKOUT_STEPS)[number]
 
 const STEP_LABELS: Record<CheckoutStep, string> = {
-  'recap':        'Récapitulatif',
   'addresses':    'Adresses',
-  'transmission': 'Mode de transmission',
+  'recap':        'Vérification',
 }
 
 export function getStepIndex(step: CheckoutStep): number {
@@ -42,5 +41,7 @@ export type CheckoutPage = (typeof CHECKOUT_PAGES)[number]
 export const STEP_QUERY_PARAM = 'etape'
 
 export function parseCheckoutPage(raw: string | null): CheckoutPage {
+  // Ancienne étape supprimée : le tunnel reprend sur une étape valide.
+  if (raw === 'transmission') return 'addresses'
   return CHECKOUT_PAGES.find(page => page === raw) ?? 'cart'
 }

@@ -13,11 +13,11 @@ Ne renseigne que ce qui est réellement utile à ce projet. Une ligne vide ou ab
 
 - `STACK` : Vite 5 + React 18 + TypeScript strict + styled-components v6 + React Router v6
 - `FRONTEND` : React 18 + Vite 5
-- `BACKEND` : Serverless functions Vercel (Node.js)
-- `DATABASE` : Supabase (tables livres, commandes, libraires) + mock data localStorage
+- `BACKEND` : aucun backend actif ; front statique uniquement
+- `DATABASE` : aucune base active ; catalogue mock embarqué et données utilisateur en localStorage
 - `AUTHENTICATION` : Mock JWT (bcrypt, localStorage)
-- `AI_PROVIDER` : Anthropic (Claude, via API serverless /api/aidenia)
-- `DEPLOYMENT` : Vercel
+- `AI_PROVIDER` : aucun fournisseur actif ; le chatbot Aidénia est mis de côté dans `parked/aidenia/` et hors build
+- `DEPLOYMENT` : configuration Vercel statique présente ; aucun déploiement ou service serveur à supposer actif
 
 ## Outillage
 
@@ -44,8 +44,10 @@ Ne renseigne que ce qui est réellement utile à ce projet. Une ligne vide ou ab
 
 ## Notes libres
 
-- App B2B exclusive pour libraires (commandes de livres, nouveautes, fonds, top ventes, selections)
+- Démonstrateur B2B pour libraires d'un diffuseur-distributeur fictif (catalogue, commandes, top ventes, sélections)
 - Theme/charte graphique : source de verite dans `src/lib/theme.ts`, jamais hardcoder les couleurs
 - Panier et historique partages par `codeClient` (une librairie = un compte), persistent apres deconnexion
 - Donnees isolees par `codeClient` (cles localStorage suffixees)
-- Les titres a paraitre ne sont PAS commandables via l'app
+- Les titres à paraître sont commandables et leur type est conservé sur la ligne de commande.
+- Le panier crée des commandes « Site FlowDiff » uniquement. La page EDI simule séparément des commandes externes et leurs messages ; aucune connexion Dilicom n'est active.
+- Les couvertures sont des fichiers locaux dans `public/covers`. AS400/CRM, envoi d'email et paiement réel ne sont pas intégrés.

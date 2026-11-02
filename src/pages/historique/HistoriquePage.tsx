@@ -182,6 +182,19 @@ const RefBadge = styled.div`
   letter-spacing: 0.02em;
 `
 
+const OriginBadge = styled.div`
+  display: inline-block;
+  margin-top: 3px;
+  margin-bottom: 1px;
+  padding: 2px 10px;
+  border-radius: 10px;
+  background: ${({ theme }) => theme.colors.white};
+  color: ${({ theme }) => theme.colors.navy};
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 11px;
+  font-weight: ${({ theme }) => theme.typography.weights.semibold};
+`
+
 const RefItemLine = styled.div`
   font-family: ${({ theme }) => theme.typography.fontFamily};
   font-size: 11px;
@@ -847,6 +860,7 @@ export function HistoriquePage() {
               <OrderCardHeader>
                 <div>
                   <OrderNumero>{order.numero}</OrderNumero>
+                  <OriginBadge>{order.transmissionMode === 'EDI' ? 'EDI — simulation' : 'Site FlowDiff'}</OriginBadge>
                   {order.referenceCommande && <RefBadge>Réf : {order.referenceCommande}</RefBadge>}
                   <OrderDate>{formatDate(order.date)}</OrderDate>
                 </div>

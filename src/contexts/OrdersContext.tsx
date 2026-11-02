@@ -1,9 +1,10 @@
 import { createContext, useContext, useState, useEffect, useMemo } from 'react'
 import { MOCK_ORDERS, type Order, type OrderItem } from '@/data/mockOrders'
-import type { CartItem } from '@/contexts/CartContext'
+import { computeTotals, REMISE_RATES, type CartItem } from '@/contexts/CartContext'
 import { useAuthContext } from '@/contexts/AuthContext'
 import { storedOrdersSchema } from '@/lib/storageSchemas'
 import { getTypeCommande } from '@/lib/bookUtils'
+import { MOCK_BOOKS } from '@/data/mockBooks'
 
 /* Hoisted : MOCK_ORDERS est statique, pas besoin de recalculer à chaque render */
 const MOCK_IDS = new Set(Object.values(MOCK_ORDERS).flat().map(o => o.id))
@@ -62,6 +63,7 @@ interface OrdersContextValue {
     referenceCommande?: string
     referencesParLigne?: Record<string, string>
   }) => Order
+  createEdiSimulation: () => Order
 }
 
 const OrdersContext = createContext<OrdersContextValue | null>(null)
@@ -111,6 +113,7 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
 function OrdersAccountProvider(
   { codeClient, children }: { codeClient: string | undefined; children: React.ReactNode }
 ) {
+  const { user } = useAuthContext()
   const key = ordersKey(codeClient)
 
   const [orders, setOrders] = useState<Order[]>(() => loadOrders(key))
@@ -176,7 +179,9 @@ function OrdersAccountProvider(
       deliveryMode: params.deliveryMode,
       deliveryDate: params.deliveryDate,
       transmissionMode: params.transmissionMode,
-      ediStatus: params.transmissionMode === 'EDI' ? 'PENDING' : undefined,
+      // La simulation EDI génère immédiatement les trois messages : elle est
+      // donc déjà transmise et accusée, sans mêler cet état au traitement métier.
+      ediStatus: params.transmissionMode === 'EDI' ? 'ACK' : undefined,
       referenceCommande: params.referenceCommande,
       items: orderItems,
       subtotalHT: params.subtotalHT,
@@ -190,8 +195,40 @@ function OrdersAccountProvider(
     return order
   }
 
+  function createEdiSimulation(): Order {
+    // Catalogue et règles de calcul du portail, sans jamais lire le panier.
+    const items: CartItem[] = MOCK_BOOKS
+      .filter(book => book.type !== 'a-paraitre' && book.statut !== 'epuise')
+      .slice(0, 2)
+      .map((book, index) => ({
+        book,
+        quantity: index + 1,
+        statut: book.statut,
+        enReliquat: false,
+      }))
+    const rates = user?.remisesParUnivers
+      ? Object.fromEntries(Object.entries(user.remisesParUnivers).map(([universe, rate]) => [universe, Number(rate) / 100]))
+      : REMISE_RATES
+    const totals = computeTotals(items, [], rates)
+
+    return addOrder({
+      codeClient: codeClient ?? 'guest',
+      adresseLivraison: user?.adresseLivraison ?? 'Adresse de démonstration',
+      adresseFacturation: user?.adresseLivraison ?? 'Adresse de démonstration',
+      items,
+      subtotalHT: totals.subtotalTTC / 1.055,
+      remiseAmount: totals.remiseAmount / 1.055,
+      netHT: totals.netHT,
+      tva: totals.tva,
+      totalTTC: totals.totalTTC,
+      deliveryMode: 'standard',
+      transmissionMode: 'EDI',
+      referenceCommande: 'SIMULATION EDI',
+    })
+  }
+
   return (
-    <OrdersContext.Provider value={{ orders, userOrders, addOrder }}>
+    <OrdersContext.Provider value={{ orders, userOrders, addOrder, createEdiSimulation }}>
       {children}
     </OrdersContext.Provider>
   )

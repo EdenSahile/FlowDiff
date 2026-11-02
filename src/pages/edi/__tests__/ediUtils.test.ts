@@ -89,17 +89,17 @@ describe('formatEDIStatusLabel', () => {
 })
 
 describe('getBusinessStatus', () => {
-  it('ORDERS → Commande envoyée', () => {
-    expect(getBusinessStatus('ORDERS')).toBe('Commande envoyée')
+  it('ORDERS → Commande simulée', () => {
+    expect(getBusinessStatus('ORDERS')).toBe('Commande simulée')
   })
-  it('ORDRSP → Réponse commande reçue', () => {
-    expect(getBusinessStatus('ORDRSP')).toBe('Réponse commande reçue')
+  it('ORDRSP → Réponse du distributeur simulée', () => {
+    expect(getBusinessStatus('ORDRSP')).toBe('Réponse du distributeur simulée')
   })
-  it('DESADV → Info expédition reçue', () => {
-    expect(getBusinessStatus('DESADV')).toBe('Info expédition reçue')
+  it('DESADV → Avis d’expédition simulé', () => {
+    expect(getBusinessStatus('DESADV')).toBe('Avis d’expédition simulé')
   })
-  it('INVOIC → Facture reçue', () => {
-    expect(getBusinessStatus('INVOIC')).toBe('Facture reçue')
+  it('INVOIC → Facture simulée', () => {
+    expect(getBusinessStatus('INVOIC')).toBe('Facture simulée')
   })
 })
 

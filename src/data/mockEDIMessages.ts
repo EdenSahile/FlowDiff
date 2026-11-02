@@ -1,7 +1,9 @@
-// DEV ONLY : remplacé par API Dilicom en production
+// Données exclusivement fictives : aucune connexion ni échange réel.
 import type { EDIMessage } from '@/lib/ediUtils'
 
-export const MOCK_EDI_MESSAGES: EDIMessage[] = [
+export const DEMO_DISTRIBUTOR = 'FlowDiff — distributeur fictif'
+
+const RAW_MOCK_EDI_MESSAGES: EDIMessage[] = [
   // ── Messages anciens (alimentent les "Flux en cours") ────────────────
   {
     id: 'edi-old-1',
@@ -537,3 +539,13 @@ export const MOCK_EDI_MESSAGES: EDIMessage[] = [
     },
   },
 ]
+
+// Les éditeurs des lignes restent des données de catalogue. Seule l'identité
+// du distributeur est harmonisée pour la démonstration.
+export const MOCK_EDI_MESSAGES: EDIMessage[] = RAW_MOCK_EDI_MESSAGES.map(message => ({
+  ...message,
+  diffuseur: DEMO_DISTRIBUTOR,
+  payload: message.type === 'ORDERS'
+    ? { ...message.payload, diffuseur: DEMO_DISTRIBUTOR }
+    : message.payload,
+}))

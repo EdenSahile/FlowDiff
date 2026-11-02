@@ -3,7 +3,7 @@ import { useSearchParams, useLocation } from 'react-router-dom'
 import styled, { keyframes } from 'styled-components'
 import { useAuthContext } from '@/contexts/AuthContext'
 import { useEDI } from '@/contexts/EDIContext'
-import { theme } from '@/lib/theme'
+import { useOrders } from '@/contexts/OrdersContext'
 import { mq } from '@/lib/responsive'
 import { EDIMessageModal } from '@/components/edi/EDIMessageModal'
 import { useDemoState } from '@/contexts/DemoStateContext'
@@ -108,7 +108,7 @@ const Subtitle = styled.p`
   margin: 0;
 `
 
-const DocBtn = styled.a`
+const SimulationButton = styled.button`
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -119,10 +119,32 @@ const DocBtn = styled.a`
   font-family: ${({ theme }) => theme.typography.fontFamily};
   font-weight: ${({ theme }) => theme.typography.weights.medium};
   color: ${({ theme }) => theme.colors.navy};
-  text-decoration: none;
   white-space: nowrap;
   transition: background .15s;
+  background: ${({ theme }) => theme.colors.white};
+  cursor: pointer;
   &:hover { background: ${({ theme }) => theme.colors.gray[50]}; }
+`
+
+const SimulationBanner = styled.section`
+  background: ${({ theme }) => theme.colors.accentLight};
+  border: 1px solid ${({ theme }) => theme.colors.accent};
+  border-radius: ${({ theme }) => theme.radii.lg};
+  padding: 16px 18px;
+  margin-bottom: 24px;
+  color: ${({ theme }) => theme.colors.navy};
+`
+
+const SimulationTitle = styled.h2`
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: ${({ theme }) => theme.typography.sizes.md};
+  margin: 0 0 6px;
+`
+
+const SimulationText = styled.p`
+  font-size: ${({ theme }) => theme.typography.sizes.sm};
+  line-height: 1.5;
+  margin: 0;
 `
 
 /* ── Grille 3 statcards ── */
@@ -471,19 +493,6 @@ const HelpRow = styled.div`
   margin-bottom: 6px;
 `
 
-const ContactBtn = styled.button`
-  width: 100%;
-  margin-top: 12px;
-  padding: 8px;
-  border: 1.5px solid ${({ theme }) => theme.colors.gray[200]};
-  background: ${({ theme }) => theme.colors.white};
-  font-size: 0.8125rem;
-  font-family: ${({ theme }) => theme.typography.fontFamily};
-  color: ${({ theme }) => theme.colors.navy};
-  cursor: pointer;
-  &:hover { background: ${({ theme }) => theme.colors.gray[50]}; }
-`
-
 
 
 
@@ -518,7 +527,8 @@ const EDIFooter = styled.footer`
 ════════════════════════════════════════════════════ */
 export function EDIPage() {
   const { user } = useAuthContext()
-  const { messages, lastSync } = useEDI()
+  const { messages } = useEDI()
+  const { createEdiSimulation } = useOrders()
   const { markDesadvSeen } = useDemoState()
 
   const [searchParams] = useSearchParams()
@@ -543,6 +553,12 @@ export function EDIPage() {
   function handleFilterChange(key: EDIFilter) {
     setActiveFilter(key)
     setShowAll(false)
+  }
+
+  function handleSimulation() {
+    createEdiSimulation()
+    setActiveFilter('ALL')
+    setShowAll(true)
   }
 
   const isbnFiltered = isbnSearch.trim()
@@ -584,47 +600,53 @@ export function EDIPage() {
             <PageEyebrow>Outils</PageEyebrow>
             <Title>EDI : Échanges de données informatisés</Title>
             <Subtitle>
-              Suivez vos commandes et livraisons avec Dilicom.
+              Suivi fictif des commandes reçues du logiciel de gestion du libraire.
             </Subtitle>
           </TitleBlock>
-          <DocBtn
-            href="https://www.dilicom.net/fr/documentation"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation Dilicom ↗
-          </DocBtn>
+          <SimulationButton type="button" onClick={handleSimulation}>
+            Simuler une nouvelle commande EDI
+          </SimulationButton>
         </PageHeader>
+
+        <SimulationBanner>
+          <SimulationTitle>Simulation des échanges EDI</SimulationTitle>
+          <SimulationText>
+            Cette page illustre le suivi de commandes passées depuis le logiciel de gestion du libraire, puis transmises au distributeur via Dilicom. Toutes les données et tous les échanges présentés sont fictifs. Aucune connexion réelle à Dilicom n’est active.
+          </SimulationText>
+          <SimulationText style={{ marginTop: 8 }}>
+            La création d’une commande de démonstration génère instantanément la commande, sa réponse et son avis d’expédition ; cette accélération est propre à la démonstration.
+          </SimulationText>
+        </SimulationBanner>
 
         {/* ── Statcards ── */}
         <StatsRow>
           {/* Statut de connexion */}
           <Card>
-            <CardTitle>Statut de connexion ⓘ</CardTitle>
+            <CardTitle>Mode de la page ⓘ</CardTitle>
             <ConnectedBadge>
               <GreenDot />
               <div>
-                <ConnectedLabel>Connecté à Dilicom</ConnectedLabel>
+                <ConnectedLabel>Mode démonstration</ConnectedLabel>
                 <SyncLabel>
-                  Dernière synchronisation : {new Date(lastSync).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                  Aucune connexion réelle ni synchronisation externe.
                 </SyncLabel>
               </div>
             </ConnectedBadge>
             <MetaRow>
-              <MetaLabel>Identifiant Dilicom</MetaLabel>
-              <MetaValue>301234XXXXXXX</MetaValue>
+              <MetaLabel>Distributeur</MetaLabel>
+              <MetaValue>FlowDiff — fictif</MetaValue>
             </MetaRow>
             <MetaRow>
-              <MetaLabel>Code librairie (GLN)</MetaLabel>
-              <MetaValue>301234XXXXXXX</MetaValue>
+              <MetaLabel>Compte de démonstration</MetaLabel>
+              <MetaValue>{user?.codeClient ?? '—'}</MetaValue>
             </MetaRow>
             <MetaRow>
-              <MetaLabel>Statut</MetaLabel>
-              <ActiveBadge>Actif</ActiveBadge>
+              <MetaLabel>Étapes EDI</MetaLabel>
+              <ActiveBadge>Accélérées</ActiveBadge>
             </MetaRow>
             <MetaRow>
-              <MetaLabel>Depuis le</MetaLabel>
-              <MetaValue>12/03/2024</MetaValue>
+              <MetaLabel>Référence métier</MetaLabel>
+              <MetaValue>Dilicom (inspiration)</MetaValue>
             </MetaRow>
           </Card>
 
@@ -670,13 +692,9 @@ export function EDIPage() {
           {/* Besoin d'aide */}
           <Card>
             <CardTitle>Besoin d'aide ?</CardTitle>
-            <PanelText>Notre service clients EDI est à votre disposition.</PanelText>
-            <HelpRow>📞 01 40 20 40 20</HelpRow>
-            <HelpRow>✉ edi@flowdiff-fictif.fr</HelpRow>
-            <ContactBtn onClick={() => {
-              const body = `Nom : ${user?.nomLibrairie ?? ''}\nNuméro de compte : ${user?.codeClient ?? ''}\n\n`
-              window.location.href = `mailto:edi@flowdiff-fictif.fr?subject=${encodeURIComponent('Support EDI : ' + (user?.nomLibrairie ?? ''))}&body=${encodeURIComponent(body)}`
-            }}>Nous contacter</ContactBtn>
+            <PanelText>Les coordonnées affichées dans cette démonstration sont fictives.</PanelText>
+            <HelpRow>📞 01 40 20 40 20 (démo)</HelpRow>
+            <HelpRow>✉ edi@flowdiff-fictif.fr (démo)</HelpRow>
           </Card>
         </StatsRow>
 
@@ -796,8 +814,7 @@ export function EDIPage() {
 
       {/* ── Footer EDI ── */}
       <EDIFooter>
-        Les échanges EDI sont sécurisés et transitent via Dilicom.{' '}
-        <strong style={{ color: theme.colors.navy }}>🏢 DILICOM</strong>
+        Simulation EDI FlowDiff : données et messages fictifs, sans connexion à Dilicom.
       </EDIFooter>
 
       <EDIMessageModal

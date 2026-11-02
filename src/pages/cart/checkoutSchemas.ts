@@ -1,11 +1,5 @@
 import { z } from 'zod'
 
-export type TransmissionMode = 'FLOWDIFF' | 'EDI'
-
-export const transmissionSchema = z.object({
-  transmissionMode: z.enum(['FLOWDIFF', 'EDI']),
-})
-
 // trim avant les contrôles : Zod applique les étapes dans l'ordre d'écriture, et une
 // adresse faite d'espaces passait `min(1)` avant de partir vide dans la commande
 export const addressSchema = z.object({

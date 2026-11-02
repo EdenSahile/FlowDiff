@@ -2,6 +2,8 @@
 
 Ambiguïtés identifiées lors de l'audit croisé code / documentation / tests, avant lancement de la phase de tests.
 
+> **Statut historique.** Ce document conserve les décisions et constats de leur session d'origine. Ils ne décrivent pas nécessairement le code courant. En particulier, les références à une étape « transmission » du tunnel ont été remplacées par le tunnel à deux étapes (adresses, puis vérification) ; la simulation EDI est désormais déclenchée depuis la page EDI, indépendamment du panier. Les références à une migration Supabase restent des pistes historiques : aucune base Supabase ni backend n'est actif dans l'application actuelle.
+
 ---
 
 ## DEC-001 : Titres à paraître / "notés"
@@ -160,7 +162,7 @@ Contient la règle : "les titres à paraître ne sont PAS commandables via l'app
 * FLOW-RM-098
 * FLOW-RM-110
 
-**Décision retenue :** garder la séparation des 3 modèles pour la phase de tests en cours. L'unification passera par la migration vers Supabase comme source unique, hors scope actuel.
+**Décision retenue à l'époque :** garder la séparation des 3 modèles pour la phase de tests en cours. L'unification devait passer par une migration vers Supabase comme source unique, hors scope actuel. **Cette cible est aujourd'hui historique : le projet n'utilise aucune base Supabase ni backend actif.**
 
 ### Origine de la divergence
 

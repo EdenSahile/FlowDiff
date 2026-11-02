@@ -183,22 +183,20 @@ Tunnel de commande (LOT-07), ebooks et OP (LOT-08), storedCartSchema unitaire (L
 
 ### Objectif
 
-Couvrir les 3 étapes du checkout (récapitulatif, adresses, transmission), la validation d'adresse, le choix du mode de transmission, la confirmation de commande, et les options associées (livraison, référence, messages de succès).
+Couvrir le tunnel à 2 étapes (adresses, puis vérification), la validation d'adresse, la confirmation d'une commande Site FlowDiff et les options associées (livraison, références, message de succès). La simulation EDI est un parcours séparé depuis `/edi`.
 
 ### Règles couvertes
 
 | ID | Règle | Emplacement | Tests existants |
 | -- | ----- | ----------- | --------------- |
-| FLOW-RM-050 | Tunnel en 3 étapes : récapitulatif, adresses, transmission | `src/pages/cart/checkoutSteps.ts` | `checkoutSteps.test.ts` : 8 tests |
-| FLOW-RM-051 | Adresse de livraison : rue, code postal 5 chiffres, ville | `src/pages/cart/checkoutSchemas.ts:9-13` | `checkoutSchemas.test.ts` : 7 tests |
-| FLOW-RM-052 | Mode de transmission : FLOWDIFF ou EDI (Dilicom) | `src/pages/cart/checkoutSchemas.ts:3-7` | Aucun |
-| FLOW-RM-053 | Mode de transmission par défaut : FLOWDIFF | `src/contexts/CartContext.tsx:104` | Aucun |
-| FLOW-RM-054 | Préférence mode transmission persistée par codeClient | `src/contexts/CartContext.tsx:272-277` | Aucun |
-| FLOW-RM-055 | Confirmation : crée order, vide panier, écran de succès | `src/pages/cart/CartPage.tsx:1185-1208` | Aucun |
-| FLOW-RM-056 | Si articles en reliquat, toast « notifié par email » | `src/pages/cart/CartPage.tsx:1206-1208` | Aucun |
-| FLOW-RM-057 | Message de succès différent FLOWDIFF vs EDI | `src/pages/cart/CartPage.tsx:1217-1245` | Aucun |
-| FLOW-RM-058 | Référence commande : globale max 35 car + par ligne max 35 car | `src/pages/cart/CartPage.tsx:1501-1509` | Aucun |
-| FLOW-RM-059 | Livraison : standard (1-3 jours) ou date spécifique (>= aujourd'hui) | `src/pages/cart/CartPage.tsx:1736-1757` | Aucun |
+| FLOW-RM-050 | Tunnel à 2 étapes : adresses, vérification, et redirection de l'ancienne URL de transmission | `src/pages/cart/checkoutSteps.ts` | `checkoutSteps.test.ts` |
+| FLOW-RM-051 | Adresse de livraison : rue, code postal 5 chiffres, ville | `src/pages/cart/checkoutSchemas.ts` | `checkoutSchemas.test.ts` |
+| FLOW-RM-052 à 054 | Choix et préférence de transmission du panier | **Remplacés** par la séparation Site FlowDiff / EDI — simulation | — |
+| FLOW-RM-055 | Validation : crée la commande, vide le panier, écran de succès | `src/pages/cart/CartPage.tsx` | smoke LOT-07 |
+| FLOW-RM-056 | Si articles en reliquat, toast de démonstration sans promesse d'email | `src/pages/cart/CartPage.tsx` | `hasReliquatInItems` + smoke LOT-07 |
+| FLOW-RM-057 | Commandes Site FlowDiff et EDI — simulation séparées | `CartPage`, `EDIPage`, `EDIContext` | `EDIContext.test.tsx` + smoke LOT-07 |
+| FLOW-RM-058 | Référence commande : globale max 35 car + par ligne max 35 car | `src/pages/cart/CartPage.tsx` | smoke LOT-07 |
+| FLOW-RM-059 | Livraison : standard (1-3 jours) ou date spécifique (>= aujourd'hui) | `src/pages/cart/CartPage.tsx` | smoke LOT-07 |
 
 ### Hors périmètre
 
@@ -301,14 +299,14 @@ Aucun.
 
 ### Objectif
 
-Couvrir la génération automatique de réponses EDI (ORDRSP, DESADV), l'isolation par codeClient, le groupement DESADV par commande, les fonctions utilitaires (filtrage, comptage flux, matching ISBN), et la génération de placeholders EDIFACT.
+Couvrir la simulation EDI depuis sa page dédiée : génération immédiate, pour les besoins de la démonstration, de messages ORDERS, ORDRSP et DESADV, isolation par `codeClient`, groupement DESADV et utilitaires associés. Aucune connexion réelle à Dilicom n'est impliquée.
 
 ### Règles couvertes
 
 | ID | Règle | Emplacement | Tests existants |
 | -- | ----- | ----------- | --------------- |
-| FLOW-RM-084 | Commande EDI génère auto ORDRSP après 3s et DESADV après 8s | `src/contexts/EDIContext.tsx:~80-100` | Aucun |
-| FLOW-RM-085 | Données EDI isolées par codeClient | `src/contexts/EDIContext.tsx:~40` | Aucun |
+| FLOW-RM-084 | Simulation EDI : messages ORDERS, ORDRSP et DESADV immédiats, sans doublon | `src/contexts/EDIContext.tsx` | `EDIContext.test.tsx` |
+| FLOW-RM-085 | Données EDI isolées par codeClient | `src/contexts/EDIContext.tsx` | `EDIContext.test.tsx` |
 | FLOW-RM-086 | groupDESADVByOrder : EN_COURS si qté livrée < commandée, SOLDE sinon | `src/lib/ediUtils.ts` | Aucun |
 | FLOW-RM-087 | filterEDIMessages filtre par type ou ALL | `src/lib/ediUtils.ts` | `ediUtils.test.ts` |
 | FLOW-RM-088 | getFluxCounts : comptage par catégorie | `src/lib/ediUtils.ts` | `ediUtils.test.ts` |
@@ -318,7 +316,7 @@ Couvrir la génération automatique de réponses EDI (ORDRSP, DESADV), l'isolati
 
 ### Hors périmètre
 
-Mode de transmission EDI dans le tunnel de commande (LOT-07), ediStatus sur les commandes (LOT-09).
+Choix de transmission dans le panier (règle supprimée). Le statut technique EDI reste porté par les commandes de simulation (LOT-09).
 
 ### Points à clarifier
 

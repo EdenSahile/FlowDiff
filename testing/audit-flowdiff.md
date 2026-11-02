@@ -1,5 +1,7 @@
 # Audit des règles métier FlowDiff
 
+> **Archive d'audit.** Les emplacements, règles et comptes de tests ci-dessous reflètent l'état lors de cet audit. Pour le code courant, consulter les inventaires et scénarios mis à jour : le tunnel ne contient plus d'étape de transmission, l'EDI est une simulation séparée et aucune intégration Supabase active n'existe.
+
 ## 1. Périmètre analysé
 
 - **Contexts** (12) : AuthContext, CartContext, EDIContext, NotificationsContext, OnboardingContext, OrdersContext, RdvContext, ReturnsContext, ThemeContext, ToastContext, WishlistContext, DemoStateContext

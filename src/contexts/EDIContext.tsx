@@ -1,5 +1,5 @@
 import {
-  createContext, useContext, useState, useEffect, useRef, useCallback,
+  createContext, useContext, useState, useEffect, useCallback,
   type ReactNode,
 } from 'react'
 import { useAuthContext } from '@/contexts/AuthContext'
@@ -32,7 +32,6 @@ function paramsKey(cc: string)    { return `bookflow_edi_params_${cc}` }
 function versionKey(cc: string)   { return `bookflow_edi_version_${cc}` }
 
 const DEFAULT_PARAMS: EDIParams = {
-  preferEdiByDefault: true,
   emailNotifications: true,
   relanceDelay: '24h',
 }
@@ -92,10 +91,6 @@ function EDIAccountProvider(
   const [params, setParams]     = useState<EDIParams>(() => loadParams(codeClient))
   const [lastSync]              = useState<string>(() => new Date().toISOString())
 
-  const processedIds = useRef<Set<string>>(
-    new Set(loadMessages(codeClient).filter(m => m.orderId).map(m => m.orderId!))
-  )
-
   useEffect(() => {
     localStorage.setItem(messagesKey(codeClient), JSON.stringify(messages))
   }, [messages, codeClient])
@@ -110,31 +105,22 @@ function EDIAccountProvider(
     )
 
     ediOrders.forEach(order => {
-      if (processedIds.current.has(order.id)) return
-      processedIds.current.add(order.id)
-
-      // Une commande du jour vient d'etre passee : l'heure courante est juste, et
-      // les delais simulent Dilicom qui repond progressivement. Une commande plus
-      // ancienne est rejouee, ses messages ayant ete purges par un changement de
-      // MOCK_EDI_VERSION alors qu'elle-meme est restee : on la date depuis la
-      // commande et sans delai, sinon elle reapparait avec la date du jour.
-      const estDuJour    = order.date === new Date().toISOString().slice(0, 10)
-      const now          = estDuJour ? new Date() : new Date(`${order.date}T09:00:00.000Z`)
-      const delaiAck     = estDuJour ? 3000 : 0
-      const delaiDesadv  = estDuJour ? 8000 : 0
+      const now = order.date === new Date().toISOString().slice(0, 10)
+        ? new Date()
+        : new Date(`${order.date}T09:00:00.000Z`)
 
       const ordersMsg: EDIMessage = {
         id: `edi-${order.id}-orders`,
         type: 'ORDERS',
         status: 'SENT',
         documentRef: order.numero,
-        diffuseur: 'Interforum (Editis)',
+        diffuseur: 'FlowDiff — distributeur fictif',
         detail: `${order.items.length} lignes / ${order.items.reduce((s, i) => s + i.quantity, 0)} ex.`,
         createdAt: now.toISOString(),
         orderId: order.id,
         payload: {
           orderId: order.numero,
-          diffuseur: 'Interforum (Editis)',
+          diffuseur: 'FlowDiff — distributeur fictif',
           lines: order.items.map((item, i) => {
             const book = MOCK_BOOKS.find(b => b.isbn === item.isbn)
             return {
@@ -153,17 +139,14 @@ function EDIAccountProvider(
         },
       }
 
-      setMessages(prev => [...prev, ordersMsg])
-
-      setTimeout(() => {
-        const ackRef    = `ACK-${order.numero.replace('CMD', '')}`
-        const ackDate   = new Date(now.getTime() + 3000).toISOString()
-        const ack: EDIMessage = {
+      const ackRef    = `ACK-${order.numero.replace('CMD', '')}`
+      const ackDate   = new Date(now.getTime() + 3000).toISOString()
+      const ack: EDIMessage = {
           id: `edi-${order.id}-ordrsp`,
           type: 'ORDRSP',
           status: 'RECEIVED',
           documentRef: ackRef,
-          diffuseur: 'Interforum (Editis)',
+          diffuseur: 'FlowDiff — distributeur fictif',
           detail: 'Acceptée',
           createdAt: ackDate,
           orderId: order.id,
@@ -182,17 +165,13 @@ function EDIAccountProvider(
             })),
           },
         }
-        setMessages(prev => [...prev, ack])
-      }, delaiAck)
-
-      setTimeout(() => {
-        const desadvRef = `DESADV-${order.numero.replace('CMD', '')}`
-        const desadv: EDIMessage = {
+      const desadvRef = `DESADV-${order.numero.replace('CMD', '')}`
+      const desadv: EDIMessage = {
           id: `edi-${order.id}-desadv`,
           type: 'DESADV',
           status: 'RECEIVED',
           documentRef: desadvRef,
-          diffuseur: 'Interforum (Editis)',
+          diffuseur: 'FlowDiff — distributeur fictif',
           detail: `${order.items.reduce((s, i) => s + i.quantity, 0)} ex.`,
           createdAt: new Date(now.getTime() + 8000).toISOString(),
           orderId: order.id,
@@ -205,8 +184,13 @@ function EDIAccountProvider(
             })),
           },
         }
-        setMessages(prev => [...prev, desadv])
-      }, delaiDesadv)
+      // Les trois documents sont instantanés par choix de démonstration. La
+      // garde par identifiant rend l'opération idempotente après rechargement.
+      setMessages(prev => {
+        const ids = new Set(prev.map(message => message.id))
+        const additions = [ordersMsg, ack, desadv].filter(message => !ids.has(message.id))
+        return additions.length ? [...prev, ...additions] : prev
+      })
     })
   }, [orders, codeClient])
 
@@ -217,7 +201,7 @@ function EDIAccountProvider(
   return (
     <EDIContext.Provider value={{
       messages,
-      connectionStatus: 'connected',
+      connectionStatus: 'disconnected',
       lastSync,
       params,
       updateParams,
