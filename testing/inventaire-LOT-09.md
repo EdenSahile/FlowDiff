@@ -29,7 +29,7 @@
 | Regle | Ce qu'on verifie | Testable unitaire ? | Pourquoi | Comment |
 |---|---|---|---|---|
 | FLOW-RM-069 | `useClientOrders` filtre les commandes par `codeClient` : seules les commandes du client demande sont retournees | 🟢 | Filtre `Array.filter` sur notre donnee, logique pure | Unitaire, test-first |
-| FLOW-RM-073 | `migrateStorage` efface toutes les cles `bookflow_orders_*` et reinitialise le compteur quand `STORAGE_VERSION` change | 🟢 | Notre logique de migration, localStorage disponible dans jsdom, testable via reset de modules Vitest (`vi.resetModules`) | Unitaire, test-first |
+| FLOW-RM-073 | `migrateStorage` efface toutes les cles `flowdiff_orders_*` et reinitialise le compteur quand `STORAGE_VERSION` change | 🟢 | Notre logique de migration, localStorage disponible dans jsdom, testable via reset de modules Vitest (`vi.resetModules`) | Unitaire, test-first |
 
 ---
 

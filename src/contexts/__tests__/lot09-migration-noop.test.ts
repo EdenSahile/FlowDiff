@@ -6,13 +6,13 @@ import { STORAGE_VERSION, STORAGE_VERSION_KEY } from '@/contexts/OrdersContext'
  * quand STORAGE_VERSION est deja a jour.
  */
 
-const ORDER_COUNTER_KEY = 'bookflow_order_counter'
+const ORDER_COUNTER_KEY = 'flowdiff_order_counter'
 
 vi.hoisted(() => {
   localStorage.clear()
-  localStorage.setItem('bookflow_orders_LIB001', JSON.stringify([{ id: 'keep-this' }]))
-  localStorage.setItem('bookflow_order_counter', '42')
-  localStorage.setItem('bookflow_storage_version', '3')
+  localStorage.setItem('flowdiff_orders_LIB001', JSON.stringify([{ id: 'keep-this' }]))
+  localStorage.setItem('flowdiff_order_counter', '42')
+  localStorage.setItem('flowdiff_storage_version', '3')
 })
 
 vi.mock('@/contexts/AuthContext', () => ({
@@ -22,7 +22,7 @@ vi.mock('@/contexts/AuthContext', () => ({
 describe('FLOW-RM-073 (no-op) : Migration storage version a jour', () => {
 
   it('conserve les commandes existantes', () => {
-    expect(localStorage.getItem('bookflow_orders_LIB001')).toBe(
+    expect(localStorage.getItem('flowdiff_orders_LIB001')).toBe(
       JSON.stringify([{ id: 'keep-this' }]),
     )
   })

@@ -1,4 +1,4 @@
-# Audit & Refonte Mobile Responsive — BookFlow
+# Audit & Refonte Mobile Responsive — FlowDiff
 
 **Date :** 2026-05-04  
 **Scope :** Toutes les pages (19 pages + composants layout)  
@@ -9,7 +9,7 @@
 
 ## Contexte
 
-L'app BookFlow n'a pas de système de breakpoints unifié. Les pages utilisent des valeurs hardcodées disparates (`480px`, `700px`, `900px`, `1024px`) et une approche incohérente (`min-width` vs `max-width`). 4 pages sont entièrement cassées sur mobile (0 media queries layout), 11 sont partielles.
+L'app FlowDiff n'a pas de système de breakpoints unifié. Les pages utilisent des valeurs hardcodées disparates (`480px`, `700px`, `900px`, `1024px`) et une approche incohérente (`min-width` vs `max-width`). 4 pages sont entièrement cassées sur mobile (0 media queries layout), 11 sont partielles.
 
 **Critères de succès :**
 - Aucun scroll horizontal sur aucun écran (360px → 1400px)

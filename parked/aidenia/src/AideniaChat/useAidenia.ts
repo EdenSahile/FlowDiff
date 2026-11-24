@@ -10,7 +10,7 @@ export interface ChatMessage {
 }
 
 function getMockToken(): string | null {
-  return localStorage.getItem('bookflow_token')
+  return localStorage.getItem('flowdiff_token')
 }
 
 export function useAidenia() {

@@ -27,9 +27,9 @@ const EDIContext = createContext<EDIContextValue | null>(null)
 // v10 ceux que v9 avait redatés du jour au lieu de la date de la commande.
 const MOCK_EDI_VERSION = 'v10'
 
-function messagesKey(cc: string)  { return `bookflow_edi_${cc}` }
-function paramsKey(cc: string)    { return `bookflow_edi_params_${cc}` }
-function versionKey(cc: string)   { return `bookflow_edi_version_${cc}` }
+function messagesKey(cc: string)  { return `flowdiff_edi_${cc}` }
+function paramsKey(cc: string)    { return `flowdiff_edi_params_${cc}` }
+function versionKey(cc: string)   { return `flowdiff_edi_version_${cc}` }
 
 const DEFAULT_PARAMS: EDIParams = {
   emailNotifications: true,

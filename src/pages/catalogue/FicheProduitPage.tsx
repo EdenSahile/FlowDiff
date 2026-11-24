@@ -1531,7 +1531,7 @@ export function FicheProduitPage() {
     )
   }
 
-  const fakeYtUrl = `https://www.youtube.com/watch?v=bookflow-${book.isbn.slice(-6)}`
+  const fakeYtUrl = `https://www.youtube.com/watch?v=flowdiff-${book.isbn.slice(-6)}`
 
   const uvStyle        = UNIVERSE_STYLES[book.universe] ?? { bg: '#E8EDF3', color: '#1C3252' }
   const sectionLabel   = book.type === 'a-paraitre' ? 'À paraître' : book.type === 'nouveaute' ? 'Nouveautés' : 'Fonds'

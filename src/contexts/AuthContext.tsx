@@ -10,7 +10,7 @@ import {
   type RegisterInput,
 } from '@/lib/authUtils'
 
-const TOKEN_KEY = 'bookflow_token'
+const TOKEN_KEY = 'flowdiff_token'
 const BCRYPT_COST = 12
 
 /* ── Types ── */
@@ -175,7 +175,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const codeClientForLogout = user?.codeClient
   const logout = useCallback(() => {
     if (codeClientForLogout) {
-      localStorage.removeItem(`bookflow_wishlist_username_${codeClientForLogout}`)
+      localStorage.removeItem(`flowdiff_wishlist_username_${codeClientForLogout}`)
     }
     localStorage.removeItem(TOKEN_KEY)
     setUser(null)

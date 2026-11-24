@@ -10,8 +10,8 @@ Logout (ce qui est supprime vs conserve), protection des routes, securite anti o
 
 | Regle | Ce qu'on verifie | Testable unitaire ? | Pourquoi | Comment |
 |---|---|---|---|---|
-| FLOW-RM-016 | Logout supprime `bookflow_token` et `bookflow_wishlist_username_${codeClient}`, met `user` a `null` | 🟢 | Logique a nous : `localStorage.removeItem` sur des cles connues + `setUser(null)`. jsdom fournit un localStorage fonctionnel, pas de dependance externe dont on teste le comportement reel. | Unitaire, test-first |
-| FLOW-RM-016 | Logout conserve panier (`bookflow_cart_*`) et historique (`bookflow_orders_*`) | 🟢 | Meme raisonnement : on verifie que `logout()` ne touche pas a certaines cles localStorage. Pas de dependance externe. | Unitaire, test-first |
+| FLOW-RM-016 | Logout supprime `flowdiff_token` et `flowdiff_wishlist_username_${codeClient}`, met `user` a `null` | 🟢 | Logique a nous : `localStorage.removeItem` sur des cles connues + `setUser(null)`. jsdom fournit un localStorage fonctionnel, pas de dependance externe dont on teste le comportement reel. | Unitaire, test-first |
+| FLOW-RM-016 | Logout conserve panier (`flowdiff_cart_*`) et historique (`flowdiff_orders_*`) | 🟢 | Meme raisonnement : on verifie que `logout()` ne touche pas a certaines cles localStorage. Pas de dependance externe. | Unitaire, test-first |
 
 **Tests existants** : 2 tests dans `src/contexts/__tests__/AuthContext.test.tsx` (describe `logout`) couvrent deja ces 2 cas. A verifier si la couverture est suffisante ou si des cas limites manquent (ex. logout sans user connecte, absence de la cle wishlist).
 

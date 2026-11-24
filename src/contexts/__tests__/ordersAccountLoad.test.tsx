@@ -13,7 +13,7 @@ import { OrdersProvider } from '@/contexts/OrdersContext'
 
 const mockAuth = vi.mocked(useAuthContext)
 
-const ORDERS_KEY_LIB001 = 'bookflow_orders_LIB001'
+const ORDERS_KEY_LIB001 = 'flowdiff_orders_LIB001'
 
 function authEnCours() {
   return {

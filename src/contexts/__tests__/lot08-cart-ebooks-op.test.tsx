@@ -31,7 +31,7 @@ const mockAuth = vi.mocked(useAuthContext)
 
 /* ── Helpers ── */
 
-const CART_KEY = 'bookflow_cart_LIB001'
+const CART_KEY = 'flowdiff_cart_LIB001'
 
 function authUser(codeClient: string) {
   return {

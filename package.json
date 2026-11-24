@@ -1,5 +1,5 @@
 {
-  "name": "bookflow",
+  "name": "FlowDiff",
   "version": "0.1.0",
   "packageManager": "npm@11.17.0",
   "private": true,

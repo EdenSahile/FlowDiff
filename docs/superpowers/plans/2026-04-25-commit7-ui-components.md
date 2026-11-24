@@ -850,7 +850,7 @@ function getHeaders(multiOrder: boolean): string[] {
 }
 
 function handleExportAll() {
-  exportToCSV('bookflow_historique_complet.csv', getHeaders(true), buildRows(filtered))
+  exportToCSV('flowdiff_historique_complet.csv', getHeaders(true), buildRows(filtered))
 }
 
 function handleExportOrder(order: Order) {

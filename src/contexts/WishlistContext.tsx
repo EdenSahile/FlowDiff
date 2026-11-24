@@ -32,11 +32,11 @@ interface WishlistContextValue {
 const WishlistContext = createContext<WishlistContextValue | null>(null)
 
 function storageKey(codeClient: string | undefined) {
-  return `bookflow_wishlists_${codeClient ?? 'guest'}`
+  return `flowdiff_wishlists_${codeClient ?? 'guest'}`
 }
 
 function nameKey(codeClient: string | undefined) {
-  return `bookflow_wishlist_username_${codeClient ?? 'guest'}`
+  return `flowdiff_wishlist_username_${codeClient ?? 'guest'}`
 }
 
 function loadLists(key: string): Wishlist[] {

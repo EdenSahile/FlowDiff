@@ -49,8 +49,8 @@ interface EDIParams {
 ## EDIContext
 
 **Clés localStorage :**
-- Messages : `bookflow_edi_${codeClient}` (tableau `EDIMessage[]`)
-- Paramètres : `bookflow_edi_params_${codeClient}` (objet `EDIParams`)
+- Messages : `flowdiff_edi_${codeClient}` (tableau `EDIMessage[]`)
+- Paramètres : `flowdiff_edi_params_${codeClient}` (objet `EDIParams`)
 
 **État exposé :**
 ```ts
