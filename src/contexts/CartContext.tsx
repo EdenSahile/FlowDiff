@@ -130,7 +130,7 @@ interface CartContextValue {
 const CartContext = createContext<CartContextValue | null>(null)
 
 function cartKey(codeClient: string | undefined) {
-  return `bookflow_cart_${codeClient ?? 'guest'}`
+  return `flowdiff_cart_${codeClient ?? 'guest'}`
 }
 
 export function hasReliquatInItems(items: Pick<CartItem, 'enReliquat'>[]): boolean {

@@ -10,15 +10,15 @@ import { STORAGE_VERSION, STORAGE_VERSION_KEY } from '@/contexts/OrdersContext'
  * ce qui force la migration a tourner avec une ancienne version.
  */
 
-const ORDER_COUNTER_KEY = 'bookflow_order_counter'
+const ORDER_COUNTER_KEY = 'flowdiff_order_counter'
 
 vi.hoisted(() => {
   localStorage.clear()
-  localStorage.setItem('bookflow_orders_LIB001', JSON.stringify([{ id: 'old-order-1' }]))
-  localStorage.setItem('bookflow_orders_LIB002', JSON.stringify([{ id: 'old-order-2' }]))
-  localStorage.setItem('bookflow_order_counter', '42')
-  localStorage.setItem('bookflow_storage_version', 'OLD_VERSION')
-  localStorage.setItem('bookflow_other_key', 'should_persist')
+  localStorage.setItem('flowdiff_orders_LIB001', JSON.stringify([{ id: 'old-order-1' }]))
+  localStorage.setItem('flowdiff_orders_LIB002', JSON.stringify([{ id: 'old-order-2' }]))
+  localStorage.setItem('flowdiff_order_counter', '42')
+  localStorage.setItem('flowdiff_storage_version', 'OLD_VERSION')
+  localStorage.setItem('flowdiff_other_key', 'should_persist')
 })
 
 vi.mock('@/contexts/AuthContext', () => ({
@@ -27,9 +27,9 @@ vi.mock('@/contexts/AuthContext', () => ({
 
 describe('FLOW-RM-073 : Migration storage', () => {
 
-  it('efface les cles bookflow_orders_* quand STORAGE_VERSION change', () => {
-    expect(localStorage.getItem('bookflow_orders_LIB001')).toBeNull()
-    expect(localStorage.getItem('bookflow_orders_LIB002')).toBeNull()
+  it('efface les cles flowdiff_orders_* quand STORAGE_VERSION change', () => {
+    expect(localStorage.getItem('flowdiff_orders_LIB001')).toBeNull()
+    expect(localStorage.getItem('flowdiff_orders_LIB002')).toBeNull()
   })
 
   it('reinitialise le compteur a 14', () => {
@@ -40,7 +40,7 @@ describe('FLOW-RM-073 : Migration storage', () => {
     expect(localStorage.getItem(STORAGE_VERSION_KEY)).toBe(STORAGE_VERSION)
   })
 
-  it('ne touche pas aux cles qui ne commencent pas par bookflow_orders_', () => {
-    expect(localStorage.getItem('bookflow_other_key')).toBe('should_persist')
+  it('ne touche pas aux cles qui ne commencent pas par flowdiff_orders_', () => {
+    expect(localStorage.getItem('flowdiff_other_key')).toBe('should_persist')
   })
 })

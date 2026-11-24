@@ -23,7 +23,7 @@ const mockAuth = vi.mocked(useAuthContext)
 
 /* ── Constantes localStorage (miroir des valeurs dans OrdersContext) ── */
 
-const ORDER_COUNTER_KEY = 'bookflow_order_counter'
+const ORDER_COUNTER_KEY = 'flowdiff_order_counter'
 
 /* ── Helpers ── */
 
@@ -215,7 +215,7 @@ describe('LOT-09 : Commandes et historique', () => {
       expect(simulated.ediStatus).toBe('ACK')
       expect(simulated.codeClient).toBe('LIB001')
       expect(simulated.items.length).toBeGreaterThan(0)
-      expect(localStorage.getItem('bookflow_cart_LIB001')).toBeNull()
+      expect(localStorage.getItem('flowdiff_cart_LIB001')).toBeNull()
     })
 
     it('FLOW-RM-072 : reporte deliveryMode standard sur la commande', () => {

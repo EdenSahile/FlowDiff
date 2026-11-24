@@ -348,7 +348,7 @@ Pour `logout`, remplacer (lignes 172-179) :
 ```tsx
   const logout = useCallback(() => {
     if (user?.codeClient) {
-      localStorage.removeItem(`bookflow_wishlist_username_${user.codeClient}`)
+      localStorage.removeItem(`flowdiff_wishlist_username_${user.codeClient}`)
     }
     localStorage.removeItem(TOKEN_KEY)
     setUser(null)

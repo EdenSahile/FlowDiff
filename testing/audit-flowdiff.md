@@ -40,7 +40,7 @@
 | FLOW-RM-017 | ProtectedRoute redirige vers /login si non connecté, en sauvegardant le pathname d'origine | Navigate to="/login" avec state.from | `src/components/auth/ProtectedRoute.tsx:12-14` | Aucun | Absente | Non |
 | FLOW-RM-018 | Redirection post-login sécurisée (anti open-redirect) | Rejette protocol-relative, backslash, schémas | `src/lib/authUtils.ts:102-115` | `authUtils.test.ts` : 10 tests | Complète | Non |
 | FLOW-RM-019 | Confirmation mot de passe doit correspondre (registerSchema) | Zod refine dans registerSchema | `src/lib/authUtils.ts:38-41` | Testé indirectement via AuthContext | Partielle | Non |
-| FLOW-RM-020 | Données isolées par codeClient (clés localStorage suffixées) | Clés `bookflow_cart_<codeClient>`, `bookflow_orders_<codeClient>`, etc. | Multiples contexts | Aucun test dédié | Absente | Non |
+| FLOW-RM-020 | Données isolées par codeClient (clés localStorage suffixées) | Clés `flowdiff_cart_<codeClient>`, `flowdiff_orders_<codeClient>`, etc. | Multiples contexts | Aucun test dédié | Absente | Non |
 
 ### Catalogue
 
@@ -78,13 +78,13 @@
 | FLOW-RM-045 | Formule : netHT = (subtotalTTC - remiseTTC) / 1.055, tva = netHT * 0.055, totalTTC = netHT + tva | Calcul séquentiel dans computeTotals | `src/contexts/CartContext.tsx:141-145` | `computeTotals.test.ts` : vérifications arithmétiques | Complète | Non |
 | FLOW-RM-046 | Panier vide : computeTotals retourne tout à 0 | Guard clause en entrée | `src/contexts/CartContext.tsx:120-145` | `computeTotals.test.ts` : 1 test | Complète | Non |
 | FLOW-RM-047 | updateQty : si qty < 1, supprime l'article | filter dans updateQty | `src/contexts/CartContext.tsx:204-206` | Aucun | Absente | Non |
-| FLOW-RM-048 | Panier persisté en localStorage par codeClient | Clé `bookflow_cart_<codeClient>` | `src/contexts/CartContext.tsx:91-93,178-182` | Aucun | Absente | Non |
+| FLOW-RM-048 | Panier persisté en localStorage par codeClient | Clé `flowdiff_cart_<codeClient>` | `src/contexts/CartContext.tsx:91-93,178-182` | Aucun | Absente | Non |
 | FLOW-RM-049 | Validation du panier stocké via storedCartSchema (Zod) : données invalides = panier vidé | safeParse dans loadCart | `src/contexts/CartContext.tsx:113-118` | `storageSchemas.test.ts` : schéma testé | Partielle (schéma oui, logique purge non) | Non |
 | FLOW-RM-050 | Tunnel de commande en 3 étapes : récapitulatif, adresses, mode de transmission | checkoutSteps définit les étapes | `src/pages/cart/checkoutSteps.ts` | `checkoutSteps.test.ts` : 8 tests | Complète | Non |
 | FLOW-RM-051 | Adresse de livraison : rue requis, code postal 5 chiffres, ville requis | addressSchema Zod | `src/pages/cart/checkoutSchemas.ts:9-13` | `checkoutSchemas.test.ts` : 7 tests | Complète | Non |
 | FLOW-RM-052 | Mode de transmission : FLOWDIFF ou EDI (Dilicom) | transmissionModeSchema enum | `src/pages/cart/checkoutSchemas.ts:3-7` | Aucun | Absente | Non |
 | FLOW-RM-053 | Mode de transmission par défaut : FLOWDIFF | Valeur initiale dans CartContext | `src/contexts/CartContext.tsx:104` | Aucun | Absente | Non |
-| FLOW-RM-054 | Préférence mode de transmission persistée en localStorage par codeClient | Clé `bookflow_transmission_<codeClient>` | `src/contexts/CartContext.tsx:272-277` | Aucun | Absente | Non |
+| FLOW-RM-054 | Préférence mode de transmission persistée en localStorage par codeClient | Clé `flowdiff_transmission_<codeClient>` | `src/contexts/CartContext.tsx:272-277` | Aucun | Absente | Non |
 | FLOW-RM-055 | Confirmation de commande : crée une order, vide le panier, affiche écran de succès | Enchaînement addOrder + clearCart | `src/pages/cart/CartPage.tsx:1185-1208` | Aucun | Absente | Non |
 | FLOW-RM-056 | Si commande contient des articles en reliquat, toast « notifié par email dès expédition » | Condition enReliquat dans le flux de confirmation | `src/pages/cart/CartPage.tsx:1206-1208` | Aucun | Absente | Non |
 | FLOW-RM-057 | Message de succès différent selon mode FLOWDIFF vs EDI | Affichage conditionnel | `src/pages/cart/CartPage.tsx:1217-1245` | Aucun | Absente | Non |

@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Rendre toutes les pages de l'app BookFlow correctement responsives sur 360px → 1400px, sans scroll horizontal, touch targets ≥ 44px, font ≥ 16px sur le contenu principal.
+**Goal:** Rendre toutes les pages de l'app FlowDiff correctement responsives sur 360px → 1400px, sans scroll horizontal, touch targets ≥ 44px, font ≥ 16px sur le contenu principal.
 
 **Architecture:** Approche hybrid — créer d'abord un système de breakpoints unifié (`src/lib/responsive.ts`), puis l'appliquer progressivement en 3 vagues sur les 19 pages. Mobile-first : styles de base pour 360px, surcharges via `min-width`.
 

@@ -9,7 +9,7 @@
 
 ## Contexte
 
-L'application BookFlow est une SPA Vite + React 18. Toutes les données livres sont actuellement en mémoire (`src/data/mockBooks.ts`). Prisma est installé avec un schéma PostgreSQL (`Libraire`, `Commande`, `LigneCommande`) mais non branché.
+L'application FlowDiff est une SPA Vite + React 18. Toutes les données livres sont actuellement en mémoire (`src/data/mockBooks.ts`). Prisma est installé avec un schéma PostgreSQL (`Libraire`, `Commande`, `LigneCommande`) mais non branché.
 
 L'objectif de cette phase est de persister le catalogue livres dans Supabase (PostgreSQL managé) et de remplacer les imports mock par des appels réels via le client Supabase JS.
 

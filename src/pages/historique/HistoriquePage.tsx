@@ -744,7 +744,7 @@ export function HistoriquePage() {
   const hasFilters = !!(search || dateFrom || dateTo || selectedStatus)
 
   function handleExportAll() {
-    exportToCSV('bookflow_historique_complet.csv', getHeaders(true), buildRows(filtered))
+    exportToCSV('flowdiff_historique_complet.csv', getHeaders(true), buildRows(filtered))
   }
 
   function handleExportOrder(order: Order) {

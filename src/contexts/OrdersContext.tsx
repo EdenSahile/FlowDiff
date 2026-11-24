@@ -10,21 +10,21 @@ import { MOCK_BOOKS } from '@/data/mockBooks'
 const MOCK_IDS = new Set(Object.values(MOCK_ORDERS).flat().map(o => o.id))
 
 function ordersKey(codeClient: string | undefined) {
-  return `bookflow_orders_${codeClient ?? 'guest'}`
+  return `flowdiff_orders_${codeClient ?? 'guest'}`
 }
 
 /* ── Génération numéro de commande ── */
-const ORDER_COUNTER_KEY = 'bookflow_order_counter'
+const ORDER_COUNTER_KEY = 'flowdiff_order_counter'
 const ORDER_COUNTER_INITIAL = 14 // CMD0000001 à CMD0000014 réservés aux mocks
 
 /* ── Migration localStorage : efface les commandes ancienne numérotation ── */
-export const STORAGE_VERSION_KEY = 'bookflow_storage_version'
+export const STORAGE_VERSION_KEY = 'flowdiff_storage_version'
 export const STORAGE_VERSION = '3'
 
 function migrateStorage() {
   if (localStorage.getItem(STORAGE_VERSION_KEY) === STORAGE_VERSION) return
   Object.keys(localStorage)
-    .filter(k => k.startsWith('bookflow_orders_'))
+    .filter(k => k.startsWith('flowdiff_orders_'))
     .forEach(k => localStorage.removeItem(k))
   localStorage.setItem(ORDER_COUNTER_KEY, String(ORDER_COUNTER_INITIAL))
   localStorage.setItem(STORAGE_VERSION_KEY, STORAGE_VERSION)

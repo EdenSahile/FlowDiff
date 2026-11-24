@@ -103,7 +103,7 @@ describe('AuthContext', () => {
         await result.current.login({ identifier: VALID_IDENTIFIER, password: VALID_PASSWORD })
       })
 
-      expect(localStorage.getItem('bookflow_token')).toBeTruthy()
+      expect(localStorage.getItem('flowdiff_token')).toBeTruthy()
     })
   })
 
@@ -116,7 +116,7 @@ describe('AuthContext', () => {
       await act(async () => {
         await first.current.login({ identifier: VALID_IDENTIFIER, password: VALID_PASSWORD })
       })
-      const token = localStorage.getItem('bookflow_token')
+      const token = localStorage.getItem('flowdiff_token')
       expect(token).toBeTruthy()
 
       // Nouvelle instance du provider (nouveau "chargement de page")
@@ -126,12 +126,12 @@ describe('AuthContext', () => {
     })
 
     it('ignore et nettoie un token malformé en localStorage', async () => {
-      localStorage.setItem('bookflow_token', 'ceci-nest-pas-un-token-valide')
+      localStorage.setItem('flowdiff_token', 'ceci-nest-pas-un-token-valide')
       const { result } = renderHook(() => useAuthContext(), { wrapper })
       await waitFor(() => expect(result.current.isLoading).toBe(false))
 
       expect(result.current.user).toBeNull()
-      expect(localStorage.getItem('bookflow_token')).toBeNull()
+      expect(localStorage.getItem('flowdiff_token')).toBeNull()
     })
 
     it('nettoie le token si le codeClient du payload ne correspond à aucun utilisateur connu', async () => {
@@ -139,13 +139,13 @@ describe('AuthContext', () => {
       const payload = btoa(JSON.stringify({
         sub: 'ghost-user', codeClient: 'FANTOME99', iat: Date.now(), exp: Date.now() + 3600000,
       }))
-      localStorage.setItem('bookflow_token', `${header}.${payload}.mock`)
+      localStorage.setItem('flowdiff_token', `${header}.${payload}.mock`)
 
       const { result } = renderHook(() => useAuthContext(), { wrapper })
       await waitFor(() => expect(result.current.isLoading).toBe(false))
 
       expect(result.current.user).toBeNull()
-      expect(localStorage.getItem('bookflow_token')).toBeNull()
+      expect(localStorage.getItem('flowdiff_token')).toBeNull()
     })
 
     it('ignore et nettoie un token expiré', async () => {
@@ -155,13 +155,13 @@ describe('AuthContext', () => {
       const payload = btoa(JSON.stringify({
         sub: 'mock-lib001', codeClient: 'LIB001', iat: Date.now() - 100000, exp: Date.now() - 1000,
       }))
-      localStorage.setItem('bookflow_token', `${header}.${payload}.mock`)
+      localStorage.setItem('flowdiff_token', `${header}.${payload}.mock`)
 
       const { result } = renderHook(() => useAuthContext(), { wrapper })
       await waitFor(() => expect(result.current.isLoading).toBe(false))
 
       expect(result.current.user).toBeNull()
-      expect(localStorage.getItem('bookflow_token')).toBeNull()
+      expect(localStorage.getItem('flowdiff_token')).toBeNull()
     })
   })
 
@@ -179,7 +179,7 @@ describe('AuthContext', () => {
       })
 
       expect(result.current.user).toBeNull()
-      expect(localStorage.getItem('bookflow_token')).toBeNull()
+      expect(localStorage.getItem('flowdiff_token')).toBeNull()
     })
 
     it('conserve panier et historique (ne supprime que le token et la wishlist)', async () => {
@@ -215,14 +215,14 @@ describe('AuthContext', () => {
       await act(async () => {
         await result.current.login({ identifier: VALID_IDENTIFIER, password: VALID_PASSWORD })
       })
-      localStorage.removeItem(`bookflow_wishlist_username_${VALID_IDENTIFIER}`)
+      localStorage.removeItem(`flowdiff_wishlist_username_${VALID_IDENTIFIER}`)
 
       act(() => {
         result.current.logout()
       })
 
       expect(result.current.user).toBeNull()
-      expect(localStorage.getItem('bookflow_token')).toBeNull()
+      expect(localStorage.getItem('flowdiff_token')).toBeNull()
     })
   })
 

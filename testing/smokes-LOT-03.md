@@ -48,7 +48,7 @@
 
 - L'application tourne en local (`npm run dev`)
 - Aucun utilisateur n'est connecte (page `/login` affichee)
-- Le localStorage du navigateur est vide pour les cles `bookflow_*` (ouvrir DevTools > Application > Local Storage et supprimer les entrees qui commencent par `bookflow_`)
+- Le localStorage du navigateur est vide pour les cles `flowdiff_*` (ouvrir DevTools > Application > Local Storage et supprimer les entrees qui commencent par `flowdiff_`)
 
 **Point d'attention** : la page de login est actuellement verrouillee sur le compte LIB001 (champs pre-remplis et desactives). Pour se connecter en LIB002, il faut passer par les DevTools du navigateur (voir etape 5). Si un mecanisme de selection de compte est ajoute ulterieurement, adapter les etapes 5-6 en consequence.
 
@@ -64,7 +64,7 @@
 1. Sur la page `/login`, cliquer sur **Se connecter** (les identifiants LIB001 sont pre-remplis). Verifier que l'accueil s'affiche et que le code client affiche dans la sidebar est `LIB001`.
 2. Naviguer vers un livre commandable (section **Fonds** ou **Nouveautes**, cliquer sur un titre). Sur la fiche produit, cliquer sur **Ajouter au panier**. Verifier que le badge panier affiche `1`.
 3. Cliquer sur **Se deconnecter** dans la sidebar (en bas). Confirmer dans la modale. Verifier que la page `/login` s'affiche.
-4. Ouvrir DevTools > Application > Local Storage. Verifier que la cle `bookflow_cart_LIB001` existe et contient le livre ajoute (le panier LIB001 est conserve apres logout, conformement a FLOW-RM-016).
+4. Ouvrir DevTools > Application > Local Storage. Verifier que la cle `flowdiff_cart_LIB001` existe et contient le livre ajoute (le panier LIB001 est conserve apres logout, conformement a FLOW-RM-016).
 5. Dans la console DevTools, activer les champs de login et saisir les identifiants LIB002 :
    ```js
    document.querySelector('#identifier').disabled = false
@@ -79,7 +79,7 @@
 **Resultat attendu**
 
 - A l'etape 7, la page panier affiche le message "Votre panier est vide" (texte exact dans `CartPage.tsx` ligne 1256). Le badge panier en header n'affiche aucun chiffre (ou 0).
-- La cle `bookflow_cart_LIB002` dans le localStorage est soit absente, soit contient un tableau `items` vide.
-- La cle `bookflow_cart_LIB001` contient toujours le livre de l'etape 2 (pas de perte de donnees croisee).
+- La cle `flowdiff_cart_LIB002` dans le localStorage est soit absente, soit contient un tableau `items` vide.
+- La cle `flowdiff_cart_LIB001` contient toujours le livre de l'etape 2 (pas de perte de donnees croisee).
 
 - [ ] Scenario valide

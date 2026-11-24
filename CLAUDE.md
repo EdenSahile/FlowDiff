@@ -139,7 +139,7 @@ En permanence : **Panier** (droite, avec badge quantité) +  à gauche du panier
 
 ### Flash Infos
 - Classées par univers : BD/Mangas, Jeunesse, Littérature, Pratique
-- Catégories : Auteurs, Fonds, Nouveautés, BookFlow
+- Catégories : Auteurs, Fonds, Nouveautés, FlowDiff
 - Contenu : vidéo ou image + texte + lien + possibilité d'ajouter au panier directement
 
 ### Panier

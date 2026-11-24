@@ -104,7 +104,7 @@ describe('FLOW-RM-101 : fallback sur état vide si données corrompues', () => {
   })
 
   it('JSON invalide en localStorage → liste vide, pas de crash', () => {
-    localStorage.setItem('bookflow_wishlists_LIB001', '{pas du json valide')
+    localStorage.setItem('flowdiff_wishlists_LIB001', '{pas du json valide')
 
     const { result } = renderHook(() => useWishlist(), { wrapper: Wrapper })
 
@@ -112,7 +112,7 @@ describe('FLOW-RM-101 : fallback sur état vide si données corrompues', () => {
   })
 
   it('données qui ne passent pas le schéma Zod → liste vide', () => {
-    localStorage.setItem('bookflow_wishlists_LIB001', JSON.stringify([
+    localStorage.setItem('flowdiff_wishlists_LIB001', JSON.stringify([
       { id: 'wl-1' },
     ]))
 
@@ -122,7 +122,7 @@ describe('FLOW-RM-101 : fallback sur état vide si données corrompues', () => {
   })
 
   it('tableau de type inattendu → liste vide', () => {
-    localStorage.setItem('bookflow_wishlists_LIB001', JSON.stringify('pas un tableau'))
+    localStorage.setItem('flowdiff_wishlists_LIB001', JSON.stringify('pas un tableau'))
 
     const { result } = renderHook(() => useWishlist(), { wrapper: Wrapper })
 

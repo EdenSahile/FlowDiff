@@ -54,7 +54,7 @@ Date;Éditeur;Univers;Montant TTC (€);Nb exemplaires;Statut
 - Séparateur `;` (standard français Excel/Numbers)
 - Décimales avec virgule (`,`)
 - Statut : `Livrée` ou `Annulée`
-- Nom du fichier : `bookflow-dashboard-YYYY-MM-DD.csv` (date du jour)
+- Nom du fichier : `flowdiff-dashboard-YYYY-MM-DD.csv` (date du jour)
 - Encodage : UTF-8 avec BOM (`﻿`) pour compatibilité Excel
 
 ### Modification : `src/pages/home/HomePage.tsx`

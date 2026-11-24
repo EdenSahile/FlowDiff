@@ -52,13 +52,13 @@ describe('FLOW-RM-020 : isolation par codeClient', () => {
     localStorage.clear()
   })
 
-  describe('CartContext (bookflow_cart_*)', () => {
+  describe('CartContext (flowdiff_cart_*)', () => {
     function Wrapper({ children }: { children: ReactNode }) {
       return <CartProvider>{children}</CartProvider>
     }
 
-    it('charge le panier depuis bookflow_cart_{codeClient}', () => {
-      localStorage.setItem('bookflow_cart_LIB001', JSON.stringify({
+    it('charge le panier depuis flowdiff_cart_{codeClient}', () => {
+      localStorage.setItem('flowdiff_cart_LIB001', JSON.stringify({
         items: [{ book: { id: 'b1' }, quantity: 2 }], opGroups: [],
       }))
 
@@ -71,7 +71,7 @@ describe('FLOW-RM-020 : isolation par codeClient', () => {
     })
 
     it('utilise le suffixe guest quand aucun user n\'est connecté', () => {
-      localStorage.setItem('bookflow_cart_guest', JSON.stringify({
+      localStorage.setItem('flowdiff_cart_guest', JSON.stringify({
         items: [{ book: { id: 'guest-book' }, quantity: 1 }], opGroups: [],
       }))
 
@@ -84,10 +84,10 @@ describe('FLOW-RM-020 : isolation par codeClient', () => {
     })
 
     it('isole les données entre deux codeClients', () => {
-      localStorage.setItem('bookflow_cart_LIB001', JSON.stringify({
+      localStorage.setItem('flowdiff_cart_LIB001', JSON.stringify({
         items: [{ book: { id: 'book-001' }, quantity: 1 }], opGroups: [],
       }))
-      localStorage.setItem('bookflow_cart_LIB002', JSON.stringify({
+      localStorage.setItem('flowdiff_cart_LIB002', JSON.stringify({
         items: [{ book: { id: 'book-002' }, quantity: 5 }], opGroups: [],
       }))
 
@@ -100,13 +100,13 @@ describe('FLOW-RM-020 : isolation par codeClient', () => {
     })
   })
 
-  describe('WishlistContext (bookflow_wishlists_*)', () => {
+  describe('WishlistContext (flowdiff_wishlists_*)', () => {
     function Wrapper({ children }: { children: ReactNode }) {
       return <WishlistProvider>{children}</WishlistProvider>
     }
 
-    it('charge les listes depuis bookflow_wishlists_{codeClient}', () => {
-      localStorage.setItem('bookflow_wishlists_LIB001', JSON.stringify([
+    it('charge les listes depuis flowdiff_wishlists_{codeClient}', () => {
+      localStorage.setItem('flowdiff_wishlists_LIB001', JSON.stringify([
         { id: 'wl1', name: 'Ma liste', items: [], createdAt: '2026-01-01T00:00:00Z' },
       ]))
 
@@ -119,7 +119,7 @@ describe('FLOW-RM-020 : isolation par codeClient', () => {
     })
 
     it('utilise le suffixe guest quand aucun user n\'est connecté', () => {
-      localStorage.setItem('bookflow_wishlists_guest', JSON.stringify([
+      localStorage.setItem('flowdiff_wishlists_guest', JSON.stringify([
         { id: 'wl-guest', name: 'Liste invité', items: [], createdAt: '2026-01-01T00:00:00Z' },
       ]))
 
@@ -132,10 +132,10 @@ describe('FLOW-RM-020 : isolation par codeClient', () => {
     })
 
     it('isole les données entre deux codeClients', () => {
-      localStorage.setItem('bookflow_wishlists_LIB001', JSON.stringify([
+      localStorage.setItem('flowdiff_wishlists_LIB001', JSON.stringify([
         { id: 'wl1', name: 'Liste LIB001', items: [], createdAt: '2026-01-01T00:00:00Z' },
       ]))
-      localStorage.setItem('bookflow_wishlists_LIB002', JSON.stringify([
+      localStorage.setItem('flowdiff_wishlists_LIB002', JSON.stringify([
         { id: 'wl2', name: 'Liste LIB002', items: [], createdAt: '2026-01-01T00:00:00Z' },
       ]))
 
@@ -168,12 +168,12 @@ describe('FLOW-RM-020 : isolation par codeClient', () => {
   })
 
 
-  describe('OrdersContext (bookflow_orders_*)', () => {
+  describe('OrdersContext (flowdiff_orders_*)', () => {
     function Wrapper({ children }: { children: ReactNode }) {
       return <OrdersProvider>{children}</OrdersProvider>
     }
 
-    it('charge les commandes extra depuis bookflow_orders_{codeClient}', () => {
+    it('charge les commandes extra depuis flowdiff_orders_{codeClient}', () => {
       const extraOrder = {
         id: 'extra-test-order',
         numero: 'CMD9999999',
@@ -189,7 +189,7 @@ describe('FLOW-RM-020 : isolation par codeClient', () => {
         codeClient: 'LIB001',
         deliveryMode: 'standard',
       }
-      localStorage.setItem('bookflow_orders_LIB001', JSON.stringify([extraOrder]))
+      localStorage.setItem('flowdiff_orders_LIB001', JSON.stringify([extraOrder]))
 
       mockAuth.mockReturnValue(authUser('LIB001'))
 
@@ -215,7 +215,7 @@ describe('FLOW-RM-020 : isolation par codeClient', () => {
         codeClient: 'LIB002',
         deliveryMode: 'standard',
       }
-      localStorage.setItem('bookflow_orders_LIB002', JSON.stringify([otherOrder]))
+      localStorage.setItem('flowdiff_orders_LIB002', JSON.stringify([otherOrder]))
 
       mockAuth.mockReturnValue(authUser('LIB001'))
 

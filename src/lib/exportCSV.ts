@@ -340,7 +340,7 @@ export function exportKPIOnlyCSV(
   const url  = URL.createObjectURL(blob)
   const a    = document.createElement('a')
   a.href     = url
-  a.download = `bookflow-kpi-${isoDate(new Date())}.csv`
+  a.download = `flowdiff-kpi-${isoDate(new Date())}.csv`
   document.body.appendChild(a)
   a.click()
   document.body.removeChild(a)
@@ -362,7 +362,7 @@ export function exportEvolutionCSV(
   const url  = URL.createObjectURL(blob)
   const a    = document.createElement('a')
   a.href     = url
-  a.download = `bookflow-evolution-${isoDate(new Date())}.csv`
+  a.download = `flowdiff-evolution-${isoDate(new Date())}.csv`
   document.body.appendChild(a)
   a.click()
   document.body.removeChild(a)
@@ -384,7 +384,7 @@ export function exportRepartitionCSV(
   const url  = URL.createObjectURL(blob)
   const a    = document.createElement('a')
   a.href     = url
-  a.download = `bookflow-repartition-${isoDate(new Date())}.csv`
+  a.download = `flowdiff-repartition-${isoDate(new Date())}.csv`
   document.body.appendChild(a)
   a.click()
   document.body.removeChild(a)
@@ -406,7 +406,7 @@ export function exportTopEditeursCSV(
   const url  = URL.createObjectURL(blob)
   const a    = document.createElement('a')
   a.href     = url
-  a.download = `bookflow-top-editeurs-${isoDate(new Date())}.csv`
+  a.download = `flowdiff-top-editeurs-${isoDate(new Date())}.csv`
   document.body.appendChild(a)
   a.click()
   document.body.removeChild(a)
@@ -431,7 +431,7 @@ export function exportEDICSV(flux: {
   const url  = URL.createObjectURL(blob)
   const a    = document.createElement('a')
   a.href     = url
-  a.download = `bookflow-edi-${isoDate(new Date())}.csv`
+  a.download = `flowdiff-edi-${isoDate(new Date())}.csv`
   document.body.appendChild(a)
   a.click()
   document.body.removeChild(a)
@@ -450,7 +450,7 @@ export function exportActionsCSV(actions: { label: string; count: number; deadli
   const url  = URL.createObjectURL(blob)
   const a    = document.createElement('a')
   a.href     = url
-  a.download = `bookflow-actions-${isoDate(new Date())}.csv`
+  a.download = `flowdiff-actions-${isoDate(new Date())}.csv`
   document.body.appendChild(a)
   a.click()
   document.body.removeChild(a)
@@ -477,7 +477,7 @@ export function exportNouveautesCSV(books: Book[]): void {
   const url  = URL.createObjectURL(blob)
   const a    = document.createElement('a')
   a.href     = url
-  a.download = `bookflow-nouveautes-${isoDate(new Date())}.csv`
+  a.download = `flowdiff-nouveautes-${isoDate(new Date())}.csv`
   document.body.appendChild(a)
   a.click()
   document.body.removeChild(a)
@@ -495,7 +495,7 @@ export function exportDashboardCSV(
   const url  = URL.createObjectURL(blob)
   const a    = document.createElement('a')
   a.href     = url
-  a.download = `bookflow-dashboard-${isoDate(new Date())}.csv`
+  a.download = `flowdiff-dashboard-${isoDate(new Date())}.csv`
   document.body.appendChild(a)
   a.click()
   document.body.removeChild(a)
@@ -510,7 +510,7 @@ export function exportDashboardExcel(
   comparison?: ComparisonExport,
 ): void {
   const workbook = buildDashboardWorkbook(kpi, orders, period, preset, comparison)
-  XLSX.writeFile(workbook, `bookflow-dashboard-${isoDate(new Date())}.xlsx`, {
+  XLSX.writeFile(workbook, `flowdiff-dashboard-${isoDate(new Date())}.xlsx`, {
     bookType: 'xlsx',
     compression: true,
   })

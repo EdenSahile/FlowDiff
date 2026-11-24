@@ -209,7 +209,7 @@ export function exportDashboardCSV(
   const url  = URL.createObjectURL(blob)
   const a    = document.createElement('a')
   a.href     = url
-  a.download = `bookflow-dashboard-${isoDate(new Date())}.csv`
+  a.download = `flowdiff-dashboard-${isoDate(new Date())}.csv`
   document.body.appendChild(a)
   a.click()
   document.body.removeChild(a)
