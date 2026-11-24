@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { buildDashboardCSV, buildKPIOnlyCSV } from '@/lib/exportCSV'
+import * as XLSX from 'xlsx'
+import { buildDashboardCSV, buildDashboardWorkbook, buildKPIOnlyCSV, buildTitleLinesRows } from '@/lib/exportCSV'
 import type { PeriodKPI, DashboardOrder } from '@/data/mockDashboard'
 
 const kpi: PeriodKPI = {
@@ -71,6 +72,12 @@ describe('buildDashboardCSV', () => {
   it('formats cancelled order as Annulée', () => {
     const csv = buildDashboardCSV(kpi, orders, period, 'Ce mois-ci')
     expect(csv).toContain('2026-04-15;Pika Édition;BD/Mangas;189,30;8;Annulée')
+  })
+
+  it('trie le détail des commandes par date décroissante', () => {
+    const detailRows = buildDashboardCSV(kpi, orders, period, 'Ce mois-ci').split('\n').slice(6)
+
+    expect(detailRows.map(row => row.split(';')[0])).toEqual(['2026-04-15', '2026-04-01'])
   })
 
   it('exports only headers when no orders', () => {
@@ -145,5 +152,94 @@ describe('buildKPIOnlyCSV', () => {
     const kpiOnlyCSV = buildKPIOnlyCSV(kpi, period, 'Du 1er; au 29')
 
     expect(kpiOnlyCSV).toContain('"Du 1er; au 29"')
+  })
+})
+
+describe('export Excel du tableau de bord', () => {
+  const orderWithTitle: DashboardOrder = {
+    ...orders[0],
+    orderNumber: 'CMD0000013',
+    orderStatus: 'livré',
+    invoiceNumber: 'FAC-2026-0342',
+    invoiceDate: '2026-04-03',
+    items: [{
+      isbn: '978-2070360024',
+      title: "L'Étranger",
+      author: 'Albert Camus',
+      publisher: 'Gallimard',
+      typeCommande: 'Fonds',
+      quantity: 6,
+      unitPriceHT: 4.90,
+      unitPriceTTC: 5.17,
+      discountRate: 0.35,
+      montantTTC: 20.18,
+    }],
+  }
+
+  it('présente les données N-1 dans le Dashboard et dans Lignes titres', () => {
+    const workbook = buildDashboardWorkbook(kpi, [orderWithTitle], period, 'Ce mois-ci', {
+      orders: [{ ...orderWithTitle, orderNumber: 'CMD0000012', date: '2025-04-01' }],
+      period: { start: new Date('2025-04-01'), end: new Date('2025-04-29') },
+      label: 'N-1',
+    })
+    expect(workbook.SheetNames).toEqual(['Dashboard', 'Lignes titres'])
+
+    const dashboard = workbook.Sheets.Dashboard
+    expect(dashboard.A1.v).toBe('=== KPIs — période analysée ===')
+    expect(dashboard.A5.v).toBe('=== KPIs — comparatif N-1 ===')
+    expect(dashboard.A7.v).toBe('N-1')
+    expect(dashboard.B7.v).toBe('2025-04-01')
+    expect(dashboard.A9.v).toBe('=== Détail des commandes — période analysée ===')
+    expect(dashboard.A11.v).toBe('2026-04-01')
+    expect(dashboard.A13.v).toBe('=== Détail des commandes — N-1 ===')
+    expect(dashboard.A15.v).toBe('2025-04-01')
+    expect(workbook.Sheets['Lignes titres'].A3.v).toBe('CMD0000013')
+    expect(workbook.Sheets['Lignes titres'].A4.v).toBe('CMD0000012')
+
+    const exported = XLSX.write(workbook, { type: 'array', bookType: 'xlsx' })
+    const reopened = XLSX.read(exported, { type: 'array' })
+    expect(reopened.SheetNames).toEqual(['Dashboard', 'Lignes titres'])
+    expect(reopened.Sheets['Lignes titres']['!merges']).toHaveLength(3)
+    expect(reopened.Sheets['Lignes titres'].A4.v).toBe('CMD0000012')
+  })
+
+  it('n’ajoute aucune ligne N-1 sans comparatif actif', () => {
+    const workbook = buildDashboardWorkbook(kpi, [orderWithTitle], period, 'Ce mois-ci')
+
+    expect(workbook.SheetNames).toEqual(['Dashboard', 'Lignes titres'])
+    expect(workbook.Sheets['Lignes titres'].A4).toBeUndefined()
+  })
+
+  it('groupe les lignes par commande, livre et montants avec des valeurs calculées', () => {
+    const rows = buildTitleLinesRows([orderWithTitle])
+    expect(rows).toEqual([[
+      'CMD0000013', 'Livrée', '01/04/2026', 'Avril', 2026, 'FAC-2026-0342', '03/04/2026',
+      '9782070360024', "L'Étranger", 'Albert Camus', 'Gallimard', 'Littérature', 'Fonds',
+      6, 5.17, 35, 3.19, 19.14,
+    ]])
+  })
+
+  it('trie les lignes titres par date de commande décroissante', () => {
+    const rows = buildTitleLinesRows([
+      { ...orderWithTitle, date: '2026-04-01' },
+      { ...orderWithTitle, orderNumber: 'CMD0000014', date: '2026-04-20' },
+    ])
+
+    expect(rows.map(row => row[2])).toEqual(['20/04/2026', '01/04/2026'])
+  })
+
+  it('calcule le net HT depuis le prix public TTC, sans remettre le tarif de commande', () => {
+    const rows = buildTitleLinesRows([{
+      ...orderWithTitle,
+      items: [{
+        ...orderWithTitle.items[0],
+        quantity: 2,
+        unitPriceHT: 14.60,
+        unitPriceTTC: 21.90,
+        discountRate: 0.35,
+      }],
+    }])
+
+    expect(rows[0].slice(13)).toEqual([2, 21.90, 35, 13.49, 26.98])
   })
 })

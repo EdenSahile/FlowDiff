@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useEffect } from 'react'
 import {
   MOCK_DASHBOARD_ORDERS,
   filterDataByPeriod,
@@ -179,98 +179,53 @@ function resolveComparePeriod(
   return null
 }
 
-/* ─────────────────────────────────────────
-   Clé localStorage
-───────────────────────────────────────── */
-
-const LS_KEY = 'flowdiff.periodFilter'
-
-interface PersistedState {
-  preset: PeriodPreset
-  compareMode: CompareMode
-  customStart: string
-  customEnd: string
-  customCompareStart: string
-  customCompareEnd: string
-}
-
-function loadFromStorage(): Partial<PersistedState> {
-  try {
-    const raw = localStorage.getItem(LS_KEY)
-    if (!raw) return {}
-    return JSON.parse(raw) as Partial<PersistedState>
-  } catch {
-    return {}
-  }
-}
-
-function saveToStorage(state: PersistedState): void {
-  try {
-    localStorage.setItem(LS_KEY, JSON.stringify(state))
-  } catch {
-    // quota dépassé ou incognito → on ignore
-  }
-}
+/* Les filtres de période sont volontairement éphémères : un rechargement
+   revient toujours au tableau de bord par défaut. */
+const LEGACY_STORAGE_KEY = 'flowdiff.periodFilter'
 
 /* ─────────────────────────────────────────
    Hook principal
 ───────────────────────────────────────── */
 
 export function usePeriodFilter(extraOrders?: DashboardOrder[]): UsePeriodFilterReturn {
-  const stored = useMemo(() => loadFromStorage(), [])
-
   const today = new Date().toISOString().slice(0, 10)
   const monthAgo = addDays(new Date(), -30).toISOString().slice(0, 10)
 
-  const [preset, _setPreset]               = useState<PeriodPreset>(stored.preset ?? 'last-30')
-  const [compareMode, _setCompareMode]     = useState<CompareMode>(stored.compareMode ?? 'none')
-  const [customStart, _setCustomStart]     = useState(stored.customStart ?? monthAgo)
-  const [customEnd, _setCustomEnd]         = useState(stored.customEnd ?? today)
-  const [customCompareStart, _setCustomCompareStart] = useState(stored.customCompareStart ?? monthAgo)
-  const [customCompareEnd, _setCustomCompareEnd]     = useState(stored.customCompareEnd ?? today)
+  const [preset, _setPreset]               = useState<PeriodPreset>('last-30')
+  const [compareMode, _setCompareMode]     = useState<CompareMode>('none')
+  const [customStart, _setCustomStart]     = useState(monthAgo)
+  const [customEnd, _setCustomEnd]         = useState(today)
+  const [customCompareStart, _setCustomCompareStart] = useState(monthAgo)
+  const [customCompareEnd, _setCustomCompareEnd]     = useState(today)
 
-  // Wraps setters pour persister automatiquement
-  const persist = useCallback((patch: Partial<PersistedState>) => {
-    saveToStorage({
-      preset,
-      compareMode,
-      customStart,
-      customEnd,
-      customCompareStart,
-      customCompareEnd,
-      ...patch,
-    })
-  }, [preset, compareMode, customStart, customEnd, customCompareStart, customCompareEnd])
+  // Nettoie la sélection persistée par les versions précédentes.
+  useEffect(() => {
+    localStorage.removeItem(LEGACY_STORAGE_KEY)
+  }, [])
 
   const setPreset = useCallback((p: PeriodPreset) => {
     _setPreset(p)
-    persist({ preset: p })
-  }, [persist])
+  }, [])
 
   const setCompareMode = useCallback((m: CompareMode) => {
     _setCompareMode(m)
-    persist({ compareMode: m })
-  }, [persist])
+  }, [])
 
   const setCustomStart = useCallback((v: string) => {
     _setCustomStart(v)
-    persist({ customStart: v })
-  }, [persist])
+  }, [])
 
   const setCustomEnd = useCallback((v: string) => {
     _setCustomEnd(v)
-    persist({ customEnd: v })
-  }, [persist])
+  }, [])
 
   const setCustomCompareStart = useCallback((v: string) => {
     _setCustomCompareStart(v)
-    persist({ customCompareStart: v })
-  }, [persist])
+  }, [])
 
   const setCustomCompareEnd = useCallback((v: string) => {
     _setCustomCompareEnd(v)
-    persist({ customCompareEnd: v })
-  }, [persist])
+  }, [])
 
   // Résolution des plages de dates
   const period = useMemo<DateRange>(() => {
@@ -345,7 +300,6 @@ export function usePeriodFilter(extraOrders?: DashboardOrder[]): UsePeriodFilter
       _setCustomEnd(defaultEnd)
       _setCustomCompareStart(defaultStart)
       _setCustomCompareEnd(defaultEnd)
-      localStorage.removeItem(LS_KEY)
     }, []),
   }
 }

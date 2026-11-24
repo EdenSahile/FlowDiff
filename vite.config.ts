@@ -1,5 +1,6 @@
 import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
+import babel from '@rolldown/plugin-babel'
 import path from 'path'
 
 export default defineConfig({
@@ -12,19 +13,18 @@ export default defineConfig({
     // les emplacements d'origine, et qui échouent au chargement.
     exclude: ['**/node_modules/**', '**/dist/**', 'parked/**', 'e2e/**'],
     alias: {
-      '@': path.resolve(__dirname, './src'),
+      '@': path.resolve(import.meta.dirname, './src'),
     },
   },
   plugins: [
-    react({
-      babel: {
-        plugins: ['babel-plugin-styled-components'],
-      },
+    react(),
+    babel({
+      plugins: ['babel-plugin-styled-components'],
     }),
   ],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
+      '@': path.resolve(import.meta.dirname, './src'),
     },
   },
   server: {},

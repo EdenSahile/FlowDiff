@@ -165,6 +165,18 @@ const ErrorText = styled.p`
   color: ${({ theme }) => theme.colors.error};
 `
 
+const SimulationNotice = styled.p`
+  margin: ${({ theme }) => theme.spacing.lg} 0 0;
+  padding: 10px 12px;
+  border: 1px solid ${({ theme }) => theme.colors.gray[200]};
+  border-radius: ${({ theme }) => theme.radii.md};
+  background-color: ${({ theme }) => theme.colors.gray[50]};
+  color: ${({ theme }) => theme.colors.gray[600]};
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: ${({ theme }) => theme.typography.sizes.sm};
+  line-height: 1.5;
+`
+
 const InfoCard = styled.div`
   background-color: ${({ theme }) => theme.colors.navyLight};
   border-left: 3px solid ${({ theme }) => theme.colors.accent};
@@ -240,7 +252,7 @@ export function ContactPage() {
       setSending(false)
       setSujet('')
       setMessage('')
-      showToast('Votre message a été envoyé. Nous vous répondrons dans les meilleurs délais.')
+      showToast('Envoi fictif confirmé : aucun e-mail n’a été envoyé.')
     }, 800)
   }
 
@@ -297,12 +309,16 @@ export function ContactPage() {
             {errors.message && <ErrorText>{errors.message}</ErrorText>}
           </FieldGroup>
 
+          <SimulationNotice role="note">
+            Mode démo : aucun e-mail n’est envoyé. Ce formulaire simule uniquement un envoi.
+          </SimulationNotice>
+
           <SendButton
             type="submit"
             disabled={sending}
             style={{ marginTop: '24px' }}
           >
-            {sending ? 'Envoi en cours…' : `Envoyer à ${recipient === 'representant' ? 'mon représentant' : 'le service clients'}`}
+            {sending ? 'Simulation en cours…' : recipient === 'representant' ? 'Simuler l’envoi à mon représentant' : 'Simuler l’envoi au service clients'}
           </SendButton>
         </form>
       </Card>

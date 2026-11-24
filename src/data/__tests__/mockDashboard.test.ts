@@ -55,6 +55,15 @@ describe('données de tableau de bord', () => {
     ]))
   })
 
+  it('fournit des ISBN EAN-13 et un type de commande pour les lignes de démonstration', () => {
+    const lines = MOCK_DASHBOARD_ORDERS.flatMap(order => order.items)
+
+    expect(lines.length).toBeGreaterThan(0)
+    expect(lines.every(line => /^\d{13}$/.test(line.isbn))).toBe(true)
+    expect(lines.every(line => line.typeCommande)).toBe(true)
+    expect(lines.every(line => [0.30, 0.35].includes(line.discountRate ?? 0))).toBe(true)
+  })
+
   it('conserve les dates locales de début et de fin dans la courbe', () => {
     const points = computeChartData([
       dashboardOrder({ id: 'first-day', orderId: 'first-day', date: '2026-10-15' }),
@@ -120,10 +129,10 @@ describe('données de tableau de bord', () => {
     expect(rows).toHaveLength(2)
     expect(rows.every(row => row.orderId === order.id)).toBe(true)
     expect(rows.flatMap(row => row.items)).toEqual(expect.arrayContaining([
-      expect.objectContaining({ isbn: '9780000000001', title: 'Titre A', publisher: 'Gallimard', quantity: 2, unitPriceTTC: 20, montantTTC: 40 }),
-      expect.objectContaining({ isbn: '9780000000002', title: 'Titre B', publisher: 'Dargaud', quantity: 1, unitPriceTTC: 20, montantTTC: 20 }),
+      expect.objectContaining({ isbn: '9780000000001', title: 'Titre A', publisher: 'Gallimard', quantity: 2, unitPriceTTC: 20, discountRate: 0.35, montantTTC: 26 }),
+      expect.objectContaining({ isbn: '9780000000002', title: 'Titre B', publisher: 'Dargaud', quantity: 1, unitPriceTTC: 20, discountRate: 0.30, montantTTC: 14 }),
     ]))
-    expect(computeKPIs(rows)).toMatchObject({ nbCommandes: 1, montantTotal: 60, nbExemplaires: 3 })
+    expect(computeKPIs(rows)).toMatchObject({ nbCommandes: 1, montantTotal: 40, nbExemplaires: 3 })
   })
 })
 

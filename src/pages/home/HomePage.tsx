@@ -18,7 +18,7 @@ import { useDashboardConfig, type DashboardZone } from '@/hooks/useDashboardConf
 import { CustomizerDrawer } from '@/components/dashboard/CustomizerDrawer'
 import { computeKPIs, computeChartData, computeDonutData, computeTopPublishers, orderToDashboardOrders, summarizeDashboardOrders, fmtEur, type ChartPoint, type DonutSegment } from '@/data/mockDashboard'
 import {
-  exportDashboardCSV,
+  exportDashboardExcel,
   exportKPIOnlyCSV,
   exportEvolutionCSV,
   exportRepartitionCSV,
@@ -1840,9 +1840,15 @@ export function HomePage() {
   const dateLabel = 'Aujourd\'hui'
   const dateValue = now.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
 
+  const dashboardRemiseRates = useMemo(
+    () => Object.fromEntries(
+      Object.entries(user?.remisesParUnivers ?? {}).map(([universe, rate]) => [universe, Number(rate) / 100]),
+    ),
+    [user?.remisesParUnivers],
+  )
   const extraDashboardOrders = useMemo(
-    () => userOrders.flatMap(orderToDashboardOrders),
-    [userOrders],
+    () => userOrders.flatMap(order => orderToDashboardOrders(order, dashboardRemiseRates)),
+    [dashboardRemiseRates, userOrders],
   )
   const periodFilter = usePeriodFilter(extraDashboardOrders)
 
@@ -2282,9 +2288,21 @@ export function HomePage() {
                 </ResetLink>
               </ControlsLeft>
               <CustomizeBtn type="button" onClick={() =>
-                exportDashboardCSV(kpi, periodFilter.orders, periodFilter.period, periodFilter.preset)
+                exportDashboardExcel(
+                  kpi,
+                  periodFilter.orders,
+                  periodFilter.period,
+                  periodFilter.preset,
+                  periodFilter.comparePeriod
+                    ? {
+                        orders: periodFilter.compareOrders,
+                        period: periodFilter.comparePeriod,
+                        label: periodFilter.compareMode === 'year-ago' ? 'N-1' : 'Période comparée',
+                      }
+                    : undefined,
+                )
               }>
-                <IconDownload /> Exporter CSV
+                <IconDownload /> Exporter Excel
               </CustomizeBtn>
             </DashboardControls>
             {periodFilter.preset === 'custom' && (
