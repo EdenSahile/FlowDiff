@@ -52,6 +52,21 @@ describe('usePeriodFilter', () => {
     expect(result.current.compareMode).toBe('none')
     expect(result.current.isDefault).toBe(true)
   })
+
+  it('ignore une sélection de période mémorisée au rechargement', () => {
+    localStorage.setItem('flowdiff.periodFilter', JSON.stringify({
+      preset: 'last-7',
+      compareMode: 'year-ago',
+      customStart: '2026-01-01',
+      customEnd: '2026-01-31',
+    }))
+
+    const { result } = renderHook(() => usePeriodFilter())
+
+    expect(result.current.preset).toBe('last-30')
+    expect(result.current.compareMode).toBe('none')
+    expect(localStorage.getItem('flowdiff.periodFilter')).toBeNull()
+  })
 })
 
 /* ─────────────────────────────────────────────────

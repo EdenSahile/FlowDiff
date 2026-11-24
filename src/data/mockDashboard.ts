@@ -1,6 +1,6 @@
 import type { Universe } from './mockBooks'
 import { MOCK_BOOKS } from './mockBooks'
-import type { Order } from './mockOrders'
+import type { Order, OrderStatus, TypeCommande } from './mockOrders'
 import { formatPrice, roundCurrency } from '@/lib/format'
 
 /* ─────────────────────────────────────────
@@ -11,7 +11,12 @@ export interface DashboardOrder {
   id: string
   /** Identifiant logique de commande : plusieurs lignes peuvent la ventiler par éditeur. */
   orderId: string
+  /** Numéro métier affiché au libraire, quand la commande en possède un. */
+  orderNumber?: string
   date: string          // YYYY-MM-DD
+  orderStatus?: OrderStatus
+  invoiceNumber?: string
+  invoiceDate?: string  // YYYY-MM-DD
   montantTTC: number
   nbExemplaires: number
   publisher: string
@@ -25,8 +30,12 @@ export interface DashboardOrder {
 export interface DashboardOrderItem {
   isbn: string
   title: string
+  author?: string
   publisher: string
+  typeCommande?: TypeCommande
   quantity: number
+  /** Prix public HT avant remise, lorsqu'il est connu. */
+  unitPriceHT?: number
   /** Prix public TTC avant la remise appliquée à cette ligne. */
   unitPriceTTC: number
   /** Taux de remise appliqué au prix public, entre 0 et 1. */
@@ -83,6 +92,14 @@ const UNIVERSE_COLORS: Record<Universe, string> = {
   'Littérature':     '#22C55E',
   'Jeunesse':        '#EAB308',
   'Adulte-pratique': '#9CA3AF',
+}
+
+/** Taux de démonstration alignés sur les remises par thématique du compte. */
+export const DASHBOARD_REMISE_RATES: Record<Universe, number> = {
+  'BD/Mangas':       0.30,
+  'Jeunesse':        0.30,
+  'Littérature':     0.35,
+  'Adulte-pratique': 0.35,
 }
 
 /* ─────────────────────────────────────────
@@ -153,6 +170,21 @@ function addDays(d: Date, n: number): Date {
   return r
 }
 
+function ean13CheckDigit(base: string): string {
+  const sum = [...base].reduce((total, digit, index) =>
+    total + Number(digit) * (index % 2 === 0 ? 1 : 3), 0)
+  return String((10 - (sum % 10)) % 10)
+}
+
+function demoISBN13(index: number, itemIndex: number): string {
+  const base = `978${String(260000000 + index * 10 + itemIndex).padStart(9, '0')}`
+  return `${base}${ean13CheckDigit(base)}`
+}
+
+function demoOrderType(daysAgo: number): TypeCommande {
+  return daysAgo <= 30 ? 'Nouveauté' : 'Fonds'
+}
+
 const DEMO_TITLES: Record<Universe, string[]> = {
   'Littérature': ['Les heures silencieuses', 'Une saison sur le quai', 'La carte des absences'],
   'BD/Mangas': ['Les Chroniques du passage', 'Le Club des étoiles', 'Les Jardins d’acier'],
@@ -176,15 +208,20 @@ function buildDemoItems(seed: DemoOrderSeed, index: number): DashboardOrderItem[
 
   return quantities.map((quantity, itemIndex) => {
     const montantTTC = amountsInCents[itemIndex] / 100
-    const discountRate = seed.discountRate ?? 0
+    const discountRate = seed.discountRate ?? DASHBOARD_REMISE_RATES[seed.universe]
     return {
-      isbn: `978-${String(260000000 + index * 10 + itemIndex).padStart(9, '0')}`,
+      isbn: demoISBN13(index, itemIndex),
       title: titles[(index + itemIndex) % titles.length],
+      author: '',
       publisher: seed.publisher,
+      typeCommande: demoOrderType(seed.daysAgo),
       quantity,
       unitPriceTTC: discountRate > 0
         ? roundCurrency(montantTTC / quantity / (1 - discountRate))
         : montantTTC / quantity,
+      unitPriceHT: discountRate > 0
+        ? roundCurrency(montantTTC / quantity / (1 - discountRate) / 1.055)
+        : roundCurrency(montantTTC / quantity / 1.055),
       discountRate: discountRate || undefined,
       montantTTC,
     }
@@ -199,6 +236,7 @@ function generateOrders(): DashboardOrder[] {
     return {
       id,
       orderId: id,
+      orderNumber: `CMD-DÉMO-${String(index + 1).padStart(3, '0')}`,
       date: isoDate(addDays(today, -seed.daysAgo)),
       montantTTC: seed.montantTTC,
       nbExemplaires: seed.nbExemplaires,
@@ -365,52 +403,46 @@ function itemPriceTTC(item: Order['items'][number]): number {
   return MOCK_BOOKS.find(b => b.id === item.bookId)?.priceTTC ?? item.unitPriceHT * 1.055
 }
 
-export function orderToDashboardOrders(order: Order): DashboardOrder[] {
+export function orderToDashboardOrders(
+  order: Order,
+  remiseRates: Record<string, number> = DASHBOARD_REMISE_RATES,
+): DashboardOrder[] {
   const groups = new Map<string, Order['items']>()
   for (const item of order.items) {
     const key = `${item.publisher}||${item.universe}`
     groups.set(key, [...(groups.get(key) ?? []), item])
   }
 
-  const orderGrossTTC = order.items.reduce((s, it) => s + itemPriceTTC(it) * it.quantity, 0)
-
   const entries = [...groups.entries()]
-  let allocatedTTC = 0
 
   return entries.map(([key, items], i) => {
     const [publisher, universe] = key.split('||')
-    const groupGrossTTC = items.reduce((s, it) => s + itemPriceTTC(it) * it.quantity, 0)
-    const montantTTC = i === entries.length - 1
-      ? roundCurrency(order.totalTTC - allocatedTTC)
-      : orderGrossTTC > 0
-        ? roundCurrency((groupGrossTTC / orderGrossTTC) * order.totalTTC)
-        : 0
-    allocatedTTC += montantTTC
-    let allocatedLineTTC = 0
-    const dashboardItems = items.map((item, itemIndex) => {
-      const itemGrossTTC = itemPriceTTC(item) * item.quantity
-      const itemMontantTTC = itemIndex === items.length - 1
-        ? roundCurrency(montantTTC - allocatedLineTTC)
-        : groupGrossTTC > 0
-          ? roundCurrency((itemGrossTTC / groupGrossTTC) * montantTTC)
-          : 0
-      allocatedLineTTC += itemMontantTTC
+    const dashboardItems = items.map(item => {
+      const unitPriceTTC = itemPriceTTC(item)
+      const discountRate = remiseRates[item.universe] ?? DASHBOARD_REMISE_RATES[universe as Universe]
+      const itemMontantTTC = roundCurrency(unitPriceTTC * item.quantity * (1 - discountRate))
       return {
         isbn: item.isbn,
         title: item.title,
+        author: item.author,
         publisher: item.publisher,
+        typeCommande: item.typeCommande,
         quantity: item.quantity,
-        unitPriceTTC: itemPriceTTC(item),
-        discountRate: itemGrossTTC > 0
-          ? Math.max(0, 1 - itemMontantTTC / itemGrossTTC)
-          : undefined,
+        unitPriceHT: item.unitPriceHT,
+        unitPriceTTC,
+        discountRate,
         montantTTC: itemMontantTTC,
       }
     })
+    const montantTTC = roundCurrency(dashboardItems.reduce((sum, item) => sum + item.montantTTC, 0))
     return {
       id:            `${order.id}-grp${i}`,
       orderId:       order.id,
+      orderNumber:   order.numero,
       date:          order.date,
+      orderStatus:   order.status,
+      invoiceNumber: order.numFacture,
+      invoiceDate:   order.dateFacturation,
       montantTTC,
       nbExemplaires: items.reduce((s, it) => s + it.quantity, 0),
       publisher,

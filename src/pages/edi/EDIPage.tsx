@@ -126,6 +126,28 @@ const SimulationButton = styled.button`
   &:hover { background: ${({ theme }) => theme.colors.gray[50]}; }
 `
 
+const SimulationConfirmation = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  width: 100%;
+  padding: 10px 14px;
+  margin-top: -12px;
+  margin-bottom: 20px;
+  border-radius: ${({ theme }) => theme.radii.md};
+  background: ${({ theme }) => theme.colors.primaryLight};
+  color: ${({ theme }) => theme.colors.navy};
+  font-size: ${({ theme }) => theme.typography.sizes.sm};
+`
+
+const SimulationHistoryLink = styled.a`
+  color: ${({ theme }) => theme.colors.navy};
+  font-weight: ${({ theme }) => theme.typography.weights.semibold};
+  text-decoration: underline;
+  &:hover { color: ${({ theme }) => theme.colors.primaryHover}; }
+`
+
 const SimulationBanner = styled.section`
   background: ${({ theme }) => theme.colors.accentLight};
   border: 1px solid ${({ theme }) => theme.colors.accent};
@@ -549,6 +571,7 @@ export function EDIPage() {
   const [selectedMessage, setSelectedMessage] = useState<EDIMessage | null>(null)
   const [isbnSearch, setIsbnSearch] = useState('')
   const [showAll, setShowAll] = useState(false)
+  const [simulationCreated, setSimulationCreated] = useState(false)
 
   function handleFilterChange(key: EDIFilter) {
     setActiveFilter(key)
@@ -557,6 +580,11 @@ export function EDIPage() {
 
   function handleSimulation() {
     createEdiSimulation()
+    setActiveFilter('ALL')
+    setSimulationCreated(true)
+  }
+
+  function handleShowHistory() {
     setActiveFilter('ALL')
     setShowAll(true)
   }
@@ -604,9 +632,18 @@ export function EDIPage() {
             </Subtitle>
           </TitleBlock>
           <SimulationButton type="button" onClick={handleSimulation}>
-            Simuler une nouvelle commande EDI
+            {simulationCreated ? 'Simuler une autre commande EDI' : 'Simuler une nouvelle commande EDI'}
           </SimulationButton>
         </PageHeader>
+
+        {simulationCreated && (
+          <SimulationConfirmation role="status" aria-live="polite">
+            Commande EDI simulée. Les échanges ont été ajoutés à l’historique.
+            <SimulationHistoryLink href="#historique" onClick={handleShowHistory}>
+              Voir l’historique
+            </SimulationHistoryLink>
+          </SimulationConfirmation>
+        )}
 
         <SimulationBanner>
           <SimulationTitle>Simulation des échanges EDI</SimulationTitle>

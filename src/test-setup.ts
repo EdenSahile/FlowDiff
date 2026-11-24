@@ -1,4 +1,4 @@
-import '@testing-library/jest-dom'
+import '@testing-library/jest-dom/vitest'
 
 // Node 26 expose un localStorage natif (expérimental, nécessite --localstorage-file).
 // Sans ce flag, il retourne undefined et masque celui de jsdom.
