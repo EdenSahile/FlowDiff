@@ -1,6 +1,7 @@
 import { test, expect, type Page } from '@playwright/test'
 import { MOCK_ORDERS, ORDER_STATUSES, ORDER_STATUS_LABELS, type Order } from '../src/data/mockOrders'
 import { MOCK_BOOKS } from '../src/data/mockBooks'
+import { getPurchaseAvailability } from '../src/lib/bookUtils'
 import { collectCrashes, DEMO_CODE_CLIENT, expectCartCount, login, sidebarLink } from './helpers'
 
 /*
@@ -15,22 +16,33 @@ import { collectCrashes, DEMO_CODE_CLIENT, expectCartCount, login, sidebarLink }
 
 test.use({ viewport: { width: 1440, height: 900 } })
 
-const CATALOGUE_IDS = new Set(MOCK_BOOKS.map(book => book.id))
+const CATALOGUE = new Map(MOCK_BOOKS.map(book => [book.id, book]))
+
+/*
+  Une ligne ne peut retourner au panier que si son livre est encore au
+  catalogue ET commandable aujourd'hui. getPurchaseAvailability est la même
+  fonction que BookCard consulte : un titre épuisé ou en rupture n'est
+  ajoutable par aucun chemin de l'application.
+*/
+function isDuplicable(bookId: string): boolean {
+  const book = CATALOGUE.get(bookId)
+  return !!book && getPurchaseAvailability(book.type, book.statut).canAddToCart
+}
 
 // Tri de la page : date décroissante.
 const ORDERS = [...(MOCK_ORDERS[DEMO_CODE_CLIENT] ?? [])]
   .sort((a, b) => b.date.localeCompare(a.date))
 
 const duplicableItems = (order: Order) =>
-  order.items.filter(item => CATALOGUE_IDS.has(item.bookId))
+  order.items.filter(item => isDuplicable(item.bookId))
 
 const duplicableCopies = (order: Order) =>
   duplicableItems(order).reduce((sum, item) => sum + item.quantity, 0)
 
 /*
-  2 commandes de démonstration contiennent des lignes dont le livre a quitté
-  le catalogue. La duplication les ignore en silence, d'où ces 2 jeux
-  distincts : l'un pour la duplication complète, l'autre pour la partielle.
+  Une commande de démonstration porte un titre passé en rupture depuis, d'où
+  ces 2 jeux distincts : l'un pour la duplication complète, l'autre pour la
+  partielle.
 */
 const FULLY_DUPLICABLE = ORDERS.find(order => duplicableItems(order).length === order.items.length)!
 const PARTIALLY_DUPLICABLE = ORDERS.find(order =>
@@ -210,12 +222,13 @@ test.describe('Duplication en 1 clic', () => {
   })
 
   /*
-    Une commande peut porter un titre qui a quitté le catalogue depuis.
-    handleDupliquer ne reprend que les lignes qu'il retrouve dans MOCK_BOOKS,
-    et le libraire doit l'apprendre : sans message, il croit avoir remis au
-    panier une commande de 18 exemplaires alors qu'il en a 8.
+    Une commande garde l'historique de ce qui a été livré, et un titre peut
+    être épuisé ou en rupture depuis. Ce titre n'est ajoutable par aucun autre
+    chemin de l'application, la duplication ne doit pas être une porte
+    dérobée, et le libraire doit savoir qu'il repart avec moins
+    d'exemplaires qu'il n'en avait commandé.
   */
-  test('les lignes dont le livre a quitté le catalogue sont signalées', async ({ page }) => {
+  test('les lignes non commandables aujourd\'hui sont écartées et signalées', async ({ page }) => {
     const ordered = PARTIALLY_DUPLICABLE.items.reduce((sum, item) => sum + item.quantity, 0)
     const copies = duplicableCopies(PARTIALLY_DUPLICABLE)
     const skipped = PARTIALLY_DUPLICABLE.items.length - duplicableItems(PARTIALLY_DUPLICABLE).length
@@ -225,7 +238,7 @@ test.describe('Duplication en 1 clic', () => {
 
     await expectCartCount(page, copies)
     await expect(page.getByText(
-      `${skipped} titre${skipped > 1 ? 's' : ''} de cette commande ${skipped > 1 ? 'ne sont' : 'n\'est'} plus au catalogue et ${skipped > 1 ? "n'ont" : "n'a"} pas été repris.`,
+      `${skipped} titre${skipped > 1 ? 's' : ''} de cette commande ${skipped > 1 ? 'ne sont' : 'n\'est'} plus commandable${skipped > 1 ? 's' : ''} et ${skipped > 1 ? "n'ont" : "n'a"} pas été repris.`,
     )).toBeVisible()
   })
 
@@ -233,7 +246,7 @@ test.describe('Duplication en 1 clic', () => {
     await duplicateButton(page, FULLY_DUPLICABLE).click()
 
     await expectCartCount(page, duplicableCopies(FULLY_DUPLICABLE))
-    await expect(page.getByText(/plus au catalogue/)).toHaveCount(0)
+    await expect(page.getByText(/plus commandable/)).toHaveCount(0)
   })
 
   test('la commande dupliquée se retrouve dans le panier', async ({ page }) => {
