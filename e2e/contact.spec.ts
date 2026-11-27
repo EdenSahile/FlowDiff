@@ -16,6 +16,18 @@ test.use({ viewport: { width: 1440, height: 900 } })
 
 const USER = MOCK_USERS.find(u => u.codeClient === DEMO_CODE_CLIENT)!
 
+/*
+  Libellés du bouton d'envoi. La page parle de simulation, pas d'envoi : rien
+  ne part réellement. Ils sont écrits ici parce que ce sont des textes
+  d'interface, que rien n'exporte.
+
+  L'apostrophe de « l'envoi » est une apostrophe typographique dans la source :
+  le sélecteur générique accepte les 2 formes pour ne pas dépendre d'elle.
+*/
+const SEND_TO_REP = 'Simuler l’envoi à mon représentant'
+const SEND_TO_SERVICE = 'Simuler l’envoi au service clients'
+const ANY_SEND_BUTTON = /^Simuler l[’']envoi/
+
 // Satisfait contactSchema : 2 caractères minimum pour le sujet, 10 pour le message.
 const VALID_SUBJECT = 'Demande de renseignement'
 const VALID_MESSAGE = 'Bonjour, je souhaite des informations sur une commande.'
@@ -49,7 +61,7 @@ test.describe('Affichage', () => {
   })
 
   test('le bouton d\'envoi nomme le destinataire courant', async ({ page }) => {
-    await expect(page.getByRole('button', { name: 'Envoyer à mon représentant' })).toBeVisible()
+    await expect(page.getByRole('button', { name: SEND_TO_REP })).toBeVisible()
   })
 })
 
@@ -62,7 +74,7 @@ test.describe('Destinataire', () => {
 
     await expect(page.getByText('Service clients FlowDiff')).toBeVisible()
     await expect(page.getByText('Délai de réponse : sous 24h ouvrées')).toBeVisible()
-    await expect(page.getByRole('button', { name: 'Envoyer à le service clients' })).toBeVisible()
+    await expect(page.getByRole('button', { name: SEND_TO_SERVICE })).toBeVisible()
   })
 
   test('revenir au représentant restaure son bloc', async ({ page }) => {
@@ -91,7 +103,7 @@ test.describe('Destinataire', () => {
 ──────────────────────────────────────────── */
 test.describe('Validation', () => {
   test('un formulaire vide affiche les deux erreurs', async ({ page }) => {
-    await page.getByRole('button', { name: /^Envoyer à/ }).click()
+    await page.getByRole('button', { name: ANY_SEND_BUTTON }).click()
 
     await expect(page.getByText('Sujet trop court (2 caractères min.)')).toBeVisible()
     await expect(page.getByText('Message trop court (10 caractères min.)')).toBeVisible()
@@ -101,14 +113,14 @@ test.describe('Validation', () => {
     await page.getByLabel('Sujet *').fill(VALID_SUBJECT)
     await page.getByLabel('Message *').fill('court')
 
-    await page.getByRole('button', { name: /^Envoyer à/ }).click()
+    await page.getByRole('button', { name: ANY_SEND_BUTTON }).click()
 
     await expect(page.getByText('Sujet trop court (2 caractères min.)')).toHaveCount(0)
     await expect(page.getByText('Message trop court (10 caractères min.)')).toBeVisible()
   })
 
   test('corriger un champ efface son erreur', async ({ page }) => {
-    await page.getByRole('button', { name: /^Envoyer à/ }).click()
+    await page.getByRole('button', { name: ANY_SEND_BUTTON }).click()
     await expect(page.getByText('Sujet trop court (2 caractères min.)')).toBeVisible()
 
     await page.getByLabel('Sujet *').fill(VALID_SUBJECT)
@@ -126,11 +138,11 @@ test.describe('Envoi', () => {
     await page.getByLabel('Sujet *').fill(VALID_SUBJECT)
     await page.getByLabel('Message *').fill(VALID_MESSAGE)
 
-    await page.getByRole('button', { name: /^Envoyer à/ }).click()
+    await page.getByRole('button', { name: ANY_SEND_BUTTON }).click()
 
     // L'envoi simulé dure 800 ms : le bouton annonce l'attente.
-    await expect(page.getByRole('button', { name: 'Envoi en cours…' })).toBeVisible()
-    await expect(page.getByText('Votre message a été envoyé')).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Simulation en cours…' })).toBeVisible()
+    await expect(page.getByText(/Envoi fictif confirmé/)).toBeVisible()
     await expect(page.getByLabel('Sujet *')).toHaveValue('')
     await expect(page.getByLabel('Message *')).toHaveValue('')
     expect(crashes).toEqual([])
