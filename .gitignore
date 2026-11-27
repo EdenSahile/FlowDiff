@@ -82,3 +82,7 @@ bun.lockb
 CONTEXT.md
 handoffs/
 test-results/
+
+# Vite écrit ce fichier le temps de lire vite.config.ts, puis le supprime.
+# Un plantage ou une interruption le laisse sur le disque.
+vite.config.ts.timestamp-*.mjs
