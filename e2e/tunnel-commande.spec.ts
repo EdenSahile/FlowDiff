@@ -1,17 +1,21 @@
 import { test, expect, type Page } from '@playwright/test'
+import { CHECKOUT_STEPS, getStepLabel } from '../src/pages/cart/checkoutSteps'
 
 /*
   Tunnel de commande, de la connexion à la confirmation.
 
-  C'est le flux le plus critique de l'application, et le seul parcours majeur
-  qui n'avait aucun test e2e : sa logique est couverte en unitaire
-  (checkoutTunnel, cartOperations, lot09-orders), mais rien ne vérifiait
-  qu'elle s'enchaîne à l'écran.
+  C'est le flux le plus critique de l'application, et sa logique est couverte
+  en unitaire (checkoutTunnel, cartOperations, lot09-orders). Ce fichier
+  vérifie l'enchaînement à l'écran : le panier se remplit, les étapes
+  défilent, la commande part, le panier se vide, la commande arrive dans
+  l'historique.
 
   Les montants et les remises ne sont pas rejoués ici, computeTotals.test.ts
-  les couvre. Ce fichier vérifie l'enchaînement : le panier se remplit, les
-  3 étapes défilent, la commande part, le panier se vide, la commande arrive
-  dans l'historique.
+  les couvre.
+
+  Le nombre d'étapes se lit dans CHECKOUT_STEPS et leur libellé dans
+  getStepLabel : passer de 3 à 2 étapes, ou renommer une étape, ne doit pas
+  faire tomber la suite.
 */
 
 test.use({ viewport: { width: 1440, height: 900 } })
@@ -63,15 +67,44 @@ function collectCrashes(page: Page): string[] {
   return crashes
 }
 
-// Déroule les 3 étapes du tunnel depuis le panier jusqu'à la confirmation.
+/*
+  Le stepper est la marque d'étape qui ne dépend d'aucun libellé de bouton :
+  chaque pastille porte en aria-label le nom de son étape, et la pastille de
+  l'étape courante porte en plus aria-current="step".
+*/
+function stepper(page: Page) {
+  return page.getByRole('list', { name: 'Étapes de la commande' })
+}
+
+async function expectOnStep(page: Page, step: (typeof CHECKOUT_STEPS)[number]) {
+  await expect(stepper(page).locator('[aria-current="step"]'))
+    .toHaveAttribute('aria-label', getStepLabel(step))
+}
+
+/*
+  Avance d'une étape. Le bouton d'avancement porte le nom de l'action qu'il
+  déclenche, non celui de l'étape visée : « Vérifier ma commande » quitte
+  l'étape des adresses. Un tunnel à plus de 2 étapes demanderait un libellé
+  par étape intermédiaire.
+*/
+async function goToNextStep(page: Page) {
+  await page.getByRole('button', { name: 'Vérifier ma commande' }).click()
+}
+
+// Déroule le tunnel depuis le panier jusqu'à la confirmation.
 async function runCheckout(page: Page) {
   await page.goto('/panier')
-
   await page.getByRole('button', { name: 'Valider la commande' }).click()
-  await page.getByRole('button', { name: /^Suivant : Adresses/ }).click()
-  await page.getByRole('button', { name: /^Suivant : Mode de transmission/ }).click()
-  await page.getByRole('button', { name: 'Envoyer la commande' }).click()
+
+  // Une étape de moins que d'étapes : la dernière se quitte par la validation.
+  for (let i = 0; i < CHECKOUT_STEPS.length - 1; i++) {
+    await goToNextStep(page)
+  }
+
+  await page.getByRole('button', { name: 'Valider ma commande' }).click()
 }
+
+const SUCCESS_TEXT = 'Votre commande a été enregistrée sur FlowDiff.'
 
 /* ────────────────────────────────────────────
    Scénarios
@@ -102,22 +135,41 @@ test.describe('Tunnel de commande', () => {
     await expect(page.getByRole('button', { name: 'Valider la commande' })).toBeEnabled()
   })
 
-  test('les 3 étapes du tunnel défilent jusqu\'à la confirmation', async ({ page }) => {
+  test('les étapes du tunnel défilent jusqu\'à la confirmation', async ({ page }) => {
     await login(page)
     await addBookToCart(page)
     await page.goto('/panier')
 
     await page.getByRole('button', { name: 'Valider la commande' }).click()
-    await expect(page.getByRole('button', { name: /^Suivant : Adresses/ })).toBeVisible()
 
-    await page.getByRole('button', { name: /^Suivant : Adresses/ }).click()
-    await expect(page.getByRole('button', { name: /^Suivant : Mode de transmission/ })).toBeVisible()
+    // Le stepper annonce toutes les étapes, dans l'ordre déclaré.
+    await expect(stepper(page).getByRole('listitem'))
+      .toHaveText(CHECKOUT_STEPS.map(step => new RegExp(getStepLabel(step))))
 
-    await page.getByRole('button', { name: /^Suivant : Mode de transmission/ }).click()
-    await expect(page.getByRole('button', { name: 'Envoyer la commande' })).toBeVisible()
+    for (const step of CHECKOUT_STEPS) {
+      await expectOnStep(page, step)
+      if (step !== CHECKOUT_STEPS[CHECKOUT_STEPS.length - 1]) {
+        await goToNextStep(page)
+      }
+    }
 
-    await page.getByRole('button', { name: 'Envoyer la commande' }).click()
-    await expect(page.getByText('Commande envoyée !')).toBeVisible()
+    await page.getByRole('button', { name: 'Valider ma commande' }).click()
+
+    await expect(page.getByText(SUCCESS_TEXT)).toBeVisible()
+  })
+
+  test('revenir en arrière ramène à l\'étape précédente', async ({ page }) => {
+    test.skip(CHECKOUT_STEPS.length < 2, 'Le tunnel n\'a qu\'une étape.')
+    await login(page)
+    await addBookToCart(page)
+    await page.goto('/panier')
+    await page.getByRole('button', { name: 'Valider la commande' }).click()
+    await goToNextStep(page)
+    await expectOnStep(page, CHECKOUT_STEPS[1])
+
+    await page.getByRole('button', { name: /Modifier les adresses/ }).click()
+
+    await expectOnStep(page, CHECKOUT_STEPS[0])
   })
 
   test('le panier est vidé après l\'envoi de la commande', async ({ page }) => {
@@ -126,7 +178,7 @@ test.describe('Tunnel de commande', () => {
 
     await runCheckout(page)
 
-    await expect(page.getByText('Commande envoyée !')).toBeVisible()
+    await expect(page.getByText(SUCCESS_TEXT)).toBeVisible()
     await expectCartCount(page, 0)
   })
 
@@ -139,7 +191,7 @@ test.describe('Tunnel de commande', () => {
     await addBookToCart(page)
 
     await runCheckout(page)
-    await expect(page.getByText('Commande envoyée !')).toBeVisible()
+    await expect(page.getByText(SUCCESS_TEXT)).toBeVisible()
     await page.goto('/historique')
 
     await expect(orderNumbers(page)).toHaveCount(countBeforeOrder + 1)
@@ -152,7 +204,7 @@ test.describe('Tunnel de commande', () => {
     await addBookToCart(page)
 
     await runCheckout(page)
-    await expect(page.getByText('Commande envoyée !')).toBeVisible()
+    await expect(page.getByText(SUCCESS_TEXT)).toBeVisible()
     await page.goto('/historique')
 
     expect(crashes).toEqual([])
