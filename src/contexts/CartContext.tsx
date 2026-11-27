@@ -196,11 +196,26 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [{ items, opGroups }, setCart] = useState<StoredCart>(() => loadCart(cartKey(user?.codeClient)))
   const toastGuardRef = useRef(false)
 
-  /* Re-charger le panier quand l'utilisateur change */
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+  /*
+    Recharger le panier quand l'utilisateur change, PENDANT le rendu et non
+    dans un effet.
+
+    Au premier rendu d'un chargement de page, l'utilisateur n'est pas encore
+    restauré : la clé vaut « guest » et le panier est vide. Dans un effet, le
+    changement de clé arrivait trop tard : l'effet de persistance, qui suit,
+    voyait encore le panier vide du rendu courant et l'écrivait sous la
+    nouvelle clé, effaçant le panier stocké. Un rechargement tombant dans
+    cette fenêtre perdait le panier.
+
+    En ajustant l'état pendant le rendu, `items` correspond toujours à `key`
+    quand les effets s'exécutent. Même motif que FacturationPage avec ses
+    états `prev*`.
+  */
+  const [loadedKey, setLoadedKey] = useState(key)
+  if (loadedKey !== key) {
+    setLoadedKey(key)
     setCart(loadCart(key))
-  }, [key, user?.codeClient])
+  }
 
   const setItems = useCallback((fn: (prev: CartItem[]) => CartItem[]) =>
     setCart(c => ({ ...c, items: fn(c.items) }))
