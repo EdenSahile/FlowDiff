@@ -210,24 +210,30 @@ test.describe('Duplication en 1 clic', () => {
   })
 
   /*
-    ⚠️ Comportement constaté, non choisi : handleDupliquer cherche chaque ligne
-    dans MOCK_BOOKS et ignore celles qu'il n'y trouve pas, sans le dire. Sur la
-    commande testée ici, le panier reçoit moins d'exemplaires que la commande
-    n'en portait, et le bouton annonce « Ajouté au panier » comme si tout avait
-    été repris.
-
-    Le test fixe ce qui se passe. Si le jour vient d'avertir le libraire, il
-    tombera, et c'est le signal attendu.
+    Une commande peut porter un titre qui a quitté le catalogue depuis.
+    handleDupliquer ne reprend que les lignes qu'il retrouve dans MOCK_BOOKS,
+    et le libraire doit l'apprendre : sans message, il croit avoir remis au
+    panier une commande de 18 exemplaires alors qu'il en a 8.
   */
-  test('les lignes dont le livre a quitté le catalogue sont ignorées en silence', async ({ page }) => {
+  test('les lignes dont le livre a quitté le catalogue sont signalées', async ({ page }) => {
     const ordered = PARTIALLY_DUPLICABLE.items.reduce((sum, item) => sum + item.quantity, 0)
     const copies = duplicableCopies(PARTIALLY_DUPLICABLE)
+    const skipped = PARTIALLY_DUPLICABLE.items.length - duplicableItems(PARTIALLY_DUPLICABLE).length
     expect(copies).toBeLessThan(ordered)
 
     await duplicateButton(page, PARTIALLY_DUPLICABLE).click()
 
     await expectCartCount(page, copies)
-    await expect(duplicateButton(page, PARTIALLY_DUPLICABLE)).toHaveText('Ajouté au panier')
+    await expect(page.getByText(
+      `${skipped} titre${skipped > 1 ? 's' : ''} de cette commande ${skipped > 1 ? 'ne sont' : 'n\'est'} plus au catalogue et ${skipped > 1 ? "n'ont" : "n'a"} pas été repris.`,
+    )).toBeVisible()
+  })
+
+  test('une duplication complète ne signale rien', async ({ page }) => {
+    await duplicateButton(page, FULLY_DUPLICABLE).click()
+
+    await expectCartCount(page, duplicableCopies(FULLY_DUPLICABLE))
+    await expect(page.getByText(/plus au catalogue/)).toHaveCount(0)
   })
 
   test('la commande dupliquée se retrouve dans le panier', async ({ page }) => {

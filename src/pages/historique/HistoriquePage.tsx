@@ -5,6 +5,7 @@ import { mq } from '@/lib/responsive'
 import styled, { keyframes } from 'styled-components'
 import { useAuthContext } from '@/contexts/AuthContext'
 import { useCart, REMISE_RATES } from '@/contexts/CartContext'
+import { useToast } from '@/contexts/ToastContext'
 import { useClientOrders } from '@/contexts/OrdersContext'
 import { ORDER_STATUSES, ORDER_STATUS_LABELS, type OrderStatus, type Order, type OrderItem } from '@/data/mockOrders'
 import { getCatalogueBookById, MOCK_BOOKS } from '@/data/mockBooks'
@@ -696,6 +697,7 @@ function IconDocument() {
 export function HistoriquePage() {
   const { user } = useAuthContext()
   const { addToCart } = useCart()
+  const { showToast } = useToast()
   const clientOrders = useClientOrders(user?.codeClient ?? '')
 
   const [search, setSearch]                 = useState('')
@@ -727,12 +729,28 @@ export function HistoriquePage() {
 
   if (!user) return null
 
+  /*
+    Une commande garde ses lignes telles qu'elles ont été passées, et un titre
+    peut avoir quitté le catalogue depuis. Celui-là ne peut pas retourner au
+    panier, et le libraire doit l'apprendre : sans message, il repart avec
+    moins d'exemplaires qu'il n'en a demandé sans rien voir.
+  */
   function handleDupliquer(order: Order) {
     let added = 0
+    let skipped = 0
     for (const item of order.items) {
       const book = MOCK_BOOKS.find(b => b.id === item.bookId)
-      if (book) { addToCart(book, item.quantity); added++ }
+      if (book) { addToCart(book, item.quantity); added++ } else { skipped++ }
     }
+
+    if (skipped > 0) {
+      const plural = skipped > 1
+      showToast(
+        `${skipped} titre${plural ? 's' : ''} de cette commande ${plural ? 'ne sont' : "n'est"} plus au catalogue et ${plural ? "n'ont" : "n'a"} pas été repris.`,
+        'error',
+      )
+    }
+
     if (added > 0) {
       setAddedMap(prev => ({ ...prev, [order.id]: true }))
       setTimeout(() => {
