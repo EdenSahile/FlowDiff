@@ -1011,7 +1011,12 @@ function CheckoutStepper({ current }: { current: CheckoutStep }) {
         const last   = i === CHECKOUT_STEPS.length - 1
         return (
           <StepperItem key={step} role="listitem">
-            <StepperDot $active={active} $done={done} aria-label={getStepLabel(step)}>
+            <StepperDot
+              $active={active}
+              $done={done}
+              aria-label={getStepLabel(step)}
+              aria-current={active ? 'step' : undefined}
+            >
               {done ? <IconCheckSmall /> : i + 1}
             </StepperDot>
             <StepperLabel $active={active} $done={done}>{getStepLabel(step)}</StepperLabel>
