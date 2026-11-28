@@ -1,5 +1,6 @@
 import type { Facture } from '@/data/mockFactures'
 import { VENDEUR } from '@/data/mockFactures'
+import { theme } from '@/lib/theme'
 
 /* ── Helpers ── */
 const fmtDate = (iso: string) =>
@@ -43,7 +44,7 @@ function buildHtml(f: Facture): string {
         </tr>
         <tr>
           <td>Remise totale</td>
-          <td style="color:#C0392B;font-weight:600">− ${fmtEur(f.remiseMontant)}</td>
+          <td style="color:${theme.colors.error};font-weight:600">− ${fmtEur(f.remiseMontant)}</td>
         </tr>` : ''
 
   return `<!DOCTYPE html>
@@ -65,7 +66,7 @@ function buildHtml(f: Facture): string {
 
   /* ── Barre d'actions (masquée à l'impression) ── */
   .toolbar {
-    background: #232f3e;
+    background: ${theme.colors.navy};
     color: #fff;
     padding: 12px 24px;
     display: flex;
@@ -89,7 +90,7 @@ function buildHtml(f: Facture): string {
     font-family: inherit;
     letter-spacing: 0.02em;
   }
-  .btn-primary { background: #C9A84C; color: #232f3e; }
+  .btn-primary { background: ${theme.colors.accent}; color: ${theme.colors.navy}; }
   .btn-primary:hover { background: #b8943f; }
   .btn-secondary {
     background: rgba(255,255,255,0.12);
@@ -115,24 +116,24 @@ function buildHtml(f: Facture): string {
     align-items: flex-start;
     margin-bottom: 28px;
     padding-bottom: 20px;
-    border-bottom: 2px solid #232f3e;
+    border-bottom: 2px solid ${theme.colors.navy};
   }
   .brand-name {
     font-size: 22px;
     font-weight: 800;
     letter-spacing: -0.5px;
-    color: #232f3e;
+    color: ${theme.colors.navy};
     line-height: 1;
   }
-  .brand-diff { color: #C9A84C; }
+  .brand-diff { color: ${theme.colors.accentDark}; }
   .brand-pro {
     display: inline-block;
     font-size: 8px;
     font-weight: 700;
     letter-spacing: 2px;
     text-transform: uppercase;
-    color: #C9A84C;
-    border: 1.5px solid #C9A84C;
+    color: ${theme.colors.accentDark};
+    border: 1.5px solid ${theme.colors.accent};
     padding: 1px 4px;
     border-radius: 2px;
     margin-left: 4px;
@@ -141,7 +142,7 @@ function buildHtml(f: Facture): string {
   }
   .brand-tagline { font-size: 9px; color: #666; margin-top: 3px; letter-spacing: 0.2px; }
   .invoice-ref { text-align: right; }
-  .invoice-ref-title { font-size: 18px; font-weight: 800; color: #232f3e; letter-spacing: -0.3px; }
+  .invoice-ref-title { font-size: 18px; font-weight: 800; color: ${theme.colors.navy}; letter-spacing: -0.3px; }
   .invoice-ref-num { font-size: 11px; color: #444; margin-top: 2px; font-family: 'Courier New', monospace; }
   .invoice-date { font-size: 10px; color: #666; margin-top: 6px; }
 
@@ -151,16 +152,16 @@ function buildHtml(f: Facture): string {
     flex: 1;
     padding: 14px 16px;
     background: #f7f7f5;
-    border-left: 3px solid #232f3e;
+    border-left: 3px solid ${theme.colors.navy};
   }
-  .addr-block.client-block { border-left-color: #C9A84C; }
+  .addr-block.client-block { border-left-color: ${theme.colors.accent}; }
   .addr-label { font-size: 8px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #888; margin-bottom: 8px; }
   .addr-name { font-size: 12px; font-weight: 700; color: #111; margin-bottom: 4px; }
   .addr-line { font-size: 10px; color: #444; line-height: 1.6; }
   .addr-meta { font-size: 9px; color: #888; margin-top: 6px; line-height: 1.6; }
   .client-code-block { margin-top: 10px; padding-top: 8px; border-top: 1px solid #ddd; }
   .client-code-label { font-size: 8px; text-transform: uppercase; letter-spacing: 1.5px; color: #888; font-weight: 700; display: block; margin-bottom: 3px; }
-  .client-code-value { font-size: 15px; font-weight: 800; color: #232f3e; font-family: 'Courier New', monospace; letter-spacing: 0.05em; }
+  .client-code-value { font-size: 15px; font-weight: 800; color: ${theme.colors.navy}; font-family: 'Courier New', monospace; letter-spacing: 0.05em; }
 
   /* ── Références commande ── */
   .ref-bar {
@@ -180,7 +181,7 @@ function buildHtml(f: Facture): string {
   /* ── Tableau lignes ── */
   .table-wrapper { margin-bottom: 16px; overflow-x: auto; }
   table { width: 100%; border-collapse: collapse; font-size: 9px; }
-  thead tr { background: #232f3e; color: #fff; }
+  thead tr { background: ${theme.colors.navy}; color: #fff; }
   thead th {
     padding: 7px 6px;
     text-align: left;
@@ -213,7 +214,7 @@ function buildHtml(f: Facture): string {
   .totals-table td:first-child { color: #555; }
   .totals-table td:last-child { text-align: right; font-weight: 600; }
   .totals-total-row td {
-    background: #232f3e;
+    background: ${theme.colors.navy};
     color: #fff !important;
     font-weight: 700 !important;
     font-size: 12px !important;

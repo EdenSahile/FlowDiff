@@ -473,9 +473,9 @@ const CartBtn = styled.button<{ $hasItems: boolean }>`
 
   /* Mobile : style doré si items, transparent sinon */
   ${({ $hasItems }) => $hasItems ? `
-    background: #D4A843;
-    border: 1.5px solid #D4A843;
-    color: #232f3e;
+    background: ${theme.colors.accent};
+    border: 1.5px solid ${theme.colors.accent};
+    color: ${theme.colors.navy};
     box-shadow: 0 2px 8px rgba(212,168,67,0.35);
     &:hover { background: #E0B84A; border-color: #E0B84A; }
   ` : `

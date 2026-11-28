@@ -1,5 +1,6 @@
 import { memo, useState } from 'react'
 import styled from 'styled-components'
+import { theme } from '@/lib/theme'
 import type { Universe } from '@/data/mockBooks'
 
 /* ══════════════════════════════════════════════
@@ -162,8 +163,8 @@ function BookCoverBase({
   const titleFs  = Math.max(8,  Math.round(height * 0.10))
   const authorFs = Math.max(7,  Math.round(height * 0.08))
   const pad      = Math.max(4,  Math.round(width  * 0.07))
-  const fallbackBg     = '#232f3e'
-  const fallbackAccent = '#C9A84C'
+  const fallbackBg     = theme.colors.navy
+  const fallbackAccent = theme.colors.accent
 
   return (
     <Wrapper $w={width} $h={height} $fill={fill}>
