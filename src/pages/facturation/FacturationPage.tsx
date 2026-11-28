@@ -724,13 +724,20 @@ function IconTransfer() {
 }
 
 /* ── localStorage ── */
-const PAID_KEY = 'flowdiff_paid_invoices'
-function loadPaid(): Set<string> {
-  try { return new Set(JSON.parse(localStorage.getItem(PAID_KEY) ?? '[]') as string[]) }
+/*
+  La clé porte le codeClient : les factures appartiennent à une librairie, et
+  une clé nue faisait voir à une librairie les factures qu'une autre avait
+  réglées. Même suffixe que le panier, l'historique et les listes.
+*/
+function paidKey(codeClient: string | undefined) {
+  return `flowdiff_paid_invoices_${codeClient ?? 'guest'}`
+}
+function loadPaid(codeClient: string | undefined): Set<string> {
+  try { return new Set(JSON.parse(localStorage.getItem(paidKey(codeClient)) ?? '[]') as string[]) }
   catch { return new Set() }
 }
-function savePaid(ids: Set<string>) {
-  localStorage.setItem(PAID_KEY, JSON.stringify([...ids]))
+function savePaid(codeClient: string | undefined, ids: Set<string>) {
+  localStorage.setItem(paidKey(codeClient), JSON.stringify([...ids]))
 }
 
 /* ── Constantes ── */
@@ -751,7 +758,19 @@ export function FacturationPage() {
   )
 
   /* ── Paiement ── */
-  const [paidIds,       setPaidIds]       = useState<Set<string>>(() => loadPaid())
+  const [paidIds,       setPaidIds]       = useState<Set<string>>(() => loadPaid(user?.codeClient))
+
+  /*
+    Au premier rendu d'un chargement de page, l'utilisateur n'est pas encore
+    restauré depuis le jeton : l'état part sur la clé « guest ». On recharge
+    pendant le rendu quand le codeClient arrive, et non dans un effet, pour
+    que paidIds corresponde toujours à la librairie affichée.
+  */
+  const [loadedCodeClient, setLoadedCodeClient] = useState(user?.codeClient)
+  if (loadedCodeClient !== user?.codeClient) {
+    setLoadedCodeClient(user?.codeClient)
+    setPaidIds(loadPaid(user?.codeClient))
+  }
   const [paymentModal,  setPaymentModal]  = useState<Facture | null>(null)
   const [payTab,        setPayTab]        = useState<'cb' | 'virement'>('cb')
   const [cardNumber,    setCardNumber]    = useState('')
@@ -775,7 +794,7 @@ export function FacturationPage() {
   function handleResetPaid() {
     const next = new Set<string>()
     setPaidIds(next)
-    savePaid(next)
+    savePaid(user?.codeClient, next)
   }
 
   function handlePay() {
@@ -787,7 +806,7 @@ export function FacturationPage() {
         const next = new Set(paidIds)
         next.add(paymentModal.id)
         setPaidIds(next)
-        savePaid(next)
+        savePaid(user?.codeClient, next)
       }
     }, 1600)
   }
@@ -798,7 +817,7 @@ export function FacturationPage() {
       const next = new Set(paidIds)
       next.add(paymentModal.id)
       setPaidIds(next)
-      savePaid(next)
+      savePaid(user?.codeClient, next)
     }
   }
 

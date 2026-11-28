@@ -55,9 +55,13 @@ function numeroCell(page: Page, rowIndex: number) {
 }
 
 // Clear paid invoices before each test so every test starts from a clean state.
+// La clé porte le codeClient, comme toutes les données d'une librairie.
 test.beforeEach(async ({ page }) => {
   await page.goto('/login')
-  await page.evaluate(() => localStorage.removeItem('flowdiff_paid_invoices'))
+  await page.evaluate(
+    code => localStorage.removeItem(`flowdiff_paid_invoices_${code}`),
+    CODE_CLIENT,
+  )
   await page.getByRole('button', { name: 'Se connecter' }).click()
   await page.locator('input[aria-label="Recherche globale"]').waitFor()
   await page.goto('/facturation')
