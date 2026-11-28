@@ -1,10 +1,13 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useNotifications } from '@/contexts/NotificationsContext'
 import { useNavigate } from 'react-router-dom'
 import { theme } from '@/lib/theme'
 import { formatPrice } from '@/lib/format'
 import styled, { keyframes } from 'styled-components'
 import { getAllBooksAsync } from '@/services/books'
+import { useClientOrders } from '@/contexts/OrdersContext'
+import { useAuthContext } from '@/contexts/AuthContext'
+import type { Order } from '@/data/mockOrders'
 import type { Book, Universe } from '@/data/mockBooks'
 import { BookCard } from '@/components/catalogue/BookCard'
 import { BookCover } from '@/components/catalogue/BookCover'
@@ -63,7 +66,6 @@ const SALES: Record<string, SalesData> = {
   'f-pra-homo':      { units: 432,  trend: 'down' },
 }
 
-type Period  = '30j' | '3mois'
 type TabView = 'tous' | Universe
 
 const UNIVERSES: Universe[] = ['BD/Mangas', 'Jeunesse', 'Littérature', 'Adulte-pratique']
@@ -109,6 +111,28 @@ function salesOf(book: Book): SalesData {
 
 function getRankedBooks(books: Book[]) {
   return [...books].sort((a, b) => salesOf(b).units - salesOf(a).units)
+}
+
+/*
+  Dernière commande de chaque titre par la librairie connectée. Une commande
+  garde ses lignes telles qu'elles ont été passées, donc le croisement se fait
+  sur le bookId de la ligne.
+*/
+function buildLastOrderDates(orders: Order[]): Map<string, string> {
+  const dates = new Map<string, string>()
+  for (const order of orders) {
+    for (const item of order.items) {
+      const known = dates.get(item.bookId)
+      if (!known || order.date > known) dates.set(item.bookId, order.date)
+    }
+  }
+  return dates
+}
+
+function formatOrderMark(lastOrderDate: string | undefined): string {
+  if (!lastOrderDate) return 'Jamais commandé'
+  const [year, month, day] = lastOrderDate.split('-')
+  return `Commandé le ${day}/${month}/${year}`
 }
 
 function getSection(books: Book[], type: 'nouveaute' | 'fonds', universe: TabView) {
@@ -173,6 +197,23 @@ const PageTitle = styled.h1`
   margin: 0 0 4px;
 `
 
+/*
+  La période des chiffres est une mention, pas un choix : les ventes de
+  démonstration ne portent qu'une période, et 2 boutons qui ne changeaient
+  rien ont tenu la place de ce constat.
+*/
+const PeriodNote = styled.p`
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 12px;
+  color: ${({ theme }) => theme.colors.gray[600]};
+  background: ${({ theme }) => theme.colors.white};
+  border: 1px solid ${({ theme }) => theme.colors.gray[200]};
+  border-radius: ${({ theme }) => theme.radii.xl};
+  padding: 6px 14px;
+  margin: 0;
+  flex-shrink: 0;
+`
+
 const PageSubtitle = styled.p`
   font-family: ${({ theme }) => theme.typography.fontFamily};
   font-size: ${({ theme }) => theme.typography.sizes.sm};
@@ -180,28 +221,7 @@ const PageSubtitle = styled.p`
   margin: 0;
 `
 
-const PeriodSelector = styled.div`
-  display: flex;
-  background: ${({ theme }) => theme.colors.white};
-  border: 1px solid ${({ theme }) => theme.colors.gray[200]};
-  border-radius: ${({ theme }) => theme.radii.xl};
-  padding: 3px;
-  gap: 2px;
-  flex-shrink: 0;
-`
 
-const PeriodBtn = styled.button<{ $active: boolean }>`
-  padding: 5px 14px;
-  border: none;
-  border-radius: ${({ theme }) => theme.radii.xl};
-  font-family: ${({ theme }) => theme.typography.fontFamily};
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.15s;
-  background: ${({ $active, theme }) => $active ? theme.colors.navy : 'transparent'};
-  color: ${({ $active, theme }) => $active ? '#fff' : theme.colors.gray[600]};
-`
 
 /* ══════════════════════════════════════════════════════
    STYLED : TABS
@@ -495,6 +515,66 @@ function TrendIcon({ trend }: { trend: SalesData['trend'] }) {
   return <TrendStable><IconStable /></TrendStable>
 }
 
+/*
+  Repère de commande. La question d'un libraire devant un classement n'est pas
+  « quelle période », c'est « est-ce que je l'ai » : un titre qui se vend
+  partout et qu'il n'a jamais pris est un manque à rattraper.
+*/
+/*
+  Repère de commande.
+
+  Le texte reste navy dans les 2 états, à 13,57 de contraste sur blanc : c'est
+  lui qui porte la lisibilité. L'or de la charte, essayé d'abord, tombe à 2,29
+  sur blanc, sous le minimum de 4,5 que WCAG AA demande pour du petit texte, et
+  la mention était illisible. Un fond plein, essayé ensuite, imposait un
+  padding vertical donc de la hauteur sur chacune des 7 lignes du classement,
+  problématique au téléphone.
+
+  C'est donc la puce qui porte le signal, motif déjà employé 3 fois dans
+  l'application : GreenDot sur les OP commerciales, StatusDot sur les statuts
+  de commande, TagDot sur les thématiques. Un libraire sait déjà qu'ici une
+  puce colorée annonce un état.
+*/
+const OrderMark = styled.p<{ $ordered: boolean }>`
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 11px;
+  font-weight: ${({ $ordered }) => $ordered ? 500 : 700};
+  white-space: nowrap;
+  margin: 0;
+  color: ${({ $ordered, theme }) => $ordered ? theme.colors.gray[600] : theme.colors.navy};
+`
+
+const NeverOrderedDot = styled.span`
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: ${({ theme }) => theme.colors.error};
+  flex-shrink: 0;
+`
+
+const TabSpacer = styled.span`
+  flex: 1;
+  min-width: 8px;
+`
+
+const PodiumFooter = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding-top: 6px;
+`
+
+const PodiumMark = styled(OrderMark)`
+  justify-content: center;
+  align-self: center;
+  padding-top: 2px;
+`
+
 const EmptySection = styled.p`
   font-family: ${({ theme }) => theme.typography.fontFamily};
   font-size: 13px;
@@ -510,8 +590,14 @@ const EmptySection = styled.p`
 ══════════════════════════════════════════════════════ */
 
 function ListItem({
-  book, rank, showUniverse, onAdd,
-}: { book: Book; rank: number; showUniverse: boolean; onAdd: (b: Book) => void }) {
+  book, rank, showUniverse, onAdd, lastOrderDate,
+}: {
+  book: Book
+  rank: number
+  showUniverse: boolean
+  onAdd: (b: Book) => void
+  lastOrderDate: string | undefined
+}) {
   const navigate = useNavigate()
   const sales    = salesOf(book)
   const uc       = UNIVERSE_COLORS[book.universe]
@@ -535,7 +621,13 @@ function ListItem({
         </RowSub>
       </RowInfo>
       <RowRight onClick={e => e.stopPropagation()}>
-        {sales && <RowSales><TrendIcon trend={sales.trend} /> {sales.units.toLocaleString('fr-FR')} ex.</RowSales>}
+        <OrderMark $ordered={!!lastOrderDate} data-commande-pour={book.id}>
+          {!lastOrderDate && <NeverOrderedDot aria-hidden="true" />}
+          {formatOrderMark(lastOrderDate)}
+        </OrderMark>
+        <RowSales data-tendance-pour={book.id}>
+          <TrendIcon trend={sales.trend} /> {sales.units.toLocaleString('fr-FR')} ex.
+        </RowSales>
         <RowPrice>{formatPrice(book.priceTTC)} €</RowPrice>
         <RowAddBtn onClick={() => onAdd(book)} aria-label="Ajouter au panier">
           <IconCart />
@@ -550,13 +642,14 @@ function ListItem({
 ══════════════════════════════════════════════════════ */
 
 function TopSection({
-  label, books, universe, showUniverse, onAdd,
+  label, books, universe, showUniverse, onAdd, lastOrderDates,
 }: {
   label: string
   books: Book[]
   universe?: Universe
   showUniverse: boolean
   onAdd: (b: Book) => void
+  lastOrderDates: Map<string, string>
 }) {
   const podium     = books.slice(0, 3)
   const listItems  = books.slice(3, 10)
@@ -595,6 +688,18 @@ function TopSection({
                 <BadgeNum>{rank}</BadgeNum>
               </TopBadge>
               <BookCard book={book} showType coverFirst />
+              <PodiumFooter>
+                <RowSales data-tendance-pour={book.id}>
+                  <TrendIcon trend={salesOf(book).trend} /> {salesOf(book).units.toLocaleString('fr-FR')} ex.
+                </RowSales>
+                <PodiumMark
+                  $ordered={!!lastOrderDates.get(book.id)}
+                  data-commande-pour={book.id}
+                >
+                  {!lastOrderDates.get(book.id) && <NeverOrderedDot aria-hidden="true" />}
+                  {formatOrderMark(lastOrderDates.get(book.id))}
+                </PodiumMark>
+              </PodiumFooter>
             </CardWrapper>
           )
         })}
@@ -610,6 +715,7 @@ function TopSection({
               rank={i + 4}
               showUniverse={showUniverse}
               onAdd={onAdd}
+              lastOrderDate={lastOrderDates.get(book.id)}
             />
           ))}
         </ListRows>
@@ -626,11 +732,15 @@ export function TopVentesPage() {
   const { markAsRead } = useNotifications()
   useEffect(() => { markAsRead('topventes') }, [markAsRead])
 
-  const [period,    setPeriod] = useState<Period>('30j')  // eslint-disable-line @typescript-eslint/no-unused-vars
   const [activeTab, setTab]    = useState<TabView>('tous')
   const [allBooks, setAllBooks] = useState<Book[]>([])
+  const [neverOrderedOnly, setNeverOrderedOnly] = useState(false)
   const { addToCart }          = useCart()
   const { showToast }          = useToast()
+  const { user }               = useAuthContext()
+  const clientOrders           = useClientOrders(user?.codeClient ?? '')
+
+  const lastOrderDates = useMemo(() => buildLastOrderDates(clientOrders), [clientOrders])
 
   useEffect(() => {
     getAllBooksAsync().then(setAllBooks).catch(console.error)
@@ -644,8 +754,17 @@ export function TopVentesPage() {
   const showUniverse    = activeTab === 'tous'
   const sectionUniverse = activeTab !== 'tous' ? activeTab : undefined
 
-  const nouveautes = getSection(allBooks, 'nouveaute', activeTab)
-  const fonds      = getSection(allBooks, 'fonds',     activeTab)
+  /*
+    Le filtre répond à la question suivante : qu'est-ce qui se vend partout
+    sauf chez moi. Il s'applique avant le classement, pour que les rangs
+    affichés restent consécutifs.
+  */
+  const rankable = neverOrderedOnly
+    ? allBooks.filter(book => !lastOrderDates.has(book.id))
+    : allBooks
+
+  const nouveautes = getSection(rankable, 'nouveaute', activeTab)
+  const fonds      = getSection(rankable, 'fonds',     activeTab)
 
   return (
     <Page>
@@ -656,10 +775,7 @@ export function TopVentesPage() {
           <PageTitle>Top Ventes</PageTitle>
           <PageSubtitle>Meilleures ventes du réseau par thématique</PageSubtitle>
         </PageHeaderText>
-        <PeriodSelector>
-          <PeriodBtn $active={period === '30j'}   onClick={() => setPeriod('30j')}>30 jours</PeriodBtn>
-          <PeriodBtn $active={period === '3mois'} onClick={() => setPeriod('3mois')}>3 mois</PeriodBtn>
-        </PeriodSelector>
+        <PeriodNote>Ventes des 30 derniers jours sur le réseau</PeriodNote>
       </PageHeader>
 
       <TabBar>
@@ -668,6 +784,14 @@ export function TopVentesPage() {
         {UNIVERSES.map(u => (
           <Tab key={u} $active={activeTab === u} onClick={() => setTab(u)}>{u}</Tab>
         ))}
+        <TabSpacer />
+        <Tab
+          $active={neverOrderedOnly}
+          onClick={() => setNeverOrderedOnly(v => !v)}
+          title="Ne garder que les titres que la librairie n'a jamais commandés"
+        >
+          Jamais commandés
+        </Tab>
       </TabBar>
 
       <Content>
@@ -677,6 +801,7 @@ export function TopVentesPage() {
           universe={sectionUniverse}
           showUniverse={showUniverse}
           onAdd={handleAdd}
+          lastOrderDates={lastOrderDates}
         />
         <TopSection
           label="Top Fonds"
@@ -684,6 +809,7 @@ export function TopVentesPage() {
           universe={sectionUniverse}
           showUniverse={showUniverse}
           onAdd={handleAdd}
+          lastOrderDates={lastOrderDates}
         />
       </Content>
     </Page>

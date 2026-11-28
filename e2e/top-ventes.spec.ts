@@ -1,7 +1,8 @@
 import { test, expect, type Page } from '@playwright/test'
 import { getCatalogueBooks, UNIVERSES, type Universe } from '../src/data/mockBooks'
 import { getPurchaseAvailability } from '../src/lib/bookUtils'
-import { collectCrashes, expectCartCount, login, sidebarLink } from './helpers'
+import { MOCK_ORDERS } from '../src/data/mockOrders'
+import { collectCrashes, DEMO_CODE_CLIENT, expectCartCount, login, sidebarLink } from './helpers'
 
 /*
   Page Top Ventes : 2 classements, nouveautés et fonds, par thématique.
@@ -26,6 +27,23 @@ async function shownBookIds(page: Page): Promise<string[]> {
   const hrefs = await page.locator('article a[href^="/livre/"]')
     .evaluateAll(links => links.map(link => link.getAttribute('href') ?? ''))
   return hrefs.map(href => href.replace('/livre/', ''))
+}
+
+/*
+  Titres déjà commandés par la librairie, et date de leur commande la plus
+  récente, calculés depuis MOCK_ORDERS comme la page le fait.
+*/
+const ORDERED = new Map<string, string>()
+for (const order of MOCK_ORDERS[DEMO_CODE_CLIENT] ?? []) {
+  for (const item of order.items) {
+    const known = ORDERED.get(item.bookId)
+    if (!known || order.date > known) ORDERED.set(item.bookId, order.date)
+  }
+}
+
+const frenchDate = (iso: string) => {
+  const [year, month, day] = iso.split('-')
+  return `${day}/${month}/${year}`
 }
 
 function tab(page: Page, label: string) {
@@ -126,17 +144,28 @@ test.describe('Filtre par thématique', () => {
 })
 
 /* ────────────────────────────────────────────
-   3. Période
+   3. Période annoncée, non sélectionnable
 ──────────────────────────────────────────── */
 test.describe('Période', () => {
-  test('les 2 périodes sont proposées et restent sans erreur', async ({ page }) => {
-    const crashes = collectCrashes(page)
-    await expect(page.getByRole('button', { name: '30 jours' })).toBeVisible()
+  /*
+    La page portait 2 boutons, « 30 jours » et « 3 mois », qui ne changeaient
+    que leur propre surbrillance : l'état period était déclaré avec un
+    eslint-disable pour variable inutilisée et n'était jamais lu, et le
+    sous-titre des sections écrivait « 30j réseau » quoi qu'on clique.
 
-    await page.getByRole('button', { name: '3 mois' }).click()
+    Un contrôle qui ne fait rien est pire que pas de contrôle : le premier
+    réflexe devant un classement est de cliquer sur la période, et il n'en
+    sort rien. Les chiffres portent une seule période, la page le dit en une
+    phrase. Une vraie sélection demanderait d'inventer un second jeu de
+    chiffres de ventes.
+  */
+  test('la période est annoncée en clair', async ({ page }) => {
+    await expect(page.getByText('Ventes des 30 derniers jours sur le réseau')).toBeVisible()
+  })
 
-    await expect(page.getByText('Top Nouveautés')).toBeVisible()
-    expect(crashes).toEqual([])
+  test('aucun sélecteur de période ne subsiste', async ({ page }) => {
+    await expect(page.getByRole('button', { name: '30 jours' })).toHaveCount(0)
+    await expect(page.getByRole('button', { name: '3 mois' })).toHaveCount(0)
   })
 })
 
@@ -184,5 +213,79 @@ test.describe('Commande depuis le classement', () => {
     await page.locator('article a[href^="/livre/"]').first().click()
 
     await expect(page).toHaveURL(`/livre/${ids[0]}`)
+  })
+})
+
+/* ────────────────────────────────────────────
+   5. Repère « déjà commandé »
+──────────────────────────────────────────── */
+test.describe('Déjà commandé', () => {
+  /*
+    La question d'un libraire devant un classement n'est pas « quelle
+    période », c'est « est-ce que je l'ai ». Chaque entrée dit donc si la
+    librairie a déjà commandé ce titre, et quand.
+
+    L'attendu vient de MOCK_ORDERS : aucun identifiant de titre n'est écrit
+    ici, le croisement est rejoué comme la page le fait.
+  */
+  test('chaque entrée du classement porte un repère de commande', async ({ page }) => {
+    const ids = await shownBookIds(page)
+    expect(ids.length).toBeGreaterThan(0)
+
+    for (const id of ids) {
+      const marker = page.locator(`[data-commande-pour="${id}"]`)
+      await expect(marker).toHaveCount(1)
+      await expect(marker).toHaveText(
+        ORDERED.has(id) ? `Commandé le ${frenchDate(ORDERED.get(id)!)}` : 'Jamais commandé',
+      )
+    }
+  })
+
+  test('un titre déjà commandé porte la date de sa dernière commande', async ({ page }) => {
+    const alreadyOrdered = (await shownBookIds(page)).find(id => ORDERED.has(id))
+    test.skip(!alreadyOrdered, 'Aucun titre du classement n\'a été commandé.')
+
+    await expect(page.locator(`[data-commande-pour="${alreadyOrdered}"]`))
+      .toHaveText(`Commandé le ${frenchDate(ORDERED.get(alreadyOrdered!)!)}`)
+  })
+
+  /*
+    Le filtre répond à la question suivante : qu'est-ce qui se vend partout
+    sauf chez moi. C'est le classement moins ce que la librairie a déjà pris.
+  */
+  test('le filtre ne garde que les titres jamais commandés', async ({ page }) => {
+    await page.getByRole('button', { name: 'Jamais commandés' }).click()
+
+    const ids = await shownBookIds(page)
+    expect(ids.length).toBeGreaterThan(0)
+    for (const id of ids) {
+      expect(ORDERED.has(id)).toBe(false)
+    }
+  })
+
+  test('le filtre se désactive au second clic', async ({ page }) => {
+    const before = (await shownBookIds(page)).length
+
+    await page.getByRole('button', { name: 'Jamais commandés' }).click()
+    await page.getByRole('button', { name: 'Jamais commandés' }).click()
+
+    expect((await shownBookIds(page)).length).toBe(before)
+  })
+})
+
+/* ────────────────────────────────────────────
+   6. Tendance
+──────────────────────────────────────────── */
+test.describe('Tendance', () => {
+  /*
+    La tendance n'était affichée que sur les rangs 4 à 10. Un titre qui grimpe
+    est un titre à reprendre : les 3 cartes du podium la portent aussi.
+  */
+  test('chaque entrée du classement porte sa tendance', async ({ page }) => {
+    const ids = await shownBookIds(page)
+
+    for (const id of ids) {
+      await expect(page.locator(`[data-tendance-pour="${id}"]`)).toHaveCount(1)
+    }
   })
 })
