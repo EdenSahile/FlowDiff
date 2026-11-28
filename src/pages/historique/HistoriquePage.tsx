@@ -886,7 +886,7 @@ export function HistoriquePage() {
               <OrderCardHeader>
                 <div>
                   <OrderNumero>{order.numero}</OrderNumero>
-                  <OriginBadge>{order.transmissionMode === 'EDI' ? 'EDI — simulation' : 'Site FlowDiff'}</OriginBadge>
+                  {order.transmissionMode === 'EDI' && <OriginBadge>EDI — simulation</OriginBadge>}
                   {order.referenceCommande && <RefBadge>Réf : {order.referenceCommande}</RefBadge>}
                   <OrderDate>{formatDate(order.date)}</OrderDate>
                 </div>
