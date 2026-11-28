@@ -67,7 +67,7 @@ const BusinessBadge = styled.span<{ $type: string }>`
   background: ${({ $type, theme }) =>
     $type === 'ORDERS' ? theme.colors.accentLight : theme.colors.primaryLight};
   color: ${({ $type, theme }) =>
-    $type === 'ORDERS' ? '#8B6914' : theme.colors.success};
+    $type === 'ORDERS' ? theme.colors.accentDark : theme.colors.success};
 `
 
 const MsgId = styled.div`

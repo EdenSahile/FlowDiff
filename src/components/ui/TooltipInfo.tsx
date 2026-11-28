@@ -35,7 +35,7 @@ const IconBtn = styled.button<{ $onDark: boolean }>`
 
   &:hover, &:focus-visible {
     border-color: ${({ theme }) => theme.colors.accent};
-    color: ${({ theme }) => theme.colors.accent};
+    color: ${({ theme }) => theme.colors.accentDark};
     outline: none;
   }
 `

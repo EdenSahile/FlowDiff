@@ -79,7 +79,7 @@ const PageEyebrow = styled.p`
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: ${({ theme }) => theme.colors.accent};
+  color: ${({ theme }) => theme.colors.accentDark};
   margin: 0 0 4px;
   display: flex;
   align-items: center;
@@ -452,7 +452,7 @@ const StatusBadgeTable = styled.span<{ $status: string }>`
     theme.colors.primaryLight};
   color: ${({ $status, theme }) =>
     $status === 'ERROR'  ? theme.colors.error :
-    $status === 'ORDERS' ? '#8B6914' :
+    $status === 'ORDERS' ? theme.colors.accentDark :
     theme.colors.success};
 `
 

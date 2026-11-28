@@ -60,23 +60,43 @@ L'app permet également :
 
 > Palette actuelle, source de vérité : `src/lib/theme.ts`
 
+Palette « Ardoise & Champagne ». Les valeurs ci-dessous sont celles de `theme.ts` au 28 novembre 2026. En cas de doute, c'est `theme.ts` qui a raison : cette table a déjà divergé sur 9 valeurs sur 13 après un changement de palette, et des calculs de contraste faits dessus se sont révélés faux.
+
 | Rôle | Token | Valeur | Usage |
 |------|-------|--------|-------|
-| Bleu foncé principal | `primary` / `navy` | `#232f3e` | Fond header, sidebar, CTA primaires, texte titres |
-| Bleu hover | `primaryHover` | `#42556c` | Hover CTA primaires |
-| Or / accent | `accent` | `#C9A84C` | Liens actifs sidebar, badges "nouveauté", accents |
-| Or clair | `accentLight` | `#F7F0DC` | Fonds or très clair |
-| Vert pâle | `primaryLight` / `navyLight` | `#E6EFE9` | Surfaces alternées, fond badges |
-| Lin (fond page) | `gray.50` | `#F4F4F0` | Fond général de l'application |
-| Gris surface | `gray.100` | `#EAEAE6` | Zones neutres |
-| Gris bordure | `gray.200` | `#D8D8D4` | Bordures, séparateurs |
-| Gris texte 3 | `gray.400` | `#6B6B68` | Placeholders, texte tertiaire (WCAG AA sur blanc) |
+| Ardoise principale | `primary` / `navy` | `#2D3A4A` | Fond header, sidebar, CTA primaires, texte titres |
+| Ardoise hover | `primaryHover` / `navyHover` | `#3D4E60` | Hover CTA primaires |
+| Champagne / accent | `accent` | `#D4A843` | Fonds, bordures, puces, icônes sur navy. **Jamais en texte sur fond clair** |
+| Champagne texte | `accentDark` | `#7A5C12` | L'or quand il est un **texte sur fond clair** |
+| Champagne clair | `accentLight` | `#FBF6E8` | Fonds or très clair |
+| Beige surface | `primaryLight` / `navyLight` | `#EDE8DF` | Surfaces alternées, fond badges |
+| Lin (fond page) | `gray.50` | `#F8F5EE` | Fond général de l'application |
+| Beige surface | `gray.100` | `#EDE8DF` | Zones neutres |
+| Gris bordure | `gray.200` | `#DAD4C8` | Bordures, séparateurs |
+| Gris texte 3 | `gray.400` | `#6A6A66` | Placeholders, texte tertiaire |
 | Gris texte 2 | `gray.600` | `#555550` | Texte secondaire |
 | Gris texte 1 | `gray.800` | `#111111` | Texte principal |
 | Erreur | `error` | `#C0392B` | Messages d'erreur, actions destructrices |
+| Succès | `success` | `#226241` | Confirmations, indicateur d'offre |
 | Blanc | `white` | `#FFFFFF` | Surfaces cards, fond inputs |
 
 **Règle** : ne jamais hardcoder les couleurs dans les composants : toujours passer par `theme.colors.*`.
+
+### L'or ne s'écrit pas sur fond clair
+
+`accent` est un or clair. Employé comme couleur de **texte** sur un fond clair, il passe sous le seuil de lisibilité de WCAG AA, qui demande 4,5 de contraste pour du petit texte et 3 pour une icône.
+
+| `accent` sur | Contraste | Verdict |
+|---|---|---|
+| navy `#2D3A4A` | 5,22 | OK, c'est son seul usage valide en texte |
+| blanc | 2,21 | insuffisant même pour une icône |
+| `gray.50`, le fond des pages | 2,03 | insuffisant même pour une icône |
+| `gray.100` | 1,82 | insuffisant même pour une icône |
+| `accentLight` | 2,05 | insuffisant même pour une icône |
+
+Donc : **`accent` pour les fonds, bordures, puces et surfaces ; `accentDark` dès que l'or devient une lettre sur fond clair.** `accentDark` passe sur les 4 fonds clairs du thème, de 5,11 sur `gray.100` à 6,24 sur blanc.
+
+Ce défaut concernait 26 emplacements, dont 17 libellés de type « eyebrow » en 10 px, corrigés le 28 novembre 2026.
 
 ---
 

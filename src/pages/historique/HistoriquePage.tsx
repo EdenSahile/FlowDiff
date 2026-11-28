@@ -28,7 +28,7 @@ const fadeIn = keyframes`from{opacity:0;transform:translateY(8px)}to{opacity:1;t
 
 /* ── Couleurs par statut : palette Forêt & Lin ── */
 const STATUS_COLORS: Record<OrderStatus, { bg: string; text: string; dot: string }> = {
-  'en préparation': { bg: '#F7F0DC', text: '#8B6914', dot: '#8B6914' },
+  'en préparation': { bg: '#F7F0DC', text: theme.colors.accentDark, dot: theme.colors.accentDark },
   'expédié':        { bg: '#E6EFE9', text: theme.colors.success, dot: theme.colors.success },
   'livré':          { bg: '#D4EDDA', text: '#155724', dot: '#155724' },
 }
@@ -51,7 +51,7 @@ const PageEyebrow = styled.p`
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: ${({ theme }) => theme.colors.accent};
+  color: ${({ theme }) => theme.colors.accentDark};
   margin: 0 0 4px;
   display: flex;
   align-items: center;

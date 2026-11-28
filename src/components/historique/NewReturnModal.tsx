@@ -132,7 +132,7 @@ const InfoNote = styled.div`
   border-radius: ${({ theme }) => theme.radii.md};
   padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.md};
   font-size: ${({ theme }) => theme.typography.sizes.xs};
-  color: #8B6914; display: flex; align-items: flex-start; gap: 8px;
+  color: ${({ theme }) => theme.colors.accentDark}; display: flex; align-items: flex-start; gap: 8px;
 `
 
 const SubmitBtn = styled.button<{ $loading?: boolean }>`

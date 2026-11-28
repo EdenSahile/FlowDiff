@@ -47,9 +47,9 @@ const UNIVERSE_ICONS: Record<Universe, JSX.Element> = {
   'Adulte-pratique': <IconPratique />,
 }
 
-/* Couleurs alignées palette Forêt & Lin : toutes accessibles blanc/4.5:1+ */
+/* Toutes ces couleurs dépassent 4,5 de contraste sur blanc. */
 const UNIVERSE_ACTIVE_COLORS: Record<Universe, string> = {
-  'BD/Mangas':       '#8B6914',   // or foncé
+  'BD/Mangas':       theme.colors.accentDark,
   'Jeunesse':        '#2D6A52',   // vert profond
   'Littérature':     theme.colors.success,   // vert forêt (primary)
   'Adulte-pratique': '#6B5440',   // brun foncé

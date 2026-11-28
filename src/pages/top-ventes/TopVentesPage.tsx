@@ -72,14 +72,14 @@ const UNIVERSES: Universe[] = ['BD/Mangas', 'Jeunesse', 'Littérature', 'Adulte-
 
 /* Palette Forêt & Lin : cohérente avec UniverseFilter et FlashInfosPage */
 const UNIVERSE_COLORS: Record<Universe, { bg: string; text: string; dot: string }> = {
-  'BD/Mangas':       { bg: '#F7F0DC', text: '#8B6914', dot: '#8B6914' },
+  'BD/Mangas':       { bg: '#F7F0DC', text: theme.colors.accentDark, dot: theme.colors.accentDark },
   'Jeunesse':        { bg: '#EFF4F1', text: '#2D6A52', dot: '#2D6A52' },
   'Littérature':     { bg: '#E6EFE9', text: theme.colors.success, dot: theme.colors.success },
   'Adulte-pratique': { bg: '#F0EDE8', text: '#6B5440', dot: '#6B5440' },
 }
 
 const SECTION_BORDER: Record<Universe, string> = {
-  'BD/Mangas':       '#8B6914',
+  'BD/Mangas':       theme.colors.accentDark,
   'Jeunesse':        '#2D6A52',
   'Littérature':     theme.colors.success,
   'Adulte-pratique': '#6B5440',
@@ -174,7 +174,7 @@ const PageEyebrow = styled.p`
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: ${({ theme }) => theme.colors.accent};
+  color: ${({ theme }) => theme.colors.accentDark};
   margin-bottom: 4px;
   display: flex;
   align-items: center;

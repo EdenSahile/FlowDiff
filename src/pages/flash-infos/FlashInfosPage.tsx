@@ -33,7 +33,7 @@ const PageEyebrow = styled.p`
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: ${({ theme }) => theme.colors.accent};
+  color: ${({ theme }) => theme.colors.accentDark};
   margin-bottom: 4px;
   display: flex;
   align-items: center;
@@ -572,7 +572,7 @@ const UNIVERSE_BG: Record<Universe, string> = {
 }
 
 const CATEGORY_COLORS: Record<FlashCategory, { bg: string; text: string }> = {
-  'Auteurs':    { bg: '#F7F0DC', text: '#8B6914' },   // or pâle / or foncé
+  'Auteurs':    { bg: '#F7F0DC', text: theme.colors.accentDark },
   'Fonds':      { bg: '#E6EFE9', text: theme.colors.success },   // vert pâle / vert forêt
   'Nouveautés': { bg: '#E6EFE9', text: '#1A4D32' },   // vert pâle / vert profond
   'FlowDiff':   { bg: '#EAEAE6', text: '#555550' },   // gris neutre
