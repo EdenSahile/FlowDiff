@@ -447,7 +447,7 @@ const StatusBadgeTable = styled.span<{ $status: string }>`
   font-size: 0.75rem;
   font-weight: ${({ theme }) => theme.typography.weights.medium};
   background: ${({ $status, theme }) =>
-    $status === 'ERROR'  ? '#FDECEA' :
+    $status === 'ERROR'  ? theme.colors.errorLight :
     $status === 'ORDERS' ? theme.colors.accentLight :
     theme.colors.primaryLight};
   color: ${({ $status, theme }) =>
@@ -460,8 +460,8 @@ const DetailBadge = styled.span<{ $variant: 'warning' | 'error' }>`
   padding: 2px 8px;
   font-size: 0.75rem;
   font-weight: ${({ theme }) => theme.typography.weights.semibold};
-  background: ${({ $variant }) =>
-    $variant === 'error' ? '#FDECEA' : '#FFF7ED'};
+  background: ${({ $variant, theme }) =>
+    $variant === 'error' ? theme.colors.errorLight : '#FFF7ED'};
   color: ${({ $variant, theme }) =>
     $variant === 'error' ? theme.colors.error : '#C2410C'};
 `

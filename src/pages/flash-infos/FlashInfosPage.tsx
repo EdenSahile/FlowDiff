@@ -565,16 +565,16 @@ const UNIVERSE_COLORS: Record<Universe, string> = {
 }
 
 const UNIVERSE_BG: Record<Universe, string> = {
-  'Littérature':     '#E6EFE9',   // primaryLight
-  'BD/Mangas':       '#F7F0DC',   // accentLight
+  'Littérature':     theme.colors.successLight,
+  'BD/Mangas':       theme.colors.accentLight,
   'Jeunesse':        '#EFF4F1',   // vert très pâle
   'Adulte-pratique': '#F0EDE8',   // lin chaud
 }
 
 const CATEGORY_COLORS: Record<FlashCategory, { bg: string; text: string }> = {
-  'Auteurs':    { bg: '#F7F0DC', text: theme.colors.accentDark },
-  'Fonds':      { bg: '#E6EFE9', text: theme.colors.success },   // vert pâle / vert forêt
-  'Nouveautés': { bg: '#E6EFE9', text: '#1A4D32' },   // vert pâle / vert profond
+  'Auteurs':    { bg: theme.colors.accentLight, text: theme.colors.accentDark },
+  'Fonds':      { bg: theme.colors.successLight, text: theme.colors.success },
+  'Nouveautés': { bg: theme.colors.successLight, text: '#1A4D32' },   // vert profond
   'FlowDiff':   { bg: '#EAEAE6', text: '#555550' },   // gris neutre
 }
 

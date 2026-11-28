@@ -270,7 +270,7 @@ const CardDragHandle = styled.div`
 
 /* ── Actions en attente ── */
 const ActionsBox = styled.section`
-  background: #FDECEA;
+  background: ${({ theme }) => theme.colors.errorLight};
   border: 1px solid #FECACA;
   border-radius: ${({ theme }) => theme.radii.md};
   padding: 16px 18px;
@@ -1999,7 +1999,7 @@ export function HomePage() {
     },
     'action-edi-error': {
       icon: '⚠️',
-      iconBg: '#FDECEA', iconColor: '#C0392B',
+      iconBg: theme.colors.errorLight, iconColor: theme.colors.error,
       count: ediCounts.errors, label: ediCounts.errors <= 1 ? 'erreur EDI à traiter' : 'erreurs EDI à traiter',
       route: '/edi#flux-en-cours',
     },
@@ -2074,7 +2074,7 @@ export function HomePage() {
     },
     'kpi-rupture': {
       icon: '✕',
-      iconBg: '#FDECEA', iconColor: '#C0392B',
+      iconBg: theme.colors.errorLight, iconColor: theme.colors.error,
       label: 'Taux d’annulation',
       tooltip: 'Pourcentage de commandes annulées sur la période.',
       value: `${(kpi.tauxAnnulation * 100).toFixed(1).replace('.', ',')} %`,
@@ -2549,7 +2549,7 @@ export function HomePage() {
                       <ChartStatRow>
                         <ChartStatLabel>Commandes annulées</ChartStatLabel>
                         <ChartStatValueRow>
-                          <ChartStatIcon $bg="#FDECEA" $color="#C0392B">✕</ChartStatIcon>
+                          <ChartStatIcon $bg={theme.colors.errorLight} $color={theme.colors.error}>✕</ChartStatIcon>
                           <ChartStatNum>{nbAnnulees}</ChartStatNum>
                           {cmpAnnulees !== null && (
                             <ChartStatDelta $up={nbAnnulees <= cmpAnnulees}>
@@ -2564,7 +2564,7 @@ export function HomePage() {
                       <ChartStatRow>
                         <ChartStatLabel>Taux d'annulation</ChartStatLabel>
                         <ChartStatValueRow>
-                          <ChartStatIcon $bg="#FDECEA" $color="#C0392B">%</ChartStatIcon>
+                          <ChartStatIcon $bg={theme.colors.errorLight} $color={theme.colors.error}>%</ChartStatIcon>
                           <ChartStatNum>{(kpi.tauxAnnulation * 100).toFixed(1).replace('.', ',')} %</ChartStatNum>
                           {compareKpi && (
                             <ChartStatDelta $up={kpi.tauxAnnulation <= compareKpi.tauxAnnulation}>
@@ -2732,7 +2732,7 @@ export function HomePage() {
                       </div>
                     </EdiStatItem>
                     <EdiStatItem>
-                      <EdiStatIcon $bg="#FDECEA" $color="#C0392B">⚠️</EdiStatIcon>
+                      <EdiStatIcon $bg={theme.colors.errorLight} $color={theme.colors.error}>⚠️</EdiStatIcon>
                       <div>
                         <EdiStatNum>1</EdiStatNum>
                         <EdiStatLabel>Erreur à traiter</EdiStatLabel>

@@ -1,13 +1,14 @@
 import styled from 'styled-components'
 import { useToast } from '@/contexts/ToastContext'
+import { theme } from '@/lib/theme'
 import type { ReturnRequest, ReturnStatus } from '@/data/mockReturns'
 import { RETURN_REASON_LABELS } from '@/data/mockReturns'
 
 const STATUS_CONFIG: Record<ReturnStatus, { label: string; bg: string; text: string }> = {
   pending:     { label: 'En attente',   bg: '#EAEAE6', text: '#555550' },
   in_transit:  { label: 'En transit',   bg: '#FEF3E2', text: '#B65A00' },
-  avoir_emis:  { label: 'Avoir émis',   bg: '#EFF4F1', text: '#226241' },
-  refused:     { label: 'Refusé',       bg: '#FDECEA', text: '#C0392B' },
+  avoir_emis:  { label: 'Avoir émis',   bg: '#EFF4F1', text: theme.colors.success },
+  refused:     { label: 'Refusé',       bg: theme.colors.errorLight, text: theme.colors.error },
 }
 
 const Card = styled.div`
@@ -110,10 +111,10 @@ const CardFooter = styled.div`
 `
 
 const RefusalBox = styled.div`
-  background: #FDECEA; border-radius: ${({ theme }) => theme.radii.md};
+  background: ${({ theme }) => theme.colors.errorLight}; border-radius: ${({ theme }) => theme.radii.md};
   padding: 8px 12px; margin-bottom: ${({ theme }) => theme.spacing.sm};
   font-size: ${({ theme }) => theme.typography.sizes.xs};
-  color: #C0392B;
+  color: ${({ theme }) => theme.colors.error};
 `
 
 const ContestBtn = styled.button`

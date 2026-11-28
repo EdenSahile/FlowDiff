@@ -28,8 +28,8 @@ const fadeIn = keyframes`from{opacity:0;transform:translateY(8px)}to{opacity:1;t
 
 /* ── Couleurs par statut : palette Forêt & Lin ── */
 const STATUS_COLORS: Record<OrderStatus, { bg: string; text: string; dot: string }> = {
-  'en préparation': { bg: '#F7F0DC', text: theme.colors.accentDark, dot: theme.colors.accentDark },
-  'expédié':        { bg: '#E6EFE9', text: theme.colors.success, dot: theme.colors.success },
+  'en préparation': { bg: theme.colors.accentLight, text: theme.colors.accentDark, dot: theme.colors.accentDark },
+  'expédié':        { bg: theme.colors.successLight, text: theme.colors.success, dot: theme.colors.success },
   'livré':          { bg: '#D4EDDA', text: '#155724', dot: '#155724' },
 }
 

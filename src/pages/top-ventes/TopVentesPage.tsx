@@ -72,9 +72,9 @@ const UNIVERSES: Universe[] = ['BD/Mangas', 'Jeunesse', 'Littérature', 'Adulte-
 
 /* Palette Forêt & Lin : cohérente avec UniverseFilter et FlashInfosPage */
 const UNIVERSE_COLORS: Record<Universe, { bg: string; text: string; dot: string }> = {
-  'BD/Mangas':       { bg: '#F7F0DC', text: theme.colors.accentDark, dot: theme.colors.accentDark },
+  'BD/Mangas':       { bg: theme.colors.accentLight, text: theme.colors.accentDark, dot: theme.colors.accentDark },
   'Jeunesse':        { bg: '#EFF4F1', text: '#2D6A52', dot: '#2D6A52' },
-  'Littérature':     { bg: '#E6EFE9', text: theme.colors.success, dot: theme.colors.success },
+  'Littérature':     { bg: theme.colors.successLight, text: theme.colors.success, dot: theme.colors.success },
   'Adulte-pratique': { bg: '#F0EDE8', text: '#6B5440', dot: '#6B5440' },
 }
 
