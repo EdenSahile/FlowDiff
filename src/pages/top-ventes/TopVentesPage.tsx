@@ -520,27 +520,40 @@ function TrendIcon({ trend }: { trend: SalesData['trend'] }) {
   « quelle période », c'est « est-ce que je l'ai » : un titre qui se vend
   partout et qu'il n'a jamais pris est un manque à rattraper.
 */
+/*
+  Repère de commande.
+
+  Le texte reste navy dans les 2 états, à 13,57 de contraste sur blanc : c'est
+  lui qui porte la lisibilité. L'or de la charte, essayé d'abord, tombe à 2,29
+  sur blanc, sous le minimum de 4,5 que WCAG AA demande pour du petit texte, et
+  la mention était illisible. Un fond plein, essayé ensuite, imposait un
+  padding vertical donc de la hauteur sur chacune des 7 lignes du classement,
+  problématique au téléphone.
+
+  C'est donc la puce qui porte le signal, motif déjà employé 3 fois dans
+  l'application : GreenDot sur les OP commerciales, StatusDot sur les statuts
+  de commande, TagDot sur les thématiques. Un libraire sait déjà qu'ici une
+  puce colorée annonce un état.
+*/
 const OrderMark = styled.p<{ $ordered: boolean }>`
+  display: flex;
+  align-items: center;
+  gap: 5px;
   font-family: ${({ theme }) => theme.typography.fontFamily};
   font-size: 11px;
-  font-weight: 700;
+  font-weight: ${({ $ordered }) => $ordered ? 500 : 700};
   white-space: nowrap;
   margin: 0;
+  color: ${({ $ordered, theme }) => $ordered ? theme.colors.gray[600] : theme.colors.navy};
+`
 
-  /*
-    Les 2 états ne pèsent pas pareil. « Commandé le… » est un rappel, il reste
-    en texte gris. « Jamais commandé » demande une décision, il prend une
-    pastille pleine : à 11 px, une couleur de texte seule se perd au milieu
-    des autres mentions, c'est le fond qui porte le contraste.
-  */
-  ${({ $ordered, theme }) => $ordered
-    ? `color: ${theme.colors.gray[600]};`
-    : `
-      color: ${theme.colors.white};
-      background: ${theme.colors.error};
-      border-radius: ${theme.radii.full};
-      padding: 3px 9px;
-    `}
+const NeverOrderedDot = styled.span`
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: ${({ theme }) => theme.colors.error};
+  flex-shrink: 0;
 `
 
 const TabSpacer = styled.span`
@@ -557,8 +570,9 @@ const PodiumFooter = styled.div`
 `
 
 const PodiumMark = styled(OrderMark)`
-  text-align: center;
+  justify-content: center;
   align-self: center;
+  padding-top: 2px;
 `
 
 const EmptySection = styled.p`
@@ -608,6 +622,7 @@ function ListItem({
       </RowInfo>
       <RowRight onClick={e => e.stopPropagation()}>
         <OrderMark $ordered={!!lastOrderDate} data-commande-pour={book.id}>
+          {!lastOrderDate && <NeverOrderedDot aria-hidden="true" />}
           {formatOrderMark(lastOrderDate)}
         </OrderMark>
         <RowSales data-tendance-pour={book.id}>
@@ -681,6 +696,7 @@ function TopSection({
                   $ordered={!!lastOrderDates.get(book.id)}
                   data-commande-pour={book.id}
                 >
+                  {!lastOrderDates.get(book.id) && <NeverOrderedDot aria-hidden="true" />}
                   {formatOrderMark(lastOrderDates.get(book.id))}
                 </PodiumMark>
               </PodiumFooter>
