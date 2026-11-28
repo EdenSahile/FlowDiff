@@ -19,7 +19,7 @@ const Btn = styled.button`
   transition: opacity 0.15s, color 0.15s;
   &:hover {
     opacity: 1;
-    color: ${({ theme }) => theme.colors.accent};
+    color: ${({ theme }) => theme.colors.accentDark};
   }
 `
 

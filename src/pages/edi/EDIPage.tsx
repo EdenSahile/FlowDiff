@@ -452,7 +452,7 @@ const StatusBadgeTable = styled.span<{ $status: string }>`
     theme.colors.primaryLight};
   color: ${({ $status, theme }) =>
     $status === 'ERROR'  ? theme.colors.error :
-    $status === 'ORDERS' ? '#8B6914' :
+    $status === 'ORDERS' ? theme.colors.accentDark :
     theme.colors.success};
 `
 

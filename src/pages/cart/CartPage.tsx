@@ -1314,7 +1314,7 @@ export function CartPage() {
               <span>{op.cadeau.emoji} {op.cadeau.label} × {op.cadeau.quantity} (offert)</span>
               <span>0,00 €</span>
             </RecapRow>
-            <RecapRow style={{ paddingLeft: 12, color: '#8B6914' }}>
+            <RecapRow style={{ paddingLeft: 12, color: theme.colors.accentDark }}>
               <span>PLV × {op.plv.quantity}</span>
               <span>{fmt(op.plv.pricePerUnit * op.plv.quantity)}</span>
             </RecapRow>
@@ -1638,17 +1638,17 @@ export function CartPage() {
                   </OPRow>
 
                   <OPRow $variant="plv">
-                    <OPCover style={{ color: '#8B6914' }}>
+                    <OPCover style={{ color: theme.colors.accentDark }}>
                       <IconTag />
                     </OPCover>
                     <OPText>
-                      <OPRowTitle style={{ color: '#8B6914' }}>{op.plv.description}</OPRowTitle>
+                      <OPRowTitle style={{ color: theme.colors.accentDark }}>{op.plv.description}</OPRowTitle>
                       <OPRowMeta>PLV payante</OPRowMeta>
                       <OPRowIsbn>ISBN {op.plv.isbn}</OPRowIsbn>
                     </OPText>
-                    <OPCell $color="#8B6914">{fmt(op.plv.pricePerUnit)}</OPCell>
-                    <OPCell $color="#8B6914" style={{ textAlign: 'center' }}>{op.plv.quantity}</OPCell>
-                    <OPCell $bold $color="#8B6914">{fmt(opPLVPrice)}</OPCell>
+                    <OPCell $color={theme.colors.accentDark}>{fmt(op.plv.pricePerUnit)}</OPCell>
+                    <OPCell $color={theme.colors.accentDark} style={{ textAlign: 'center' }}>{op.plv.quantity}</OPCell>
+                    <OPCell $bold $color={theme.colors.accentDark}>{fmt(opPLVPrice)}</OPCell>
                   </OPRow>
                 </OPTable>
 

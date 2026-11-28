@@ -731,7 +731,7 @@ const SimilarLinkEl = styled.button`
   border: none;
   font-family: ${({ theme }) => theme.typography.fontFamily};
   font-size: 12.5px;
-  color: ${({ theme }) => theme.colors.accent};
+  color: ${({ theme }) => theme.colors.accentDark};
   font-weight: 500;
   cursor: pointer;
   &:hover { text-decoration: underline; }

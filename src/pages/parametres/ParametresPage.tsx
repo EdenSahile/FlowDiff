@@ -275,7 +275,7 @@ const TourBtn = styled.button`
 
   &:hover {
     border-color: ${({ theme }) => theme.colors.accent};
-    color: ${({ theme }) => theme.colors.accent};
+    color: ${({ theme }) => theme.colors.accentDark};
   }
 `
 

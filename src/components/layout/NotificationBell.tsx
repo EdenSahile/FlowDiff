@@ -29,14 +29,19 @@ const BellBtn = styled.button<{ $active: boolean }>`
     background: rgba(201,168,76,.15);
     color: ${theme.colors.accent};
   }
+  /*
+    En desktop la cloche quitte le header navy pour un fond blanc : son glyphe
+    est le seul indicateur de l'état actif, il passe donc à accentDark. La
+    variante mobile reste sur accent, lisible sur navy à 5,22.
+  */
   @media (min-width: ${theme.breakpoints.mobile}) {
     border-color: ${({ $active }) => $active ? theme.colors.accent : theme.colors.gray[200]};
     background: ${({ $active }) => $active ? 'rgba(201,168,76,.08)' : theme.colors.white};
-    color: ${({ $active }) => $active ? theme.colors.accent : theme.colors.gray[600]};
+    color: ${({ $active }) => $active ? theme.colors.accentDark : theme.colors.gray[600]};
     &:hover {
       border-color: ${theme.colors.accent};
       background: rgba(201,168,76,.08);
-      color: ${theme.colors.accent};
+      color: ${theme.colors.accentDark};
     }
   }
 `
@@ -98,7 +103,7 @@ const PanelTitle = styled.span`
 const MarkAllBtn = styled.button`
   font-size: 11px;
   font-weight: 600;
-  color: ${theme.colors.accent};
+  color: ${theme.colors.accentDark};
   background: none;
   border: none;
   cursor: pointer;
@@ -184,7 +189,7 @@ const ItemLink = styled.div`
   gap: 3px;
   font-size: 10px;
   font-weight: 600;
-  color: ${theme.colors.accent};
+  color: ${theme.colors.accentDark};
   font-family: ${theme.typography.fontFamily};
 `
 

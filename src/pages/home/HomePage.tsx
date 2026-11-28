@@ -633,7 +633,7 @@ const KPILink = styled.button`
   padding: 0;
   font-size: 11px;
   font-weight: 600;
-  color: ${({ theme }) => theme.colors.accent};
+  color: ${({ theme }) => theme.colors.accentDark};
   cursor: pointer;
   text-align: left;
   margin-top: 2px;
@@ -958,7 +958,7 @@ const PanelSeeAll = styled.button`
   padding: 0;
   font-size: 11px;
   font-weight: 600;
-  color: ${({ theme }) => theme.colors.accent};
+  color: ${({ theme }) => theme.colors.accentDark};
   cursor: pointer;
   white-space: nowrap;
   &:hover { opacity: .75; }
@@ -1757,7 +1757,7 @@ const SectionArrowBtn = styled.button<{ $disabled?: boolean }>`
 const MiniPrice = styled.div`
   font-size: 11px;
   font-weight: 700;
-  color: ${({ theme }) => theme.colors.accent};
+  color: ${({ theme }) => theme.colors.accentDark};
   margin-top: 3px;
 `
 
