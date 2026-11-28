@@ -24,6 +24,10 @@ export const theme = {
     white:        '#FFFFFF',
     error:        '#C0392B',
     success:      '#226241',
+    /* Survol des boutons verts. Assombrit, là où primaryHover éclaircit :
+       primary est trop sombre pour qu'un assombrissement se voie, success
+       non. Blanc dessus donne 7,87 de contraste. */
+    successHover: '#1B5E20',
     /*
       Fonds pâles des badges « fond clair + texte saturé ». Chacun est prévu
       pour porter la couleur pleine du même nom en texte : error sur errorLight

@@ -420,7 +420,7 @@ const DupliquerButton = styled.button<{ $done?: boolean }>`
   align-items: center;
   gap: 6px;
   padding: 8px 16px;
-  background-color: ${({ $done, theme }) => $done ? '#2E7D32' : theme.colors.primary};
+  background-color: ${({ $done, theme }) => $done ? theme.colors.success : theme.colors.primary};
   color: #fdfdfd;
   border: none;
   border-radius: ${({ theme }) => theme.radii.md};
@@ -431,7 +431,7 @@ const DupliquerButton = styled.button<{ $done?: boolean }>`
   transition: background-color 0.2s ease, color 0.2s ease;
 
   &:hover:not(:disabled) {
-    background-color: ${({ $done, theme }) => $done ? '#1B5E20' : theme.colors.primaryHover};
+    background-color: ${({ $done, theme }) => $done ? theme.colors.successHover : theme.colors.primaryHover};
   }
   &:disabled { cursor: not-allowed; opacity: 0.8; }
 `
@@ -442,7 +442,7 @@ const SuccessAlert = styled.div`
   gap: 6px;
   font-size: ${({ theme }) => theme.typography.sizes.xs};
   font-weight: ${({ theme }) => theme.typography.weights.semibold};
-  color: #2E7D32;
+  color: ${({ theme }) => theme.colors.success};
   animation: ${fadeSlideIn} 0.2s ease forwards;
 `
 

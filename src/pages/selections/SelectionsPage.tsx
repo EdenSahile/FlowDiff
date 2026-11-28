@@ -1,5 +1,6 @@
 import { useState, useMemo, useRef, useEffect } from 'react'
 import styled, { keyframes } from 'styled-components'
+import { theme } from '@/lib/theme'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useCart } from '@/contexts/CartContext'
 import { getAllBooksAsync } from '@/services/books'
@@ -165,13 +166,13 @@ const FilterPill = styled.button<{ $active: boolean; $variant?: 'prix' | 'offre'
   border-radius: ${({ theme }) => theme.radii.full};
   border: 1.5px solid ${({ $active, $variant, theme }) => {
     if ($active && $variant === 'prix') return '#7B1FA2'
-    if ($active && $variant === 'offre') return '#2E7D32'
+    if ($active && $variant === 'offre') return theme.colors.success
     if ($active) return theme.colors.navy
     return theme.colors.gray[200]
   }};
   background-color: ${({ $active, $variant, theme }) => {
     if ($active && $variant === 'prix') return '#7B1FA2'
-    if ($active && $variant === 'offre') return '#2E7D32'
+    if ($active && $variant === 'offre') return theme.colors.success
     if ($active) return theme.colors.navy
     return theme.colors.white
   }};
@@ -189,18 +190,18 @@ const FilterPill = styled.button<{ $active: boolean; $variant?: 'prix' | 'offre'
   &:hover:not(:disabled) {
     background-color: ${({ $active, $variant, theme }) => {
       if ($active && $variant === 'prix') return '#6A1B9A'
-      if ($active && $variant === 'offre') return '#1B5E20'
+      if ($active && $variant === 'offre') return theme.colors.successHover
       if ($active) return theme.colors.primaryHover
       if ($variant === 'prix') return '#F3E5F5'
-      if ($variant === 'offre') return '#E8F5E9'
+      if ($variant === 'offre') return theme.colors.successLight
       return theme.colors.navyLight
     }};
     border-color: ${({ $active, $variant, theme }) => {
       if ($active && $variant === 'prix') return '#6A1B9A'
-      if ($active && $variant === 'offre') return '#1B5E20'
+      if ($active && $variant === 'offre') return theme.colors.successHover
       if ($active) return theme.colors.primaryHover
       if ($variant === 'prix') return '#7B1FA2'
-      if ($variant === 'offre') return '#2E7D32'
+      if ($variant === 'offre') return theme.colors.success
       return theme.colors.navy
     }};
   }
@@ -1396,7 +1397,7 @@ export function SelectionsPage() {
             <SerieHeaderTitle>
               {selectedSerie.nom}
               {selectedSerie.isOffreSpeciale && (
-                <Badge $color="#1B5E20" $bg="#E8F5E9"><IconDot /> OP commerciale</Badge>
+                <Badge $color={theme.colors.success} $bg={theme.colors.successLight}><IconDot /> OP commerciale</Badge>
               )}
               {selectedSerie.isPrixLitteraire && (
                 <Badge $color="#4A148C" $bg="#F3E5F5"><IconTrophy size={11} /> Prix littéraire</Badge>
@@ -1466,12 +1467,12 @@ export function SelectionsPage() {
                     <span style={{ fontSize: 26 }}>{offre.cadeauEmoji}</span>
                   </OPTCover>
                   <OPTText>
-                    <OPTTitle style={{ color: '#2E7D32' }}>{offre.cadeauLabel}</OPTTitle>
+                    <OPTTitle style={{ color: theme.colors.success }}>{offre.cadeauLabel}</OPTTitle>
                     <OPTMeta style={{ color: '#4CAF50' }}>Offert au lecteur final</OPTMeta>
                   </OPTText>
-                  <OPTCell $color="#2E7D32">0,00 €</OPTCell>
-                  <OPTCell data-col="qty" $color="#2E7D32">{nbCadeaux}</OPTCell>
-                  <OPTCell $bold $color="#2E7D32">0,00 €</OPTCell>
+                  <OPTCell $color={theme.colors.success}>0,00 €</OPTCell>
+                  <OPTCell data-col="qty" $color={theme.colors.success}>{nbCadeaux}</OPTCell>
+                  <OPTCell $bold $color={theme.colors.success}>0,00 €</OPTCell>
                 </OPTRow>
 
                 {/* Ligne totaux : ouvrages uniquement */}

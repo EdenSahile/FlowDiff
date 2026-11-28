@@ -1,6 +1,7 @@
 import { useState, useMemo, useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import styled, { keyframes } from 'styled-components'
+import { theme } from '@/lib/theme'
 import { useAuthContext } from '@/contexts/AuthContext'
 import { MOCK_FACTURES, type Facture } from '@/data/mockFactures'
 import { openInvoicePDF } from '@/lib/invoicePdf'
@@ -406,8 +407,8 @@ const PaidBadge = styled.span`
   align-items: center;
   gap: 4px;
   padding: 4px 10px;
-  background: #E6F4EC;
-  color: #1E7045;
+  background: ${({ theme }) => theme.colors.successLight};
+  color: ${({ theme }) => theme.colors.success};
   border-radius: ${({ theme }) => theme.radii.xl};
   font-family: ${({ theme }) => theme.typography.fontFamily};
   font-size: 0.75rem;
@@ -540,7 +541,7 @@ const PayNowBtn = styled.button<{ $loading?: boolean; $success?: boolean }>`
   padding: 13px;
   border: none;
   border-radius: ${({ theme }) => theme.radii.md};
-  background: ${({ $success, theme }) => $success ? '#1E7045' : theme.colors.navy};
+  background: ${({ $success, theme }) => $success ? theme.colors.success : theme.colors.navy};
   color: #fff;
   font-family: ${({ theme }) => theme.typography.fontFamily};
   font-size: 0.9375rem;
@@ -552,7 +553,7 @@ const PayNowBtn = styled.button<{ $loading?: boolean; $success?: boolean }>`
   justify-content: center;
   gap: 8px;
 
-  &:hover:not(:disabled) { background: ${({ $success, theme }) => $success ? '#1E7045' : theme.colors.primaryHover}; }
+  &:hover:not(:disabled) { background: ${({ $success, theme }) => $success ? theme.colors.successHover : theme.colors.primaryHover}; }
   &:active:not(:disabled) { transform: scale(0.98); }
 `
 
@@ -648,7 +649,7 @@ const SuccessIcon = styled.div`
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: #E6F4EC;
+  background: ${({ theme }) => theme.colors.successLight};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -658,7 +659,7 @@ const SuccessTitle = styled.p`
   font-family: ${({ theme }) => theme.typography.fontFamily};
   font-size: 1rem;
   font-weight: 700;
-  color: #1E7045;
+  color: ${({ theme }) => theme.colors.success};
   margin: 0;
   text-align: center;
 `
@@ -687,7 +688,7 @@ function IconPDF() {
 
 function IconCheck() {
   return (
-    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1E7045" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke={theme.colors.success} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
       <polyline points="20 6 9 17 4 12"/>
     </svg>
   )

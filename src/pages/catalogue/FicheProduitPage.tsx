@@ -54,7 +54,7 @@ const UNIVERSE_STYLES: Record<string, { bg: string; color: string }> = {
   'Littérature':     { bg: '#E8EDF3', color: '#1C3252' },
   'BD/Mangas':       { bg: '#FDEBD0', color: '#C04A00' },
   'Jeunesse':        { bg: '#F5E8F8', color: '#7B2D8B' },
-  'Adulte-pratique': { bg: '#E6F4EC', color: '#1E7045' },
+  'Adulte-pratique': { bg: theme.colors.successLight, color: theme.colors.success },
 }
 
 /* ══ Animations ══ */
@@ -498,9 +498,9 @@ const StockIndicatorEl = styled.span<{ $statut?: string }>`
     $statut === 'sur_commande' ? 'rgba(91,122,158,.1)' :
     $statut === 'en_reimp'     ? 'rgba(160,112,64,.1)' : 'rgba(46,125,50,.08)'};
   color: ${({ $statut }) =>
-    $statut === 'disponible'   ? '#2E7D32' :
+    $statut === 'disponible'   ? theme.colors.success :
     $statut === 'sur_commande' ? '#5B7A9E' :
-    $statut === 'en_reimp'     ? '#A07040' : '#2E7D32'};
+    $statut === 'en_reimp'     ? '#A07040' : theme.colors.success};
   &::before {
     content: '';
     width: 6px;
@@ -590,7 +590,7 @@ const QtyInputLg = styled.input`
 const AddBtnMain = styled.button<{ $added: boolean }>`
   height: 36px;
   padding: 0 18px;
-  background: ${({ $added, theme }) => $added ? '#2E7D32' : theme.colors.navy};
+  background: ${({ $added, theme }) => $added ? theme.colors.success : theme.colors.navy};
   color: ${({ theme }) => theme.colors.white};
   border: none;
   border-radius: 7px;

@@ -30,7 +30,7 @@ const textBadgeVariants = {
     color: ${({ theme }) => theme.colors.white};
   `,
   promo: css`
-    background-color: #2E7D32;
+    background-color: ${({ theme }) => theme.colors.success};
     color: ${({ theme }) => theme.colors.white};
   `,
   new: css`

@@ -16,13 +16,13 @@ import {
 } from '@/components/auth/AuthLayout'
 
 const SuccessBox = styled.div`
-  background-color: #E8F5E9;
+  background-color: ${({ theme }) => theme.colors.successLight};
   border: 1px solid #A5D6A7;
   border-radius: ${({ theme }) => theme.radii.md};
   padding: ${({ theme }) => theme.spacing.md};
   font-family: ${({ theme }) => theme.typography.fontFamily};
   font-size: ${({ theme }) => theme.typography.sizes.sm};
-  color: #1B5E20;
+  color: ${({ theme }) => theme.colors.success};
   text-align: center;
   line-height: ${({ theme }) => theme.typography.lineHeights.relaxed};
 `
