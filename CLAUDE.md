@@ -78,7 +78,8 @@ Palette « Ardoise & Champagne ». Les valeurs ci-dessous sont celles de `theme.
 | Gris texte 1 | `gray.800` | `#111111` | Texte principal |
 | Erreur | `error` | `#C0392B` | Messages d'erreur, actions destructrices |
 | Erreur, fond | `errorLight` | `#FDECEA` | Fond des badges d'erreur, porte `error` en texte |
-| Succès | `success` | `#226241` | Confirmations, indicateur d'offre |
+| Succès | `success` | `#226241` | Confirmations, disponibilité, indicateur d'offre |
+| Succès hover | `successHover` | `#1B5E20` | Survol des boutons verts |
 | Succès, fond | `successLight` | `#E6EFE9` | Fond des badges de succès, porte `success` en texte |
 | Blanc | `white` | `#FFFFFF` | Surfaces cards, fond inputs |
 
@@ -97,6 +98,18 @@ Un badge se compose d'un fond pâle et de la couleur pleine du même nom en text
 Les fonds pâles manquaient au thème jusqu'au 28 novembre 2026, ce qui explique les 15 valeurs écrites en dur retirées ce jour-là. Un nouveau badge se sert de ces paires ; s'il a besoin d'une teinte qui n'existe pas, le token s'ajoute à `theme.ts` plutôt que la valeur au composant.
 
 Restent hors thème 4 fonds pâles qui n'ont pas de couleur pleine associée : `#FFF7ED` et `#FEF3E2` (orange, avertissements), `#EFF4F1` (vert, univers Jeunesse) et `#F0EDE8` (lin, univers Adulte-pratique). Les couleurs d'univers forment un jeu à part, non tokenisé.
+
+### Les deux sens du survol
+
+`primaryHover` **éclaircit** `primary`, `successHover` **assombrit** `success`. Ce n'est pas une incohérence : `primary` (`#2D3A4A`) est trop sombre pour qu'un assombrissement se voie, `success` (`#226241`) non. Un futur token de survol se choisit sur ce critère, pas par symétrie avec les autres.
+
+### Un seul vert, et il ne s'écrit pas à la main
+
+Le projet a porté 8 verts pour un seul sens jusqu'au 28 novembre 2026 : `#2E7D32` 15 fois, `#1E7045` 7, `#16a34a` 7, `#1B5E20` 5, plus 3 verts pâles (`#E8F5E9`, `#E6F4EC`, `#E6F2EC`) séparés de moins de 2,4 % sur un canal, donc indiscernables.
+
+La cause est datable : `#2E7D32` a été écrit le 22 avril 2026, et le token `success` créé le **23 avril**. Le vert ne contredisait pas le token, il le précédait d'un jour, et rien ne l'a rattrapé ensuite. `#16a34a` a en plus traîné un défaut d'accessibilité, servant de couleur de texte à 3,30 de contraste, dont 2 fois en 7 px.
+
+**Règle** : tout vert passe par `success`, `successHover` ou `successLight`. Un vert écrit à la main dans un composant est un bug, même s'il ressemble au bon.
 
 ### Le PDF de facture a sa propre feuille de style
 
