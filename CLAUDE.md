@@ -77,10 +77,36 @@ Palette « Ardoise & Champagne ». Les valeurs ci-dessous sont celles de `theme.
 | Gris texte 2 | `gray.600` | `#555550` | Texte secondaire |
 | Gris texte 1 | `gray.800` | `#111111` | Texte principal |
 | Erreur | `error` | `#C0392B` | Messages d'erreur, actions destructrices |
+| Erreur, fond | `errorLight` | `#FDECEA` | Fond des badges d'erreur, porte `error` en texte |
 | Succès | `success` | `#226241` | Confirmations, indicateur d'offre |
+| Succès, fond | `successLight` | `#E6EFE9` | Fond des badges de succès, porte `success` en texte |
 | Blanc | `white` | `#FFFFFF` | Surfaces cards, fond inputs |
 
 **Règle** : ne jamais hardcoder les couleurs dans les composants : toujours passer par `theme.colors.*`.
+
+### Les badges vont par paires, fond pâle et texte saturé
+
+Un badge se compose d'un fond pâle et de la couleur pleine du même nom en texte. Les 3 paires du thème, toutes au-dessus des 4,5 de contraste que WCAG AA demande pour du petit texte :
+
+| Texte | sur fond | Contraste |
+|---|---|---|
+| `error` | `errorLight` | 4,76 |
+| `success` | `successLight` | 6,19 |
+| `accentDark` | `accentLight` | 5,78 |
+
+Les fonds pâles manquaient au thème jusqu'au 28 novembre 2026, ce qui explique les 15 valeurs écrites en dur retirées ce jour-là. Un nouveau badge se sert de ces paires ; s'il a besoin d'une teinte qui n'existe pas, le token s'ajoute à `theme.ts` plutôt que la valeur au composant.
+
+Restent hors thème 4 fonds pâles qui n'ont pas de couleur pleine associée : `#FFF7ED` et `#FEF3E2` (orange, avertissements), `#EFF4F1` (vert, univers Jeunesse) et `#F0EDE8` (lin, univers Adulte-pratique). Les couleurs d'univers forment un jeu à part, non tokenisé.
+
+### Le PDF de facture a sa propre feuille de style
+
+`src/lib/invoicePdf.ts` construit un document HTML complet dans un template string, avec son CSS écrit à la main. Il ne passe pas par styled-components, donc **un changement de palette ne l'atteint pas tout seul.**
+
+Il est resté sur l'ancienne palette jusqu'au 28 novembre 2026 : l'ancien navy `#232f3e` 9 fois et l'ancien or `#C9A84C` 5 fois, soit une facture téléchargée aux couleurs d'avant. Ses couleurs de marque passent maintenant par `theme.colors.*` interpolés.
+
+Ses 14 gris d'impression (`#888`, `#ddd`, `#666`…) restent volontairement en dur : ils forment l'échelle du document imprimé, qui n'est pas celle des gris beiges de l'écran. Même chose pour les jaunes de sa bannière « document fictif ».
+
+**Règle** : toute modification de `primary`, `accent` ou `navy` demande de vérifier le rendu d'une facture, que `theme.ts` seul ne garantit pas.
 
 ### L'or ne s'écrit pas sur fond clair
 
