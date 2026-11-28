@@ -47,6 +47,32 @@ test.describe('Classements', () => {
     await expect(page.getByText('Top Fonds')).toBeVisible()
   })
 
+  /*
+    Les 2 classements doivent porter des titres, pas seulement leur libellé.
+    Un classement vide est exactement la panne qui est passée inaperçue : la
+    table des ventes désignait des titres écrits comme nouveautés, et le type
+    d'un titre se déduisant de sa date de parution, ils sont tous devenus du
+    fonds. Le libellé « Top Nouveautés » restait affiché au-dessus de
+    « Aucune donnée disponible ».
+
+    L'attendu se calcule depuis le catalogue : un classement montre en podium
+    autant de titres que son type en compte, dans la limite de 3.
+  */
+  for (const [label, type] of [['Top Nouveautés', 'nouveaute'], ['Top Fonds', 'fonds']] as const) {
+    test(`${label} montre des titres, pas seulement son libellé`, async ({ page }) => {
+      const available = getCatalogueBooks().filter(book => book.type === type).length
+      const expectedPodium = Math.min(available, 3)
+      expect(expectedPodium).toBeGreaterThan(0)
+
+      const section = page.locator('section').filter({
+        has: page.getByRole('heading', { name: label, level: 2 }),
+      })
+
+      await expect(section.getByText('Aucune donnée disponible')).toHaveCount(0)
+      await expect(section.locator('article')).toHaveCount(expectedPodium)
+    })
+  }
+
   // Le podium porte les 3 premiers rangs en badge, le reste en liste compacte.
   test('chaque classement porte un podium de 3 rangs', async ({ page }) => {
     for (const rank of [1, 2, 3]) {
