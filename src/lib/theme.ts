@@ -6,6 +6,14 @@ export const theme = {
     primaryLight: '#EDE8DF',
     accent:       '#D4A843',
     accentLight:  '#FBF6E8',
+    /*
+      Or lisible en texte sur fond clair. `accent` ne dépasse pas 2,21 de
+      contraste sur blanc et 1,82 sur gray.100, quand WCAG AA demande 4,5 pour
+      du petit texte et 3 pour une icône : il ne tient comme couleur de texte
+      que sur navy, à 5,22. accentDark passe sur les 4 fonds clairs du thème,
+      de 5,11 sur gray.100 à 6,24 sur blanc.
+    */
+    accentDark:   '#7A5C12',
 
     /* Sidebar / header dark */
     navy:         '#2D3A4A',
