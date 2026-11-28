@@ -192,6 +192,20 @@ Deux règles qui en découlent :
 
 ---
 
+## Le type d'un titre est calculé, jamais écrit
+
+`getCatalogueType` déduit le type d'un titre de sa **date de parution** : à paraître tant qu'elle est dans le futur, nouveauté pendant 6 mois, fonds ensuite. Aucun champ `type` n'est écrit dans `mockBooks.ts`.
+
+Conséquence, et elle a déjà coûté 3 pannes : **toute donnée écrite à la main qui désigne un titre par son moment commercial se désaccorde avec le temps.**
+
+- `SALES`, la table des ventes de `TopVentesPage`, nommait les titres écrits comme nouveautés. Tous sont passés en fonds, l'intersection est devenue vide, et Top Nouveautés n'affichait plus rien. Corrigé par un repli déterministe qui rend tout titre classable.
+- `FlashInfosPage.test.tsx` codait en dur un titre à paraître. Il est tombé le jour de la parution de ce titre, sans qu'aucun code ne change. Corrigé en figeant le temps du test.
+- Les commandes de démonstration pointaient sur des titres supprimés lors d'une refonte des dates.
+
+**Règle** : un test ou une donnée qui dépend du moment commercial d'un titre doit soit fournir sa propre date de référence (`getCatalogueType(date, referenceDate)`, comme `catalogueType.test.ts`), soit figer l'horloge, soit dériver la liste des titres du catalogue au lieu de la recopier.
+
+---
+
 ## Stack technique
 
 > **Stratégie** : **démo front sur données mock, sans backend.** Vite 5 + React 18, stack définitive. Pas de migration Next.js prévue. Le projet ne gagne pas de fonctionnalités, il se maintient au propre.
@@ -208,7 +222,7 @@ Deux règles qui en découlent :
 | Base de données | **aucune.** Prisma reste installé, son schéma n'est branché sur rien |
 | API serveur | **aucune.** Pas de dossier `api/`, rien à déployer côté serveur |
 | Validation | **Zod** (tous les inputs) |
-| Tests | **Vitest** (jsdom) |
+| Tests | **Vitest** (jsdom) pour l'unitaire, **Playwright** (`e2e/`) pour le bout en bout |
 | Déploiement | Configuration Vercel statique présente ; aucune disponibilité d'URL n'est à supposer |
 
 ### Il n'y a pas de backend
@@ -222,6 +236,12 @@ Supabase a été câblé le 16 mai 2026, puis le projet a été supprimé côté
 - **Catalogue** : `src/services/books.ts` lit `MOCK_BOOKS`. Chemin unique, aucun appel réseau, aucun repli.
 - **Panier, commandes, comptes** : `localStorage`.
 - **Couvertures** : fichiers servis depuis `public/covers/{isbn}.jpg`. 40 titres sur 44 en ont une, les 4 autres affichent le placeholder dessiné.
+
+### La section Office est un écran d'attente
+
+La route `/offices` sert « Bientôt disponible », et c'est tout ce qu'elle sert. Le bordereau d'office complet a été écrit puis mis de côté, inachevé, et il a été retiré du code le 28 novembre 2026 : il vivait dans le même fichier sous le nom `OfficesPageFull`, compilé à chaque build et rendu par rien. Son historique reste dans git.
+
+Ne pas le rebrancher sans décision explicite, et dans ce cas écrire ses tests : `e2e/offices.spec.ts` porte un garde-fou qui tombe dès qu'une action de bordereau apparaît.
 
 ### Code conservé mais hors du build
 
@@ -264,7 +284,7 @@ Deux ensembles existent dans le repo sans être compilés ni atteignables. Ne pa
 | 8 | Menu Burger + Mon compte + Historique | ✅ Fait |
 | 9 | ~~Scanner caméra (lecture code-barres réelle)~~, **supprimé** | 🚫 Annulé |
 | 10 | ~~PWA avec vite-plugin-pwa (manifest, service worker, icônes)~~, **annulé** | 🚫 Annulé |
-| 11 | Tests + recette fonctionnelle | ✅ Fait (Vitest) |
+| 11 | Tests + recette fonctionnelle | ✅ Fait (614 tests Vitest, 408 tests Playwright) |
 | 12 | ~~Migration Next.js 14~~, **annulé**, le projet reste sur Vite | 🚫 Annulé |
 | 13 | Déploiement Vercel | ⚠️ État historique : configuration statique présente ; disponibilité d'une URL non vérifiée dans le code courant |
 
