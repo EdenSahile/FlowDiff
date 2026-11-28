@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, within } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { ThemeProvider } from 'styled-components'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { FlashInfosPage } from '@/pages/flash-infos/FlashInfosPage'
 import { theme } from '@/lib/theme'
 
@@ -39,6 +39,10 @@ describe('FlashInfosPage : ajout au panier', () => {
     mockShowToast.mockClear()
   })
 
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
   it('n’affiche pas d’ajout au panier pour un titre en rupture', () => {
     renderPage()
 
@@ -64,7 +68,21 @@ describe('FlashInfosPage : ajout au panier', () => {
     )
   })
 
+  /*
+    Le type d'un titre se déduit de sa date de parution (getCatalogueType) :
+    « a-paraitre » tant que la parution est dans le futur, « nouveaute »
+    ensuite. L'exemple ci-dessous, ap-bd-02, paraît le 19 novembre 2026, et ce
+    test est tombé tout seul ce jour-là, sans qu'aucun code ne change.
+
+    Le temps est donc figé avant cette parution. La règle testée, un titre à
+    paraître demande confirmation, ne dépend pas du calendrier : le test ne
+    doit pas en dépendre non plus. Seul Date est simulé, pour laisser les
+    minuteries du composant intactes.
+  */
   it('avertit puis ajoute un titre à paraître après confirmation', () => {
+    vi.useFakeTimers({ toFake: ['Date'] })
+    vi.setSystemTime(new Date('2026-11-01T12:00:00'))
+
     renderPage()
 
     fireEvent.click(flashCard('Rencontre autour de L’Atelier des nuages').getByRole('button', { name: 'Ajouter au panier' }))

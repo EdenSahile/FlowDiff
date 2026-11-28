@@ -83,10 +83,32 @@ const SECTION_BORDER: Record<Universe, string> = {
   'Adulte-pratique': '#6B5440',
 }
 
+/*
+  Volume de ventes d'un titre absent de la table.
+
+  SALES ne contient que des identifiants écrits à la main, et le type d'un
+  titre se déduit de sa date de parution : les titres écrits comme nouveautés
+  sont tous passés en fonds avec le temps, et Top Nouveautés s'est vidé sans
+  qu'aucun code ne change. Un repli déterministe rend tout titre du catalogue
+  classable, donc le classement ne peut plus se vider.
+
+  Le volume est dérivé de l'identifiant, donc stable d'un chargement à
+  l'autre, et reste sous les volumes écrits à la main pour que les titres
+  dont les chiffres sont choisis gardent la tête du classement.
+*/
+function derivedSales(id: string): SalesData {
+  let hash = 0
+  for (let i = 0; i < id.length; i++) hash = (hash * 31 + id.charCodeAt(i)) % 100_000
+  const trends = ['up', 'stable', 'down'] as const
+  return { units: 120 + (hash % 780), trend: trends[hash % trends.length] }
+}
+
+function salesOf(book: Book): SalesData {
+  return SALES[book.id] ?? derivedSales(book.id)
+}
+
 function getRankedBooks(books: Book[]) {
-  return [...books]
-    .filter(b => SALES[b.id])
-    .sort((a, b) => (SALES[b.id]?.units ?? 0) - (SALES[a.id]?.units ?? 0))
+  return [...books].sort((a, b) => salesOf(b).units - salesOf(a).units)
 }
 
 function getSection(books: Book[], type: 'nouveaute' | 'fonds', universe: TabView) {
@@ -491,7 +513,7 @@ function ListItem({
   book, rank, showUniverse, onAdd,
 }: { book: Book; rank: number; showUniverse: boolean; onAdd: (b: Book) => void }) {
   const navigate = useNavigate()
-  const sales    = SALES[book.id]
+  const sales    = salesOf(book)
   const uc       = UNIVERSE_COLORS[book.universe]
 
   return (
@@ -538,7 +560,7 @@ function TopSection({
 }) {
   const podium     = books.slice(0, 3)
   const listItems  = books.slice(3, 10)
-  const totalUnits = books.reduce((s, b) => s + (SALES[b.id]?.units ?? 0), 0)
+  const totalUnits = books.reduce((s, b) => s + salesOf(b).units, 0)
 
   if (books.length === 0) {
     return (

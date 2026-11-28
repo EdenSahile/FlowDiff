@@ -5,9 +5,11 @@ import { mq } from '@/lib/responsive'
 import styled, { keyframes } from 'styled-components'
 import { useAuthContext } from '@/contexts/AuthContext'
 import { useCart, REMISE_RATES } from '@/contexts/CartContext'
+import { useToast } from '@/contexts/ToastContext'
 import { useClientOrders } from '@/contexts/OrdersContext'
 import { ORDER_STATUSES, ORDER_STATUS_LABELS, type OrderStatus, type Order, type OrderItem } from '@/data/mockOrders'
 import { getCatalogueBookById, MOCK_BOOKS } from '@/data/mockBooks'
+import { getPurchaseAvailability } from '@/lib/bookUtils'
 import { TrackingModal } from '@/components/historique/TrackingModal'
 import type { Shipment } from '@/data/mockOrders'
 import { useReturns } from '@/contexts/ReturnsContext'
@@ -696,6 +698,7 @@ function IconDocument() {
 export function HistoriquePage() {
   const { user } = useAuthContext()
   const { addToCart } = useCart()
+  const { showToast } = useToast()
   const clientOrders = useClientOrders(user?.codeClient ?? '')
 
   const [search, setSearch]                 = useState('')
@@ -727,12 +730,35 @@ export function HistoriquePage() {
 
   if (!user) return null
 
+  /*
+    Une commande garde l'historique de ce qui a été livré, et un titre peut
+    avoir quitté le catalogue ou être passé épuisé ou en rupture depuis.
+    getPurchaseAvailability est la même règle que BookCard applique, où un tel
+    titre a son bouton désactivé : la duplication ne doit pas être une porte
+    dérobée vers le panier, et le libraire doit savoir ce qui n'a pas été
+    repris, sans quoi il repart avec moins d'exemplaires sans rien voir.
+  */
   function handleDupliquer(order: Order) {
     let added = 0
+    let skipped = 0
     for (const item of order.items) {
       const book = MOCK_BOOKS.find(b => b.id === item.bookId)
-      if (book) { addToCart(book, item.quantity); added++ }
+      if (book && getPurchaseAvailability(book.type, book.statut).canAddToCart) {
+        addToCart(book, item.quantity)
+        added++
+      } else {
+        skipped++
+      }
     }
+
+    if (skipped > 0) {
+      const plural = skipped > 1
+      showToast(
+        `${skipped} titre${plural ? 's' : ''} de cette commande ${plural ? 'ne sont' : "n'est"} plus commandable${plural ? 's' : ''} et ${plural ? "n'ont" : "n'a"} pas été repris.`,
+        'error',
+      )
+    }
+
     if (added > 0) {
       setAddedMap(prev => ({ ...prev, [order.id]: true }))
       setTimeout(() => {
