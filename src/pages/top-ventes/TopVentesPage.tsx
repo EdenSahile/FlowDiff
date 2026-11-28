@@ -1,10 +1,13 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useNotifications } from '@/contexts/NotificationsContext'
 import { useNavigate } from 'react-router-dom'
 import { theme } from '@/lib/theme'
 import { formatPrice } from '@/lib/format'
 import styled, { keyframes } from 'styled-components'
 import { getAllBooksAsync } from '@/services/books'
+import { useClientOrders } from '@/contexts/OrdersContext'
+import { useAuthContext } from '@/contexts/AuthContext'
+import type { Order } from '@/data/mockOrders'
 import type { Book, Universe } from '@/data/mockBooks'
 import { BookCard } from '@/components/catalogue/BookCard'
 import { BookCover } from '@/components/catalogue/BookCover'
@@ -108,6 +111,28 @@ function salesOf(book: Book): SalesData {
 
 function getRankedBooks(books: Book[]) {
   return [...books].sort((a, b) => salesOf(b).units - salesOf(a).units)
+}
+
+/*
+  Dernière commande de chaque titre par la librairie connectée. Une commande
+  garde ses lignes telles qu'elles ont été passées, donc le croisement se fait
+  sur le bookId de la ligne.
+*/
+function buildLastOrderDates(orders: Order[]): Map<string, string> {
+  const dates = new Map<string, string>()
+  for (const order of orders) {
+    for (const item of order.items) {
+      const known = dates.get(item.bookId)
+      if (!known || order.date > known) dates.set(item.bookId, order.date)
+    }
+  }
+  return dates
+}
+
+function formatOrderMark(lastOrderDate: string | undefined): string {
+  if (!lastOrderDate) return 'Jamais commandé'
+  const [year, month, day] = lastOrderDate.split('-')
+  return `Commandé le ${day}/${month}/${year}`
 }
 
 function getSection(books: Book[], type: 'nouveaute' | 'fonds', universe: TabView) {
@@ -490,6 +515,38 @@ function TrendIcon({ trend }: { trend: SalesData['trend'] }) {
   return <TrendStable><IconStable /></TrendStable>
 }
 
+/*
+  Repère de commande. La question d'un libraire devant un classement n'est pas
+  « quelle période », c'est « est-ce que je l'ai » : un titre qui se vend
+  partout et qu'il n'a jamais pris est un manque à rattraper.
+*/
+const OrderMark = styled.p<{ $ordered: boolean }>`
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  margin: 0;
+  color: ${({ $ordered, theme }) => $ordered ? theme.colors.gray[600] : theme.colors.accent};
+`
+
+const TabSpacer = styled.span`
+  flex: 1;
+  min-width: 8px;
+`
+
+const PodiumFooter = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding-top: 6px;
+`
+
+const PodiumMark = styled(OrderMark)`
+  text-align: center;
+  padding: 6px 4px 0;
+`
+
 const EmptySection = styled.p`
   font-family: ${({ theme }) => theme.typography.fontFamily};
   font-size: 13px;
@@ -505,8 +562,14 @@ const EmptySection = styled.p`
 ══════════════════════════════════════════════════════ */
 
 function ListItem({
-  book, rank, showUniverse, onAdd,
-}: { book: Book; rank: number; showUniverse: boolean; onAdd: (b: Book) => void }) {
+  book, rank, showUniverse, onAdd, lastOrderDate,
+}: {
+  book: Book
+  rank: number
+  showUniverse: boolean
+  onAdd: (b: Book) => void
+  lastOrderDate: string | undefined
+}) {
   const navigate = useNavigate()
   const sales    = salesOf(book)
   const uc       = UNIVERSE_COLORS[book.universe]
@@ -530,7 +593,12 @@ function ListItem({
         </RowSub>
       </RowInfo>
       <RowRight onClick={e => e.stopPropagation()}>
-        {sales && <RowSales><TrendIcon trend={sales.trend} /> {sales.units.toLocaleString('fr-FR')} ex.</RowSales>}
+        <OrderMark $ordered={!!lastOrderDate} data-commande-pour={book.id}>
+          {formatOrderMark(lastOrderDate)}
+        </OrderMark>
+        <RowSales data-tendance-pour={book.id}>
+          <TrendIcon trend={sales.trend} /> {sales.units.toLocaleString('fr-FR')} ex.
+        </RowSales>
         <RowPrice>{formatPrice(book.priceTTC)} €</RowPrice>
         <RowAddBtn onClick={() => onAdd(book)} aria-label="Ajouter au panier">
           <IconCart />
@@ -545,13 +613,14 @@ function ListItem({
 ══════════════════════════════════════════════════════ */
 
 function TopSection({
-  label, books, universe, showUniverse, onAdd,
+  label, books, universe, showUniverse, onAdd, lastOrderDates,
 }: {
   label: string
   books: Book[]
   universe?: Universe
   showUniverse: boolean
   onAdd: (b: Book) => void
+  lastOrderDates: Map<string, string>
 }) {
   const podium     = books.slice(0, 3)
   const listItems  = books.slice(3, 10)
@@ -590,6 +659,17 @@ function TopSection({
                 <BadgeNum>{rank}</BadgeNum>
               </TopBadge>
               <BookCard book={book} showType coverFirst />
+              <PodiumFooter>
+                <RowSales data-tendance-pour={book.id}>
+                  <TrendIcon trend={salesOf(book).trend} /> {salesOf(book).units.toLocaleString('fr-FR')} ex.
+                </RowSales>
+                <PodiumMark
+                  $ordered={!!lastOrderDates.get(book.id)}
+                  data-commande-pour={book.id}
+                >
+                  {formatOrderMark(lastOrderDates.get(book.id))}
+                </PodiumMark>
+              </PodiumFooter>
             </CardWrapper>
           )
         })}
@@ -605,6 +685,7 @@ function TopSection({
               rank={i + 4}
               showUniverse={showUniverse}
               onAdd={onAdd}
+              lastOrderDate={lastOrderDates.get(book.id)}
             />
           ))}
         </ListRows>
@@ -623,8 +704,13 @@ export function TopVentesPage() {
 
   const [activeTab, setTab]    = useState<TabView>('tous')
   const [allBooks, setAllBooks] = useState<Book[]>([])
+  const [neverOrderedOnly, setNeverOrderedOnly] = useState(false)
   const { addToCart }          = useCart()
   const { showToast }          = useToast()
+  const { user }               = useAuthContext()
+  const clientOrders           = useClientOrders(user?.codeClient ?? '')
+
+  const lastOrderDates = useMemo(() => buildLastOrderDates(clientOrders), [clientOrders])
 
   useEffect(() => {
     getAllBooksAsync().then(setAllBooks).catch(console.error)
@@ -638,8 +724,17 @@ export function TopVentesPage() {
   const showUniverse    = activeTab === 'tous'
   const sectionUniverse = activeTab !== 'tous' ? activeTab : undefined
 
-  const nouveautes = getSection(allBooks, 'nouveaute', activeTab)
-  const fonds      = getSection(allBooks, 'fonds',     activeTab)
+  /*
+    Le filtre répond à la question suivante : qu'est-ce qui se vend partout
+    sauf chez moi. Il s'applique avant le classement, pour que les rangs
+    affichés restent consécutifs.
+  */
+  const rankable = neverOrderedOnly
+    ? allBooks.filter(book => !lastOrderDates.has(book.id))
+    : allBooks
+
+  const nouveautes = getSection(rankable, 'nouveaute', activeTab)
+  const fonds      = getSection(rankable, 'fonds',     activeTab)
 
   return (
     <Page>
@@ -659,6 +754,14 @@ export function TopVentesPage() {
         {UNIVERSES.map(u => (
           <Tab key={u} $active={activeTab === u} onClick={() => setTab(u)}>{u}</Tab>
         ))}
+        <TabSpacer />
+        <Tab
+          $active={neverOrderedOnly}
+          onClick={() => setNeverOrderedOnly(v => !v)}
+          title="Ne garder que les titres que la librairie n'a jamais commandés"
+        >
+          Jamais commandés
+        </Tab>
       </TabBar>
 
       <Content>
@@ -668,6 +771,7 @@ export function TopVentesPage() {
           universe={sectionUniverse}
           showUniverse={showUniverse}
           onAdd={handleAdd}
+          lastOrderDates={lastOrderDates}
         />
         <TopSection
           label="Top Fonds"
@@ -675,6 +779,7 @@ export function TopVentesPage() {
           universe={sectionUniverse}
           showUniverse={showUniverse}
           onAdd={handleAdd}
+          lastOrderDates={lastOrderDates}
         />
       </Content>
     </Page>
