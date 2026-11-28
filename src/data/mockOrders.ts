@@ -98,6 +98,7 @@ export const MOCK_ORDERS: Record<string, Order[]> = {
       commandePar: 'Marc Dupont',
       adresseLivraison: '12 rue du Parc, 75001 Paris',
       deliveryMode: 'standard',
+      transmissionMode: 'FLOWDIFF',
       referenceCommande: 'BC-2026-0412',
       items: [
         {
@@ -219,6 +220,7 @@ export const MOCK_ORDERS: Record<string, Order[]> = {
       commandePar: 'Marc Dupont',
       adresseLivraison: '12 rue du Parc, 75001 Paris',
       deliveryMode: 'standard',
+      transmissionMode: 'FLOWDIFF',
       referenceCommande: 'BC-2026-0455',
       items: [
         {
