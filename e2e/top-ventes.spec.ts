@@ -126,17 +126,28 @@ test.describe('Filtre par thématique', () => {
 })
 
 /* ────────────────────────────────────────────
-   3. Période
+   3. Période annoncée, non sélectionnable
 ──────────────────────────────────────────── */
 test.describe('Période', () => {
-  test('les 2 périodes sont proposées et restent sans erreur', async ({ page }) => {
-    const crashes = collectCrashes(page)
-    await expect(page.getByRole('button', { name: '30 jours' })).toBeVisible()
+  /*
+    La page portait 2 boutons, « 30 jours » et « 3 mois », qui ne changeaient
+    que leur propre surbrillance : l'état period était déclaré avec un
+    eslint-disable pour variable inutilisée et n'était jamais lu, et le
+    sous-titre des sections écrivait « 30j réseau » quoi qu'on clique.
 
-    await page.getByRole('button', { name: '3 mois' }).click()
+    Un contrôle qui ne fait rien est pire que pas de contrôle : le premier
+    réflexe devant un classement est de cliquer sur la période, et il n'en
+    sort rien. Les chiffres portent une seule période, la page le dit en une
+    phrase. Une vraie sélection demanderait d'inventer un second jeu de
+    chiffres de ventes.
+  */
+  test('la période est annoncée en clair', async ({ page }) => {
+    await expect(page.getByText('Ventes des 30 derniers jours sur le réseau')).toBeVisible()
+  })
 
-    await expect(page.getByText('Top Nouveautés')).toBeVisible()
-    expect(crashes).toEqual([])
+  test('aucun sélecteur de période ne subsiste', async ({ page }) => {
+    await expect(page.getByRole('button', { name: '30 jours' })).toHaveCount(0)
+    await expect(page.getByRole('button', { name: '3 mois' })).toHaveCount(0)
   })
 })
 

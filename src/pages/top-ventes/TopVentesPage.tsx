@@ -63,7 +63,6 @@ const SALES: Record<string, SalesData> = {
   'f-pra-homo':      { units: 432,  trend: 'down' },
 }
 
-type Period  = '30j' | '3mois'
 type TabView = 'tous' | Universe
 
 const UNIVERSES: Universe[] = ['BD/Mangas', 'Jeunesse', 'Littérature', 'Adulte-pratique']
@@ -173,6 +172,23 @@ const PageTitle = styled.h1`
   margin: 0 0 4px;
 `
 
+/*
+  La période des chiffres est une mention, pas un choix : les ventes de
+  démonstration ne portent qu'une période, et 2 boutons qui ne changeaient
+  rien ont tenu la place de ce constat.
+*/
+const PeriodNote = styled.p`
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 12px;
+  color: ${({ theme }) => theme.colors.gray[600]};
+  background: ${({ theme }) => theme.colors.white};
+  border: 1px solid ${({ theme }) => theme.colors.gray[200]};
+  border-radius: ${({ theme }) => theme.radii.xl};
+  padding: 6px 14px;
+  margin: 0;
+  flex-shrink: 0;
+`
+
 const PageSubtitle = styled.p`
   font-family: ${({ theme }) => theme.typography.fontFamily};
   font-size: ${({ theme }) => theme.typography.sizes.sm};
@@ -180,28 +196,7 @@ const PageSubtitle = styled.p`
   margin: 0;
 `
 
-const PeriodSelector = styled.div`
-  display: flex;
-  background: ${({ theme }) => theme.colors.white};
-  border: 1px solid ${({ theme }) => theme.colors.gray[200]};
-  border-radius: ${({ theme }) => theme.radii.xl};
-  padding: 3px;
-  gap: 2px;
-  flex-shrink: 0;
-`
 
-const PeriodBtn = styled.button<{ $active: boolean }>`
-  padding: 5px 14px;
-  border: none;
-  border-radius: ${({ theme }) => theme.radii.xl};
-  font-family: ${({ theme }) => theme.typography.fontFamily};
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.15s;
-  background: ${({ $active, theme }) => $active ? theme.colors.navy : 'transparent'};
-  color: ${({ $active, theme }) => $active ? '#fff' : theme.colors.gray[600]};
-`
 
 /* ══════════════════════════════════════════════════════
    STYLED : TABS
@@ -626,7 +621,6 @@ export function TopVentesPage() {
   const { markAsRead } = useNotifications()
   useEffect(() => { markAsRead('topventes') }, [markAsRead])
 
-  const [period,    setPeriod] = useState<Period>('30j')  // eslint-disable-line @typescript-eslint/no-unused-vars
   const [activeTab, setTab]    = useState<TabView>('tous')
   const [allBooks, setAllBooks] = useState<Book[]>([])
   const { addToCart }          = useCart()
@@ -656,10 +650,7 @@ export function TopVentesPage() {
           <PageTitle>Top Ventes</PageTitle>
           <PageSubtitle>Meilleures ventes du réseau par thématique</PageSubtitle>
         </PageHeaderText>
-        <PeriodSelector>
-          <PeriodBtn $active={period === '30j'}   onClick={() => setPeriod('30j')}>30 jours</PeriodBtn>
-          <PeriodBtn $active={period === '3mois'} onClick={() => setPeriod('3mois')}>3 mois</PeriodBtn>
-        </PeriodSelector>
+        <PeriodNote>Ventes des 30 derniers jours sur le réseau</PeriodNote>
       </PageHeader>
 
       <TabBar>
