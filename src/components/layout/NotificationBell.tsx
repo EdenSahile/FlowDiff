@@ -205,7 +205,7 @@ const Dot = styled.div<{ $urgent: boolean }>`
 /* ── Icônes emoji background par id ── */
 const ICON_BG: Record<NotifId, string> = {
   panier: '#FFF3CD',
-  nouveautes: '#E6EFE9',
+  nouveautes: theme.colors.successLight,
   topventes: '#FDE8E8',
 }
 

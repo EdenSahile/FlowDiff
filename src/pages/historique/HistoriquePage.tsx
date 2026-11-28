@@ -28,8 +28,8 @@ const fadeIn = keyframes`from{opacity:0;transform:translateY(8px)}to{opacity:1;t
 
 /* ── Couleurs par statut : palette Forêt & Lin ── */
 const STATUS_COLORS: Record<OrderStatus, { bg: string; text: string; dot: string }> = {
-  'en préparation': { bg: '#F7F0DC', text: theme.colors.accentDark, dot: theme.colors.accentDark },
-  'expédié':        { bg: '#E6EFE9', text: theme.colors.success, dot: theme.colors.success },
+  'en préparation': { bg: theme.colors.accentLight, text: theme.colors.accentDark, dot: theme.colors.accentDark },
+  'expédié':        { bg: theme.colors.successLight, text: theme.colors.success, dot: theme.colors.success },
   'livré':          { bg: '#D4EDDA', text: '#155724', dot: '#155724' },
 }
 
@@ -420,7 +420,7 @@ const DupliquerButton = styled.button<{ $done?: boolean }>`
   align-items: center;
   gap: 6px;
   padding: 8px 16px;
-  background-color: ${({ $done, theme }) => $done ? '#2E7D32' : theme.colors.primary};
+  background-color: ${({ $done, theme }) => $done ? theme.colors.success : theme.colors.primary};
   color: #fdfdfd;
   border: none;
   border-radius: ${({ theme }) => theme.radii.md};
@@ -431,7 +431,7 @@ const DupliquerButton = styled.button<{ $done?: boolean }>`
   transition: background-color 0.2s ease, color 0.2s ease;
 
   &:hover:not(:disabled) {
-    background-color: ${({ $done, theme }) => $done ? '#1B5E20' : theme.colors.primaryHover};
+    background-color: ${({ $done, theme }) => $done ? theme.colors.successHover : theme.colors.primaryHover};
   }
   &:disabled { cursor: not-allowed; opacity: 0.8; }
 `
@@ -442,7 +442,7 @@ const SuccessAlert = styled.div`
   gap: 6px;
   font-size: ${({ theme }) => theme.typography.sizes.xs};
   font-weight: ${({ theme }) => theme.typography.weights.semibold};
-  color: #2E7D32;
+  color: ${({ theme }) => theme.colors.success};
   animation: ${fadeSlideIn} 0.2s ease forwards;
 `
 

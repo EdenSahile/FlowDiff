@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import styled from 'styled-components'
+import { theme } from '@/lib/theme'
 import type { StockStatut } from '@/data/mockBooks'
 
 /*
@@ -9,12 +10,12 @@ import type { StockStatut } from '@/data/mockBooks'
   libelles qui avaient diverge.
 */
 export const STATUT_CONFIG: Record<StockStatut, { label: string; color: string }> = {
-  disponible:   { label: 'Disponible',      color: '#2E7D32' },
+  disponible:   { label: 'Disponible',      color: theme.colors.success },
   stock_limite: { label: 'Stock limité',    color: '#C17E00' },
   sur_commande: { label: 'Sur commande',    color: '#5B7A9E' },
   en_reimp:     { label: 'En réimpression', color: '#A07040' },
   epuise:       { label: 'Épuisé',          color: '#999999' },
-  rupture:      { label: 'Rupture',         color: '#C0392B' },
+  rupture:      { label: 'Rupture',         color: theme.colors.error },
 }
 
 const STATUTS_WITH_TOOLTIP: ReadonlyArray<StockStatut> = ['sur_commande', 'en_reimp']

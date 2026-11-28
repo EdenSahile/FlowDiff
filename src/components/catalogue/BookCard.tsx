@@ -19,7 +19,7 @@ const CATEGORY_COLORS: Record<string, { bg: string; text: string }> = {
   'Littérature':     { bg: '#E8EDF3', text: '#1C3252' },
   'BD/Mangas':       { bg: '#FDEBD0', text: '#C04A00' },
   'Jeunesse':        { bg: '#F5E8F8', text: '#7B2D8B' },
-  'Adulte-pratique': { bg: '#E6F4EC', text: '#1E7045' },
+  'Adulte-pratique': { bg: theme.colors.successLight, text: theme.colors.success },
   'Autres':          { bg: '#F1EFE8', text: '#5F5E5A' },
 }
 

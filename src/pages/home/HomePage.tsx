@@ -270,7 +270,7 @@ const CardDragHandle = styled.div`
 
 /* ── Actions en attente ── */
 const ActionsBox = styled.section`
-  background: #FDECEA;
+  background: ${({ theme }) => theme.colors.errorLight};
   border: 1px solid #FECACA;
   border-radius: ${({ theme }) => theme.radii.md};
   padding: 16px 18px;
@@ -624,7 +624,7 @@ const KPITrend = styled.div<{ $up: boolean }>`
   align-items: center;
   gap: 3px;
   font-size: 11px;
-  color: ${({ $up }) => $up ? '#16a34a' : '#DC2626'};
+  color: ${({ $up }) => $up ? theme.colors.success : theme.colors.error};
 `
 
 const KPILink = styled.button`
@@ -1092,14 +1092,14 @@ function ChartEvolution({
           strokeDasharray="4 2" strokeLinejoin="round" strokeLinecap="round" opacity="0.75" />
       )}
       {mainPoly && (
-        <polyline points={mainPoly} fill="none" stroke="#16a34a" strokeWidth="1.5"
+        <polyline points={mainPoly} fill="none" stroke={theme.colors.success} strokeWidth="1.5"
           strokeLinejoin="round" strokeLinecap="round" />
       )}
       {mainTotal > 0 && (
         <text
           x={COX + CW + 3}
           y={COY - (mainTotal / yMax) * CH + 3.5}
-          fontSize="7" fontWeight="600" fill="#16a34a"
+          fontSize="7" fontWeight="600" fill={theme.colors.success}
         >{mainTotal}</text>
       )}
       <line x1={COX} y1={COY} x2={COX + CW} y2={COY} stroke="#D1D5DB" strokeWidth="0.8" />
@@ -1126,13 +1126,13 @@ function ChartEvolution({
           )}
           {/* dot on main curve */}
           <circle cx={hoverX} cy={hoverY} r="2.5"
-            fill="#16a34a" stroke="#fff" strokeWidth="1" />
+            fill={theme.colors.success} stroke="#fff" strokeWidth="1" />
           {/* tooltip bubble */}
           <rect x={tipX} y={tipY} width={tipW} height={tipH} rx={tipR} ry={tipR}
             fill={theme.colors.navy} opacity="0.92" />
           <text x={tipX + tipW / 2} y={tipY + 11} textAnchor="middle" fontSize="6.25">
             <tspan fill="#9CA3AF">Période </tspan>
-            <tspan fontWeight="700" fill="#16a34a">{shortDate(hoverPt.date)} : {hoverPt.count}</tspan>
+            <tspan fontWeight="700" fill={theme.colors.success}>{shortDate(hoverPt.date)} : {hoverPt.count}</tspan>
           </text>
           {hoverCmpPt && (
             <text x={tipX + tipW / 2} y={tipY + 23} textAnchor="middle" fontSize="6.25">
@@ -1238,7 +1238,7 @@ const ChartStatNum = styled.span`
 
 const ChartStatDelta = styled.span<{ $up: boolean }>`
   font-size: 11px;
-  color: ${({ $up }) => $up ? '#16a34a' : '#DC2626'};
+  color: ${({ $up }) => $up ? theme.colors.success : theme.colors.error};
 `
 
 function IconMonitorList() {
@@ -1976,7 +1976,7 @@ export function HomePage() {
   const actionCardDefs: Record<string, ActionCardDef> = {
     'action-offices': {
       icon: '📦',
-      iconBg: '#E6F2EC', iconColor: '#226241',
+      iconBg: theme.colors.successLight, iconColor: theme.colors.success,
       count: 1,
       label: 'office à valider',
       deadline: 'Limite : 13 mai 2027',
@@ -1999,7 +1999,7 @@ export function HomePage() {
     },
     'action-edi-error': {
       icon: '⚠️',
-      iconBg: '#FDECEA', iconColor: '#C0392B',
+      iconBg: theme.colors.errorLight, iconColor: theme.colors.error,
       count: ediCounts.errors, label: ediCounts.errors <= 1 ? 'erreur EDI à traiter' : 'erreurs EDI à traiter',
       route: '/edi#flux-en-cours',
     },
@@ -2023,7 +2023,7 @@ export function HomePage() {
   const kpiCardDefs: Record<string, KpiCardDef> = {
     'kpi-commandes': {
       icon: '🛒',
-      iconBg: '#E6F2EC', iconColor: '#226241',
+      iconBg: theme.colors.successLight, iconColor: theme.colors.success,
       label: 'Commandes passées',
       value: kpi.nbActive,
       trend: compareKpi
@@ -2033,7 +2033,7 @@ export function HomePage() {
     },
     'kpi-montant': {
       icon: '€',
-      iconBg: '#E6F2EC', iconColor: '#226241',
+      iconBg: theme.colors.successLight, iconColor: theme.colors.success,
       label: 'Montant total net commandé (TTC)',
       tooltip: 'Montant net TTC des commandes confirmées : les remises sont déjà déduites et les annulations exclues.',
       value: fmtEur(kpi.montantTotal),
@@ -2044,7 +2044,7 @@ export function HomePage() {
     },
     'kpi-exemplaires': {
       icon: '📦',
-      iconBg: '#E6F2EC', iconColor: '#226241',
+      iconBg: theme.colors.successLight, iconColor: theme.colors.success,
       label: 'Exemplaires commandés',
       value: kpi.nbExemplaires.toLocaleString('fr-FR'),
       trend: compareKpi
@@ -2074,7 +2074,7 @@ export function HomePage() {
     },
     'kpi-rupture': {
       icon: '✕',
-      iconBg: '#FDECEA', iconColor: '#C0392B',
+      iconBg: theme.colors.errorLight, iconColor: theme.colors.error,
       label: 'Taux d’annulation',
       tooltip: 'Pourcentage de commandes annulées sur la période.',
       value: `${(kpi.tauxAnnulation * 100).toFixed(1).replace('.', ',')} %`,
@@ -2514,7 +2514,7 @@ export function HomePage() {
                   {compareChartData && (
                     <ChartLegend>
                       <ChartLegendItem>
-                        <ChartLegendLine $color="#16a34a" />
+                        <ChartLegendLine $color={theme.colors.success} />
                         Période sélectionnée
                       </ChartLegendItem>
                       <ChartLegendItem>
@@ -2534,7 +2534,7 @@ export function HomePage() {
                       <ChartStatRow>
                         <ChartStatLabel>Commandes envoyées</ChartStatLabel>
                         <ChartStatValueRow>
-                          <ChartStatIcon $bg="#E6F2EC" $color="#226241">↑</ChartStatIcon>
+                          <ChartStatIcon $bg={theme.colors.successLight} $color={theme.colors.success}>↑</ChartStatIcon>
                           <ChartStatNum>{nbEnvoyees}</ChartStatNum>
                           {cmpEnvoyees !== null && (
                             <ChartStatDelta $up={nbEnvoyees >= cmpEnvoyees}>
@@ -2549,7 +2549,7 @@ export function HomePage() {
                       <ChartStatRow>
                         <ChartStatLabel>Commandes annulées</ChartStatLabel>
                         <ChartStatValueRow>
-                          <ChartStatIcon $bg="#FDECEA" $color="#C0392B">✕</ChartStatIcon>
+                          <ChartStatIcon $bg={theme.colors.errorLight} $color={theme.colors.error}>✕</ChartStatIcon>
                           <ChartStatNum>{nbAnnulees}</ChartStatNum>
                           {cmpAnnulees !== null && (
                             <ChartStatDelta $up={nbAnnulees <= cmpAnnulees}>
@@ -2564,7 +2564,7 @@ export function HomePage() {
                       <ChartStatRow>
                         <ChartStatLabel>Taux d'annulation</ChartStatLabel>
                         <ChartStatValueRow>
-                          <ChartStatIcon $bg="#FDECEA" $color="#C0392B">%</ChartStatIcon>
+                          <ChartStatIcon $bg={theme.colors.errorLight} $color={theme.colors.error}>%</ChartStatIcon>
                           <ChartStatNum>{(kpi.tauxAnnulation * 100).toFixed(1).replace('.', ',')} %</ChartStatNum>
                           {compareKpi && (
                             <ChartStatDelta $up={kpi.tauxAnnulation <= compareKpi.tauxAnnulation}>
@@ -2711,7 +2711,7 @@ export function HomePage() {
                   </PanelHeader>
                   <EdiStatsGrid>
                     <EdiStatItem>
-                      <EdiStatIcon $bg="#E6F2EC" $color="#226241">↑</EdiStatIcon>
+                      <EdiStatIcon $bg={theme.colors.successLight} $color={theme.colors.success}>↑</EdiStatIcon>
                       <div>
                         <EdiStatNum>12</EdiStatNum>
                         <EdiStatLabel>Commandes envoyées</EdiStatLabel>
@@ -2732,7 +2732,7 @@ export function HomePage() {
                       </div>
                     </EdiStatItem>
                     <EdiStatItem>
-                      <EdiStatIcon $bg="#FDECEA" $color="#C0392B">⚠️</EdiStatIcon>
+                      <EdiStatIcon $bg={theme.colors.errorLight} $color={theme.colors.error}>⚠️</EdiStatIcon>
                       <div>
                         <EdiStatNum>1</EdiStatNum>
                         <EdiStatLabel>Erreur à traiter</EdiStatLabel>

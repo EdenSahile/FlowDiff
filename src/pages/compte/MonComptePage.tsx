@@ -1,4 +1,5 @@
 import styled, { keyframes } from 'styled-components'
+import { theme } from '@/lib/theme'
 import { useAuthContext } from '@/contexts/AuthContext'
 import { mq } from '@/lib/responsive'
 import { BackButton } from '@/components/ui/BackButton'
@@ -189,7 +190,7 @@ const ReliquatBadge = styled.span<{ $accepted: boolean }>`
   font-size: 13px;
   font-weight: 700;
   background: ${({ $accepted }) => $accepted ? 'rgba(46,125,50,0.10)' : 'rgba(107,107,104,0.10)'};
-  color: ${({ $accepted }) => $accepted ? '#2E7D32' : '#6B6B68'};
+  color: ${({ $accepted }) => $accepted ? theme.colors.success : '#6B6B68'};
   border: 1px solid ${({ $accepted }) => $accepted ? 'rgba(46,125,50,0.25)' : 'rgba(107,107,104,0.20)'};
 `
 
