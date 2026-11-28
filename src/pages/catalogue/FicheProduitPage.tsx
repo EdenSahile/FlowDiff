@@ -116,7 +116,7 @@ const SectionEyebrow = styled.p`
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: ${({ theme }) => theme.colors.accent};
+  color: ${({ theme }) => theme.colors.accentDark};
   margin: 30px 0 10px;
   display: flex;
   align-items: center;

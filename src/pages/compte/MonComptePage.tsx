@@ -28,7 +28,7 @@ const PageEyebrow = styled.p`
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: ${({ theme }) => theme.colors.accent};
+  color: ${({ theme }) => theme.colors.accentDark};
   margin: 0 0 4px;
   display: flex;
   align-items: center;
@@ -212,7 +212,7 @@ const PolicyEyebrow = styled.p`
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: ${({ theme }) => theme.colors.accent};
+  color: ${({ theme }) => theme.colors.accentDark};
   margin: 0 0 12px;
   display: flex;
   align-items: center;

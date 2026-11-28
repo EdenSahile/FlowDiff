@@ -67,7 +67,7 @@ const AuthorLabel = styled.p`
   font-family: ${({ theme }) => theme.typography.fontFamily};
   font-size: 10px;
   font-weight: 700;
-  color: ${({ theme }) => theme.colors.accent};
+  color: ${({ theme }) => theme.colors.accentDark};
   text-transform: uppercase;
   letter-spacing: 0.14em;
   margin-bottom: 4px;
