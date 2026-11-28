@@ -523,10 +523,24 @@ function TrendIcon({ trend }: { trend: SalesData['trend'] }) {
 const OrderMark = styled.p<{ $ordered: boolean }>`
   font-family: ${({ theme }) => theme.typography.fontFamily};
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
   white-space: nowrap;
   margin: 0;
-  color: ${({ $ordered, theme }) => $ordered ? theme.colors.gray[600] : theme.colors.accent};
+
+  /*
+    Les 2 états ne pèsent pas pareil. « Commandé le… » est un rappel, il reste
+    en texte gris. « Jamais commandé » demande une décision, il prend une
+    pastille pleine : à 11 px, une couleur de texte seule se perd au milieu
+    des autres mentions, c'est le fond qui porte le contraste.
+  */
+  ${({ $ordered, theme }) => $ordered
+    ? `color: ${theme.colors.gray[600]};`
+    : `
+      color: ${theme.colors.white};
+      background: ${theme.colors.error};
+      border-radius: ${theme.radii.full};
+      padding: 3px 9px;
+    `}
 `
 
 const TabSpacer = styled.span`
@@ -544,7 +558,7 @@ const PodiumFooter = styled.div`
 
 const PodiumMark = styled(OrderMark)`
   text-align: center;
-  padding: 6px 4px 0;
+  align-self: center;
 `
 
 const EmptySection = styled.p`
