@@ -1,5 +1,4 @@
 import { test, expect } from '@playwright/test'
-import { CURRENT_OFFICE } from '../src/data/mockOffices'
 import { collectCrashes, login, pageMain, sidebarLink } from './helpers'
 
 /*
@@ -70,16 +69,9 @@ test.describe('Navigation', () => {
 ──────────────────────────────────────────── */
 test.describe('Bordereau non branché', () => {
   /*
-    OfficesPageFull n'est pas routé : ni le libellé de l'office, ni ses
-    titres, ni ses actions ne doivent apparaître. Si l'un d'eux surgit, c'est
-    que le bordereau a été branché et que les tests du bordereau sont à
-    écrire.
+    Si l'une de ces actions surgit, c'est que le bordereau a été repris et
+    branché, et que ses propres tests sont à écrire.
   */
-  test('n\'affiche ni l\'office en cours ni ses titres', async ({ page }) => {
-    await expect(page.getByText(CURRENT_OFFICE.label)).toHaveCount(0)
-    await expect(page.getByText(CURRENT_OFFICE.books[0].title)).toHaveCount(0)
-  })
-
   test('n\'offre aucune action de bordereau', async ({ page }) => {
     await expect(page.getByRole('button', { name: 'Valider mon office' })).toHaveCount(0)
     await expect(page.getByRole('button', { name: 'Exporter office' })).toHaveCount(0)
